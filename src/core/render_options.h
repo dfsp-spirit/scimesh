@@ -1,0 +1,26 @@
+#pragma once
+
+#include "types.h"
+
+namespace scimesh {
+
+enum class ShadingMode {
+    SMOOTH,
+    FLAT
+};
+
+struct RenderOptions {
+    int width = 800;
+    int height = 600;
+    ShadingMode shading = ShadingMode::SMOOTH;
+    bool backface_culling = true;
+    Color background_color = TRANSPARENT_BLACK;
+    Color default_color = DEFAULT_COLOR;
+    bool invert_normals = false;
+    bool wireframe = false;
+
+    float near_plane = 0.1f;
+    float far_plane = 10000.0f;
+};
+
+} // namespace scimesh
