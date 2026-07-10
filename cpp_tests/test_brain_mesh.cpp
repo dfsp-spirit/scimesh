@@ -82,12 +82,14 @@ static Mesh load_ply_mesh(const std::string &filename) {
     return mesh;
 }
 
-TEST_CASE("Render real brain hemisphere mesh from PLY", "[.brain]") {
+TEST_CASE("Render real brain hemisphere mesh from PLY") {
     const std::string ply_path = "../test_data/ply/lh_mesh_sulc_viridis.ply";
     if (!std::filesystem::exists(ply_path)) {
         WARN("Skipping brain render test: PLY file not found at " << ply_path);
         return;
     }
+
+    auto total_start = std::chrono::high_resolution_clock::now();
 
     // 1. Load the mesh
     auto load_start = std::chrono::high_resolution_clock::now();
@@ -171,4 +173,8 @@ TEST_CASE("Render real brain hemisphere mesh from PLY", "[.brain]") {
     bool ok = img.write_ppm("reference_images/brain_lh_lateral.ppm");
     REQUIRE(ok);
     std::cout << "Image written to reference_images/brain_lh_lateral.ppm\n";
+
+    auto total_end = std::chrono::high_resolution_clock::now();
+    double total_ms = std::chrono::duration<double, std::milli>(total_end - total_start).count();
+    std::cout << "Total test time: " << total_ms << " ms\n";
 }
