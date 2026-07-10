@@ -720,12 +720,90 @@ add_cylinder(start=c(5, -20, 40), end=c(15, -25, 50), radius=0.5, color="yellow"
 ```
 
 
-## 14. Rationale for Custom Engine Architecture vs. Existing Frameworks
+## 14. Future Enhancements
+
+The following features are explicitly deferred from the initial implementation but are planned for future versions. The current architecture is designed to accommodate these additions without requiring fundamental changes.
+
+### 14.1 Transparency and Alpha Blending
+
+**Status:** Planned for future release
+
+**Current State:** The renderer already uses RGBA framebuffers and accepts per-vertex alpha values. However, the initial implementation will render all triangles as fully opaque, ignoring alpha channels.
+
+**What's Already in Place:**
+- RGBA framebuffer (4 channels per pixel)
+- Per-vertex color storage includes alpha
+- Z-buffer for depth testing
+
+**What Will Be Needed:**
+1. **Two-pass rendering:** Render opaque triangles first (with Z-buffer writes), then transparent triangles
+2. **Depth sorting:** Sort transparent triangles back-to-front (painter's algorithm) based on camera-space depth
+3. **Alpha blending:** Modify pixel loop to blend source/destination colors: `pixel = src_alpha * src_color + (1 - src_alpha) * dst_pixel`
+4. **Z-buffer handling:** Don't write to Z-buffer for transparent triangles (or use conditional writes)
+
+**Architectural Compatibility:** Adding transparency will **not** require architectural changes. The core rasterizer, camera system, and framebuffer are already compatible. The implementation will involve:
+- Separating opaque/transparent triangles (~20 lines)
+- Sorting transparent triangles by depth (~30 lines)
+- Modifying pixel loop for alpha blending (~3 lines)
+- Conditional Z-buffer writes (~5 lines)
+
+**Performance Considerations:**
+- Opaque-only rendering remains unchanged (fast path)
+- Transparent rendering adds O(n log n) sorting cost for transparent triangles
+- Use case: rendering subcortical structures (amygdala, hippocampus) within semi-transparent cortical surfaces
+
+**Estimated Effort:** ~100-200 lines of C++ code, moderate complexity
+
+### 14.2 Anti-Aliasing via Supersampling
+
+**Status:** Optional feature for future release
+
+**Current State:** The renderer produces aliased output. Anti-aliasing is not implemented.
+
+**What Will Be Needed:**
+- Render at 2× resolution (e.g., 2000×1500 instead of 1000×750)
+- Downsample to target resolution using box filter or bilinear interpolation
+- Quadruples render time but remains within performance budget
+
+**Architectural Compatibility:** Fully compatible. This is a post-processing step that operates on the RGBA buffer after rendering.
+
+**Estimated Effort:** ~50 lines of C++ code, low complexity
+
+### 14.3 Additional Geometric Primitives
+
+**Status:** Planned for future release
+
+**Current State:** Sphere, cube, cone, and cylinder primitives are implemented.
+
+**Planned Additions:**
+- **Torus:** For circular annotations or ring markers
+- **Arrow with configurable head:** More sophisticated arrow primitives with separate shaft and head parameters
+- **Text labels in 3D:** Billboard text that always faces the camera (requires font rendering or pre-rendered textures)
+
+**Architectural Compatibility:** Fully compatible. New primitives are generated as triangle meshes and follow the same pipeline.
+
+### 14.4 Multiple Light Sources
+
+**Status:** Not currently planned, but architecturally feasible
+
+**Current State:** Single camera-aligned directional light ("headlight shading")
+
+**What Will Be Needed:**
+- Extend lighting model to support multiple light sources
+- Each light has position, direction, color, intensity
+- Sum contributions from all lights at each vertex/fragment
+
+**Architectural Compatibility:** Requires extending the shading pipeline but does not affect rasterization or camera system.
+
+**Note:** This is a lower priority enhancement. The single headlight provides sufficient depth perception for most neuroimaging use cases.
+
+
+## 15. Rationale for Custom Engine Architecture vs. Existing Frameworks
 
 A foundational question for any engineering project is why a custom renderer is necessary when mature open-source solutions exist. During the scoping phase, three prominent MIT-licensed candidates were thoroughly evaluated: `ssloy/tinyrenderer`, `elnormous/SoftwareRenderer`, and `trenki2/SoftwareRenderer`. While excellent in their respective domains, these engines carry heavy abstractions designed to emulate complex, stateful graphics APIs (like OpenGL or Vulkan) or real-time game loops, introducing unnecessary architectural bloat, complex dependency chains, and difficult memory management for data passing. Because `scimesh` strictly rejects real-time windowing, texturing, global illumination, and interactive event loops, the required functional footprint is small and manageable. Developing the engine from scratch ensures that data structures map perfectly and zero-copy to R matrices, guarantees absolute cross-platform compliance under CRAN's strict memory sanitizers (ASAN/UBSAN), and results in a radically maintainable codebase perfectly optimized for the highly specific niche of headless neuroimaging visualization.
 
 
-## 15. Technology Choices
+## 16. Technology Choices
 
 ### C++ Math Library: GLM
 
