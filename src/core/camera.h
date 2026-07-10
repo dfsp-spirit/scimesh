@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "scene.h"
 
 namespace scimesh {
 
@@ -19,5 +20,15 @@ struct Camera {
     Mat4 get_view_matrix() const;
     Mat4 get_projection_matrix(float aspect_ratio, float near_plane, float far_plane) const;
 };
+
+Camera camera_look_at(const Vec3 &center, float radius,
+                      const Vec3 &direction, const Vec3 &up,
+                      float fov_degrees, float margin = 1.1f);
+
+Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
+                        const Vec3 &up, float fov_degrees, float margin = 1.1f);
+
+Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
+                       const Vec3 &up, float fov_degrees, float margin = 1.1f);
 
 } // namespace scimesh

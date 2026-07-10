@@ -13,10 +13,6 @@ Mat4 Camera::get_projection_matrix(float aspect_ratio, float near_plane, float f
     if (projection == ProjectionType::PERSPECTIVE) {
         return glm::perspective(glm::radians(fov_degrees), aspect_ratio, near_plane, far_plane);
     } else {
-        // Orthographic: use symmetric frustum based on a unit-ish scale
-        // The caller should adjust eye distance or we use a fixed scale.
-        // We compute ortho bounds from a simple scale = 1 (caller can pre-scale mesh).
-        // For auto-framing compatibility, we use the distance from eye to center as half-size.
         float dist = glm::length(eye - center);
         if (dist < 1e-6f)
             dist = 1.0f;
@@ -24,6 +20,37 @@ Mat4 Camera::get_projection_matrix(float aspect_ratio, float near_plane, float f
         float half_w = half_h * aspect_ratio;
         return glm::ortho(-half_w, half_w, -half_h, half_h, near_plane, far_plane);
     }
+}
+
+Camera camera_look_at(const Vec3 &center, float radius,
+                      const Vec3 &direction, const Vec3 &up,
+                      float fov_degrees, float margin) {
+    Camera cam;
+    cam.center = center;
+    cam.up = glm::normalize(up);
+    cam.fov_degrees = fov_degrees;
+    float fov_rad = glm::radians(fov_degrees);
+    float dist = radius / std::sin(fov_rad * 0.5f) * margin;
+    cam.eye = center + glm::normalize(direction) * dist;
+    return cam;
+}
+
+Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
+                        const Vec3 &up, float fov_degrees, float margin) {
+    Vec3 bmin, bmax;
+    scene.compute_bounding_box(bmin, bmax);
+    Vec3 center = (bmin + bmax) * 0.5f;
+    float radius = glm::length(bmax - bmin) * 0.5f;
+    return camera_look_at(center, radius, direction, up, fov_degrees, margin);
+}
+
+Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
+                       const Vec3 &up, float fov_degrees, float margin) {
+    Vec3 bmin, bmax;
+    mesh.compute_bounding_box(bmin, bmax);
+    Vec3 center = (bmin + bmax) * 0.5f;
+    float radius = glm::length(bmax - bmin) * 0.5f;
+    return camera_look_at(center, radius, direction, up, fov_degrees, margin);
 }
 
 } // namespace scimesh

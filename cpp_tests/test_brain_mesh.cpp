@@ -106,29 +106,18 @@ TEST_CASE("Render real brain hemisphere mesh from PLY") {
               << mesh.colors.size() << " colors\n";
     std::cout << "Load time: " << load_ms << " ms\n";
 
-    // 2. Compute bounding box for manual auto-framing
+    // 2. Compute bounding box for diagnostics
     Vec3 bbox_min, bbox_max;
     mesh.compute_bounding_box(bbox_min, bbox_max);
     Vec3 center = (bbox_min + bbox_max) * 0.5f;
-    Vec3 extent = bbox_max - bbox_min;
-    float radius = glm::length(extent) * 0.5f;
+    float radius = glm::length(bbox_max - bbox_min) * 0.5f;
 
     std::cout << "Bounding box: min=(" << bbox_min.x << ", " << bbox_min.y << ", " << bbox_min.z << ")"
               << " max=(" << bbox_max.x << ", " << bbox_max.y << ", " << bbox_max.z << ")\n";
     std::cout << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")  radius=" << radius << "\n";
 
     // 3. Camera: lateral view (look from -X toward center in RAS)
-    // Position camera at distance = radius / sin(fov/2) to fit the mesh.
-    float fov_rad = glm::radians(45.0f);
-    float dist = radius / std::sin(fov_rad * 0.5f);
-    // Add a small margin
-    dist *= 1.1f;
-
-    Camera cam;
-    cam.eye = Vec3(center.x - dist, center.y, center.z);
-    cam.center = center;
-    cam.up = Vec3(0, 0, 1); // RAS: Z is up (superior)
-    cam.fov_degrees = 45.0f;
+    Camera cam = camera_fit_mesh(mesh, Vec3(-1, 0, 0), Vec3(0, 0, 1), 45.0f);
 
     RenderOptions opts;
     opts.width = 640;
@@ -138,7 +127,7 @@ TEST_CASE("Render real brain hemisphere mesh from PLY") {
     opts.backface_culling = false; // brain surfaces are open (single surface)
     opts.invert_normals = false;
     opts.near_plane = 0.1f;
-    opts.far_plane = dist * 4.0f;
+    opts.far_plane = glm::length(cam.eye - cam.center) * 4.0f;
 
     std::cout << "Camera: eye=(" << cam.eye.x << ", " << cam.eye.y << ", " << cam.eye.z << ")"
               << " center=(" << center.x << ", " << center.y << ", " << center.z << ")\n";
