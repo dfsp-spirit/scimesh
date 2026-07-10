@@ -58,11 +58,15 @@ Every feature included in the core engine is strictly justified by the requireme
 * *Rationale:* Each render depends only on the mesh, camera, lighting, and render options. No hidden state, making the renderer predictable, testable, and suitable for batch processing.
 
 
+* **Geometric Primitives for Annotation**
+* *Rationale:* Scientific visualization often requires marking specific points in space (e.g., landmarks, activation peaks), drawing arrows to highlight regions, or connecting points on a mesh. The engine provides procedural mesh generators for primitives (spheres, cubes, cones, cylinders) and line rendering, allowing users to annotate visualizations without loading external model files.
+
+
 ---
 
 ## 2. Strict Boundary Matrix: What Is Out of Scope
 
-To prevent scope creep and ensure the project can be completed inside a one-week development sprint, the following features are **explicitly excluded** from the C++ layer.
+To prevent scope creep and ensure the project can be completed in short time (weeks, not months), the following features are **explicitly excluded** from the C++ layer.
 
 | Feature / Capability | Status | Handling / Alternative |
 | --- | --- | --- |
@@ -313,12 +317,77 @@ This provides comfortable margin within the 1.5-second budget.
 The 1.5-second per-view budget is achievable with a clean, well-optimized implementation.
 
 
-## 9. Rationale for Custom Engine Architecture vs. Existing Frameworks
+## 9. Geometric Primitives for Annotation
+
+Scientific visualization often requires annotating specific locations or relationships in 3D space. `scimesh` provides procedural mesh generators for common primitives, allowing users to mark points, draw arrows, or connect regions without loading external model files.
+
+### 9.1 Supported Primitives
+
+| Primitive | Use Case | Implementation |
+|-----------|----------|----------------|
+| **Sphere** | Mark landmarks, activation peaks | Icosphere subdivision (configurable detail level) |
+| **Cube** | Mark points with flat-sided geometry | 8 vertices, 12 triangles |
+| **Cone** | Arrow heads, directional indicators | Circular base with apex, configurable segments |
+| **Cylinder** | Connect two points, shaft of arrows | Two circular caps connected by tube segments |
+| **Line Segment** | Connect points on mesh, draw edges | Thin quad (billboarded or fixed screen-space width) |
+
+### 9.2 Implementation Approach
+
+**C++ Core:** Provides low-level mesh generation functions that return vertex/index arrays:
+```cpp
+Mesh generate_sphere(Vec3 center, float radius, int subdivisions);
+Mesh generate_cube(Vec3 center, float size);
+Mesh generate_cone(Vec3 base_center, Vec3 apex, float radius, int segments);
+Mesh generate_cylinder(Vec3 start, Vec3 end, float radius, int segments);
+```
+
+**R Wrapper:** Exposes high-level, user-friendly functions:
+```r
+add_sphere(position, radius=1.0, color="red", subdivisions=2)
+add_cube(position, size=1.0, color="blue")
+add_arrow(start, end, color="green", shaft_radius=0.1, head_radius=0.3)
+add_line(start, end, color="yellow", width=2.0)
+```
+
+### 9.3 Rendering Strategy
+
+Primitives are rendered as regular triangle meshes, appended to the main scene before rendering:
+
+1. **Mesh Generation:** Procedural functions create vertex positions, indices, and vertex colors
+2. **Scene Assembly:** Primitive meshes are concatenated with the main mesh data
+3. **Unified Rendering:** The standard rasterization pipeline processes all triangles together
+
+**Line Rendering:** Lines are special cases — they can be rendered as:
+- **Thin quads** (two triangles per line segment) with fixed screen-space width
+- **Billboarded quads** that always face the camera for consistent visual thickness
+
+### 9.4 Performance Considerations
+
+- Small primitives (spheres with 2-3 subdivisions, cubes) add negligible overhead (~100-1000 triangles)
+- Procedural generation is fast (~1ms for a sphere with 3 subdivisions)
+- Primitives can be cached if reused across multiple renderings
+
+### 9.5 Example Use Cases
+
+```r
+# Mark an activation peak on the brain
+vis.subject.morph.native(subjects_dir, 'subject1', 'thickness', 'lh')
+add_sphere(position=c(10, -30, 45), radius=2.0, color="red")
+
+# Draw an arrow pointing to a region
+add_arrow(start=c(0, 0, 0), end=c(10, -30, 45), color="blue")
+
+# Connect two points on the cortical surface
+add_line(start=c(5, -20, 40), end=c(15, -25, 50), color="yellow", width=2.0)
+```
+
+
+## 10. Rationale for Custom Engine Architecture vs. Existing Frameworks
 
 A foundational question for any engineering project is why a custom renderer is necessary when mature open-source solutions exist. During the scoping phase, three prominent MIT-licensed candidates were thoroughly evaluated: `ssloy/tinyrenderer`, `elnormous/SoftwareRenderer`, and `trenki2/SoftwareRenderer`. While excellent in their respective domains, these engines carry heavy abstractions designed to emulate complex, stateful graphics APIs (like OpenGL or Vulkan) or real-time game loops, introducing unnecessary architectural bloat, complex dependency chains, and difficult memory management for data passing. Because `scimesh` strictly rejects real-time windowing, texturing, global illumination, and interactive event loops, the required functional footprint is exceptionally small (~300–400 lines of pure C++). Developing the engine from scratch ensures that data structures map perfectly and zero-copy to R matrices, guarantees absolute cross-platform compliance under CRAN's strict memory sanitizers (ASAN/UBSAN), and results in a radically maintainable codebase perfectly optimized for the highly specific niche of headless neuroimaging visualization.
 
 
-## 10. Technology Choices
+## 11. Technology Choices
 
 ### C++ Math Library: GLM
 
