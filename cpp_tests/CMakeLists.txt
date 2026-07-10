@@ -22,6 +22,7 @@ set(CORE_SOURCES
     ${CMAKE_SOURCE_DIR}/../src/core/clipping.cpp
     ${CMAKE_SOURCE_DIR}/../src/core/rasterizer.cpp
     ${CMAKE_SOURCE_DIR}/../src/core/renderer.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/tinyply.cpp
 )
 
 # Catch2 test runner (amalgamated)
@@ -37,6 +38,7 @@ add_executable(scimesh_tests
     test_rasterizer.cpp
     test_integration.cpp
     test_visual_validation.cpp
+    test_brain_mesh.cpp
     ${CORE_SOURCES}
 )
 
