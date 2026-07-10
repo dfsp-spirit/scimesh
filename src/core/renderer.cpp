@@ -42,9 +42,11 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     Mat4 projection = camera.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
 
-    // 4. Compute light direction in view space (camera-aligned "headlight")
-    // The light points in the same direction the camera looks (forward = -Z in view space)
-    Vec3 light_direction = Vec3(0.0f, 0.0f, -1.0f);
+    // 4. Compute light direction in view space (camera-aligned "headlight").
+    // This is the direction FROM the surface TO the light source (at the camera,
+    // i.e. view-space origin). For a front-facing surface whose view-space normal
+    // points toward the camera (+Z), dot(normal, light_dir) == 1 → fully lit.
+    Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
 
     // 5. For each mesh
     for (const auto *mesh_ptr : meshes) {

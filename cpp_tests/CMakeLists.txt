@@ -36,6 +36,7 @@ add_executable(scimesh_tests
     test_clipping.cpp
     test_rasterizer.cpp
     test_integration.cpp
+    test_visual_validation.cpp
     ${CORE_SOURCES}
 )
 

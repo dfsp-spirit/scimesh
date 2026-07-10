@@ -40,12 +40,14 @@ void Rasterizer::rasterize_triangle(
     Image &output) {
 
     // Backface culling: compute signed area in screen space.
-    // In screen space (Y down), positive area = CW = CCW in NDC = front-facing.
-    // Negative area = CCW in screen = CW in NDC = back-facing → cull.
+    // Screen space has Y pointing down (row 0 at top). ndc_to_screen flips Y from
+    // NDC (where Y points up), so a CCW (front-facing) triangle in NDC becomes a
+    // triangle with NEGATIVE signed area in screen space: area_screen = -k * area_ndc.
+    // Therefore front-facing triangles have area < 0 here; back-facing have area > 0.
     float area = (screen_v1.x - screen_v0.x) * (screen_v2.y - screen_v0.y) -
                 (screen_v2.x - screen_v0.x) * (screen_v1.y - screen_v0.y);
 
-    if (backface_culling && area < 0.0f)
+    if (backface_culling && area > 0.0f)
         return;
 
     // Skip degenerate triangles

@@ -27,7 +27,8 @@ TEST_CASE("Rasterizer renders a single visible triangle", "[rasterizer]") {
     Rasterizer r(100, 100);
     r.clear(1.0f);
 
-    Vec3 v0(30, 30, 0.5f), v1(70, 30, 0.5f), v2(50, 70, 0.5f);
+    // Front-facing winding: CCW visually in Y-down screen → negative signed area.
+    Vec3 v0(30, 30, 0.5f), v1(50, 70, 0.5f), v2(70, 30, 0.5f);
     Color c(1, 0, 0, 1);
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
@@ -49,8 +50,9 @@ TEST_CASE("Rasterizer Z-buffer occludes farther triangle", "[rasterizer]") {
     Rasterizer r(50, 50);
     r.clear(1.0f);
 
-    Vec3 v0(10, 10, 0.8f), v1(40, 10, 0.8f), v2(25, 40, 0.8f);
-    Vec3 v3(10, 10, 0.2f), v4(40, 10, 0.2f), v5(25, 40, 0.2f);
+    // Front-facing winding (negative signed area in screen Y-down)
+    Vec3 v0(10, 10, 0.8f), v1(25, 40, 0.8f), v2(40, 10, 0.8f);
+    Vec3 v3(10, 10, 0.2f), v4(25, 40, 0.2f), v5(40, 10, 0.2f);
     Color red(1, 0, 0, 1);
     Color green(0, 1, 0, 1);
     Vec3 n(0, 0, -1);
@@ -75,8 +77,8 @@ TEST_CASE("Rasterizer backface culling discards back-facing triangle", "[rasteri
     Rasterizer r(100, 100);
     r.clear(1.0f);
 
-    // CW winding in screen space (back-facing)
-    Vec3 v0(30, 30, 0.5f), v1(50, 70, 0.5f), v2(70, 30, 0.5f);
+    // Back-facing winding: CW visually in Y-down screen → positive signed area → culled.
+    Vec3 v0(30, 30, 0.5f), v1(70, 30, 0.5f), v2(50, 70, 0.5f);
     Color c(1, 0, 0, 1);
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
@@ -96,8 +98,8 @@ TEST_CASE("Rasterizer without backface culling renders both sides", "[rasterizer
     Rasterizer r(100, 100);
     r.clear(1.0f);
 
-    // CW winding (back-facing)
-    Vec3 v0(30, 30, 0.5f), v1(50, 70, 0.5f), v2(70, 30, 0.5f);
+    // Back-facing winding (positive signed area), but culling disabled.
+    Vec3 v0(30, 30, 0.5f), v1(70, 30, 0.5f), v2(50, 70, 0.5f);
     Color c(1, 0, 0, 1);
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
