@@ -229,3 +229,34 @@ Once the 3D C++ rendering core finishes writing the individual alpha-transparent
 ## 7. Rationale for Custom Engine Architecture vs. Existing Frameworks
 
 A foundational question for any engineering project is why a custom renderer is necessary when mature open-source solutions exist. During the scoping phase, three prominent MIT-licensed candidates were thoroughly evaluated: `ssloy/tinyrenderer`, `elnormous/SoftwareRenderer`, and `trenki2/SoftwareRenderer`. While excellent in their respective domains, these engines carry heavy abstractions designed to emulate complex, stateful graphics APIs (like OpenGL or Vulkan) or real-time game loops, introducing unnecessary architectural bloat, complex dependency chains, and difficult memory management for data passing. Because `scimesh` strictly rejects real-time windowing, texturing, global illumination, and interactive event loops, the required functional footprint is exceptionally small (~300–400 lines of pure C++). Developing the engine from scratch ensures that data structures map perfectly and zero-copy to R matrices, guarantees absolute cross-platform compliance under CRAN's strict memory sanitizers (ASAN/UBSAN), and results in a radically maintainable codebase perfectly optimized for the highly specific niche of headless neuroimaging visualization.
+
+
+## 8. Performance Budget Analysis
+
+A typical publication-quality brain plot requires 2–4 mesh renders plus R-side composition (colorbars, labels, layout). The current `fsbrain` pipeline takes 8–10 seconds total, leaving approximately **1.5 seconds per rendering** as the performance target for the C++ engine.
+
+### Feasibility Assessment
+
+**Typical input sizes:**
+- Freesurfer cortical surfaces: 150k–300k triangles per hemisphere
+- Publication resolution: 800×600 to 1200×900 pixels
+
+**Estimated costs per view (300k triangles at 1000×750):**
+- Triangle setup (vertex transform, backface cull, bounding box): ~30–50 ms
+- Pixel rasterization (barycentric test, z-buffer, shading): ~200–400 ms
+- **Total per view: ~250–500 ms**
+
+This provides comfortable margin within the 1.5-second budget.
+
+### Key Performance Enablers
+
+1. **Bounding-box rasterization** — processes only pixels within each triangle's screen-space bounds, not the entire framebuffer
+2. **Cache-friendly memory layout** — row-major framebuffer access with contiguous z-buffer
+3. **Compiler optimization** — `-O3` with modern GCC/Clang auto-vectorizes inner pixel loops
+4. **Resolution discipline** — 1000×750 is sufficient for publications; avoid unnecessary 4K rendering
+
+The 1.5-second per-view budget is achievable with a clean, well-optimized implementation.
+
+
+
+
