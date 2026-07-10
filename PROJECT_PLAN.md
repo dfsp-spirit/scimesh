@@ -113,6 +113,41 @@ To guarantee maximum developer efficiency and minimize friction, the project wil
 * `tests/testthat/`: Holds high-level R interface unit tests confirming class validation, type checks, and user-facing error limits.
 * `cpp_tests/`: Standalone, isolated C++ workspace containing a separate testing harness (e.g., `Catch2` or `doctest`) backed by a lightweight `CMakeLists.txt` profile.
 
+
+Proposed layout:
+
+```shell
+scimesh/
+├── DESCRIPTION
+├── NAMESPACE
+├── .Rbuildignore
+│
+├── R/
+│   ├── render_mesh.R         # R wrapper exposing user-facing functions
+│   └── cbar_layout.R         # Headless grid/patchwork composition logic
+│
+├── src/                      # CRAN compiled code folder
+│   ├── Makevars              # Compiler flags (-O3)
+│   ├── Makevars.win
+│   ├── rcpp_bindings.cpp     # Rcpp translation boundary (ONLY file with R hooks)
+│   │
+│   └── core/                 # Pure C++ Engine (100% independent of R)
+│       ├── renderer.h        # Main rasterization loops & Z-buffer
+│       ├── camera.h          # LookAt matrix math
+│       ├── math_utils.h      # Vector/Matrix structs & transformations
+│       └── stb_image_write.h # Header-only PNG output writer
+│
+├── tests/                    # Standard R package tests
+│   ├── testthat.R
+│   └── testthat/
+│       └── test-interface.R  # Tests for matrix validations & inputs
+│
+└── cpp_tests/                # Standalone C++ Testing Workspace
+    ├── CMakeLists.txt        # Build profile for independent C++ compiling
+    ├── main_test.cpp         # Test runner (Catch2 / doctest)
+    └── test_rasterizer.cpp   # Unit tests for the core/ algorithms
+```
+
 ### Dual-Track Development Workflow
 
 * **Track A (C++ Engine Cycle):** Optimization of raster loops, vertex transformation corrections, or depth-buffer updates are developed and compiled entirely inside `cpp_tests/`. Compilation and execution require milliseconds, completely freeing the developer from the overhead of re-installing the R extension layer during foundational graphics development.
