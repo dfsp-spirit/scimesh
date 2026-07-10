@@ -9,3 +9,16 @@ messing with meshes, again. ignore this.
 * src/core/tinyply.h and .cpp: [ddiakopoulos/tinyply](https://github.com/ddiakopoulos/tinyply). A single-header, zero-dependency (except the C++ STL) public domain implementation of the PLY mesh file format.
 * src/core/tiny_obj_loader.h: [tinyobjloader/tinyobjloader](https://github.com/tinyobjloader/tinyobjloader). Tiny but powerful Wavefront .obj/.mtl loader.
 * src/core/libfs.h: [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs). A portable, header-only, single file, no-dependency, mildly templated, C++11 library for accessing FreeSurfer neuroimaging file formats.
+
+## Development
+
+### Running the C++ unit tests
+
+The C++ unit tests use [Catch2](https://github.com/catchorg/Catch2) (amalgamated single-header version) and are located in `cpp_tests/`. To build and run them:
+
+```sh
+cd cpp_tests
+cmake -B build
+cmake --build build
+./build/scimesh_tests
+```
