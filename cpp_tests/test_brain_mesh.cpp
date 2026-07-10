@@ -7,7 +7,6 @@
 #include "image.h"
 #include "math_utils.h"
 
-#define TINYPLY_IMPLEMENTATION
 #include "tinyply.h"
 
 #include <fstream>
