@@ -177,52 +177,36 @@ While `rgl` dynamically responds to desktop window modifications—often introdu
 The image dimensions (`width` and `height` in pixels) must be declared explicitly at execution time. The projection matrix calculates the aspect ratio strictly as $\frac{\text{width}}{\text{height}}$, guaranteeing that structural mesh features and anatomical proportions remain perfectly locked and invariant across all rendering scales and output file resolutions.
 
 
-## 6. Details on Headless Colorbar Generation & Layout Composition Architecture
-
-For scientific visualization, an accurate colorbar is as critical as the 3D geometry itself. To eliminate historical dependencies on interactive screen contexts (like X11, OpenGL widgets, or external image-stitching binaries like ImageMagick), `scimesh` decouples colorbar production from the 3D mesh engine and leverages a **100% headless, server-safe layout pipeline** executed completely within R session memory.
-
-### 6.1 Generation of the Colorbar Asset without X11
-Traditional plotting architectures require active desktop display devices to track window coordinates and compute typographic spacing. `scimesh` avoids this requirement by using **Grid Graphics** (the core `grid` engine built directly into R), which designs objects mathematically in memory as Graphical Objects (**grobs**):
-
-1.  **The Scale Strip:** The continuous color mapping applied to vertices is passed to a `grid::rasterGrob()`. This converts the hex palette array into a resolution-independent, vector-scaled gradient strip.
-2.  **The Metrics & Labels:** Value ticks and scientific annotations (e.g., minimum, midpoint, and maximum activation thresholds) are configured as a separate `grid::textGrob()`.
-3.  **Isolation:** Because these structures are represented as native data matrices in the active R session, **no X11 graphic context or desktop display server is ever initialized.**
-
-### 6.2 Layout Composition and Target Assembly
-Once the 3D C++ rendering core finishes writing the individual alpha-transparent PNG views to disk (or passes its raw pixel stream), the R framework re-imports them as native raster grobs. The complete multi-panel figure compilation follows a strict, side-effect-free structural pipeline:
-
-
-[ C++ Renderer Engine ] -> Transparent Brain View PNG -> grid::rasterGrob() ┐
-├─> [ patchwork / cowplot ] ──> ggsave("figure.png")
-[ Native R Memory      ] -> Palette Vector Gradient   -> grid::textGrob()   ┘
-
-```markdown
 ## 6. Headless Colorbar Generation & Layout Composition Architecture
 
-For scientific visualization, an accurate colorbar is as critical as the 3D geometry itself. To eliminate historical dependencies on interactive screen contexts (like X11, OpenGL widgets, or external image-stitching binaries like ImageMagick), `scimesh` decouples colorbar production from the 3D mesh engine and leverages a **100% headless, server-safe layout pipeline** executed completely within R session memory.
+For scientific visualization, an accurate colorbar is as critical as the 3D geometry itself. `scimesh` decouples colorbar production from the 3D mesh engine and handles it entirely in R using `magick` for pixel-perfect compositing.
 
-### 6.1 Generation of the Colorbar Asset without X11
-Traditional plotting architectures require active desktop display devices to track window coordinates and compute typographic spacing. `scimesh` avoids this requirement by using **Grid Graphics** (the core `grid` engine built directly into R), which designs objects mathematically in memory as Graphical Objects (**grobs**):
+### 6.1 Colorbar Generation Strategy
 
-1.  **The Scale Strip:** The continuous color mapping applied to vertices is passed to a `grid::rasterGrob()`. This converts the hex palette array into a resolution-independent, vector-scaled gradient strip.
-2.  **The Metrics & Labels:** Value ticks and scientific annotations (e.g., minimum, midpoint, and maximum activation thresholds) are configured as a separate `grid::textGrob()`.
-3.  **Isolation:** Because these structures are represented as native data matrices in the active R session, **no X11 graphic context or desktop display server is ever initialized.**
+Instead of relying on R's grid graphics (which require active display devices and produce unpredictable sizes), colorbars are generated as **deterministic raster images**:
 
-### 6.2 Layout Composition and Target Assembly
-Once the 3D C++ rendering core finishes writing the individual alpha-transparent PNG views to disk (or passes its raw pixel stream), the R framework re-imports them as native raster grobs. The complete multi-panel figure compilation follows a strict, side-effect-free structural pipeline:
+1. **Color strip:** Generate directly as a raster matrix from the colormap function, write to PNG
+2. **Tick labels:** Add using `magick::image_annotate()` with known font metrics
+3. **Fixed dimensions:** Colorbar images have predictable sizes (e.g., 600×80px horizontal), eliminating layout guesswork
 
+This approach requires no X11, no graphics device, and produces consistent output across platforms.
 
+### 6.2 Layout Composition with Magick
+
+Multi-panel figures are assembled using `magick::image_append()`:
+
+```r
+# Side-by-side brain views
+brain_views <- image_append(c(lateral, medial), stack=FALSE)
+# Stack with colorbar below
+final <- image_append(c(brain_views, colorbar), stack=TRUE)
 ```
 
-[ C++ Renderer Engine ] -> Transparent Brain View PNG -> grid::rasterGrob() ┐
-├─> [ patchwork / cowplot ] ──> ggsave("figure.png")
-[ Native R Memory      ] -> Palette Vector Gradient   -> grid::textGrob()   ┘
-
-```
-
-* **In-Memory Tiling:** Multi-angle layouts (e.g., Lateral, Medial, Superior) along with the accompanying colorbar grob are arranged via lightweight layout packages (`patchwork` or `cowplot`). Combining components uses an explicit, programmatic grid blueprint: `final_plot <- (lateral_view + medial_view) / colorbar_grob`.
-* **Headless Device Writing:** Saving the composite image to disk is handled by modern, headless canvas writers (such as `ragg` or Cairo-backed bitmap devices via `ggplot2::ggsave()`). The canvas compilation engine bakes the 3D pixel bitmaps, vector gradients, and clean typography layouts straight into a publication-ready target format (PNG, TIFF, or PDF).
-* **Resulting Advantages:** This architecture completely ensures that annotations and colorbar elements scale uniformly with the target pixel output resolution, avoiding aliasing artifacts, preserving transparency data, and ensuring execution on remote server networks or restricted continuous-integration environments.
+**Advantages:**
+- Pixel-perfect control with no automatic layout calculations
+- Works headlessly (no X11 needed)
+- Predictable sizing — dimensions are known upfront
+- Can cache colorbar images and reuse across plots
 
 
 
@@ -256,6 +240,25 @@ This provides comfortable margin within the 1.5-second budget.
 4. **Resolution discipline** — 1000×750 is sufficient for publications; avoid unnecessary 4K rendering
 
 The 1.5-second per-view budget is achievable with a clean, well-optimized implementation.
+
+
+## 9. Implementation Decisions
+
+### 9.1 Far-Plane Clipping: Not Needed
+
+Unlike near-plane clipping (which is critical to prevent artifacts when triangles intersect the camera), far-plane clipping is unnecessary for brain meshes. The camera is positioned to frame the entire mesh, so there are no distant objects to cull. Set the far plane to a large value in the projection matrix and let the z-buffer handle depth ordering naturally.
+
+### 9.2 Anti-Aliasing: Optional 2× Supersampling
+
+Start without anti-aliasing. For brain meshes with smooth shading and vertex colors, aliasing is less noticeable than with sharp edges. If needed, add 2× supersampling as an optional parameter: render at double resolution (e.g., 2000×1500) and downsample in R. This quadruples render time (~400ms → ~1600ms) but remains within budget for typical use cases. For multi-panel figures, each sub-image can be smaller, making supersampling more feasible.
+
+### 9.3 C++ Math Library: Use GLM
+
+Use GLM (OpenGL Mathematics) instead of reimplementing vector/matrix math. GLM is header-only, MIT-licensed, well-tested, and designed for graphics math (Vec3, Vec4, Mat4, transforms). It eliminates bugs in matrix operations and saves development time without adding runtime overhead.
+
+### 9.4 Colorbar and Layout: Keep in R with Magick
+
+Colorbar generation and figure composition belong in R, not C++. Adding text rendering to C++ would require font loading (FreeType dependency) and violate the zero-dependency goal. Use `magick` for pixel-perfect compositing with deterministic sizing, avoiding the unpredictability of grid graphics.
 
 
 
