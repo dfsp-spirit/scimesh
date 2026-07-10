@@ -184,7 +184,7 @@ This three-layer design ensures the core renderer interface remains reusable for
    - **Layer 1 (Generic):** Domain-agnostic renderer interface (`render_mesh`, `render_scene`)
    - **Layer 2 (Neuro Convenience):** Neuro-specific view functions (`vis.brain.lateral`, etc.)
    - **Layer 3 (Publication):** Full publication figure assembly (`vis.subject.morph.native`)
-   
+
    This ensures the core renderer interface remains reusable for non-neuroimaging applications while providing domain-specific convenience for neuroscientists.
 
 ### Multi-View Tiling, Colorbars, and Annotation Execution (Layer 3)
@@ -238,6 +238,7 @@ RenderOptions
     backface_culling: bool
     background_color: RGBA
     default_color: RGBA (for meshes without vertex colors)
+    invert_normals: bool (flip computed normals, default false)
 ```
 
 ### Image
@@ -354,7 +355,7 @@ View Transform (LookAt matrix: Eye, Center, Up)
     ↓
 Projection Transform (Orthographic or Perspective)
     ↓
-Near-Plane Clipping (remove triangles intersecting camera)
+Near-Plane Clipping (split triangles intersecting camera plane)
     ↓
 Viewport Clipping (clamp triangle bbox to framebuffer bounds)
     ↓
@@ -368,6 +369,10 @@ Shading (headlight directional light, smooth or flat)
     ↓
 RGBA Image Output (in-memory buffer)
 ```
+
+**Near-Plane Clipping:** Triangles intersecting the near plane are split using Sutherland-Hodgman clipping, producing one or two new triangles. This prevents holes in the mesh geometry.
+
+**Viewport Clamping:** Triangle bounding boxes are clamped to `[0, width-1]` × `[0, height-1]` before rasterization to prevent out-of-bounds memory writes.
 
 ### Depth Buffer Precision
 
