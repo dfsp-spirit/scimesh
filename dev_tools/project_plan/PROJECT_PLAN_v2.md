@@ -26,8 +26,12 @@ Every feature included in the core engine is strictly justified by the requireme
 * *Rationale:* Handles complex, overlapping cortical geometry natively. Accurate depth sorting ensures foreground gyri and sulci cleanly occlude deep hidden surfaces. The bounding-box processing strategy ensures predictable, cache-friendly CPU loops.
 
 
-* **On-the-Fly Normal Vector Computation with Caching**
-* *Rationale:* Standard surface file formats (e.g., Freesurfer `.white`, `.pial` or raw `.obj`/`.ply` matrices) frequently omit surface normals. The engine computes normals from winding order and caches them for reuse across multiple renderings of the same mesh, avoiding redundant computation.
+* **On-the-Fly Normal Vector Computation**
+* *Rationale:* Standard surface file formats (e.g., Freesurfer `.white`, `.pial` or raw `.obj`/`.ply` matrices) frequently omit surface normals. The engine computes normals from winding order. Normals are computed once by the R layer and stored on the `Mesh` object, keeping the renderer stateless while avoiding redundant computation across multiple renderings.
+
+
+* **Default Color for Meshes Without Vertex Colors**
+* *Rationale:* Many mesh formats do not include per-vertex colors. The renderer accepts meshes without vertex colors and uses a configurable default color (e.g., light gray) for rendering, ensuring all meshes can be visualized regardless of format completeness.
 
 
 * **Smooth (Vertex) and Flat (Face) Shading**
@@ -195,7 +199,149 @@ These are Layer 3 (publication figure assembly) features. Instead of complicatin
 
 ---
 
-## 4. Rendering Pipeline
+## 4. Core Abstractions
+
+The entire system revolves around five core objects. Defining these explicitly clarifies the API and data flow:
+
+### Mesh
+```
+Mesh
+    vertices: Nx3 float matrix (x, y, z coordinates)
+    triangles: Mx3 int matrix (vertex indices, 1-based for R)
+    colors: optional Nx4 float matrix (RGBA per vertex, 0-1 range)
+    normals: optional Nx3 float matrix (per-vertex normals)
+    default_color: RGBA color used when vertex colors are absent
+```
+
+### Scene
+```
+Scene
+    meshes: list of Mesh objects
+```
+
+### Camera
+```
+Camera
+    eye: Vec3 (camera position)
+    center: Vec3 (look-at target)
+    up: Vec3 (camera up vector)
+    projection: "orthographic" | "perspective"
+    fov: float (field of view in degrees, perspective only)
+```
+
+### RenderOptions
+```
+RenderOptions
+    width: int (output image width in pixels)
+    height: int (output image height in pixels)
+    shading: "smooth" | "flat"
+    backface_culling: bool
+    background_color: RGBA
+    default_color: RGBA (for meshes without vertex colors)
+```
+
+### Image
+```
+Image
+    width: int
+    height: int
+    pixels: RGBA array (width × height × 4, uint8 or float)
+```
+
+---
+
+## 5. API Examples
+
+### Layer 1: Generic Renderer Interface (Domain-Agnostic)
+
+```r
+library(scimesh)
+
+# Load any mesh3d object (from rgl, freesurferformats, etc.)
+mesh <- read_mesh("model.obj")
+
+# Render with explicit camera
+img <- render_mesh(
+    mesh,
+    camera = camera(
+        eye = c(0, 0, 200),
+        center = c(0, 0, 0),
+        up = c(0, 1, 0)
+    ),
+    options = render_options(
+        width = 800,
+        height = 600,
+        shading = "smooth",
+        background_color = c(1, 1, 1, 1)  # white
+    )
+)
+
+# img is an Image object (in-memory RGBA buffer)
+write_png(img, "output.png")
+
+# Multi-mesh scene
+scene <- scene(list(mesh1, mesh2, mesh3))
+img <- render_scene(scene, camera = camera_auto(scene), options = render_options())
+write_png(img, "multi_mesh.png")
+```
+
+### Layer 2: Neuro-Specific Convenience
+
+```r
+# Load Freesurfer surface
+mesh <- read.fs.surface("lh.pial")
+
+# Render standard anatomical views
+img_lateral <- vis.brain.lateral(mesh, hemisphere = "left", data = thickness_data)
+img_medial <- vis.brain.medial(mesh, hemisphere = "left", data = thickness_data)
+img_dorsal <- vis.brain.dorsal(mesh, hemisphere = "left", data = thickness_data)
+
+# Each returns an Image object
+write_png(img_lateral, "lateral_view.png")
+```
+
+### Layer 3: Publication Figure Assembly
+
+```r
+# Full fsbrain-style workflow
+vis.subject.morph.native(
+    subjects_dir = "/path/to/subjects",
+    subject = "subject1",
+    data_name = "thickness",
+    views = c("lateral", "medial", "dorsal", "ventral"),
+    output_file = "publication_figure.png"
+)
+
+# This internally:
+# 1. Loads the mesh
+# 2. Computes vertex colors from data
+# 3. Renders each view using Layer 1
+# 4. Generates colorbar
+# 5. Stitches everything together using pure R array operations
+# 6. Writes final PNG
+```
+
+### Composition Without File I/O
+
+```r
+# Render multiple views directly to RGBA arrays
+img1 <- render_mesh(mesh, camera = cam1)
+img2 <- render_mesh(mesh, camera = cam2)
+
+# Stitch in-memory (no PNG round-trip)
+composite <- stitch_horizontal(list(img1, img2))
+
+# Add colorbar
+colorbar <- generate_colorbar(data_range = c(0, 5), colormap = cm.seq())
+final <- stitch_vertical(list(composite, colorbar))
+
+# Single write at the end
+write_png(final, "figure.png")
+```
+
+---
+
+## 6. Rendering Pipeline
 
 The rendering pipeline is explicit and follows standard graphics conventions:
 
@@ -233,7 +379,51 @@ The renderer works entirely in sRGB colorspace for simplicity. While physically 
 
 ---
 
-## 5. Development Layout & Testing Matrix
+## 7. Design Principles
+
+### Determinism: A First-Class Principle
+
+**The renderer is deterministic, explicit, and predictable.** This guiding principle drives all architectural decisions:
+
+- **Stateless rendering:** Each render call depends only on its inputs (mesh, camera, lighting, options). No hidden state, no global variables, no persistent caches.
+- **Explicit camera:** Camera position is specified explicitly, never inferred from previous renders.
+- **Explicit framebuffer size:** Output dimensions are declared upfront, never dynamic.
+- **Explicit render options:** All rendering parameters are passed explicitly, no hidden defaults that change behavior.
+- **Reproducible outputs:** Given the same inputs, the renderer always produces identical outputs, bit-for-bit.
+
+This principle ensures scientific reproducibility and makes the renderer suitable for batch processing, testing, and HPC environments.
+
+---
+
+## 8. Error Handling Philosophy
+
+Scientific software benefits from explicit error behavior. The renderer follows these rules:
+
+### Input Validation
+
+| Condition | Behavior |
+|-----------|----------|
+| **Mesh has no vertex colors** | Use `default_color` from RenderOptions (default: light gray) |
+| **Indices reference missing vertices** | Throw error with clear message |
+| **Degenerate triangles (zero area)** | Skip silently (common in real meshes) |
+| **NaN or Inf in vertex coordinates** | Throw error |
+| **Empty mesh (0 vertices)** | Return empty image (background only) |
+| **Negative viewport dimensions** | Throw error |
+| **Extremely large coordinates (>1e6)** | Warn, but attempt to render |
+| **Malformed mesh file** | Throw error during loading (before rendering) |
+
+### Graceful Degradation
+
+The renderer attempts to produce output even with imperfect input:
+- Missing normals → compute on the fly
+- Missing colors → use default color
+- Small numerical issues → clamp or skip
+
+However, fundamental problems (NaN coordinates, invalid indices) always result in errors rather than silent corruption.
+
+---
+
+## 9. Development Layout & Testing Matrix
 
 To guarantee maximum developer efficiency and minimize friction, the project will be maintained within a **single repository** using a dual-track isolated build system.
 
@@ -305,19 +495,27 @@ scimesh/
 
 ### Testing Strategy
 
-1. **C++ Unit Tests:** Validate individual algorithms (normal computation, clipping, rasterization) in `cpp_tests/` using Catch2 or doctest.
+1. **Geometry Tests:** Validate mathematical correctness of core algorithms:
+   - Clipping preserves topology
+   - Winding order is maintained
+   - Barycentric interpolation is accurate
+   - Projection matrices are correct
+   - Camera transforms produce expected results
+   - Normal generation is consistent
 
-2. **R Interface Tests:** Validate input validation, type checking, and error handling in `tests/testthat/`.
+2. **C++ Unit Tests:** Validate individual algorithms (normal computation, clipping, rasterization) in `cpp_tests/` using Catch2 or doctest.
 
-3. **Image Regression Tests:** Compare rendered images against known reference outputs to catch subtle rendering bugs. Store reference images in `tests/testthat/reference_images/`.
+3. **R Interface Tests:** Validate input validation, type checking, and error handling in `tests/testthat/`.
+
+4. **Image Regression Tests:** Compare rendered images against known reference outputs to catch subtle rendering bugs. Store reference images in `tests/testthat/reference_images/`.
 
 ---
 
-## 6. Coordinate System Alignment & Camera Mapping Philosophy
+## 10. Coordinate System Alignment & Camera Mapping Philosophy
 
 To ensure a seamless transition for users moving from stateful interactive rendering to headless file production, `scimesh` aligns its geometrical foundations with the established conventions of the R graphics and neuroimaging ecosystems while strictly shielding the C++ core from legacy architectural quirks.
 
-### 6.1 Coordinate System Mirroring
+### 10.1 Coordinate System Mirroring
 The C++ core implements a traditional **Right-Handed Coordinate System** to natively match `rgl` and standard neuroimaging spatial specifications (e.g., RAS: Right-Anterior-Superior):
 * **X-Axis:** Positive values extend to the right.
 * **Y-Axis:** Positive values extend upward.
@@ -325,19 +523,19 @@ The C++ core implements a traditional **Right-Handed Coordinate System** to nati
 
 By keeping this mathematical parity, vertex arrays extracted from `mesh3d` objects can be fed directly into the C++ vertex processor without requiring on-the-fly matrix inversions or axis swapping at the R interface boundary.
 
-### 6.2 Decoupling Camera Logic (API vs. Implementation)
+### 10.2 Decoupling Camera Logic (API vs. Implementation)
 Interactive toolkits like `rgl` manage camera positions using an intrinsic, stateful combination of spherical coordinates (theta/phi angles), pan, and bounding-box zoom states optimized for mouse interactions. To maintain code readability and engine reusability, `scimesh` splits this responsibility:
 
 * **The C++ Engine Layer:** Remains entirely textbook and stateless. It accepts only a standard, explicit mathematical **LookAt Matrix** parameterized by three pure spatial vectors: `Eye` (camera coordinates), `Center` (target focal coordinates), and `Up` (the camera's orientation vector).
 
 * **Layer 1 (Generic Renderer Interface):** Natively handles usability mapping. It exposes user-facing configuration functions that mimic the traditional `rgl::view3d(theta, phi, zoom)` interface. This layer performs the trigonometric translation of these spherical angles into explicit XYZ coordinates and injects them down into the clean C++ LookAt stack.
 
-### 6.3 Proportional Safety via Explicit Viewports
+### 10.3 Proportional Safety via Explicit Viewports
 While `rgl` dynamically responds to desktop window modifications—often introducing aspect-ratio distortion if a window is dragged non-uniformly—`scimesh` operates under absolute dimensional constraints.
 
 The image dimensions (`width` and `height` in pixels) must be declared explicitly at execution time. The projection matrix calculates the aspect ratio strictly as width/height, guaranteeing that structural mesh features and anatomical proportions remain perfectly locked and invariant across all rendering scales and output file resolutions.
 
-### 6.4 Camera Auto-Framing (Layer 1: Generic Feature)
+### 10.4 Camera Auto-Framing (Layer 1: Generic Feature)
 
 Layer 1 (Generic Renderer Interface) automatically computes the mesh bounding box and positions the camera to fit the entire scene in view. This ensures users never get empty or clipped images. This is a domain-agnostic feature that works for any mesh, not just brain meshes.
 
@@ -352,7 +550,7 @@ Users can override auto-framing by providing explicit camera parameters.
 
 **Architectural Boundary:** The C++ renderer is domain-agnostic — it has no knowledge of neuroimaging conventions, coordinate systems, or anatomical orientations. It only receives final camera parameters (LookAt vectors). Auto-framing is a generic feature in Layer 1 that works for any mesh.
 
-### 6.5 Standard Anatomical Views (Layer 2: Neuro-Specific Convenience)
+### 10.5 Standard Anatomical Views (Layer 2: Neuro-Specific Convenience)
 
 **Critical Architectural Boundary:** The C++ renderer is completely domain-agnostic. It has no knowledge of neuroimaging conventions, coordinate systems, or anatomical terminology. It only receives explicit mathematical camera parameters (LookAt vectors: Eye, Center, Up). Standard anatomical views are provided as Layer 2 convenience functions, not part of the core renderer interface.
 
@@ -383,26 +581,29 @@ These are exposed as named presets (e.g., `view="left_lateral"`, `view="dorsal"`
 - The core renderer interface (Layer 1) should remain reusable for non-neuroimaging meshes
 
 
-## 7. Headless Colorbar Generation & Layout Composition Architecture
+## 11. Headless Colorbar Generation & Layout Composition Architecture
 
 For scientific visualization, an accurate colorbar is as critical as the 3D geometry itself. `scimesh` decouples colorbar production from the 3D mesh engine and handles it entirely in R using pure R operations with the `png` package, requiring no system dependencies.
 
-### 7.1 Image Stitching with Pure R
+### 11.1 Image Stitching with Pure R (In-Memory, No File I/O)
 
-Multi-panel figures are assembled using standard R array operations:
+Multi-panel figures are assembled using standard R array operations on in-memory RGBA buffers:
 
 ```r
-# Read rendered brain images as RGBA arrays
-lateral <- png::readPNG("lateral.png")
-medial <- png::readPNG("medial.png")
+# Render multiple views directly to RGBA arrays (no file I/O)
+img_lateral <- render_mesh(mesh, camera = cam_lateral)
+img_medial <- render_mesh(mesh, camera = cam_medial)
 
-# Stitch side-by-side (assuming same height)
-brain_views <- abind::abind(lateral, medial, along=2)  # or manual array concatenation
+# Stitch side-by-side using array operations
+brain_views <- abind::abind(img_lateral$pixels, img_medial$pixels, along=2)
+
+# Generate colorbar as RGBA array
+colorbar <- generate_colorbar_array(data_range = c(0, 5), colormap = cm.seq())
 
 # Stack with colorbar below
 final <- abind::abind(brain_views, colorbar, along=1)
 
-# Write output
+# Single PNG write at the end
 png::writePNG(final, "figure.png")
 ```
 
@@ -411,33 +612,32 @@ png::writePNG(final, "figure.png")
 - Works on any HPC system without ImageMagick
 - Predictable sizing — dimensions are known from input arrays
 - Fast array operations
+- No unnecessary PNG encode/decode round-trips
 
-### 7.2 Colorbar Generation Strategy
+### 11.2 Colorbar Generation Strategy
 
-Colorbars are generated as deterministic raster images using base R and the `png` package:
+Colorbars are generated as deterministic RGBA arrays using base R:
 
 1. **Color strip:** Create a raster matrix from the colormap function
-2. **Tick labels:** Use `grid::textGrob()` with `png()` device (headless-safe)
-3. **Fixed dimensions:** Colorbar images have predictable sizes (e.g., 600×80px horizontal)
+2. **Tick labels:** Use `grid::textGrob()` with `png()` device (headless-safe) to render text, then read back as array
+3. **Fixed dimensions:** Colorbar arrays have predictable sizes (e.g., 600×80px horizontal)
 
 This approach requires no X11, no graphics device, and produces consistent output across platforms.
 
-### 7.3 Layout Composition
+### 11.3 Layout Composition
 
 The complete pipeline:
 
 1. C++ renderer returns in-memory RGBA buffers
-2. R exports each buffer to PNG using `png::writePNG()`
-3. R reads PNGs back as arrays using `png::readPNG()`
-4. R concatenates arrays for multi-panel layout
-5. R generates colorbar as array using `grid` + `png()` device
-6. R concatenates colorbar array with brain view arrays
-7. R writes final composite using `png::writePNG()`
+2. R concatenates arrays for multi-panel layout
+3. R generates colorbar as RGBA array
+4. R concatenates colorbar array with brain view arrays
+5. R writes final composite using single `png::writePNG()` call
 
 All operations are headless-safe and require no system dependencies beyond the `png` package.
 
 
-## 8. Performance Budget Analysis
+## 12. Performance Budget Analysis
 
 A typical publication-quality brain plot requires 2–4 mesh renders plus R-side composition (colorbars, labels, layout). The current `fsbrain` pipeline takes 8–10 seconds total, leaving approximately **1.5 seconds per rendering** as the performance target for the C++ engine.
 
@@ -447,12 +647,7 @@ A typical publication-quality brain plot requires 2–4 mesh renders plus R-side
 - Freesurfer cortical surfaces: 150k–300k triangles per hemisphere
 - Publication resolution: 800×600 to 1200×900 pixels
 
-**Estimated costs per view (300k triangles at 1000×750):**
-- Triangle setup (vertex transform, backface cull, bounding box): ~30–50 ms
-- Pixel rasterization (barycentric test, z-buffer, shading): ~200–400 ms
-- **Total per view: ~250–500 ms**
-
-This provides comfortable margin within the 1.5-second budget.
+Preliminary estimates suggest the design comfortably fits within the target rendering budget. Actual benchmarks will be published once the renderer is implemented.
 
 ### Key Performance Enablers
 
@@ -460,16 +655,14 @@ This provides comfortable margin within the 1.5-second budget.
 2. **Cache-friendly memory layout** — row-major framebuffer access with contiguous z-buffer
 3. **Compiler optimization** — `-O3` with modern GCC/Clang auto-vectorizes inner pixel loops
 4. **Resolution discipline** — 1000×750 is sufficient for publications; avoid unnecessary 4K rendering
-5. **Normal caching** — compute normals once, reuse across multiple views
-
-The 1.5-second per-view budget is achievable with a clean, well-optimized implementation.
+5. **Normal pre-computation** — compute normals once in R layer, reuse across multiple views
 
 
-## 9. Geometric Primitives for Annotation
+## 13. Geometric Primitives for Annotation
 
 Scientific visualization often requires annotating specific locations or relationships in 3D space. `scimesh` provides procedural mesh generators for common primitives, allowing users to mark points, draw arrows, or connect regions without loading external model files.
 
-### 9.1 Supported Primitives
+### 12.1 Supported Primitives
 
 | Primitive | Use Case | Implementation |
 |-----------|----------|----------------|
@@ -480,7 +673,7 @@ Scientific visualization often requires annotating specific locations or relatio
 
 **Note:** For connecting points or drawing lines between locations, use thin cylinders via `generate_cylinder()`. This avoids the complexity of specialized line rasterization while providing consistent visual results.
 
-### 9.2 Implementation Approach
+### 12.2 Implementation Approach
 
 **C++ Core:** Provides low-level mesh generation functions that return vertex/index arrays:
 ```cpp
@@ -497,7 +690,7 @@ add_cube(position, size=1.0, color="blue")
 add_arrow(start, end, color="green", shaft_radius=0.1, head_radius=0.3)
 ```
 
-### 9.3 Rendering Strategy
+### 12.3 Rendering Strategy
 
 Primitives are rendered as regular triangle meshes, appended to the main scene before rendering:
 
@@ -506,13 +699,13 @@ Primitives are rendered as regular triangle meshes, appended to the main scene b
 3. **Unified Rendering:** The standard rasterization pipeline processes all triangles together
 
 
-### 9.4 Performance Considerations
+### 12.4 Performance Considerations
 
 - Small primitives (spheres with 2-3 subdivisions, cubes) add negligible overhead (~100-1000 triangles)
-- Procedural generation is fast (~1ms for a sphere with 3 subdivisions)
+- Procedural generation is fast
 - Primitives can be cached if reused across multiple renderings
 
-### 9.5 Example Use Cases
+### 12.5 Example Use Cases
 
 ```r
 # Mark an activation peak on the brain
@@ -527,12 +720,12 @@ add_cylinder(start=c(5, -20, 40), end=c(15, -25, 50), radius=0.5, color="yellow"
 ```
 
 
-## 10. Rationale for Custom Engine Architecture vs. Existing Frameworks
+## 14. Rationale for Custom Engine Architecture vs. Existing Frameworks
 
 A foundational question for any engineering project is why a custom renderer is necessary when mature open-source solutions exist. During the scoping phase, three prominent MIT-licensed candidates were thoroughly evaluated: `ssloy/tinyrenderer`, `elnormous/SoftwareRenderer`, and `trenki2/SoftwareRenderer`. While excellent in their respective domains, these engines carry heavy abstractions designed to emulate complex, stateful graphics APIs (like OpenGL or Vulkan) or real-time game loops, introducing unnecessary architectural bloat, complex dependency chains, and difficult memory management for data passing. Because `scimesh` strictly rejects real-time windowing, texturing, global illumination, and interactive event loops, the required functional footprint is small and manageable. Developing the engine from scratch ensures that data structures map perfectly and zero-copy to R matrices, guarantees absolute cross-platform compliance under CRAN's strict memory sanitizers (ASAN/UBSAN), and results in a radically maintainable codebase perfectly optimized for the highly specific niche of headless neuroimaging visualization.
 
 
-## 11. Technology Choices
+## 15. Technology Choices
 
 ### C++ Math Library: GLM
 
