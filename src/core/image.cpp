@@ -45,6 +45,39 @@ void Image::clear_float(float r, float g, float b, float a) {
           static_cast<uint8_t>(std::clamp(a, 0.0f, 1.0f) * 255.0f));
 }
 
+Image Image::downsample_box(int factor) const {
+    if (factor <= 1)
+        return *this;
+
+    int out_w = width / factor;
+    int out_h = height / factor;
+    Image result(out_w, out_h);
+
+    int n = factor * factor;
+    for (int y = 0; y < out_h; y++) {
+        for (int x = 0; x < out_w; x++) {
+            int r_sum = 0, g_sum = 0, b_sum = 0, a_sum = 0;
+            for (int dy = 0; dy < factor; dy++) {
+                for (int dx = 0; dx < factor; dx++) {
+                    int sx = x * factor + dx;
+                    int sy = y * factor + dy;
+                    int idx = (sy * width + sx) * 4;
+                    r_sum += pixels[idx];
+                    g_sum += pixels[idx + 1];
+                    b_sum += pixels[idx + 2];
+                    a_sum += pixels[idx + 3];
+                }
+            }
+            result.set_pixel(x, y,
+                static_cast<uint8_t>(r_sum / n),
+                static_cast<uint8_t>(g_sum / n),
+                static_cast<uint8_t>(b_sum / n),
+                static_cast<uint8_t>(a_sum / n));
+        }
+    }
+    return result;
+}
+
 bool Image::write_ppm(const std::string &filename) const {
     std::ofstream f(filename, std::ios::binary);
     if (!f)

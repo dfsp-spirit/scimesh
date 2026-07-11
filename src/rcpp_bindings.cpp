@@ -148,6 +148,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["wireframe"])) {
         opts.wireframe = as<bool>(opt_desc["wireframe"]);
     }
+    if (opt_desc.containsElementNamed("aa_samples") &&
+        !Rf_isNull(opt_desc["aa_samples"])) {
+        opts.aa_samples = as<int>(opt_desc["aa_samples"]);
+    }
 
     return opts;
 }

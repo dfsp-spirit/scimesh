@@ -33,6 +33,7 @@ img_t4 <- vis.subject.morph.native(
     colorbar_title = "Sulcal depth [mm]",
     width        = 600L,
     height       = 450L,
+    aa_samples   = 2L,
     background   = c(0, 0, 0, 0)   # transparent RGBA
 )
 write_png(img_t4, "scimesh_subject1_sulc_t4.png")
@@ -48,6 +49,7 @@ img_t9 <- vis.subject.morph.native(
     colorbar_title = "Sulcal depth [mm]",
     width        = 400L,
     height       = 300L,
+    aa_samples   = 2L,
     background   = c(0, 0, 0, 0)
 )
 write_png(img_t9, "scimesh_subject1_sulc_t9.png")
@@ -63,6 +65,7 @@ img_lat <- vis.subject.morph.native(
     colorbar_title  = "Sulcal depth [mm]",
     width           = 800L,
     height          = 600L,
+    aa_samples      = 2L,
     background      = c(0, 0, 0, 0)
 )
 write_png(img_lat, "scimesh_subject1_sulc_lateral_lh.png")

@@ -5,23 +5,26 @@
 #include "rasterizer.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
 
 namespace scimesh {
 
 Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const RenderOptions &options) {
-    Image output(options.width, options.height);
-    render_pipeline({&mesh}, camera, options, output);
-    return output;
+    int aa = std::max(1, options.aa_samples);
+    Image internal(options.width * aa, options.height * aa);
+    render_pipeline({&mesh}, camera, options, internal);
+    return internal.downsample_box(aa);
 }
 
 Image Renderer::render_scene(const Scene &scene, const Camera &camera, const RenderOptions &options) {
-    Image output(options.width, options.height);
+    int aa = std::max(1, options.aa_samples);
+    Image internal(options.width * aa, options.height * aa);
     std::vector<const Mesh *> mesh_ptrs;
     for (const auto &m : scene.meshes) {
         mesh_ptrs.push_back(&m);
     }
-    render_pipeline(mesh_ptrs, camera, options, output);
-    return output;
+    render_pipeline(mesh_ptrs, camera, options, internal);
+    return internal.downsample_box(aa);
 }
 
 void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
@@ -33,12 +36,12 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                        options.background_color.b, options.background_color.a);
 
     // 2. Initialize rasterizer
-    Rasterizer rasterizer(options.width, options.height);
+    Rasterizer rasterizer(output.width, output.height);
     rasterizer.clear(1.0f);
 
     // 3. Compute view and projection matrices
     Mat4 view = camera.get_view_matrix();
-    float aspect = static_cast<float>(options.width) / static_cast<float>(options.height);
+    float aspect = static_cast<float>(output.width) / static_cast<float>(output.height);
     Mat4 projection = camera.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
 
@@ -127,9 +130,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
 
                 // NDC -> screen coordinates
                 float sx0, sy0, sz0, sx1, sy1, sz1, sx2, sy2, sz2;
-                ndc_to_screen(ndc0, options.width, options.height, sx0, sy0, sz0);
-                ndc_to_screen(ndc1, options.width, options.height, sx1, sy1, sz1);
-                ndc_to_screen(ndc2, options.width, options.height, sx2, sy2, sz2);
+                ndc_to_screen(ndc0, output.width, output.height, sx0, sy0, sz0);
+                ndc_to_screen(ndc1, output.width, output.height, sx1, sy1, sz1);
+                ndc_to_screen(ndc2, output.width, output.height, sx2, sy2, sz2);
 
                 Vec3 screen_v0(sx0, sy0, sz0);
                 Vec3 screen_v1(sx1, sy1, sz1);

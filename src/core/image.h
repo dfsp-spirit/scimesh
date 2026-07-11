@@ -20,6 +20,8 @@ struct Image {
     void clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     void clear_float(float r, float g, float b, float a);
 
+    Image downsample_box(int factor) const;
+
     // Write to PPM (for C++ test debugging - trivial format, no dependencies)
     bool write_ppm(const std::string &filename) const;
 

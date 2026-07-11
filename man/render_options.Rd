@@ -12,7 +12,8 @@ render_options(
   background_color = c(0, 0, 0, 0),
   default_color = c(0.7, 0.7, 0.7, 1),
   invert_normals = FALSE,
-  wireframe = FALSE
+  wireframe = FALSE,
+  aa_samples = 1L
 )
 }
 \arguments{
@@ -32,6 +33,12 @@ length 4 (values 0-1).}
 \item{invert_normals}{Whether to invert surface normals.}
 
 \item{wireframe}{Whether to render in wireframe mode.}
+
+\item{aa_samples}{Anti-aliasing supersampling factor.  Renders
+internally at \code{width * aa_samples} x
+\code{height * aa_samples}, then downsamples to the requested
+size via box averaging.  Default \code{1} (no AA), \code{2} for
+2×2 SSAA, \code{4} for 4×4.}
 }
 \value{
 A render options list for use with \code{render_mesh()} or

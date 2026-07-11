@@ -18,6 +18,7 @@ struct RenderOptions {
     Color default_color = DEFAULT_COLOR;
     bool invert_normals = false;
     bool wireframe = false;
+    int aa_samples = 1;
 
     float near_plane = 0.1f;
     float far_plane = 10000.0f;
