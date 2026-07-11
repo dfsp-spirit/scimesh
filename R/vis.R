@@ -402,19 +402,17 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
     images <- list()
     for (vn in view_names) {
         cam <- .view_to_camera(vn, meshes)
-        img <- render_scene(meshes, cam, ropts)
+        clean <- .canonical_view(vn)
+        if (grepl("_lh$", clean) && !is.null(meshes[["lh"]])) {
+            scene <- list(meshes[["lh"]])
+        } else if (grepl("_rh$", clean) && !is.null(meshes[["rh"]])) {
+            scene <- list(meshes[["rh"]])
+        } else {
+            scene <- meshes
+        }
+        img <- render_scene(scene, cam, ropts)
         images <- c(images, list(img))
     }
-
-    # ---- Auto-crop: trim transparent borders uniformly ----
-    arrays <- lapply(images, image_to_array)
-    uc <- .uniform_crop(arrays, background = background)
-    # Convert cropped arrays back to image-list format
-    images <- lapply(uc$arrays, function(arr) {
-        list(width  = dim(arr)[2L],
-             height = dim(arr)[1L],
-             pixels = as.raw(round(aperm(arr, c(3L, 2L, 1L)) * 255)))
-    })
 
     # ---- Colorbar ----
     cbar <- NULL
@@ -442,5 +440,6 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
     # ---- Compose layout ----
     compose_layout(images, colorbar = cbar,
                    colorbar_height = colorbar_height,
-                   background = background)
+                   background = background,
+                   crop = TRUE)
 }

@@ -47,6 +47,42 @@
     list(arrays = padded, bboxes = lapply(cropped, `[[`, "bbox"))
 }
 
+# Internal: crop each image individually and pad to per-row height and
+# per-column width.  This gives a tight grid where no cell has more
+# padding than necessary, saving white space for publication figures.
+#
+# Returns padded arrays and the row/column dimension vectors used.
+.grid_crop <- function(arrays, nrow, ncol, background = c(0, 0, 0, 0)) {
+    n <- length(arrays)
+    if (n == 0L) stop("arrays must be non-empty")
+
+    cropped <- lapply(arrays, .crop_content)
+    cropped_h <- vapply(cropped, function(x) dim(x$arr)[1L], 0L)
+    cropped_w <- vapply(cropped, function(x) dim(x$arr)[2L], 0L)
+
+    row_heights <- integer(nrow)
+    for (r in seq_len(nrow)) {
+        idx <- ((r - 1L) * ncol + 1L):min(r * ncol, n)
+        row_heights[r] <- max(cropped_h[idx])
+    }
+
+    col_widths <- integer(ncol)
+    for (c in seq_len(ncol)) {
+        idx <- seq(c, n, by = ncol)
+        col_widths[c] <- max(cropped_w[idx])
+    }
+
+    padded <- lapply(seq_len(n), function(i) {
+        r <- (i - 1L) %/% ncol + 1L
+        c <- (i - 1L) %% ncol + 1L
+        .pad_to_size(cropped[[i]]$arr, row_heights[r], col_widths[c],
+                     background)
+    })
+
+    list(arrays = padded, row_heights = row_heights,
+         col_widths = col_widths)
+}
+
 # Internal: scale a 3D (HxWxC) array to new dimensions using bilinear
 # interpolation along each axis. Handles edge cases where source
 # dimensions are 1.
@@ -118,6 +154,10 @@
 #' @param colorbar_width Width of the colorbar column in pixels. Only
 #'   used when appending a vertical colorbar.
 #' @param background Background RGBA color for padding (0-1 scale).
+#' @param crop Logical. If \code{TRUE}, transparent borders are
+#'   cropped individually and images are padded to per-row height
+#'   and per-column width for a tight layout with minimal white
+#'   space. Default is \code{FALSE} (images must be same size).
 #' @return A list with \code{width}, \code{height}, \code{pixels}
 #'   suitable for \code{write_png()} or \code{image_to_array()}.
 #'
@@ -126,27 +166,16 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
                            colorbar = NULL,
                            colorbar_height = 80L,
                            colorbar_width = 80L,
-                           background = c(0, 0, 0, 0)) {
+                           background = c(0, 0, 0, 0),
+                           crop = FALSE) {
     if (!is.list(images) || length(images) == 0L) {
         stop("images must be a non-empty list of renderer output images")
     }
 
     arrays <- lapply(images, image_to_array)
 
-    if (length(arrays) == 1L && is.null(colorbar)) {
+    if (length(arrays) == 1L && is.null(colorbar) && !isTRUE(crop)) {
         return(images[[1L]])
-    }
-
-    cell_h <- dim(arrays[[1L]])[1L]
-    cell_w <- dim(arrays[[1L]])[2L]
-
-    for (i in seq_along(arrays)) {
-        if (dim(arrays[[i]])[1L] != cell_h || dim(arrays[[i]])[2L] != cell_w) {
-            stop("All images must have the same dimensions for composition. ",
-                 "Image ", i, " has dimensions ",
-                 paste(dim(arrays[[i]]), collapse = "x"),
-                 " but expected ", cell_h, "x", cell_w)
-        }
     }
 
     if (is.null(nrow) && is.null(ncol)) {
@@ -158,23 +187,53 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
         ncol <- ceiling(length(arrays) / nrow)
     }
 
+    if (isTRUE(crop)) {
+        gc <- .grid_crop(arrays, nrow, ncol, background = background)
+        arrays <- gc$arrays
+        row_heights <- gc$row_heights
+        col_widths  <- gc$col_widths
+    } else {
+        cell_h <- dim(arrays[[1L]])[1L]
+        cell_w <- dim(arrays[[1L]])[2L]
+        for (i in seq_along(arrays)) {
+            if (dim(arrays[[i]])[1L] != cell_h ||
+                dim(arrays[[i]])[2L] != cell_w) {
+                stop("All images must have the same dimensions for composition. ",
+                     "Image ", i, " has dimensions ",
+                     paste(dim(arrays[[i]]), collapse = "x"),
+                     " but expected ", cell_h, "x", cell_w)
+            }
+        }
+        row_heights <- rep(cell_h, nrow)
+        col_widths  <- rep(cell_w, ncol)
+    }
+
+    if (length(arrays) == 1L && is.null(colorbar)) {
+        arr <- arrays[[1L]]
+        out_h <- dim(arr)[1L]
+        out_w <- dim(arr)[2L]
+        pixels <- as.raw(round(aperm(arr, c(3L, 2L, 1L)) * 255))
+        return(list(width = out_w, height = out_h, pixels = pixels))
+    }
+
     bg_color <- as.numeric(background)
     bg_r <- bg_color[1]; bg_g <- bg_color[2]
     bg_b <- bg_color[3]; bg_a <- if (length(bg_color) > 3) bg_color[4] else 1
 
-    full_w <- ncol * cell_w
-    full_h <- nrow * cell_h
+    full_w <- sum(col_widths)
+    full_h <- sum(row_heights)
 
     composite <- array(c(bg_r, bg_g, bg_b, bg_a),
                        dim = c(full_h, full_w, 4L))
     for (r in seq_len(nrow)) {
+        row_start <- if (r == 1L) 1L else cumsum(row_heights)[r - 1L] + 1L
+        row_end   <- cumsum(row_heights)[r]
         for (c_idx in seq_len(ncol)) {
             i <- (r - 1L) * ncol + c_idx
             if (i > length(arrays)) break
-            row_start <- (r - 1L) * cell_h + 1L
-            row_end <- r * cell_h
-            col_start <- (c_idx - 1L) * cell_w + 1L
-            col_end <- c_idx * cell_w
+            col_start <- if (c_idx == 1L) 1L
+                         else cumsum(col_widths)[c_idx - 1L] + 1L
+            col_end   <- cumsum(col_widths)[c_idx]
             composite[row_start:row_end, col_start:col_end, ] <-
                 arrays[[i]]
         }
@@ -247,7 +306,8 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
 stack_vertical <- function(..., colorbar = NULL,
                            colorbar_height = 80L,
                            colorbar_width = 80L,
-                           background = c(0, 0, 0, 0)) {
+                           background = c(0, 0, 0, 0),
+                           crop = FALSE) {
     images <- list(...)
     if (length(images) == 1L && is.list(images[[1L]]) &&
         !is.null(images[[1L]]$pixels)) {
@@ -258,7 +318,8 @@ stack_vertical <- function(..., colorbar = NULL,
     compose_layout(images, ncol = 1L, colorbar = colorbar,
                    colorbar_height = colorbar_height,
                    colorbar_width = colorbar_width,
-                   background = background)
+                   background = background,
+                   crop = crop)
 }
 
 #' Stack images horizontally
@@ -276,7 +337,8 @@ stack_vertical <- function(..., colorbar = NULL,
 stack_horizontal <- function(..., colorbar = NULL,
                               colorbar_height = 80L,
                               colorbar_width = 80L,
-                              background = c(0, 0, 0, 0)) {
+                              background = c(0, 0, 0, 0),
+                              crop = FALSE) {
     images <- list(...)
     if (length(images) == 1L && is.list(images[[1L]]) &&
         !is.null(images[[1L]]$pixels)) {
@@ -287,5 +349,6 @@ stack_horizontal <- function(..., colorbar = NULL,
     compose_layout(images, nrow = 1L, colorbar = colorbar,
                    colorbar_height = colorbar_height,
                    colorbar_width = colorbar_width,
-                   background = background)
+                   background = background,
+                   crop = crop)
 }
