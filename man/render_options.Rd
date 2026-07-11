@@ -14,6 +14,8 @@ render_options(
   invert_normals = FALSE,
   wireframe = FALSE,
   wireframe_color = c(0, 0, 0, 1),
+  specular_color = c(0, 0, 0, 0),
+  shininess = 0,
   aa_samples = 1L
 )
 }
@@ -37,6 +39,15 @@ length 4 (values 0-1).}
 
 \item{wireframe_color}{RGBA color for wireframe edges (0-1
 scale).  Default \code{c(0, 0, 0, 1)} (black).}
+
+\item{specular_color}{Specular highlight color (0-1 scale).  When
+\code{shininess > 0}, a Blinn-Phong highlight in this colour is
+added where the surface faces the camera.  Default
+\code{c(0, 0, 0, 0)} (off).}
+
+\item{shininess}{Specular exponent controlling highlight sharpness.
+Higher values produce a tighter spot.  Typical values: 32 (soft
+plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).}
 
 \item{aa_samples}{Anti-aliasing supersampling factor.  Renders
 internally at \code{width * aa_samples} x

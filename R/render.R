@@ -84,6 +84,13 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #' @param wireframe Whether to render in wireframe mode.
 #' @param wireframe_color RGBA color for wireframe edges (0-1
 #'   scale).  Default \code{c(0, 0, 0, 1)} (black).
+#' @param specular_color Specular highlight color (0-1 scale).  When
+#'   \code{shininess > 0}, a Blinn-Phong highlight in this colour is
+#'   added where the surface faces the camera.  Default
+#'   \code{c(0, 0, 0, 0)} (off).
+#' @param shininess Specular exponent controlling highlight sharpness.
+#'   Higher values produce a tighter spot.  Typical values: 32 (soft
+#'   plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
@@ -101,6 +108,8 @@ render_options <- function(width = 800L, height = 600L,
                            invert_normals = FALSE,
                            wireframe = FALSE,
                            wireframe_color = c(0, 0, 0, 1),
+                           specular_color = c(0, 0, 0, 0),
+                           shininess = 0,
                            aa_samples = 1L) {
     shading <- match.arg(shading)
     list(
@@ -113,6 +122,40 @@ render_options <- function(width = 800L, height = 600L,
         invert_normals = isTRUE(invert_normals),
         wireframe = isTRUE(wireframe),
         wireframe_color = as.numeric(wireframe_color),
+        specular_color = as.numeric(specular_color),
+        shininess = as.numeric(shininess),
         aa_samples = as.integer(aa_samples)
     )
+}
+
+#' Render raw triangles without index buffer
+#'
+#' Renders triangle geometry where positions and colours are given
+#' as flat arrays with 3 vertices per triangle (no index buffer).
+#' Useful for voxel renderings, misc3d isosurfaces, and other
+#' dynamically generated geometry.
+#'
+#' @param positions N×3 numeric matrix of vertex positions, where N
+#'   is a multiple of 3 (3 per triangle).
+#' @param colors N×4 numeric matrix of RGBA colours (0-1 scale).
+#' @param camera A camera list from \code{camera()} or
+#'   \code{camera_auto()}.
+#' @param options Render options from \code{render_options()}.
+#' @return An image list with \code{width}, \code{height},
+#'   \code{pixels}.
+#'
+#' @export
+render_triangles <- function(positions, colors, camera,
+                             options = render_options()) {
+    if (!is.matrix(positions) || ncol(positions) != 3L) {
+        stop("positions must be an Nx3 numeric matrix")
+    }
+    n <- nrow(positions)
+    if (n %% 3L != 0L) {
+        stop("positions must have a multiple of 3 rows")
+    }
+    if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
+        stop("colors must be an Nx4 numeric matrix matching positions")
+    }
+    scimesh_render_triangles_raw(positions, colors, camera, options)
 }

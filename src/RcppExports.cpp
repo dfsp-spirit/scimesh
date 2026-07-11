@@ -129,6 +129,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_render_triangles_raw
+List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors, List camera_data, List options_data);
+RcppExport SEXP _scimesh_scimesh_render_triangles_raw(SEXP positionsSEXP, SEXP colorsSEXP, SEXP camera_dataSEXP, SEXP options_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type positions(positionsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_render_triangles_raw(positions, colors, camera_data, options_data));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -140,6 +154,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
     {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
+    {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {NULL, NULL, 0}
 };
 

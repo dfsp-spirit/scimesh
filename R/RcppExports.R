@@ -37,3 +37,7 @@ scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segmen
     .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments)
 }
 
+scimesh_render_triangles_raw <- function(positions, colors, camera_data, options_data) {
+    .Call(`_scimesh_scimesh_render_triangles_raw`, positions, colors, camera_data, options_data)
+}
+

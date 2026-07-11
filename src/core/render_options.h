@@ -20,6 +20,8 @@ struct RenderOptions {
     bool wireframe = false;
     Color wireframe_color = Color(0.0f, 0.0f, 0.0f, 1.0f);
     int aa_samples = 1;
+    Color specular_color = Color(0.0f, 0.0f, 0.0f, 0.0f);
+    float shininess = 0.0f;
 
     float near_plane = 0.1f;
     float far_plane = 10000.0f;

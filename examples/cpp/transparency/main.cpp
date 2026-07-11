@@ -130,6 +130,8 @@ int main(int argc, char **argv) {
     opts.background_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
     opts.near_plane = 0.1f;
     opts.far_plane = glm::length(cam.eye - cam.center) * 4.0f;
+    opts.specular_color = Color(0.4f, 0.4f, 0.4f, 1.0f);
+    opts.shininess = 64.0f;
 
     std::cout << "Rendering " << opts.width << "x" << opts.height << "...\n";
     Renderer renderer;

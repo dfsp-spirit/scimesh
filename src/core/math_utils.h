@@ -60,15 +60,27 @@ inline void compute_barycentric(float px, float py,
 }
 
 inline Color shade_pixel(const Color &base_color, const Vec3 &normal,
-                         const Vec3 &light_dir) {
+                         const Vec3 &light_dir,
+                         const Color &specular_color = Color(0, 0, 0, 0),
+                         float shininess = 0.0f) {
     Vec3 n = glm::length(normal) > 1e-12f ? glm::normalize(normal) : Vec3(0.0f, 0.0f, 1.0f);
     Vec3 l = glm::normalize(light_dir);
-    float diff = std::max(0.0f, glm::dot(n, l));
+    float ndotl = std::max(0.0f, glm::dot(n, l));
     float ambient = 0.3f;
-    float intensity = ambient + (1.0f - ambient) * diff;
-    return Color(base_color.r * intensity,
-                 base_color.g * intensity,
-                 base_color.b * intensity,
+    float diffuse_term = (1.0f - ambient) * ndotl;
+    float intensity = ambient + diffuse_term;
+
+    float spec_r = 0.0f, spec_g = 0.0f, spec_b = 0.0f;
+    if (shininess > 0.0f && ndotl > 0.0f) {
+        float spec = std::pow(ndotl, shininess);
+        spec_r = specular_color.r * spec;
+        spec_g = specular_color.g * spec;
+        spec_b = specular_color.b * spec;
+    }
+
+    return Color(base_color.r * intensity + spec_r,
+                 base_color.g * intensity + spec_g,
+                 base_color.b * intensity + spec_b,
                  base_color.a);
 }
 

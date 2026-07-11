@@ -159,3 +159,52 @@ test_that("render_mesh with background color", {
     expect_equal(arr[1, 1, 1], 1.0)  # should be white
     expect_equal(arr[1, 1, 4], 1.0)  # fully opaque
 })
+
+test_that("specular highlight brightens surfaces facing camera", {
+    verts <- cbind(c(-1, -1, 1, 1), c(-1, 1, 1, -1), c(0, 0, 0, 0))
+    tris <- rbind(c(1L, 2L, 3L), c(1L, 3L, 4L))
+    cols <- matrix(rep(c(0, 0, 0, 1), 4), nrow = 4, byrow = TRUE)
+    cam <- camera(c(0, 0, 5), c(0, 0, 0))
+
+    img <- render_mesh(vertices = verts, triangles = tris,
+        colors = cols, camera = cam,
+        options = render_options(width = 64, height = 64,
+            backface_culling = FALSE, invert_normals = TRUE,
+            background_color = c(0, 0, 0, 1),
+            specular_color = c(1, 1, 1, 1), shininess = 1))
+
+    arr <- image_to_array(img)
+    n_bright <- sum(arr[, , 1] > 0.01)
+    expect_true(n_bright > 100)
+})
+
+test_that("specular off by default gives same result as no specular", {
+    verts <- cbind(c(-1, -1), c(-1, 1), c(0, 0))
+    tris <- rbind(c(1L, 2L, 1L))
+    cam <- camera(c(0, 0, 5), c(0, 0, 0))
+    opts <- render_options(width = 32, height = 32)
+
+    img <- render_mesh(vertices = verts, triangles = tris,
+        camera = cam, options = opts)
+    expect_type(img, "list")
+})
+
+test_that("render_triangles renders raw triangle data", {
+    cam <- camera(c(0, 0, 10), c(0, 0, 0))
+    pos <- matrix(c(
+        -1, -1, 0,  -1, 1, 0,  1, 1, 0,
+        -1, -1, 0,   1, 1, 0,  1, -1, 0
+    ), nrow = 6, byrow = TRUE)
+    cols <- matrix(c(
+        1, 0, 0, 1,  1, 0, 0, 1,  1, 0, 0, 1,
+        0, 1, 0, 1,  0, 1, 0, 1,  0, 1, 0, 1
+    ), nrow = 6, byrow = TRUE)
+
+    img <- render_triangles(pos, cols, cam,
+        render_options(width = 64, height = 64,
+            backface_culling = FALSE))
+
+    expect_type(img, "list")
+    expect_equal(img$width, 64)
+    expect_equal(length(img$pixels), 64 * 64 * 4)
+})

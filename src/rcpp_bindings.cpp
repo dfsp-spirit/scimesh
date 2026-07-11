@@ -164,6 +164,14 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["aa_samples"])) {
         opts.aa_samples = as<int>(opt_desc["aa_samples"]);
     }
+    if (opt_desc.containsElementNamed("specular_color") &&
+        !Rf_isNull(opt_desc["specular_color"])) {
+        opts.specular_color = color_from_r(opt_desc["specular_color"]);
+    }
+    if (opt_desc.containsElementNamed("shininess") &&
+        !Rf_isNull(opt_desc["shininess"])) {
+        opts.shininess = as<float>(opt_desc["shininess"]);
+    }
 
     return opts;
 }
@@ -368,4 +376,30 @@ List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends,
     }
     scimesh::Mesh mesh = scimesh::generate_multi_cylinders(s, e, r, col, segments);
     return mesh_to_r_list(mesh);
+}
+
+// ---- Raw triangles ----------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors,
+                                  List camera_data, List options_data) {
+    int n = positions.nrow();
+    if (n % 3 != 0) stop("positions must have a multiple of 3 rows (3 per triangle)");
+    std::vector<scimesh::Vec3> verts;
+    std::vector<scimesh::Color> cols;
+    for (int i = 0; i < n; i++) {
+        verts.push_back(scimesh::Vec3(
+            static_cast<float>(positions(i, 0)),
+            static_cast<float>(positions(i, 1)),
+            static_cast<float>(positions(i, 2))));
+        cols.push_back(scimesh::Color(
+            static_cast<float>(colors(i, 0)),
+            static_cast<float>(colors(i, 1)),
+            static_cast<float>(colors(i, 2)),
+            static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+    }
+    scimesh::Camera cam = build_camera_from_r(camera_data);
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+    scimesh::Renderer renderer;
+    scimesh::Image img = renderer.render_triangles_raw(verts, cols, cam, opts);
+    return image_to_r_list(img);
 }

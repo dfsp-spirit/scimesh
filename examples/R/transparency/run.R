@@ -61,7 +61,9 @@ img <- render_scene(list(white_mesh, pial_mesh), cam,
     render_options(
         width = 1200L, height = 900L,
         backface_culling = FALSE,
-        background_color = c(1, 1, 1, 1)
+        background_color = c(1, 1, 1, 1),
+        specular_color = c(0.4, 0.4, 0.4, 1),
+        shininess = 64
     ))
 
 write_png(img, "scimesh_transparency_lh.png")

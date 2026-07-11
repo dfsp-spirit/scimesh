@@ -39,6 +39,29 @@ Image Renderer::render_scene(const Scene &scene, const Camera &camera, const Ren
     return internal.downsample_box(aa);
 }
 
+Image Renderer::render_triangles_raw(const std::vector<Vec3> &positions,
+                                     const std::vector<Color> &colors,
+                                     const Camera &camera,
+                                     const RenderOptions &options) {
+    Mesh mesh;
+    mesh.vertices = positions;
+    mesh.colors = colors;
+    int nv = static_cast<int>(positions.size());
+    for (int i = 0; i < nv / 3; i++) {
+        mesh.triangles.push_back({
+            static_cast<uint32_t>(i * 3),
+            static_cast<uint32_t>(i * 3 + 1),
+            static_cast<uint32_t>(i * 3 + 2)});
+    }
+    for (const auto &c : colors) {
+        if (c.a < 1.0f - 1e-6f) {
+            mesh.has_transparency = true;
+            break;
+        }
+    }
+    return render_mesh(mesh, camera, options);
+}
+
 void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                                const Camera &camera,
                                const RenderOptions &options,
@@ -48,6 +71,8 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
 
     Rasterizer rasterizer(output.width, output.height);
     rasterizer.clear(1.0f);
+    rasterizer.specular_color = options.specular_color;
+    rasterizer.shininess = options.shininess;
 
     Mat4 view = camera.get_view_matrix();
     float aspect = static_cast<float>(output.width) / static_cast<float>(output.height);
