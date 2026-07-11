@@ -318,8 +318,10 @@
 #' @param cortex_only Logical.  If \code{TRUE}, non-cortex (medial wall)
 #'   vertices are masked to \code{NA} using the subject's
 #'   \code{label/<hemi>.cortex.label} files.
-#' @param draw_colorbar Logical.  If \code{TRUE}, a horizontal colorbar
-#'   is appended below the rendered views.
+#' @param draw_colorbar Logical or character string.  If \code{TRUE}
+#'   or \code{"horizontal"}, a horizontal colorbar is appended below
+#'   the rendered views.  If \code{"vertical"}, a vertical colorbar
+#'   is placed to the right.  Defaults to \code{FALSE}.
 #' @param colorbar_title Optional title string placed above the
 #'   colorbar (e.g. \code{"Cortical thickness [mm]"}).
 #' @param makecmap_options A named list of colormap options:
@@ -422,7 +424,9 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
 
     # ---- Colorbar ----
     cbar <- NULL
-    if (isTRUE(draw_colorbar)) {
+    if (isTRUE(draw_colorbar) || is.character(draw_colorbar)) {
+        use_horizontal <- isTRUE(draw_colorbar) ||
+                          identical(draw_colorbar, "horizontal")
         all_morph <- unlist(lapply(hemi_list, `[[`, "morph"))
         finite_vals <- all_morph[!is.na(all_morph)]
         lo <- cmap$range[1L]
@@ -434,14 +438,25 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
             lo <- -mx; hi <- mx
         }
 
-        cbar <- colorbar_horizontal(
-            cmap$colFn,
-            n_colors = cmap$n,
-            width = 600L, height = colorbar_height,
-            data_range = c(lo, hi),
-            title = colorbar_title,
-            label_cex = colorbar_cex,
-            background = background)
+        if (use_horizontal) {
+            cbar <- colorbar_horizontal(
+                cmap$colFn,
+                n_colors = cmap$n,
+                width = 600L, height = colorbar_height,
+                data_range = c(lo, hi),
+                title = colorbar_title,
+                label_cex = colorbar_cex,
+                background = background)
+        } else {
+            cbar <- colorbar_vertical(
+                cmap$colFn,
+                n_colors = cmap$n,
+                width = colorbar_height, height = 600L,
+                data_range = c(lo, hi),
+                title = colorbar_title,
+                label_cex = colorbar_cex,
+                background = background)
+        }
     }
 
     # ---- Compose layout ----

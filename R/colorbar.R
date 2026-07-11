@@ -51,8 +51,8 @@ ensure_rgba_array <- function(arr) {
         if (!is.null(title) && nchar(title) > 0L) {
             graphics::text(0.5, strip_top + 0.12,
                            labels = title,
-                           cex = label_cex * 1.2,
-                           font = 1, adj = c(0.5, 0), col = "#000000")
+                           cex = label_cex * 1.4,
+                           font = 2, adj = c(0.5, 0), col = "#000000")
         }
     } else {
         strip_left   <- 0.20
@@ -82,10 +82,10 @@ ensure_rgba_array <- function(arr) {
         }
 
         if (!is.null(title) && nchar(title) > 0L) {
-            graphics::text(strip_right + 0.20, 0.5,
+            graphics::text(0.10, 0.5,
                            labels = title,
-                           cex = label_cex * 1.2,
-                           font = 1, srt = 90, adj = c(0.5, 0),
+                           cex = label_cex * 1.4,
+                           font = 2, srt = 90, adj = c(0.5, 0.5),
                            col = "#000000")
         }
     }

@@ -10,6 +10,7 @@ stack_horizontal(
   colorbar_height = 80L,
   colorbar_width = 80L,
   background = c(0, 0, 0, 0),
+  colorbar_side = c("right", "left"),
   crop = FALSE
 )
 }

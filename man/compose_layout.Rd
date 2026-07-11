@@ -12,6 +12,7 @@ compose_layout(
   colorbar_height = 80L,
   colorbar_width = 80L,
   background = c(0, 0, 0, 0),
+  colorbar_side = c("right", "left"),
   crop = FALSE
 )
 }
@@ -36,6 +37,10 @@ used when appending a horizontal colorbar.}
 used when appending a vertical colorbar.}
 
 \item{background}{Background RGBA color for padding (0-1 scale).}
+
+\item{colorbar_side}{For vertical colorbars, whether to place
+the bar on the \code{"right"} (default) or \code{"left"} of
+the brain images. Ignored for horizontal colorbars.}
 
 \item{crop}{Logical. If \code{TRUE}, transparent borders are
 cropped individually and images are padded to per-row height

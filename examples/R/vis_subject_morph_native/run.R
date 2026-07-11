@@ -55,13 +55,13 @@ img_t9 <- vis.subject.morph.native(
 write_png(img_t9, "scimesh_subject1_sulc_t9.png")
 cat("  -> scimesh_subject1_sulc_t9.png  (", img_t9$width, "x", img_t9$height, ")\n", sep = "")
 
-# ---- lateral_lh: single left-hemi lateral view + colorbar --------------------
-cat("Rendering lateral_lh + colorbar ...\n")
+# ---- lateral_lh: single left-hemi lateral view + vertical colorbar ----
+cat("Rendering lateral_lh + vertical colorbar ...\n")
 img_lat <- vis.subject.morph.native(
     sjd, sj, "sulc",
     views           = "lateral_lh",
     cortex_only     = TRUE,
-    draw_colorbar   = TRUE,
+    draw_colorbar   = "vertical",
     colorbar_title  = "Sulcal depth [mm]",
     width           = 800L,
     height          = 600L,
@@ -70,5 +70,21 @@ img_lat <- vis.subject.morph.native(
 )
 write_png(img_lat, "scimesh_subject1_sulc_lateral_lh.png")
 cat("  -> scimesh_subject1_sulc_lateral_lh.png  (", img_lat$width, "x", img_lat$height, ")\n", sep = "")
+
+# ---- t4: 2×2 + vertical colorbar on the right --------------------------------
+cat("Rendering t4 + vertical colorbar ...\n")
+img_t4v <- vis.subject.morph.native(
+    sjd, sj, "sulc",
+    views           = "t4",
+    cortex_only     = TRUE,
+    draw_colorbar   = "vertical",
+    colorbar_title  = "Sulcal depth [mm]",
+    width           = 600L,
+    height          = 450L,
+    aa_samples      = 2L,
+    background      = c(0, 0, 0, 0)
+)
+write_png(img_t4v, "scimesh_subject1_sulc_t4_vertical.png")
+cat("  -> scimesh_subject1_sulc_t4_vertical.png  (", img_t4v$width, "x", img_t4v$height, ")\n", sep = "")
 
 cat("\nDone.\n")

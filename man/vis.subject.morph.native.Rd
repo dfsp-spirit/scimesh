@@ -48,8 +48,10 @@ are also accepted.}
 vertices are masked to \code{NA} using the subject's
 \code{label/<hemi>.cortex.label} files.}
 
-\item{draw_colorbar}{Logical.  If \code{TRUE}, a horizontal colorbar
-is appended below the rendered views.}
+\item{draw_colorbar}{Logical or character string.  If \code{TRUE}
+or \code{"horizontal"}, a horizontal colorbar is appended below
+the rendered views.  If \code{"vertical"}, a vertical colorbar
+is placed to the right.  Defaults to \code{FALSE}.}
 
 \item{colorbar_title}{Optional title string placed above the
 colorbar (e.g. \code{"Cortical thickness [mm]"}).}

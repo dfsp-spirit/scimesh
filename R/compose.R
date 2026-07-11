@@ -158,6 +158,9 @@
 #'   cropped individually and images are padded to per-row height
 #'   and per-column width for a tight layout with minimal white
 #'   space. Default is \code{FALSE} (images must be same size).
+#' @param colorbar_side For vertical colorbars, whether to place
+#'   the bar on the \code{"right"} (default) or \code{"left"} of
+#'   the brain images. Ignored for horizontal colorbars.
 #' @return A list with \code{width}, \code{height}, \code{pixels}
 #'   suitable for \code{write_png()} or \code{image_to_array()}.
 #'
@@ -167,10 +170,13 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
                            colorbar_height = 80L,
                            colorbar_width = 80L,
                            background = c(0, 0, 0, 0),
+                           colorbar_side = c("right", "left"),
                            crop = FALSE) {
     if (!is.list(images) || length(images) == 0L) {
         stop("images must be a non-empty list of renderer output images")
     }
+
+    colorbar_side <- match.arg(colorbar_side)
 
     arrays <- lapply(images, image_to_array)
 
@@ -272,8 +278,13 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
             new_w <- full_w + cbar_scaled_w
             new_composite <- array(c(bg_r, bg_g, bg_b, bg_a),
                                    dim = c(full_h, new_w, 4L))
-            new_composite[, 1L:full_w, ] <- composite
-            new_composite[, (full_w + 1L):new_w, ] <- scaled_cbar
+            if (colorbar_side == "left") {
+                new_composite[, 1L:cbar_scaled_w, ] <- scaled_cbar
+                new_composite[, (cbar_scaled_w + 1L):new_w, ] <- composite
+            } else {
+                new_composite[, 1L:full_w, ] <- composite
+                new_composite[, (full_w + 1L):new_w, ] <- scaled_cbar
+            }
             composite <- new_composite
         }
     }
@@ -307,6 +318,7 @@ stack_vertical <- function(..., colorbar = NULL,
                            colorbar_height = 80L,
                            colorbar_width = 80L,
                            background = c(0, 0, 0, 0),
+                           colorbar_side = c("right", "left"),
                            crop = FALSE) {
     images <- list(...)
     if (length(images) == 1L && is.list(images[[1L]]) &&
@@ -319,6 +331,7 @@ stack_vertical <- function(..., colorbar = NULL,
                    colorbar_height = colorbar_height,
                    colorbar_width = colorbar_width,
                    background = background,
+                   colorbar_side = colorbar_side,
                    crop = crop)
 }
 
@@ -338,6 +351,7 @@ stack_horizontal <- function(..., colorbar = NULL,
                               colorbar_height = 80L,
                               colorbar_width = 80L,
                               background = c(0, 0, 0, 0),
+                              colorbar_side = c("right", "left"),
                               crop = FALSE) {
     images <- list(...)
     if (length(images) == 1L && is.list(images[[1L]]) &&
@@ -350,5 +364,6 @@ stack_horizontal <- function(..., colorbar = NULL,
                    colorbar_height = colorbar_height,
                    colorbar_width = colorbar_width,
                    background = background,
+                   colorbar_side = colorbar_side,
                    crop = crop)
 }
