@@ -14,11 +14,13 @@ image_to_array <- function(image) {
     if (!is.list(image) || is.null(image$pixels)) {
         stop("image must be a renderer output list with 'pixels' component")
     }
-    arr <- array(
-        as.numeric(image$pixels) / 255.0,
-        dim = c(image$height, image$width, 4L)
-    )
-    arr
+    vals <- as.numeric(image$pixels) / 255.0
+    w <- image$width
+    h <- image$height
+    # C++ data is row-major RGBA interleaved: pixel(y,x) at (y*W+x)*4.
+    # array(vals, dim=c(4,W,H)) matches this layout, then aperm to (H,W,4).
+    arr <- array(vals, dim = c(4L, w, h))
+    aperm(arr, c(3L, 2L, 1L))
 }
 
 #' Write a rendered image to a PNG file

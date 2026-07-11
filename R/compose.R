@@ -172,7 +172,8 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
 
     out_h <- dim(composite)[1L]
     out_w <- dim(composite)[2L]
-    pixels <- as.raw(round(composite * 255))
+    # composite is (H,W,4). C++ pixels are (4,W,H) flattened → row-major RGBA.
+    pixels <- as.raw(round(aperm(composite, c(3L, 2L, 1L)) * 255))
 
     list(
         width = out_w,
