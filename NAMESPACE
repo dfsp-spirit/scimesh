@@ -1,0 +1,3 @@
+useDynLib(scimesh, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")

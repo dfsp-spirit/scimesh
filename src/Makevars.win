@@ -1,0 +1,14 @@
+CXX_STD = CXX17
+
+PKG_CPPFLAGS = -I../src/core -I../src/core/glm
+PKG_CXXFLAGS = -O2
+
+OBJECTS = rcpp_bindings.o \
+    RcppExports.o \
+    core/image.o \
+    core/camera.o \
+    core/normals.o \
+    core/clipping.o \
+    core/rasterizer.o \
+    core/renderer.o \
+    core/primitives.o
