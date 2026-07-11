@@ -13,3 +13,27 @@ scimesh_camera_fit_mesh <- function(mesh_data, direction, up, fov_degrees = 45.0
     .Call(`_scimesh_scimesh_camera_fit_mesh`, mesh_data, direction, up, fov_degrees, margin)
 }
 
+scimesh_transform_mesh <- function(mesh_data, matrix_4x4) {
+    .Call(`_scimesh_scimesh_transform_mesh`, mesh_data, matrix_4x4)
+}
+
+scimesh_translate_mesh <- function(mesh_data, translation) {
+    .Call(`_scimesh_scimesh_translate_mesh`, mesh_data, translation)
+}
+
+scimesh_scale_mesh <- function(mesh_data, scale) {
+    .Call(`_scimesh_scimesh_scale_mesh`, mesh_data, scale)
+}
+
+scimesh_rotate_mesh <- function(mesh_data, angle_rad, axis) {
+    .Call(`_scimesh_scimesh_rotate_mesh`, mesh_data, angle_rad, axis)
+}
+
+scimesh_generate_multi_spheres <- function(centers, radii, colors, segments = 16L) {
+    .Call(`_scimesh_scimesh_generate_multi_spheres`, centers, radii, colors, segments)
+}
+
+scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segments = 12L) {
+    .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments)
+}
+

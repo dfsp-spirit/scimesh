@@ -18,4 +18,15 @@ Mesh generate_arrow(const Vec3 &from, const Vec3 &to,
 
 void merge_mesh(Mesh &dst, const Mesh &src);
 
+Mesh generate_multi_spheres(const std::vector<Vec3> &centers,
+                            const std::vector<float> &radii,
+                            const std::vector<Color> &colors,
+                            int segments = 16);
+
+Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
+                              const std::vector<Vec3> &ends,
+                              const std::vector<float> &radii,
+                              const std::vector<Color> &colors,
+                              int segments = 12);
+
 } // namespace scimesh

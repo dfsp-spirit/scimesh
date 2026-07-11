@@ -1,5 +1,7 @@
 #include <Rcpp.h>
 #include "core/renderer.h"
+#include "core/transforms.h"
+#include "core/primitives.h"
 
 using namespace Rcpp;
 
@@ -168,6 +170,53 @@ List image_to_r_list(const scimesh::Image &img) {
         Named("pixels") = pixels);
 }
 
+List mesh_to_r_list(const scimesh::Mesh &mesh) {
+    int nv = static_cast<int>(mesh.vertices.size());
+    NumericMatrix verts(nv, 3);
+    for (int i = 0; i < nv; i++) {
+        verts(i, 0) = mesh.vertices[i].x;
+        verts(i, 1) = mesh.vertices[i].y;
+        verts(i, 2) = mesh.vertices[i].z;
+    }
+
+    int nt = static_cast<int>(mesh.triangles.size());
+    IntegerMatrix tris(nt, 3);
+    for (int i = 0; i < nt; i++) {
+        tris(i, 0) = static_cast<int>(mesh.triangles[i].v0) + 1;
+        tris(i, 1) = static_cast<int>(mesh.triangles[i].v1) + 1;
+        tris(i, 2) = static_cast<int>(mesh.triangles[i].v2) + 1;
+    }
+
+    List out = List::create(
+        Named("vertices") = verts,
+        Named("triangles") = tris);
+
+    if (!mesh.colors.empty()) {
+        int nc = static_cast<int>(mesh.colors.size());
+        NumericMatrix cols(nc, 4);
+        for (int i = 0; i < nc; i++) {
+            cols(i, 0) = mesh.colors[i].r;
+            cols(i, 1) = mesh.colors[i].g;
+            cols(i, 2) = mesh.colors[i].b;
+            cols(i, 3) = mesh.colors[i].a;
+        }
+        out["colors"] = cols;
+    }
+
+    if (!mesh.normals.empty()) {
+        int nn = static_cast<int>(mesh.normals.size());
+        NumericMatrix norms(nn, 3);
+        for (int i = 0; i < nn; i++) {
+            norms(i, 0) = mesh.normals[i].x;
+            norms(i, 1) = mesh.normals[i].y;
+            norms(i, 2) = mesh.normals[i].z;
+        }
+        out["normals"] = norms;
+    }
+
+    return out;
+}
+
 } // anonymous namespace
 
 
@@ -224,4 +273,89 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
         Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
             ? "orthographic" : "perspective"),
         Named("fov") = cam.fov_degrees);
+}
+
+// ---- Mesh transforms -------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_transform_mesh(List mesh_data, NumericMatrix matrix_4x4) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    scimesh::Mat4 m;
+    for (int r = 0; r < 4; r++)
+        for (int c = 0; c < 4; c++)
+            m[r][c] = static_cast<float>(matrix_4x4(r, c));
+    scimesh::transform_mesh(mesh, m);
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_translate_mesh(List mesh_data, NumericVector translation) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    scimesh::translate_mesh(mesh, vec3_from_r(translation));
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_scale_mesh(List mesh_data, double scale) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    scimesh::scale_mesh(mesh, static_cast<float>(scale));
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_rotate_mesh(List mesh_data, double angle_rad, NumericVector axis) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    scimesh::rotate_mesh(mesh, static_cast<float>(angle_rad), vec3_from_r(axis));
+    return mesh_to_r_list(mesh);
+}
+
+// ---- Multi primitives ------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_generate_multi_spheres(NumericMatrix centers, NumericVector radii,
+                                    NumericMatrix colors, int segments = 16) {
+    int n = centers.nrow();
+    std::vector<scimesh::Vec3> c;
+    std::vector<float> r;
+    std::vector<scimesh::Color> col;
+    for (int i = 0; i < n; i++) {
+        c.push_back(scimesh::Vec3(
+            static_cast<float>(centers(i, 0)),
+            static_cast<float>(centers(i, 1)),
+            static_cast<float>(centers(i, 2))));
+        r.push_back(static_cast<float>(radii[i]));
+        col.push_back(scimesh::Color(
+            static_cast<float>(colors(i, 0)),
+            static_cast<float>(colors(i, 1)),
+            static_cast<float>(colors(i, 2)),
+            static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+    }
+    scimesh::Mesh mesh = scimesh::generate_multi_spheres(c, r, col, segments);
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends,
+                                      NumericVector radii, NumericMatrix colors,
+                                      int segments = 12) {
+    int n = starts.nrow();
+    std::vector<scimesh::Vec3> s, e;
+    std::vector<float> r;
+    std::vector<scimesh::Color> col;
+    for (int i = 0; i < n; i++) {
+        s.push_back(scimesh::Vec3(
+            static_cast<float>(starts(i, 0)),
+            static_cast<float>(starts(i, 1)),
+            static_cast<float>(starts(i, 2))));
+        e.push_back(scimesh::Vec3(
+            static_cast<float>(ends(i, 0)),
+            static_cast<float>(ends(i, 1)),
+            static_cast<float>(ends(i, 2))));
+        r.push_back(static_cast<float>(radii[i]));
+        col.push_back(scimesh::Color(
+            static_cast<float>(colors(i, 0)),
+            static_cast<float>(colors(i, 1)),
+            static_cast<float>(colors(i, 2)),
+            static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+    }
+    scimesh::Mesh mesh = scimesh::generate_multi_cylinders(s, e, r, col, segments);
+    return mesh_to_r_list(mesh);
 }

@@ -51,11 +51,95 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_transform_mesh
+List scimesh_transform_mesh(List mesh_data, NumericMatrix matrix_4x4);
+RcppExport SEXP _scimesh_scimesh_transform_mesh(SEXP mesh_dataSEXP, SEXP matrix_4x4SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type matrix_4x4(matrix_4x4SEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_transform_mesh(mesh_data, matrix_4x4));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_translate_mesh
+List scimesh_translate_mesh(List mesh_data, NumericVector translation);
+RcppExport SEXP _scimesh_scimesh_translate_mesh(SEXP mesh_dataSEXP, SEXP translationSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type translation(translationSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_translate_mesh(mesh_data, translation));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_scale_mesh
+List scimesh_scale_mesh(List mesh_data, double scale);
+RcppExport SEXP _scimesh_scimesh_scale_mesh(SEXP mesh_dataSEXP, SEXP scaleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_scale_mesh(mesh_data, scale));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_rotate_mesh
+List scimesh_rotate_mesh(List mesh_data, double angle_rad, NumericVector axis);
+RcppExport SEXP _scimesh_scimesh_rotate_mesh(SEXP mesh_dataSEXP, SEXP angle_radSEXP, SEXP axisSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< double >::type angle_rad(angle_radSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type axis(axisSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_rotate_mesh(mesh_data, angle_rad, axis));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_multi_spheres
+List scimesh_generate_multi_spheres(NumericMatrix centers, NumericVector radii, NumericMatrix colors, int segments);
+RcppExport SEXP _scimesh_scimesh_generate_multi_spheres(SEXP centersSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type centers(centersSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_spheres(centers, radii, colors, segments));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_multi_cylinders
+List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends, NumericVector radii, NumericMatrix colors, int segments);
+RcppExport SEXP _scimesh_scimesh_generate_multi_cylinders(SEXP startsSEXP, SEXP endsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type starts(startsSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type ends(endsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_cylinders(starts, ends, radii, colors, segments));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
     {"_scimesh_scimesh_render_scene", (DL_FUNC) &_scimesh_scimesh_render_scene, 3},
     {"_scimesh_scimesh_camera_fit_mesh", (DL_FUNC) &_scimesh_scimesh_camera_fit_mesh, 5},
+    {"_scimesh_scimesh_transform_mesh", (DL_FUNC) &_scimesh_scimesh_transform_mesh, 2},
+    {"_scimesh_scimesh_translate_mesh", (DL_FUNC) &_scimesh_scimesh_translate_mesh, 2},
+    {"_scimesh_scimesh_scale_mesh", (DL_FUNC) &_scimesh_scimesh_scale_mesh, 2},
+    {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
+    {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
+    {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
     {NULL, NULL, 0}
 };
 

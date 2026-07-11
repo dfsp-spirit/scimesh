@@ -209,4 +209,35 @@ void merge_mesh(Mesh &dst, const Mesh &src) {
     }
 }
 
+Mesh generate_multi_spheres(const std::vector<Vec3> &centers,
+                            const std::vector<float> &radii,
+                            const std::vector<Color> &colors,
+                            int segments) {
+    Mesh result;
+    size_t n = centers.size();
+    for (size_t i = 0; i < n; ++i) {
+        float r = (i < radii.size()) ? radii[i] : radii[0];
+        Color c = (i < colors.size()) ? colors[i] : colors[0];
+        Mesh sphere = generate_sphere(centers[i], r, segments, c);
+        merge_mesh(result, sphere);
+    }
+    return result;
+}
+
+Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
+                              const std::vector<Vec3> &ends,
+                              const std::vector<float> &radii,
+                              const std::vector<Color> &colors,
+                              int segments) {
+    Mesh result;
+    size_t n = starts.size();
+    for (size_t i = 0; i < n; ++i) {
+        float r = (i < radii.size()) ? radii[i] : radii[0];
+        Color c = (i < colors.size()) ? colors[i] : colors[0];
+        Mesh cyl = generate_cylinder(starts[i], ends[i], r, segments, c);
+        merge_mesh(result, cyl);
+    }
+    return result;
+}
+
 } // namespace scimesh

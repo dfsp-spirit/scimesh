@@ -11,4 +11,5 @@ OBJECTS = rcpp_bindings.o \
     core/clipping.o \
     core/rasterizer.o \
     core/renderer.o \
-    core/primitives.o
+    core/primitives.o \
+    core/transforms.o
