@@ -139,6 +139,30 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
     render_scene(list(mesh), camera, options)
 }
 
+#' Convert an rgl tmesh3d to scimesh mesh format
+#'
+#' Extracts vertices and triangle indices from an rgl
+#' \code{tmesh3d} object into the format expected by
+#' \code{render_mesh()}.  Does not require the \code{rgl}
+#' package — any list with components \code{vb} (4×N
+#' homogeneous coordinates) and \code{it} (3×M index matrix)
+#' works.
+#'
+#' @param tmesh A list with components \code{vb} and
+#'   \code{it}, as produced by \code{rgl::tmesh3d()}.
+#' @return A mesh descriptor list with \code{vertices} (N×3)
+#'   and \code{triangles} (M×3, 1-based indices).
+#'
+#' @export
+mesh_from_rgl <- function(tmesh) {
+    if (!is.list(tmesh) || is.null(tmesh$vb) || is.null(tmesh$it)) {
+        stop("tmesh must be a list with 'vb' and 'it' components")
+    }
+    verts <- t(tmesh$vb[1:3, , drop = FALSE])
+    tris  <- t(tmesh$it)
+    list(vertices = verts, triangles = tris)
+}
+
 #' Generate a cuboid mesh
 #'
 #' Creates an axis-aligned cuboid (box) centred at \code{center}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "camera.h"
 
 namespace scimesh {
 
@@ -22,6 +23,7 @@ struct RenderOptions {
     int aa_samples = 1;
     Color specular_color = Color(0.0f, 0.0f, 0.0f, 0.0f);
     float shininess = 0.0f;
+    ProjectionType projection = ProjectionType::PERSPECTIVE;
 
     float near_plane = 0.1f;
     float far_plane = 10000.0f;

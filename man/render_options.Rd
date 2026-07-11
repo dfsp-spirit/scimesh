@@ -14,6 +14,7 @@ render_options(
   invert_normals = FALSE,
   wireframe = FALSE,
   wireframe_color = c(0, 0, 0, 1),
+  projection = c("perspective", "orthographic"),
   specular_color = c(0, 0, 0, 0),
   shininess = 0,
   aa_samples = 1L
@@ -39,6 +40,11 @@ length 4 (values 0-1).}
 
 \item{wireframe_color}{RGBA color for wireframe edges (0-1
 scale).  Default \code{c(0, 0, 0, 1)} (black).}
+
+\item{projection}{Projection type: \code{"perspective"} (default)
+or \code{"orthographic"}.  Orthographic gives a parallel
+projection (no perspective foreshortening), matching rgl's
+\code{view3d(fov=0)} convention.}
 
 \item{specular_color}{Specular highlight color (0-1 scale).  When
 \code{shininess > 0}, a Blinn-Phong highlight in this colour is

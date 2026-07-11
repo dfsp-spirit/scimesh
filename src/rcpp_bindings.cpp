@@ -172,6 +172,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["shininess"])) {
         opts.shininess = as<float>(opt_desc["shininess"]);
     }
+    if (opt_desc.containsElementNamed("projection") &&
+        !Rf_isNull(opt_desc["projection"])) {
+        opts.projection = parse_projection(as<std::string>(opt_desc["projection"]));
+    }
 
     return opts;
 }

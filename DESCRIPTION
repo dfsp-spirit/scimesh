@@ -24,7 +24,10 @@ LinkingTo:
 Suggests:
     testthat (>= 3.0.0),
     png,
-    freesurferformats
+    freesurferformats,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
 SystemRequirements: C++17
 Config/testthat/edition: 3
 Encoding: UTF-8

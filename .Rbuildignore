@@ -25,3 +25,5 @@
 \.Rproj\.user$
 .*\.Rproj$
 ^\.license\.stub$
+^doc$
+^Meta$

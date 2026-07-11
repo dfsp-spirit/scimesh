@@ -76,7 +76,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
 
     Mat4 view = camera.get_view_matrix();
     float aspect = static_cast<float>(output.width) / static_cast<float>(output.height);
-    Mat4 projection = camera.get_projection_matrix(aspect, options.near_plane, options.far_plane);
+    Camera proj_cam = camera;
+    proj_cam.projection = options.projection;
+    Mat4 projection = proj_cam.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
 
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
