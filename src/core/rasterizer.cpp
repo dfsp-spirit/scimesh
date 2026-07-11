@@ -20,13 +20,27 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
 
     int idx = y * width + x;
     if (depth < z_buffer[idx]) {
-        z_buffer[idx] = depth;
         Color shaded = shade_pixel(color, normal, light_direction);
-        output.set_pixel(x, y,
-                         static_cast<uint8_t>(std::clamp(shaded.r, 0.0f, 1.0f) * 255.0f),
-                         static_cast<uint8_t>(std::clamp(shaded.g, 0.0f, 1.0f) * 255.0f),
-                         static_cast<uint8_t>(std::clamp(shaded.b, 0.0f, 1.0f) * 255.0f),
-                         static_cast<uint8_t>(std::clamp(shaded.a, 0.0f, 1.0f) * 255.0f));
+
+        uint8_t r = static_cast<uint8_t>(std::clamp(shaded.r, 0.0f, 1.0f) * 255.0f);
+        uint8_t g = static_cast<uint8_t>(std::clamp(shaded.g, 0.0f, 1.0f) * 255.0f);
+        uint8_t b = static_cast<uint8_t>(std::clamp(shaded.b, 0.0f, 1.0f) * 255.0f);
+        uint8_t a = static_cast<uint8_t>(std::clamp(shaded.a, 0.0f, 1.0f) * 255.0f);
+
+        if (blend_mode) {
+            uint8_t dr, dg, db, da;
+            output.get_pixel(x, y, dr, dg, db, da);
+            float src_a = a / 255.0f;
+            float inv_a = 1.0f - src_a;
+            r = static_cast<uint8_t>(r + dr * inv_a);
+            g = static_cast<uint8_t>(g + dg * inv_a);
+            b = static_cast<uint8_t>(b + db * inv_a);
+            a = static_cast<uint8_t>(a + da * inv_a);
+        } else {
+            z_buffer[idx] = depth;
+        }
+
+        output.set_pixel(x, y, r, g, b, a);
     }
 }
 
@@ -37,58 +51,70 @@ void Rasterizer::rasterize_triangle(
     bool backface_culling,
     bool smooth_shading,
     const Vec3 &light_direction,
+    bool wireframe,
+    const Color &wireframe_color,
     Image &output) {
 
-    // Backface culling: compute signed area in screen space.
-    // Screen space has Y pointing down (row 0 at top). ndc_to_screen flips Y from
-    // NDC (where Y points up), so a CCW (front-facing) triangle in NDC becomes a
-    // triangle with NEGATIVE signed area in screen space: area_screen = -k * area_ndc.
-    // Therefore front-facing triangles have area < 0 here; back-facing have area > 0.
     float area = (screen_v1.x - screen_v0.x) * (screen_v2.y - screen_v0.y) -
                 (screen_v2.x - screen_v0.x) * (screen_v1.y - screen_v0.y);
 
     if (backface_culling && area > 0.0f)
         return;
 
-    // Skip degenerate triangles
     if (std::abs(area) < 1e-12f)
         return;
 
-    // Bounding box (clamped to viewport)
+    float abs_area = std::abs(area);
+
     float min_x = std::min({screen_v0.x, screen_v1.x, screen_v2.x});
     float max_x = std::max({screen_v0.x, screen_v1.x, screen_v2.x});
     float min_y = std::min({screen_v0.y, screen_v1.y, screen_v2.y});
     float max_y = std::max({screen_v0.y, screen_v1.y, screen_v2.y});
 
     int x_start = std::max(0, static_cast<int>(std::floor(min_x)));
-    int x_end = std::min(width - 1, static_cast<int>(std::ceil(max_x)));
+    int x_end   = std::min(width - 1, static_cast<int>(std::ceil(max_x)));
     int y_start = std::max(0, static_cast<int>(std::floor(min_y)));
-    int y_end = std::min(height - 1, static_cast<int>(std::ceil(max_y)));
+    int y_end   = std::min(height - 1, static_cast<int>(std::ceil(max_y)));
 
-    // Use the inverse of the signed area for barycentric computation
     float inv_area = 1.0f / area;
+
+    float wire_thresh = 0.0f;
+    if (wireframe) {
+        wire_thresh = 1.5f / std::sqrt(abs_area > 1e-9f ? abs_area : 1.0f);
+        if (wire_thresh > 0.5f) wire_thresh = 0.5f;
+    }
 
     for (int y = y_start; y <= y_end; ++y) {
         for (int x = x_start; x <= x_end; ++x) {
             float px = static_cast<float>(x) + 0.5f;
             float py = static_cast<float>(y) + 0.5f;
 
-            // Barycentric coordinates using the signed area method
             float w0 = ((screen_v1.x - px) * (screen_v2.y - py) -
                         (screen_v2.x - px) * (screen_v1.y - py)) * inv_area;
             float w1 = ((screen_v2.x - px) * (screen_v0.y - py) -
                         (screen_v0.x - px) * (screen_v2.y - py)) * inv_area;
             float w2 = 1.0f - w0 - w1;
 
-            // Inside test: all barycentric coords must be in [0, 1]
             if (w0 < 0.0f || w1 < 0.0f || w2 < 0.0f)
                 continue;
 
-            // Interpolate depth
+            if (wireframe) {
+                if (w0 >= wire_thresh && w1 >= wire_thresh && w2 >= wire_thresh)
+                    continue;
+                float depth = w0 * screen_v0.z + w1 * screen_v1.z + w2 * screen_v2.z;
+                int pidx = y * width + x;
+                output.set_pixel(x, y,
+                    static_cast<uint8_t>(std::clamp(wireframe_color.r, 0.0f, 1.0f) * 255.0f),
+                    static_cast<uint8_t>(std::clamp(wireframe_color.g, 0.0f, 1.0f) * 255.0f),
+                    static_cast<uint8_t>(std::clamp(wireframe_color.b, 0.0f, 1.0f) * 255.0f),
+                    static_cast<uint8_t>(std::clamp(wireframe_color.a, 0.0f, 1.0f) * 255.0f));
+                z_buffer[pidx] = depth;
+                continue;
+            }
+
             float depth = w0 * screen_v0.z + w1 * screen_v1.z + w2 * screen_v2.z;
 
             if (smooth_shading) {
-                // Interpolate color and normal, then shade
                 Color interp_color(
                     w0 * color0.r + w1 * color1.r + w2 * color2.r,
                     w0 * color0.g + w1 * color1.g + w2 * color2.g,
@@ -97,10 +123,7 @@ void Rasterizer::rasterize_triangle(
                 Vec3 interp_normal = w0 * normal0 + w1 * normal1 + w2 * normal2;
                 shade_and_write(x, y, depth, interp_color, interp_normal, light_direction, output);
             } else {
-                // Flat shading: use face normal (average of vertex normals or first vertex)
-                Vec3 face_normal = normal0; // Caller should provide face normal for flat mode
-                Color face_color = color0;
-                shade_and_write(x, y, depth, face_color, face_normal, light_direction, output);
+                shade_and_write(x, y, depth, color0, normal0, light_direction, output);
             }
         }
     }

@@ -66,6 +66,12 @@ scimesh::Mesh build_mesh_from_r(List mesh_desc) {
                 static_cast<float>(nc > 2 ? cols(i, 2) : 0.0f),
                 static_cast<float>(nc > 3 ? cols(i, 3) : 1.0f)));
         }
+        for (const auto &c : mesh.colors) {
+            if (c.a < 1.0f - 1e-6f) {
+                mesh.has_transparency = true;
+                break;
+            }
+        }
     }
 
     if (mesh_desc.containsElementNamed("normals") &&
@@ -149,6 +155,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
     if (opt_desc.containsElementNamed("wireframe") &&
         !Rf_isNull(opt_desc["wireframe"])) {
         opts.wireframe = as<bool>(opt_desc["wireframe"]);
+    }
+    if (opt_desc.containsElementNamed("wireframe_color") &&
+        !Rf_isNull(opt_desc["wireframe_color"])) {
+        opts.wireframe_color = color_from_r(opt_desc["wireframe_color"]);
     }
     if (opt_desc.containsElementNamed("aa_samples") &&
         !Rf_isNull(opt_desc["aa_samples"])) {

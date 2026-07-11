@@ -12,6 +12,7 @@ struct Mesh {
     std::vector<Color> colors;
     std::vector<Vec3> normals;
     Color default_color = DEFAULT_COLOR;
+    bool has_transparency = false;
 
     bool has_colors() const { return !colors.empty(); }
     bool has_normals() const { return !normals.empty(); }

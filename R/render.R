@@ -82,6 +82,8 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #' @param default_color Default vertex color when no colors are provided.
 #' @param invert_normals Whether to invert surface normals.
 #' @param wireframe Whether to render in wireframe mode.
+#' @param wireframe_color RGBA color for wireframe edges (0-1
+#'   scale).  Default \code{c(0, 0, 0, 1)} (black).
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
@@ -98,6 +100,7 @@ render_options <- function(width = 800L, height = 600L,
                            default_color = c(0.7, 0.7, 0.7, 1),
                            invert_normals = FALSE,
                            wireframe = FALSE,
+                           wireframe_color = c(0, 0, 0, 1),
                            aa_samples = 1L) {
     shading <- match.arg(shading)
     list(
@@ -109,6 +112,7 @@ render_options <- function(width = 800L, height = 600L,
         default_color = as.numeric(default_color),
         invert_normals = isTRUE(invert_normals),
         wireframe = isTRUE(wireframe),
+        wireframe_color = as.numeric(wireframe_color),
         aa_samples = as.integer(aa_samples)
     )
 }

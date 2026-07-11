@@ -10,15 +10,13 @@ struct Rasterizer {
     int width = 0;
     int height = 0;
     std::vector<float> z_buffer;
+    bool blend_mode = false;
 
     Rasterizer(int w, int h);
 
     void clear(float clear_depth = 1.0f);
+    void set_blend_mode(bool enabled) { blend_mode = enabled; }
 
-    // Rasterize a single triangle in screen space.
-    // screen_v{0,1,2}: (x, y, depth) in screen coordinates
-    // color{0,1,2}: vertex colors
-    // normal{0,1,2}: vertex normals (in view space for lighting)
     void rasterize_triangle(
         const Vec3 &screen_v0, const Color &color0, const Vec3 &normal0,
         const Vec3 &screen_v1, const Color &color1, const Vec3 &normal1,
@@ -26,6 +24,8 @@ struct Rasterizer {
         bool backface_culling,
         bool smooth_shading,
         const Vec3 &light_direction,
+        bool wireframe,
+        const Color &wireframe_color,
         Image &output);
 
 private:

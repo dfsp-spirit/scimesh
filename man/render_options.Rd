@@ -13,6 +13,7 @@ render_options(
   default_color = c(0.7, 0.7, 0.7, 1),
   invert_normals = FALSE,
   wireframe = FALSE,
+  wireframe_color = c(0, 0, 0, 1),
   aa_samples = 1L
 )
 }
@@ -33,6 +34,9 @@ length 4 (values 0-1).}
 \item{invert_normals}{Whether to invert surface normals.}
 
 \item{wireframe}{Whether to render in wireframe mode.}
+
+\item{wireframe_color}{RGBA color for wireframe edges (0-1
+scale).  Default \code{c(0, 0, 0, 1)} (black).}
 
 \item{aa_samples}{Anti-aliasing supersampling factor.  Renders
 internally at \code{width * aa_samples} x
