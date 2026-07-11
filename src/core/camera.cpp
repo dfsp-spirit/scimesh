@@ -40,7 +40,9 @@ Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
     Vec3 bmin, bmax;
     scene.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
-    float radius = glm::length(bmax - bmin) * 0.5f;
+    Vec3 dir = glm::normalize(direction);
+    float radius = perp_extent_radius(bmin, bmax, center, dir,
+                                       glm::radians(fov_degrees));
     return camera_look_at(center, radius, direction, up, fov_degrees, margin);
 }
 
@@ -49,7 +51,9 @@ Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
     Vec3 bmin, bmax;
     mesh.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
-    float radius = glm::length(bmax - bmin) * 0.5f;
+    Vec3 dir = glm::normalize(direction);
+    float radius = perp_extent_radius(bmin, bmax, center, dir,
+                                       glm::radians(fov_degrees));
     return camera_look_at(center, radius, direction, up, fov_degrees, margin);
 }
 

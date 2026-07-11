@@ -170,16 +170,33 @@
 
     cam_spec <- lookup[[clean]]
 
+    # Pick the mesh to fit the camera to.  For hemi-specific views we fit
+    # only that hemisphere so the camera is as close as possible.  For
+    # global views (dorsal, ventral, etc.) we fit the whole scene.
+    fit_mesh <- NULL
     if (is.list(mesh) && !is.null(mesh$vertices)) {
-        cam <- camera_auto(mesh, direction = cam_spec$dir,
-                           up = cam_spec$up)
-    } else if (is.list(mesh) && length(mesh) > 0L &&
-               is.list(mesh[[1L]]) && !is.null(mesh[[1L]]$vertices)) {
-        cam <- camera_auto(mesh[[1L]], direction = cam_spec$dir,
-                           up = cam_spec$up)
-    } else {
+        fit_mesh <- mesh  # single mesh already
+    } else if (is.list(mesh) && length(mesh) > 0L) {
+        view_hemi <- NULL
+        if (grepl("_lh$", clean)) {
+            view_hemi <- "lh"
+        } else if (grepl("_rh$", clean)) {
+            view_hemi <- "rh"
+        }
+        if (!is.null(view_hemi) && !is.null(mesh[[view_hemi]])) {
+            fit_mesh <- mesh[[view_hemi]]
+        } else {
+            # Global view or hemi key not present — use the first mesh
+            fit_mesh <- mesh[[1L]]
+        }
+    }
+
+    if (is.null(fit_mesh) || is.null(fit_mesh$vertices)) {
         stop("mesh must be a mesh descriptor list with 'vertices'")
     }
+
+    cam <- camera_auto(fit_mesh, direction = cam_spec$dir,
+                       up = cam_spec$up, margin = 1.02)
 
     attr(cam, "label") <- cam_spec$label
     cam
@@ -388,6 +405,16 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
         img <- render_scene(meshes, cam, ropts)
         images <- c(images, list(img))
     }
+
+    # ---- Auto-crop: trim transparent borders uniformly ----
+    arrays <- lapply(images, image_to_array)
+    uc <- .uniform_crop(arrays, background = background)
+    # Convert cropped arrays back to image-list format
+    images <- lapply(uc$arrays, function(arr) {
+        list(width  = dim(arr)[2L],
+             height = dim(arr)[1L],
+             pixels = as.raw(round(aperm(arr, c(3L, 2L, 1L)) * 255)))
+    })
 
     # ---- Colorbar ----
     cbar <- NULL

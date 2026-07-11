@@ -1,3 +1,52 @@
+# Internal: crop transparent/empty border from an (H,W,4) array.
+# Returns a cropped array and the bounding box list(t, b, l, r) in
+# pixel coordinates (1-indexed, inclusive).
+.crop_content <- function(arr, threshold = 0.01) {
+    alpha <- arr[, , 4L]
+    rows <- which(rowSums(alpha > threshold, na.rm = TRUE) > 0L)
+    cols <- which(colSums(alpha > threshold, na.rm = TRUE) > 0L)
+
+    if (length(rows) == 0L || length(cols) == 0L) {
+        return(list(arr = arr, bbox = list(t = 1L, b = dim(arr)[1L],
+                                            l = 1L, r = dim(arr)[2L])))
+    }
+    t <- min(rows); b <- max(rows)
+    l <- min(cols); r <- max(cols)
+    list(arr = arr[t:b, l:r, , drop = FALSE], bbox = list(t = t, b = b, l = l, r = r))
+}
+
+# Internal: pad a cropped array back to a target size, placing the
+# content centred within the canvas.  background is an RGBA vector (0-1).
+.pad_to_size <- function(arr, target_h, target_w, background = c(0, 0, 0, 0)) {
+    h <- dim(arr)[1L]; w <- dim(arr)[2L]; ch <- dim(arr)[3L]
+    if (h == target_h && w == target_w) return(arr)
+
+    canvas <- array(background, dim = c(target_h, target_w, ch))
+    # centre the content
+    row_off <- max(1L, floor((target_h - h) / 2L) + 1L)
+    col_off <- max(1L, floor((target_w - w) / 2L) + 1L)
+    row_end <- row_off + h - 1L
+    col_end <- col_off + w - 1L
+    canvas[row_off:row_end, col_off:col_end, ] <- arr
+    canvas
+}
+
+# Internal: crop each image in a list, find the maximum cropped
+# dimensions, pad all to that size, and return the uniform-sized arrays
+# along with the original bounding boxes.
+.uniform_crop <- function(arrays, background = c(0, 0, 0, 0)) {
+    cropped <- lapply(arrays, .crop_content)
+
+    # find maximum cropped dimensions
+    max_h <- max(vapply(cropped, function(x) dim(x$arr)[1L], 0L))
+    max_w <- max(vapply(cropped, function(x) dim(x$arr)[2L], 0L))
+
+    padded <- lapply(cropped, function(cr) {
+        .pad_to_size(cr$arr, max_h, max_w, background)
+    })
+    list(arrays = padded, bboxes = lapply(cropped, `[[`, "bbox"))
+}
+
 # Internal: scale a 3D (HxWxC) array to new dimensions using bilinear
 # interpolation along each axis. Handles edge cases where source
 # dimensions are 1.
