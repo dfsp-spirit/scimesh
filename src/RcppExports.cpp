@@ -143,6 +143,79 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_generate_cuboid
+List scimesh_generate_cuboid(NumericVector center, NumericVector half_extents, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_cuboid(SEXP centerSEXP, SEXP half_extentsSEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type center(centerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type half_extents(half_extentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_cuboid(center, half_extents, color));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_pyramid
+List scimesh_generate_pyramid(NumericVector base_center, NumericVector apex, double half_width, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_pyramid(SEXP base_centerSEXP, SEXP apexSEXP, SEXP half_widthSEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type base_center(base_centerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type apex(apexSEXP);
+    Rcpp::traits::input_parameter< double >::type half_width(half_widthSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_pyramid(base_center, apex, half_width, color));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_tetrahedron
+List scimesh_generate_tetrahedron(NumericVector p0, NumericVector p1, NumericVector p2, NumericVector p3, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_tetrahedron(SEXP p0SEXP, SEXP p1SEXP, SEXP p2SEXP, SEXP p3SEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type p0(p0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type p1(p1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type p2(p2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type p3(p3SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_tetrahedron(p0, p1, p2, p3, color));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_torus
+List scimesh_generate_torus(NumericVector center, double major_radius, double minor_radius, int major_segments, int minor_segments, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_torus(SEXP centerSEXP, SEXP major_radiusSEXP, SEXP minor_radiusSEXP, SEXP major_segmentsSEXP, SEXP minor_segmentsSEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type center(centerSEXP);
+    Rcpp::traits::input_parameter< double >::type major_radius(major_radiusSEXP);
+    Rcpp::traits::input_parameter< double >::type minor_radius(minor_radiusSEXP);
+    Rcpp::traits::input_parameter< int >::type major_segments(major_segmentsSEXP);
+    Rcpp::traits::input_parameter< int >::type minor_segments(minor_segmentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_torus(center, major_radius, minor_radius, major_segments, minor_segments, color));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_plane
+List scimesh_generate_plane(NumericVector center, NumericVector normal, double half_size_x, double half_size_y, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_plane(SEXP centerSEXP, SEXP normalSEXP, SEXP half_size_xSEXP, SEXP half_size_ySEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type center(centerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type normal(normalSEXP);
+    Rcpp::traits::input_parameter< double >::type half_size_x(half_size_xSEXP);
+    Rcpp::traits::input_parameter< double >::type half_size_y(half_size_ySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_plane(center, normal, half_size_x, half_size_y, color));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -155,6 +228,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
     {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
+    {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},
+    {"_scimesh_scimesh_generate_pyramid", (DL_FUNC) &_scimesh_scimesh_generate_pyramid, 4},
+    {"_scimesh_scimesh_generate_tetrahedron", (DL_FUNC) &_scimesh_scimesh_generate_tetrahedron, 5},
+    {"_scimesh_scimesh_generate_torus", (DL_FUNC) &_scimesh_scimesh_generate_torus, 6},
+    {"_scimesh_scimesh_generate_plane", (DL_FUNC) &_scimesh_scimesh_generate_plane, 5},
     {NULL, NULL, 0}
 };
 

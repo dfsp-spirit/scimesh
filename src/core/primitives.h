@@ -18,6 +18,24 @@ Mesh generate_arrow(const Vec3 &from, const Vec3 &to,
 
 void merge_mesh(Mesh &dst, const Mesh &src);
 
+Mesh generate_cuboid(const Vec3 &center, const Vec3 &half_extents,
+                     const Color &color);
+
+Mesh generate_pyramid(const Vec3 &base_center, const Vec3 &apex,
+                      float half_width, const Color &color);
+
+Mesh generate_tetrahedron(const Vec3 &p0, const Vec3 &p1,
+                          const Vec3 &p2, const Vec3 &p3,
+                          const Color &color);
+
+Mesh generate_torus(const Vec3 &center, float major_radius, float minor_radius,
+                    int major_segments, int minor_segments,
+                    const Color &color);
+
+Mesh generate_plane(const Vec3 &center, const Vec3 &normal,
+                    float half_size_x, float half_size_y,
+                    const Color &color);
+
 Mesh generate_multi_spheres(const std::vector<Vec3> &centers,
                             const std::vector<float> &radii,
                             const std::vector<Color> &colors,

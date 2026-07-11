@@ -403,3 +403,53 @@ List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors,
     scimesh::Image img = renderer.render_triangles_raw(verts, cols, cam, opts);
     return image_to_r_list(img);
 }
+
+// ---- Procedural geometry ----------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_generate_cuboid(NumericVector center, NumericVector half_extents,
+                             NumericVector color) {
+    auto m = scimesh::generate_cuboid(vec3_from_r(center), vec3_from_r(half_extents),
+                                      color_from_r(color));
+    return mesh_to_r_list(m);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_pyramid(NumericVector base_center, NumericVector apex,
+                              double half_width, NumericVector color) {
+    auto m = scimesh::generate_pyramid(vec3_from_r(base_center), vec3_from_r(apex),
+                                       static_cast<float>(half_width), color_from_r(color));
+    return mesh_to_r_list(m);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_tetrahedron(NumericVector p0, NumericVector p1,
+                                  NumericVector p2, NumericVector p3,
+                                  NumericVector color) {
+    auto m = scimesh::generate_tetrahedron(vec3_from_r(p0), vec3_from_r(p1),
+                                           vec3_from_r(p2), vec3_from_r(p3),
+                                           color_from_r(color));
+    return mesh_to_r_list(m);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_torus(NumericVector center, double major_radius,
+                            double minor_radius, int major_segments,
+                            int minor_segments, NumericVector color) {
+    auto m = scimesh::generate_torus(vec3_from_r(center),
+                                     static_cast<float>(major_radius),
+                                     static_cast<float>(minor_radius),
+                                     major_segments, minor_segments,
+                                     color_from_r(color));
+    return mesh_to_r_list(m);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_plane(NumericVector center, NumericVector normal,
+                            double half_size_x, double half_size_y,
+                            NumericVector color) {
+    auto m = scimesh::generate_plane(vec3_from_r(center), vec3_from_r(normal),
+                                     static_cast<float>(half_size_x),
+                                     static_cast<float>(half_size_y),
+                                     color_from_r(color));
+    return mesh_to_r_list(m);
+}

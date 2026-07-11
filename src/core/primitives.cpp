@@ -240,4 +240,104 @@ Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
     return result;
 }
 
+Mesh generate_cuboid(const Vec3 &center, const Vec3 &half,
+                     const Color &color) {
+    Mesh m;
+    float x = half.x, y = half.y, z = half.z;
+    Vec3 v[8] = {
+        center + Vec3(-x, -y, -z), center + Vec3( x, -y, -z),
+        center + Vec3( x,  y, -z), center + Vec3(-x,  y, -z),
+        center + Vec3(-x, -y,  z), center + Vec3( x, -y,  z),
+        center + Vec3( x,  y,  z), center + Vec3(-x,  y,  z),
+    };
+    for (int i = 0; i < 8; i++) {
+        m.vertices.push_back(v[i]);
+        m.colors.push_back(color);
+    }
+    uint32_t f[12][3] = {
+        {0,1,2}, {0,2,3}, {4,6,5}, {4,7,6},
+        {0,5,1}, {0,4,5}, {1,6,2}, {1,5,6},
+        {2,7,3}, {2,6,7}, {3,4,0}, {3,7,4},
+    };
+    for (int i = 0; i < 12; i++)
+        m.triangles.push_back({f[i][0], f[i][1], f[i][2]});
+    return m;
+}
+
+Mesh generate_pyramid(const Vec3 &base_center, const Vec3 &apex,
+                      float hw, const Color &color) {
+    Mesh m;
+    m.vertices = {
+        base_center + Vec3(-hw, 0, -hw), base_center + Vec3( hw, 0, -hw),
+        base_center + Vec3( hw, 0,  hw), base_center + Vec3(-hw, 0,  hw),
+        apex,
+    };
+    for (int i = 0; i < 5; i++) m.colors.push_back(color);
+    m.triangles = {
+        {0,1,4}, {1,2,4}, {2,3,4}, {3,0,4},
+        {0,3,2}, {0,2,1},
+    };
+    return m;
+}
+
+Mesh generate_tetrahedron(const Vec3 &p0, const Vec3 &p1,
+                          const Vec3 &p2, const Vec3 &p3,
+                          const Color &color) {
+    Mesh m;
+    m.vertices = {p0, p1, p2, p3};
+    for (int i = 0; i < 4; i++) m.colors.push_back(color);
+    m.triangles = {{0,1,2}, {0,2,3}, {0,3,1}, {1,3,2}};
+    return m;
+}
+
+Mesh generate_torus(const Vec3 &center, float R, float r,
+                    int seg_major, int seg_minor, const Color &color) {
+    Mesh m;
+    for (int i = 0; i < seg_major; i++) {
+        float phi = glm::two_pi<float>() * float(i) / float(seg_major);
+        float cp = std::cos(phi), sp = std::sin(phi);
+        for (int j = 0; j < seg_minor; j++) {
+            float theta = glm::two_pi<float>() * float(j) / float(seg_minor);
+            float ct = std::cos(theta), st = std::sin(theta);
+            float px = (R + r * ct) * cp;
+            float py = r * st;
+            float pz = (R + r * ct) * sp;
+            m.vertices.push_back(center + Vec3(px, py, pz));
+            m.colors.push_back(color);
+        }
+    }
+    for (int i = 0; i < seg_major; i++) {
+        int ni = (i + 1) % seg_major;
+        for (int j = 0; j < seg_minor; j++) {
+            int nj = (j + 1) % seg_minor;
+            uint32_t a = i * seg_minor + j;
+            uint32_t b = ni * seg_minor + j;
+            uint32_t c = ni * seg_minor + nj;
+            uint32_t d = i * seg_minor + nj;
+            m.triangles.push_back({a, b, c});
+            m.triangles.push_back({a, c, d});
+        }
+    }
+    return m;
+}
+
+Mesh generate_plane(const Vec3 &center, const Vec3 &normal,
+                    float hx, float hy, const Color &color) {
+    Mesh m;
+    Vec3 n = glm::length(normal) > 1e-9f ? glm::normalize(normal) : Vec3(0,0,1);
+    Vec3 u, v;
+    if (std::abs(n.x) < 0.9f) u = glm::normalize(glm::cross(n, Vec3(1,0,0)));
+    else u = glm::normalize(glm::cross(n, Vec3(0,1,0)));
+    v = glm::cross(n, u);
+    m.vertices = {
+        center - u * hx - v * hy,
+        center + u * hx - v * hy,
+        center + u * hx + v * hy,
+        center - u * hx + v * hy,
+    };
+    for (int i = 0; i < 4; i++) m.colors.push_back(color);
+    m.triangles = {{0,1,2}, {0,2,3}};
+    return m;
+}
+
 } // namespace scimesh

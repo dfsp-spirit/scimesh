@@ -41,3 +41,23 @@ scimesh_render_triangles_raw <- function(positions, colors, camera_data, options
     .Call(`_scimesh_scimesh_render_triangles_raw`, positions, colors, camera_data, options_data)
 }
 
+scimesh_generate_cuboid <- function(center, half_extents, color) {
+    .Call(`_scimesh_scimesh_generate_cuboid`, center, half_extents, color)
+}
+
+scimesh_generate_pyramid <- function(base_center, apex, half_width, color) {
+    .Call(`_scimesh_scimesh_generate_pyramid`, base_center, apex, half_width, color)
+}
+
+scimesh_generate_tetrahedron <- function(p0, p1, p2, p3, color) {
+    .Call(`_scimesh_scimesh_generate_tetrahedron`, p0, p1, p2, p3, color)
+}
+
+scimesh_generate_torus <- function(center, major_radius, minor_radius, major_segments, minor_segments, color) {
+    .Call(`_scimesh_scimesh_generate_torus`, center, major_radius, minor_radius, major_segments, minor_segments, color)
+}
+
+scimesh_generate_plane <- function(center, normal, half_size_x, half_size_y, color) {
+    .Call(`_scimesh_scimesh_generate_plane`, center, normal, half_size_x, half_size_y, color)
+}
+

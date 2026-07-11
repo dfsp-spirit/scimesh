@@ -138,3 +138,92 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
     mesh <- scimesh_generate_multi_cylinders(from, to, radii, colors, segments)
     render_scene(list(mesh), camera, options)
 }
+
+#' Generate a cuboid mesh
+#'
+#' Creates an axis-aligned cuboid (box) centred at \code{center}
+#' with the given half-extents along each axis.
+#'
+#' @param center Length-3 vector: centre of the cuboid.
+#' @param half_extents Length-3 vector: half-width, half-height,
+#'   half-depth.
+#' @param color Length-4 RGBA colour (0-1 scale).
+#' @return A mesh descriptor list.
+#'
+#' @export
+generate_cuboid <- function(center, half_extents, color = c(0.7, 0.7, 0.7, 1)) {
+    scimesh_generate_cuboid(center, half_extents, color)
+}
+
+#' Generate a square pyramid mesh
+#'
+#' Creates a pyramid with a square base centred at \code{base_center}
+#' in the XZ plane, with the apex above it along Y.
+#'
+#' @param base_center Length-3 vector: centre of the square base.
+#' @param apex Length-3 vector: position of the tip.
+#' @param half_width Half-width of the square base.
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @export
+generate_pyramid <- function(base_center, apex, half_width = 1,
+                             color = c(0.7, 0.7, 0.7, 1)) {
+    scimesh_generate_pyramid(base_center, apex, half_width, color)
+}
+
+#' Generate a tetrahedron mesh
+#'
+#' Creates a tetrahedron (triangular pyramid) from four arbitrary
+#' 3D points.
+#'
+#' @param p0, p1, p2, p3 Length-3 vectors: the four vertices.
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @export
+generate_tetrahedron <- function(p0, p1, p2, p3,
+                                 color = c(0.7, 0.7, 0.7, 1)) {
+    scimesh_generate_tetrahedron(p0, p1, p2, p3, color)
+}
+
+#' Generate a torus mesh
+#'
+#' Creates a torus (donut shape) centred at \code{center}, lying in
+#' the XZ plane.
+#'
+#' @param center Length-3 vector: centre of the torus.
+#' @param major_radius Radius of the ring (tube path).
+#' @param minor_radius Radius of the tube cross-section.
+#' @param major_segments Number of segments around the ring.
+#' @param minor_segments Number of segments around the tube.
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @export
+generate_torus <- function(center = c(0, 0, 0), major_radius = 1,
+                           minor_radius = 0.3, major_segments = 32,
+                           minor_segments = 16,
+                           color = c(0.7, 0.7, 0.7, 1)) {
+    scimesh_generate_torus(center, major_radius, minor_radius,
+                           major_segments, minor_segments, color)
+}
+
+#' Generate a planar quad mesh
+#'
+#' Creates a flat rectangular plane centred at \code{center} and
+#' oriented perpendicular to \code{normal}.
+#'
+#' @param center Length-3 vector: centre of the plane.
+#' @param normal Length-3 vector: surface normal.
+#' @param half_size_x Half-extent along the first tangent axis.
+#' @param half_size_y Half-extent along the second tangent axis.
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @export
+generate_plane <- function(center = c(0, 0, 0), normal = c(0, 1, 0),
+                           half_size_x = 1, half_size_y = 1,
+                           color = c(0.7, 0.7, 0.7, 1)) {
+    scimesh_generate_plane(center, normal, half_size_x, half_size_y, color)
+}
