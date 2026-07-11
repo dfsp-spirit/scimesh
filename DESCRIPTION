@@ -11,8 +11,12 @@ Maintainer: Tim Schaefer <ts+code@rcmd.org>
 Description: A minimal, fast, headless 3D software renderer written in modern
     C++ with native R bindings. Serves as a zero-dependency, fallback rendering
     engine for 3D meshes when traditional GPU-backed frameworks are unavailable.
-    Produces in-memory RGBA images suitable for scientific visualization.
+    Produces in-memory RGBA images or PNGs suitable for scientific mesh
+    visualization, e.g., in neuroimaging applications. Supports basic lighting,
+    shading, and camera controls.
 License: MIT + file LICENSE
+URL: https://github.com/dfsp-spirit/scimesh
+BugReports: https://github.com/dfsp-spirit/scimesh/issues
 Imports:
     Rcpp (>= 1.0.0)
 LinkingTo:
