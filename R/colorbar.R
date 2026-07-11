@@ -38,21 +38,21 @@ ensure_rgba_array <- function(arr) {
             tick_len <- 0.06
             graphics::segments(tick_x, strip_bottom, tick_x,
                                strip_bottom - tick_len,
-                               lwd = 1.2, col = "#333333")
+                               lwd = 1.8, col = "#000000")
             if (is.null(tick_labels)) {
                 tick_labels <- as.character(signif(ticks, 3))
             }
             graphics::text(tick_x, strip_bottom - tick_len - 0.03,
                            labels = tick_labels,
-                           cex = label_cex * 0.65,
-                           adj = c(0.5, 1), col = "#333333")
+                           cex = label_cex * 1.0,
+                           adj = c(0.5, 1), col = "#000000")
         }
 
         if (!is.null(title) && nchar(title) > 0L) {
             graphics::text(0.5, strip_top + 0.12,
                            labels = title,
-                           cex = label_cex * 0.9,
-                           font = 1, adj = c(0.5, 0), col = "#333333")
+                           cex = label_cex * 1.2,
+                           font = 1, adj = c(0.5, 0), col = "#000000")
         }
     } else {
         strip_left   <- 0.20
@@ -71,22 +71,22 @@ ensure_rgba_array <- function(arr) {
             tick_len <- 0.04
             graphics::segments(strip_right, tick_y,
                                strip_right + tick_len, tick_y,
-                               lwd = 1.2, col = "#333333")
+                               lwd = 1.8, col = "#000000")
             if (is.null(tick_labels)) {
                 tick_labels <- as.character(signif(ticks, 3))
             }
             graphics::text(strip_right + tick_len + 0.03, tick_y,
                            labels = tick_labels,
-                           cex = label_cex * 0.65,
-                           adj = c(0, 0.5), col = "#333333")
+                           cex = label_cex * 1.0,
+                           adj = c(0, 0.5), col = "#000000")
         }
 
         if (!is.null(title) && nchar(title) > 0L) {
             graphics::text(strip_right + 0.20, 0.5,
                            labels = title,
-                           cex = label_cex * 0.9,
+                           cex = label_cex * 1.2,
                            font = 1, srt = 90, adj = c(0.5, 0),
-                           col = "#333333")
+                           col = "#000000")
         }
     }
 

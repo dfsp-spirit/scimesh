@@ -19,6 +19,7 @@ vis.subject.morph.native(
   height = 600L,
   background = c(1, 1, 1, 1),
   colorbar_height = 80L,
+  colorbar_cex = 1,
   ...
 )
 }
@@ -72,6 +73,9 @@ colorbar (e.g. \code{"Cortical thickness [mm]"}).}
 \item{background}{Background RGBA colour (0-1 scale).}
 
 \item{colorbar_height}{Height of the colorbar strip in pixels.}
+
+\item{colorbar_cex}{Text size multiplier for colorbar tick labels
+and title.}
 
 \item{...}{Additional arguments passed to \code{render_options()}
 (e.g. \code{shading}, \code{invert_normals}, \code{wireframe}).}

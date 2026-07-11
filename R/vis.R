@@ -337,6 +337,8 @@
 #' @param height Height of each sub-image in pixels.
 #' @param background Background RGBA colour (0-1 scale).
 #' @param colorbar_height Height of the colorbar strip in pixels.
+#' @param colorbar_cex Text size multiplier for colorbar tick labels
+#'   and title.
 #' @param ... Additional arguments passed to \code{render_options()}
 #'   (e.g. \code{shading}, \code{invert_normals}, \code{wireframe}).
 #'
@@ -362,6 +364,7 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
                                       width = 800L, height = 600L,
                                       background = c(1, 1, 1, 1),
                                       colorbar_height = 80L,
+                                      colorbar_cex = 1.0,
                                       ...) {
     hemi <- match.arg(hemi)
 
@@ -437,6 +440,7 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
             width = 600L, height = colorbar_height,
             data_range = c(lo, hi),
             title = colorbar_title,
+            label_cex = colorbar_cex,
             background = background)
     }
 
