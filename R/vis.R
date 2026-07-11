@@ -320,6 +320,8 @@
 #'   \code{label/<hemi>.cortex.label} files.
 #' @param draw_colorbar Logical.  If \code{TRUE}, a horizontal colorbar
 #'   is appended below the rendered views.
+#' @param colorbar_title Optional title string placed above the
+#'   colorbar (e.g. \code{"Cortical thickness [mm]"}).
 #' @param makecmap_options A named list of colormap options:
 #'   \describe{
 #'     \item{colFn}{Colormap function, e.g. \code{viridis::viridis}.
@@ -355,6 +357,7 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
                                       views = c("t4"),
                                       cortex_only = FALSE,
                                       draw_colorbar = FALSE,
+                                      colorbar_title = NULL,
                                       makecmap_options = list(),
                                       width = 800L, height = 600L,
                                       background = c(1, 1, 1, 1),
@@ -432,8 +435,8 @@ vis.subject.morph.native <- function(subjects_dir, subject_id, measure,
             cmap$colFn,
             n_colors = cmap$n,
             width = 600L, height = colorbar_height,
-            ticks = signif(c(lo, (lo + hi) / 2, hi), 3),
             data_range = c(lo, hi),
+            title = colorbar_title,
             background = background)
     }
 

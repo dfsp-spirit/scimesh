@@ -14,7 +14,7 @@ ensure_rgba_array <- function(arr) {
 # Internal: render colorbar strip with optional ticks to PNG, read back as array
 .colorbar_render <- function(cols, n_colors, width, height, ticks,
                               tick_labels, data_range, label_cex,
-                              background, horizontal) {
+                              background, horizontal, title) {
     tmp <- tempfile(fileext = ".png")
     grDevices::png(tmp, width = width, height = height,
                    bg = grDevices::rgb(background[1], background[2],
@@ -24,9 +24,8 @@ ensure_rgba_array <- function(arr) {
     graphics::plot.window(xlim = c(0, 1), ylim = c(0, 1))
 
     if (horizontal) {
-        strip_margin <- 0.12
-        strip_bottom <- strip_margin
-        strip_top <- 1.0 - strip_margin
+        strip_bottom <- 0.20
+        strip_top    <- 0.72
         strip_h <- strip_top - strip_bottom
         rect_left <- seq(0, 1 - 1 / n_colors, length.out = n_colors)
         rect_right <- seq(1 / n_colors, 1, length.out = n_colors)
@@ -36,23 +35,28 @@ ensure_rgba_array <- function(arr) {
         if (!is.null(ticks)) {
             tick_x <- (ticks - data_range[1]) / diff(data_range)
             tick_x <- pmax(0, pmin(1, tick_x))
-            tick_bottom <- strip_bottom - 0.03
-            tick_len <- 0.08
+            tick_len <- 0.06
             graphics::segments(tick_x, strip_bottom, tick_x,
                                strip_bottom - tick_len,
                                lwd = 1.2, col = "#333333")
             if (is.null(tick_labels)) {
                 tick_labels <- as.character(signif(ticks, 3))
             }
-            graphics::text(tick_x, strip_bottom - tick_len - 0.04,
+            graphics::text(tick_x, strip_bottom - tick_len - 0.03,
                            labels = tick_labels,
-                           cex = label_cex * 0.7,
-                           adj = c(0.5, 0.5), col = "#333333")
+                           cex = label_cex * 0.65,
+                           adj = c(0.5, 1), col = "#333333")
+        }
+
+        if (!is.null(title) && nchar(title) > 0L) {
+            graphics::text(0.5, strip_top + 0.12,
+                           labels = title,
+                           cex = label_cex * 0.9,
+                           font = 1, adj = c(0.5, 0), col = "#333333")
         }
     } else {
-        strip_margin <- 0.12
-        strip_left <- strip_margin
-        strip_right <- 1.0 - strip_margin
+        strip_left   <- 0.20
+        strip_right  <- 0.72
         strip_w <- strip_right - strip_left
         y_bottom <- seq(0, 1 - 1 / n_colors, length.out = n_colors)
         y_top <- seq(1 / n_colors, 1, length.out = n_colors)
@@ -64,17 +68,25 @@ ensure_rgba_array <- function(arr) {
         if (!is.null(ticks)) {
             tick_y <- (ticks - data_range[1]) / diff(data_range)
             tick_y <- pmax(0, pmin(1, tick_y))
-            tick_right <- strip_right
-            graphics::segments(tick_right, tick_y,
-                               tick_right + 0.04, tick_y,
+            tick_len <- 0.04
+            graphics::segments(strip_right, tick_y,
+                               strip_right + tick_len, tick_y,
                                lwd = 1.2, col = "#333333")
             if (is.null(tick_labels)) {
                 tick_labels <- as.character(signif(ticks, 3))
             }
-            graphics::text(tick_right + 0.08, tick_y,
+            graphics::text(strip_right + tick_len + 0.03, tick_y,
                            labels = tick_labels,
-                           cex = label_cex * 0.7,
+                           cex = label_cex * 0.65,
                            adj = c(0, 0.5), col = "#333333")
+        }
+
+        if (!is.null(title) && nchar(title) > 0L) {
+            graphics::text(strip_right + 0.20, 0.5,
+                           labels = title,
+                           cex = label_cex * 0.9,
+                           font = 1, srt = 90, adj = c(0.5, 0),
+                           col = "#333333")
         }
     }
 
@@ -99,12 +111,15 @@ ensure_rgba_array <- function(arr) {
 #' @param width Output width in pixels.
 #' @param height Output height in pixels.
 #' @param ticks Numeric vector of tick positions in data units
-#'   (matching \code{data_range}). If \code{NULL}, no ticks are drawn.
+#'   (matching \code{data_range}). If \code{NULL}, ticks are computed
+#'   automatically via \code{pretty()} restricted to the data range.
 #' @param tick_labels Character vector of tick labels. If \code{NULL},
 #'   defaults to formatted tick values.
 #' @param data_range The data range that \code{ticks} are specified in.
 #'   Defaults to \code{c(0, 1)}.
 #' @param label_cex Label size multiplier.
+#' @param title Optional title string drawn above the color strip
+#'   (horizontal) or to the right (vertical).
 #' @param background Background RGBA color (0-1 scale).
 #' @return A 3D array of dimensions (height, width, 4) with values in
 #'   \code{[0, 1]}.
@@ -115,6 +130,7 @@ colorbar_horizontal <- function(colormap, n_colors = 256L,
                                  ticks = NULL, tick_labels = NULL,
                                  data_range = c(0, 1),
                                  label_cex = 1.0,
+                                 title = NULL,
                                  background = c(1, 1, 1, 1)) {
     if (is.function(colormap)) {
         cols <- colormap(n_colors)
@@ -124,9 +140,14 @@ colorbar_horizontal <- function(colormap, n_colors = 256L,
     if (!is.character(cols) || length(cols) != n_colors) {
         stop("colormap must produce ", n_colors, " colors")
     }
+    if (is.null(ticks)) {
+        tick_candidates <- pretty(data_range, n = 5)
+        ticks <- tick_candidates[tick_candidates >= data_range[1] &
+                                 tick_candidates <= data_range[2]]
+    }
     .colorbar_render(cols, n_colors, width, height, ticks,
                      tick_labels, data_range, label_cex,
-                     background, horizontal = TRUE)
+                     background, horizontal = TRUE, title = title)
 }
 
 #' Generate a vertical colorbar image
@@ -138,9 +159,13 @@ colorbar_horizontal <- function(colormap, n_colors = 256L,
 #' @param width Output width in pixels.
 #' @param height Output height in pixels.
 #' @param ticks Numeric vector of tick positions in data units.
+#'   If \code{NULL}, ticks are computed automatically via
+#'   \code{pretty()} restricted to the data range.
 #' @param tick_labels Character vector of tick labels.
 #' @param data_range The data range that \code{ticks} are specified in.
 #' @param label_cex Label size multiplier.
+#' @param title Optional title string drawn to the right of the
+#'   color strip.
 #' @param background Background RGBA color (0-1 scale).
 #' @return A 3D array of dimensions (height, width, 4) with values in
 #'   \code{[0, 1]}.
@@ -151,6 +176,7 @@ colorbar_vertical <- function(colormap, n_colors = 256L,
                                ticks = NULL, tick_labels = NULL,
                                data_range = c(0, 1),
                                label_cex = 1.0,
+                               title = NULL,
                                background = c(1, 1, 1, 1)) {
     if (is.function(colormap)) {
         cols <- colormap(n_colors)
@@ -160,9 +186,14 @@ colorbar_vertical <- function(colormap, n_colors = 256L,
     if (!is.character(cols) || length(cols) != n_colors) {
         stop("colormap must produce ", n_colors, " colors")
     }
+    if (is.null(ticks)) {
+        tick_candidates <- pretty(data_range, n = 5)
+        ticks <- tick_candidates[tick_candidates >= data_range[1] &
+                                 tick_candidates <= data_range[2]]
+    }
     .colorbar_render(cols, n_colors, width, height, ticks,
                      tick_labels, data_range, label_cex,
-                     background, horizontal = FALSE)
+                     background, horizontal = FALSE, title = title)
 }
 
 #' Viridis colormap

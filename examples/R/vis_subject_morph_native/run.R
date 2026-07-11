@@ -29,6 +29,8 @@ img_t4 <- vis.subject.morph.native(
     sjd, sj, "sulc",
     views        = "t4",
     cortex_only  = TRUE,
+    draw_colorbar = TRUE,
+    colorbar_title = "Sulcal depth [mm]",
     width        = 600L,
     height       = 450L,
     background   = c(0, 0, 0, 0)   # transparent RGBA
@@ -42,6 +44,8 @@ img_t9 <- vis.subject.morph.native(
     sjd, sj, "sulc",
     views        = "t9",
     cortex_only  = TRUE,
+    draw_colorbar = TRUE,
+    colorbar_title = "Sulcal depth [mm]",
     width        = 400L,
     height       = 300L,
     background   = c(0, 0, 0, 0)
@@ -56,6 +60,7 @@ img_lat <- vis.subject.morph.native(
     views           = "lateral_lh",
     cortex_only     = TRUE,
     draw_colorbar   = TRUE,
+    colorbar_title  = "Sulcal depth [mm]",
     width           = 800L,
     height          = 600L,
     background      = c(0, 0, 0, 0)
