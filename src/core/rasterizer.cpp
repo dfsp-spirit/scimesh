@@ -19,7 +19,7 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
         return;
 
     int idx = y * width + x;
-    if (depth < z_buffer[idx]) {
+    if (blend_mode || depth < z_buffer[idx]) {
         Color shaded = shade_pixel(color, normal, light_direction);
 
         uint8_t r = static_cast<uint8_t>(std::clamp(shaded.r, 0.0f, 1.0f) * 255.0f);
@@ -32,9 +32,9 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
             output.get_pixel(x, y, dr, dg, db, da);
             float src_a = a / 255.0f;
             float inv_a = 1.0f - src_a;
-            r = static_cast<uint8_t>(r + dr * inv_a);
-            g = static_cast<uint8_t>(g + dg * inv_a);
-            b = static_cast<uint8_t>(b + db * inv_a);
+            r = static_cast<uint8_t>(r * src_a + dr * inv_a);
+            g = static_cast<uint8_t>(g * src_a + dg * inv_a);
+            b = static_cast<uint8_t>(b * src_a + db * inv_a);
             a = static_cast<uint8_t>(a + da * inv_a);
         } else {
             z_buffer[idx] = depth;
@@ -108,7 +108,7 @@ void Rasterizer::rasterize_triangle(
                     static_cast<uint8_t>(std::clamp(wireframe_color.g, 0.0f, 1.0f) * 255.0f),
                     static_cast<uint8_t>(std::clamp(wireframe_color.b, 0.0f, 1.0f) * 255.0f),
                     static_cast<uint8_t>(std::clamp(wireframe_color.a, 0.0f, 1.0f) * 255.0f));
-                z_buffer[pidx] = depth;
+                if (!blend_mode) z_buffer[pidx] = depth;
                 continue;
             }
 

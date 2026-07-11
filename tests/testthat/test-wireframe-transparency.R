@@ -70,3 +70,28 @@ test_that("fully transparent mesh shows only background", {
     mean_b <- mean(arr[, , 3])
     expect_equal(mean_b, 1.0, tolerance = 0.01)
 })
+
+test_that("alpha blending modulates source color by alpha", {
+    verts <- cbind(c(-1, -1, 1, 1), c(-1, 1, -1, 1) * 0.5, c(0, 0, 0, 0))
+    tris <- rbind(c(1L, 2L, 3L), c(2L, 4L, 3L))
+    cam <- camera(c(0, 0, 5), c(0, 0, 0))
+    opts <- render_options(width = 64, height = 64,
+        backface_culling = FALSE, background_color = c(0, 0, 0, 1))
+
+    cols_o <- matrix(rep(c(1, 0, 0, 1.0), 4), nrow = 4, byrow = TRUE)
+    cols_t <- matrix(rep(c(1, 0, 0, 0.5), 4), nrow = 4, byrow = TRUE)
+
+    img_o <- render_mesh(vertices = verts, triangles = tris,
+        colors = cols_o, camera = cam, options = opts)
+    img_t <- render_mesh(vertices = verts, triangles = tris,
+        colors = cols_t, camera = cam, options = opts)
+
+    arr_o <- image_to_array(img_o)
+    arr_t <- image_to_array(img_t)
+
+    non_bg <- which(arr_t[, , 4] > 0.01, arr.ind = TRUE)
+    r_ratio <- mean(arr_t[non_bg[, 1], non_bg[, 2], 1] /
+                    arr_o[non_bg[, 1], non_bg[, 2], 1], na.rm = TRUE)
+
+    expect_true(r_ratio > 0.35 && r_ratio < 0.65)
+})
