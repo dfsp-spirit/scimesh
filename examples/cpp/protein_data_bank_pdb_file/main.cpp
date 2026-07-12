@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
 
     Vec3 eye_dir = glm::normalize(Vec3(0.5f, 0.4f, -1.0f));
     Camera cam = scimesh::camera_fit_mesh(atom_mesh, eye_dir,
-        Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.3f);
+        Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.05f);
 
     scimesh::Light key_light;
     key_light.position = Vec3(0.5f, 1.0f, 1.0f);
