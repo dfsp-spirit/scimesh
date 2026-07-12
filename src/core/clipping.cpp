@@ -19,6 +19,7 @@ static inline ClipVertex lerp_clip_vertex(const ClipVertex &a, const ClipVertex 
         a.color.b + t * (b.color.b - a.color.b),
         a.color.a + t * (b.color.a - a.color.a));
     result.normal = a.normal + t * (b.normal - a.normal);
+    result.uv = a.uv + t * (b.uv - a.uv);
     return result;
 }
 
@@ -100,6 +101,7 @@ struct ViewClipVertex {
     Vec3 pos;
     Color color;
     Vec3 normal;
+    Vec2 uv;
 };
 
 static inline bool is_inside_view_plane(const ViewClipVertex &v, const ClipPlane &plane) {
@@ -115,6 +117,7 @@ static inline ViewClipVertex lerp_view_vertex(const ViewClipVertex &a, const Vie
         a.color.b + t * (b.color.b - a.color.b),
         a.color.a + t * (b.color.a - a.color.a));
     result.normal = a.normal + t * (b.normal - a.normal);
+    result.uv = a.uv + t * (b.uv - a.uv);
     return result;
 }
 
@@ -160,13 +163,14 @@ int clip_triangle_view_plane(
     const Vec3 &v0, const Vec3 &v1, const Vec3 &v2,
     const Vec3 &n0, const Vec3 &n1, const Vec3 &n2,
     const Color &c0, const Color &c1, const Color &c2,
+    const Vec2 &uv0, const Vec2 &uv1, const Vec2 &uv2,
     const ClipPlane &plane,
     std::vector<ClipVertex> &output_vertices,
     std::vector<Triangle> &output_triangles) {
 
-    ViewClipVertex vc0{v0, c0, n0};
-    ViewClipVertex vc1{v1, c1, n1};
-    ViewClipVertex vc2{v2, c2, n2};
+    ViewClipVertex vc0{v0, c0, n0, uv0};
+    ViewClipVertex vc1{v1, c1, n1, uv1};
+    ViewClipVertex vc2{v2, c2, n2, uv2};
 
     std::vector<ViewClipVertex> polygon{vc0, vc1, vc2};
 
@@ -181,6 +185,7 @@ int clip_triangle_view_plane(
         cv.position = Vec4(vcv.pos, 1.0f);  // View-space pos stored in position field
         cv.color = vcv.color;
         cv.normal = vcv.normal;
+        cv.uv = vcv.uv;
         output_vertices.push_back(cv);
     }
 

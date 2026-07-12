@@ -36,6 +36,10 @@ struct RenderOptions {
 
     int threads = 0;
 
+    bool ssao_enabled = false;
+    float ssao_radius = 16.0f;
+    float ssao_intensity = 0.8f;
+
     float near_plane = 0.1f;
     float far_plane = 10000.0f;
 };

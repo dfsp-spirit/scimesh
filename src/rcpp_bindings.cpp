@@ -106,6 +106,26 @@ scimesh::Mesh build_mesh_from_r(List mesh_desc) {
         }
     }
 
+    if (mesh_desc.containsElementNamed("uv") &&
+        !Rf_isNull(mesh_desc["uv"])) {
+        NumericMatrix uv_mat = mesh_desc["uv"];
+        int nuv = uv_mat.nrow();
+        for (int i = 0; i < nuv; i++) {
+            mesh.uvs.push_back(scimesh::Vec2(
+                static_cast<float>(uv_mat(i, 0)),
+                static_cast<float>(uv_mat.ncol() > 1 ? uv_mat(i, 1) : 0.0f)));
+        }
+    }
+
+    if (mesh_desc.containsElementNamed("texture") &&
+        !Rf_isNull(mesh_desc["texture"])) {
+        List tex = mesh_desc["texture"];
+        mesh.texture.width = as<int>(tex["width"]);
+        mesh.texture.height = as<int>(tex["height"]);
+        RawVector pix = tex["pixels"];
+        mesh.texture.pixels.assign(pix.begin(), pix.end());
+    }
+
     if (mesh_desc.containsElementNamed("default_color") &&
         !Rf_isNull(mesh_desc["default_color"])) {
         mesh.default_color = color_from_r(mesh_desc["default_color"]);
@@ -249,6 +269,19 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         opts.threads = as<int>(opt_desc["threads"]);
     }
 
+    if (opt_desc.containsElementNamed("ssao_enabled") &&
+        !Rf_isNull(opt_desc["ssao_enabled"])) {
+        opts.ssao_enabled = as<bool>(opt_desc["ssao_enabled"]);
+    }
+    if (opt_desc.containsElementNamed("ssao_radius") &&
+        !Rf_isNull(opt_desc["ssao_radius"])) {
+        opts.ssao_radius = as<float>(opt_desc["ssao_radius"]);
+    }
+    if (opt_desc.containsElementNamed("ssao_intensity") &&
+        !Rf_isNull(opt_desc["ssao_intensity"])) {
+        opts.ssao_intensity = as<float>(opt_desc["ssao_intensity"]);
+    }
+
     if (opt_desc.containsElementNamed("clip_planes") &&
         !Rf_isNull(opt_desc["clip_planes"])) {
         List cplanes = opt_desc["clip_planes"];
@@ -336,6 +369,16 @@ List mesh_to_r_list(const scimesh::Mesh &mesh) {
             norms(i, 2) = mesh.normals[i].z;
         }
         out["normals"] = norms;
+    }
+
+    if (!mesh.uvs.empty()) {
+        int nu = static_cast<int>(mesh.uvs.size());
+        NumericMatrix uvs_mat(nu, 2);
+        for (int i = 0; i < nu; i++) {
+            uvs_mat(i, 0) = mesh.uvs[i].x;
+            uvs_mat(i, 1) = mesh.uvs[i].y;
+        }
+        out["uv"] = uvs_mat;
     }
 
     return out;

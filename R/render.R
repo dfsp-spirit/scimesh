@@ -17,7 +17,7 @@
 #'
 #' @export
 render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
-                        normals = NULL,
+                        normals = NULL, uv = NULL, texture = NULL,
                         camera = camera_auto(vertices),
                         options = render_options()) {
     if (!is.matrix(vertices) || ncol(vertices) != 3L) {
@@ -48,6 +48,15 @@ render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
             stop("normals must be an Nx3 numeric matrix")
         }
         mesh$normals <- normals
+    }
+    if (!is.null(uv)) {
+        if (!is.matrix(uv) || ncol(uv) != 2L) {
+            stop("uv must be an Nx2 numeric matrix")
+        }
+        mesh$uv <- uv
+    }
+    if (!is.null(texture)) {
+        mesh$texture <- texture
     }
 
     scimesh_render_mesh(mesh, camera, options)
@@ -126,6 +135,10 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #'   with \code{normal} (length-3 vector) and \code{offset} (numeric).
 #'   Points satisfying \code{dot(normal, position) + offset >= 0} are
 #'   kept.  Default \code{NULL} (no clipping).
+#' @param ssao_enabled Enable screen-space ambient occlusion.
+#'   Default \code{FALSE}.
+#' @param ssao_radius Screen-space sample radius in pixels.  Default 16.
+#' @param ssao_intensity Occlusion strength (0-1).  Default 0.8.
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
@@ -154,6 +167,9 @@ render_options <- function(width = 800L, height = 600L,
                            fog_color = c(0, 0, 0, 0),
                            threads = 0L,
                            clip_planes = NULL,
+                           ssao_enabled = FALSE,
+                           ssao_radius = 16,
+                           ssao_intensity = 0.8,
                            aa_samples = 1L) {
     shading <- match.arg(shading)
     list(
@@ -177,6 +193,9 @@ render_options <- function(width = 800L, height = 600L,
         fog_color = as.numeric(fog_color),
         threads = as.integer(threads),
         clip_planes = clip_planes,
+        ssao_enabled = isTRUE(ssao_enabled),
+        ssao_radius = as.numeric(ssao_radius),
+        ssao_intensity = as.numeric(ssao_intensity),
         aa_samples = as.integer(aa_samples)
     )
 }

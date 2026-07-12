@@ -78,6 +78,34 @@ Image Image::downsample_box(int factor) const {
     return result;
 }
 
+Color Image::sample_bilinear(float u, float v) const {
+    if (width < 1 || height < 1) return Color();
+    u = std::max(0.0f, std::min(1.0f, u));
+    v = std::max(0.0f, std::min(1.0f, v));
+    float fx = u * (width - 1);
+    float fy = v * (height - 1);
+    int x0 = static_cast<int>(fx);
+    int y0 = static_cast<int>(fy);
+    int x1 = std::min(x0 + 1, width - 1);
+    int y1 = std::min(y0 + 1, height - 1);
+    float sx = fx - x0;
+    float sy = fy - y0;
+
+    auto get = [this](int px, int py) -> Color {
+        int idx = (py * width + px) * 4;
+        return Color(pixels[idx] / 255.0f, pixels[idx+1] / 255.0f,
+                     pixels[idx+2] / 255.0f, pixels[idx+3] / 255.0f);
+    };
+    Color c00 = get(x0, y0); Color c10 = get(x1, y0);
+    Color c01 = get(x0, y1); Color c11 = get(x1, y1);
+
+    return Color(
+        c00.r * (1-sx)*(1-sy) + c10.r * sx*(1-sy) + c01.r * (1-sx)*sy + c11.r * sx*sy,
+        c00.g * (1-sx)*(1-sy) + c10.g * sx*(1-sy) + c01.g * (1-sx)*sy + c11.g * sx*sy,
+        c00.b * (1-sx)*(1-sy) + c10.b * sx*(1-sy) + c01.b * (1-sx)*sy + c11.b * sx*sy,
+        c00.a * (1-sx)*(1-sy) + c10.a * sx*(1-sy) + c01.a * (1-sx)*sy + c11.a * sx*sy);
+}
+
 bool Image::write_ppm(const std::string &filename) const {
     std::ofstream f(filename, std::ios::binary);
     if (!f)

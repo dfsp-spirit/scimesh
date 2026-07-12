@@ -10,6 +10,7 @@ struct ClipVertex {
     Vec4 position;
     Color color;
     Vec3 normal;
+    Vec2 uv;
 };
 
 // Clip a triangle against the near plane in clip space.
@@ -31,6 +32,7 @@ int clip_triangle_view_plane(
     const Vec3 &v0, const Vec3 &v1, const Vec3 &v2,
     const Vec3 &n0, const Vec3 &n1, const Vec3 &n2,
     const Color &c0, const Color &c1, const Color &c2,
+    const Vec2 &uv0, const Vec2 &uv1, const Vec2 &uv2,
     const ClipPlane &plane,
     std::vector<ClipVertex> &output_vertices,
     std::vector<Triangle> &output_triangles);

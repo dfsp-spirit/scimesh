@@ -33,7 +33,7 @@ TEST_CASE("Rasterizer renders a single visible triangle", "[rasterizer]") {
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
 
-    r.rasterize_triangle(v0, c, n, v1, c, n, v2, c, n,
+    r.rasterize_triangle(v0, c, n, Vec2(0,0), v1, c, n, Vec2(0,0), v2, c, n, Vec2(0,0),
                          true, true, light, false, Color(), img);
 
     // Center of triangle should be red
@@ -59,9 +59,9 @@ TEST_CASE("Rasterizer Z-buffer occludes farther triangle", "[rasterizer]") {
     Vec3 light(0, 0, -1);
 
     // Render far triangle first (depth 0.8), then near triangle (depth 0.2)
-    r.rasterize_triangle(v0, red, n, v1, red, n, v2, red, n,
+    r.rasterize_triangle(v0, red, n, Vec2(0,0), v1, red, n, Vec2(0,0), v2, red, n, Vec2(0,0),
                          true, true, light, false, Color(), img);
-    r.rasterize_triangle(v3, green, n, v4, green, n, v5, green, n,
+    r.rasterize_triangle(v3, green, n, Vec2(0,0), v4, green, n, Vec2(0,0), v5, green, n, Vec2(0,0),
                          true, true, light, false, Color(), img);
 
     // Center should be green (nearer triangle wins)
@@ -83,7 +83,7 @@ TEST_CASE("Rasterizer backface culling discards back-facing triangle", "[rasteri
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
 
-    r.rasterize_triangle(v0, c, n, v1, c, n, v2, c, n,
+    r.rasterize_triangle(v0, c, n, Vec2(0,0), v1, c, n, Vec2(0,0), v2, c, n, Vec2(0,0),
                          true, true, light, false, Color(), img);
 
     // Should be culled, center should remain black
@@ -104,7 +104,7 @@ TEST_CASE("Rasterizer without backface culling renders both sides", "[rasterizer
     Vec3 n(0, 0, -1);
     Vec3 light(0, 0, -1);
 
-    r.rasterize_triangle(v0, c, n, v1, c, n, v2, c, n,
+    r.rasterize_triangle(v0, c, n, Vec2(0,0), v1, c, n, Vec2(0,0), v2, c, n, Vec2(0,0),
                          false, true, light, false, Color(), img);
 
     uint8_t rr, gg, bb, aa;

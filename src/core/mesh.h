@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "image.h"
 #include <vector>
 #include <cmath>
 
@@ -12,12 +13,16 @@ struct Mesh {
     std::vector<Color> colors;
     std::vector<Color> face_colors;
     std::vector<Vec3> normals;
+    std::vector<Vec2> uvs;
+    Image texture;
     Color default_color = DEFAULT_COLOR;
     bool has_transparency = false;
 
     bool has_colors() const { return !colors.empty(); }
     bool has_face_colors() const { return !face_colors.empty(); }
     bool has_normals() const { return !normals.empty(); }
+    bool has_uvs() const { return !uvs.empty(); }
+    bool has_texture() const { return texture.width > 0; }
 
     bool is_valid() const {
         for (const auto &tri : triangles) {

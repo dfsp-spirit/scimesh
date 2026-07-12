@@ -65,9 +65,9 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
 }
 
 void Rasterizer::rasterize_triangle(
-    const Vec3 &screen_v0, const Color &color0, const Vec3 &normal0,
-    const Vec3 &screen_v1, const Color &color1, const Vec3 &normal1,
-    const Vec3 &screen_v2, const Color &color2, const Vec3 &normal2,
+    const Vec3 &screen_v0, const Color &color0, const Vec3 &normal0, const Vec2 &uv0,
+    const Vec3 &screen_v1, const Color &color1, const Vec3 &normal1, const Vec2 &uv1,
+    const Vec3 &screen_v2, const Color &color2, const Vec3 &normal2, const Vec2 &uv2,
     bool backface_culling,
     bool smooth_shading,
     const Vec3 &light_direction,
@@ -137,17 +137,30 @@ void Rasterizer::rasterize_triangle(
 
             float depth = w0 * screen_v0.z + w1 * screen_v1.z + w2 * screen_v2.z;
 
+            Color base_color;
+            Vec3 interp_normal;
             if (smooth_shading) {
-                Color interp_color(
+                base_color = Color(
                     w0 * color0.r + w1 * color1.r + w2 * color2.r,
                     w0 * color0.g + w1 * color1.g + w2 * color2.g,
                     w0 * color0.b + w1 * color1.b + w2 * color2.b,
                     w0 * color0.a + w1 * color1.a + w2 * color2.a);
-                Vec3 interp_normal = w0 * normal0 + w1 * normal1 + w2 * normal2;
-                shade_and_write(x, y, depth, interp_color, interp_normal, light_direction, output);
+                interp_normal = w0 * normal0 + w1 * normal1 + w2 * normal2;
             } else {
-                shade_and_write(x, y, depth, color0, normal0, light_direction, output);
+                base_color = color0;
+                interp_normal = normal0;
             }
+
+            if (active_texture) {
+                Vec2 interp_uv = smooth_shading
+                    ? w0 * uv0 + w1 * uv1 + w2 * uv2
+                    : uv0;
+                Color tex = active_texture->sample_bilinear(interp_uv.x, interp_uv.y);
+                base_color = Color(base_color.r * tex.r, base_color.g * tex.g,
+                                   base_color.b * tex.b, base_color.a * tex.a);
+            }
+
+            shade_and_write(x, y, depth, base_color, interp_normal, light_direction, output);
         }
     }
 }
@@ -169,6 +182,58 @@ void Rasterizer::rasterize_point(float screen_x, float screen_y, float depth,
             if (px < 0 || px >= width) continue;
             if (static_cast<float>(dx*dx + dy*dy) > r_sq) continue;
             shade_and_write(px, py, depth, color, normal, light_direction, output);
+        }
+    }
+}
+
+void Rasterizer::apply_ssao(Image &output) {
+    if (!ssao_enabled || width < 2 || height < 2) return;
+
+    int radius_i = std::max(1, static_cast<int>(ssao_radius));
+
+    // Fixed normalized sample directions (8 samples on a spiral)
+    const int ns = 8;
+    const float dirs[ns][2] = {
+        { 0.309f,  0.951f}, {-0.809f,  0.588f}, { 1.000f, -0.000f}, { 0.809f, -0.588f},
+        {-0.309f, -0.951f}, { 0.588f,  0.809f}, {-0.588f,  0.809f}, {-1.000f, -0.000f},
+    };
+
+    float inv_radius = 1.0f / std::max(1.0f, ssao_radius);
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int idx = y * width + x;
+            float center_depth = z_buffer[idx];
+
+            int occluded = 0;
+            for (int s = 0; s < ns; ++s) {
+                int sx = x + static_cast<int>(dirs[s][0] * radius_i);
+                int sy = y + static_cast<int>(dirs[s][1] * radius_i);
+                if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
+                    occluded++;
+                    continue;
+                }
+                float sample_depth = z_buffer[sy * width + sx];
+                float diff = sample_depth - center_depth;
+                if (diff < 0.0f) {
+                    float falloff = 1.0f + diff * inv_radius * 2.0f;
+                    if (falloff > 0.0f) {
+                        occluded++;
+                    }
+                }
+            }
+
+            float ao = 1.0f - ssao_intensity * static_cast<float>(occluded) / ns;
+            ao = std::max(0.0f, std::min(1.0f, ao));
+
+            if (ao < 1.0f) {
+                uint8_t r, g, b, a;
+                output.get_pixel(x, y, r, g, b, a);
+                r = static_cast<uint8_t>(r * ao);
+                g = static_cast<uint8_t>(g * ao);
+                b = static_cast<uint8_t>(b * ao);
+                output.set_pixel(x, y, r, g, b, a);
+            }
         }
     }
 }

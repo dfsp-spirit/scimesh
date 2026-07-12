@@ -19,6 +19,7 @@ struct DeferredTri {
     Vec3   screen_v0, screen_v1, screen_v2;
     Color  color0, color1, color2;
     Vec3   normal0, normal1, normal2;
+    Vec2   uv0, uv1, uv2;
     bool   smooth;
     float  view_z;  // centroid depth in view space, for back-to-front sort
 };
@@ -94,6 +95,9 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.ssao_enabled = options.ssao_enabled;
+    rasterizer.ssao_radius = options.ssao_radius;
+    rasterizer.ssao_intensity = options.ssao_intensity;
 
 #ifdef _OPENMP
     if (options.threads > 0) omp_set_num_threads(options.threads);
@@ -125,6 +129,10 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
                                     normal, light_direction, output);
     }
 
+    if (rasterizer.ssao_enabled) {
+        rasterizer.apply_ssao(output);
+    }
+
     return output.downsample_box(aa);
 }
 
@@ -145,6 +153,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.ssao_enabled = options.ssao_enabled;
+    rasterizer.ssao_radius = options.ssao_radius;
+    rasterizer.ssao_intensity = options.ssao_intensity;
 
 #ifdef _OPENMP
     if (options.threads > 0) omp_set_num_threads(options.threads);
@@ -178,6 +189,12 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     for (const auto *mesh_ptr : meshes) {
         const Mesh &mesh = *mesh_ptr;
         if (mesh.empty()) continue;
+
+        if (mesh.has_uvs() && mesh.has_texture()) {
+            rasterizer.active_texture = const_cast<Image *>(&mesh.texture);
+        } else {
+            rasterizer.active_texture = nullptr;
+        }
 
         std::vector<Vec3> computed_normals;
         const std::vector<Vec3> *normals_ptr;
@@ -216,16 +233,20 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
             Vec3 n1 = view_normals[tri.v1];
             Vec3 n2 = view_normals[tri.v2];
 
+            Vec2 uv0 = mesh.has_uvs() ? mesh.uvs[tri.v0] : Vec2(0, 0);
+            Vec2 uv1 = mesh.has_uvs() ? mesh.uvs[tri.v1] : Vec2(0, 0);
+            Vec2 uv2 = mesh.has_uvs() ? mesh.uvs[tri.v2] : Vec2(0, 0);
+
             bool tri_transparent = scene_has_transparency &&
                 (c0.a < 1.0f - 1e-6f || c1.a < 1.0f - 1e-6f || c2.a < 1.0f - 1e-6f);
 
             ClipVertex cv0, cv1, cv2;
             cv0.position = transform_point_homogeneous(view_projection, v0);
-            cv0.color = c0; cv0.normal = n0;
+            cv0.color = c0; cv0.normal = n0; cv0.uv = uv0;
             cv1.position = transform_point_homogeneous(view_projection, v1);
-            cv1.color = c1; cv1.normal = n1;
+            cv1.color = c1; cv1.normal = n1; cv1.uv = uv1;
             cv2.position = transform_point_homogeneous(view_projection, v2);
-            cv2.color = c2; cv2.normal = n2;
+            cv2.color = c2; cv2.normal = n2; cv2.uv = uv2;
 
             bool has_user_clips = !view_clip_planes.empty();
 
@@ -241,6 +262,7 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                 std::vector<Triangle> view_clip_tris;
                 int vc_count = clip_triangle_view_plane(
                     vv0, vv1, vv2, n0, n1, n2, c0, c1, c2,
+                    uv0, uv1, uv2,
                     view_clip_planes[0], view_clipped, view_clip_tris);
 
                 for (int ci = 1; ci < static_cast<int>(view_clip_planes.size()) && vc_count > 0; ++ci) {
@@ -255,8 +277,10 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                         Vec3 pc(c.position.x, c.position.y, c.position.z);
                         Vec3 na(a.normal), nb(b.normal), nc(c.normal);
                         Color ca(a.color), cb(b.color), cc(c.color);
+                        Vec2 ua(a.uv), ub(b.uv), uc(c.uv);
                         clip_triangle_view_plane(
                             pa, pb, pc, na, nb, nc, ca, cb, cc,
+                            ua, ub, uc,
                             view_clip_planes[ci], next_vertices, next_triangles);
                     }
                     view_clipped.swap(next_vertices);
@@ -336,13 +360,14 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                         screen_v0, screen_v1, screen_v2,
                         cv_a.color, cv_b.color, cv_c.color,
                         normal_a, normal_b, normal_c,
+                        cv_a.uv, cv_b.uv, cv_c.uv,
                         smooth, centroid_vs.z
                     });
                 } else {
                     rasterizer.rasterize_triangle(
-                        screen_v0, cv_a.color, normal_a,
-                        screen_v1, cv_b.color, normal_b,
-                        screen_v2, cv_c.color, normal_c,
+                        screen_v0, cv_a.color, normal_a, cv_a.uv,
+                        screen_v1, cv_b.color, normal_b, cv_b.uv,
+                        screen_v2, cv_c.color, normal_c, cv_c.uv,
                         options.backface_culling, smooth,
                         light_direction,
                         options.wireframe, options.wireframe_color,
@@ -350,6 +375,10 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                 }
             }
         }
+    }
+
+    if (rasterizer.ssao_enabled) {
+        rasterizer.apply_ssao(output);
     }
 
     if (!deferred.empty()) {
@@ -362,9 +391,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
 
         for (const auto &dt : deferred) {
             rasterizer.rasterize_triangle(
-                dt.screen_v0, dt.color0, dt.normal0,
-                dt.screen_v1, dt.color1, dt.normal1,
-                dt.screen_v2, dt.color2, dt.normal2,
+                dt.screen_v0, dt.color0, dt.normal0, dt.uv0,
+                dt.screen_v1, dt.color1, dt.normal1, dt.uv1,
+                dt.screen_v2, dt.color2, dt.normal2, dt.uv2,
                 options.backface_culling, dt.smooth,
                 light_direction,
                 options.wireframe, options.wireframe_color,

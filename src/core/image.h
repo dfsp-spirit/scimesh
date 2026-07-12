@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types.h"
 #include <vector>
 #include <cstdint>
 #include <string>
@@ -19,6 +20,8 @@ struct Image {
 
     void clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     void clear_float(float r, float g, float b, float a);
+
+    Color sample_bilinear(float u, float v) const;
 
     Image downsample_box(int factor) const;
 
