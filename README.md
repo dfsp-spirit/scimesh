@@ -22,3 +22,10 @@ cmake -B build
 cmake --build build
 ./build/scimesh_tests
 ```
+
+### TODO
+
+* Add to the demos apps that render some meshes from:
+    - Keenan Crane's Model Repository https://www.cs.cmu.edu/~kmcrane/Projects/ModelRepository/ (for UV stuff, nice clean meshes)
+    - Morgan McGuire's Computer Graphics Archive at https://casual-effects.com/data/ (clean, standard assets)
+    - The Stanford 3D Scanning Repository at https://graphics.stanford.edu/data/3Dscanrep/ (for real-world, messy models)
