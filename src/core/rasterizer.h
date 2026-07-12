@@ -13,6 +13,8 @@ struct Rasterizer {
     bool blend_mode = false;
     Color specular_color = Color(0.0f, 0.0f, 0.0f, 0.0f);
     float shininess = 0.0f;
+    std::vector<Light> lights;
+    float ambient = 0.3f;
 
     Rasterizer(int w, int h);
 

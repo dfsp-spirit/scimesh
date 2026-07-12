@@ -2,6 +2,7 @@
 #include "core/renderer.h"
 #include "core/transforms.h"
 #include "core/primitives.h"
+#include "core/stl_io.h"
 
 using namespace Rcpp;
 
@@ -67,6 +68,26 @@ scimesh::Mesh build_mesh_from_r(List mesh_desc) {
                 static_cast<float>(nc > 3 ? cols(i, 3) : 1.0f)));
         }
         for (const auto &c : mesh.colors) {
+            if (c.a < 1.0f - 1e-6f) {
+                mesh.has_transparency = true;
+                break;
+            }
+        }
+    }
+
+    if (mesh_desc.containsElementNamed("face_colors") &&
+        !Rf_isNull(mesh_desc["face_colors"])) {
+        NumericMatrix fcols = mesh_desc["face_colors"];
+        int nfc = fcols.nrow();
+        int ncc = fcols.ncol();
+        for (int i = 0; i < nfc; i++) {
+            mesh.face_colors.push_back(scimesh::Color(
+                static_cast<float>(fcols(i, 0)),
+                static_cast<float>(ncc > 1 ? fcols(i, 1) : 0.0f),
+                static_cast<float>(ncc > 2 ? fcols(i, 2) : 0.0f),
+                static_cast<float>(ncc > 3 ? fcols(i, 3) : 1.0f)));
+        }
+        for (const auto &c : mesh.face_colors) {
             if (c.a < 1.0f - 1e-6f) {
                 mesh.has_transparency = true;
                 break;
@@ -176,6 +197,35 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["projection"])) {
         opts.projection = parse_projection(as<std::string>(opt_desc["projection"]));
     }
+    if (opt_desc.containsElementNamed("lights") &&
+        !Rf_isNull(opt_desc["lights"])) {
+        List lights_list = opt_desc["lights"];
+        for (int i = 0; i < lights_list.size(); i++) {
+            List ldesc = lights_list[i];
+            scimesh::Light light;
+            if (ldesc.containsElementNamed("position") &&
+                !Rf_isNull(ldesc["position"])) {
+                light.position = vec3_from_r(ldesc["position"]);
+            }
+            if (ldesc.containsElementNamed("color") &&
+                !Rf_isNull(ldesc["color"])) {
+                light.color = color_from_r(ldesc["color"]);
+            }
+            if (ldesc.containsElementNamed("intensity") &&
+                !Rf_isNull(ldesc["intensity"])) {
+                light.intensity = as<float>(ldesc["intensity"]);
+            }
+            if (ldesc.containsElementNamed("directional") &&
+                !Rf_isNull(ldesc["directional"])) {
+                light.is_directional = as<bool>(ldesc["directional"]);
+            }
+            opts.lights.push_back(light);
+        }
+    }
+    if (opt_desc.containsElementNamed("ambient") &&
+        !Rf_isNull(opt_desc["ambient"])) {
+        opts.ambient = as<float>(opt_desc["ambient"]);
+    }
 
     return opts;
 }
@@ -223,6 +273,18 @@ List mesh_to_r_list(const scimesh::Mesh &mesh) {
             cols(i, 3) = mesh.colors[i].a;
         }
         out["colors"] = cols;
+    }
+
+    if (!mesh.face_colors.empty()) {
+        int nfc = static_cast<int>(mesh.face_colors.size());
+        NumericMatrix fcols(nfc, 4);
+        for (int i = 0; i < nfc; i++) {
+            fcols(i, 0) = mesh.face_colors[i].r;
+            fcols(i, 1) = mesh.face_colors[i].g;
+            fcols(i, 2) = mesh.face_colors[i].b;
+            fcols(i, 3) = mesh.face_colors[i].a;
+        }
+        out["face_colors"] = fcols;
     }
 
     if (!mesh.normals.empty()) {
@@ -456,4 +518,21 @@ List scimesh_generate_plane(NumericVector center, NumericVector normal,
                                      static_cast<float>(half_size_y),
                                      color_from_r(color));
     return mesh_to_r_list(m);
+}
+
+// ---- STL I/O ----------------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_read_stl(CharacterVector path) {
+    std::string p = as<std::string>(path);
+    scimesh::Mesh mesh = scimesh::stl_io::read_stl(p);
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+void scimesh_write_stl(List mesh_data, CharacterVector path,
+                       String format = "binary") {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    std::string p = as<std::string>(path);
+    std::string fmt = format;
+    scimesh::stl_io::write_stl(p, mesh, fmt);
 }

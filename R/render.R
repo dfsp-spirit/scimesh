@@ -5,6 +5,10 @@
 #' @param vertices Nx3 numeric matrix of vertex positions.
 #' @param triangles Mx3 integer matrix of triangle indices (1-based).
 #' @param colors Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
+#'   Use \code{face_colors} (M×4) for per-triangle colours instead.
+#' @param face_colors Optional Mx4 numeric matrix of per-face RGBA colors,
+#'   one row per triangle.  When present, all three vertices of a triangle
+#'   use the same colour.  Takes precedence over vertex \code{colors}.
 #' @param normals Optional Nx3 numeric matrix of vertex normals.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #' @param options A render options list from \code{render_options()}.
@@ -12,7 +16,8 @@
 #'   \code{pixels} (raw vector of RGBA values).
 #'
 #' @export
-render_mesh <- function(vertices, triangles, colors = NULL, normals = NULL,
+render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
+                        normals = NULL,
                         camera = camera_auto(vertices),
                         options = render_options()) {
     if (!is.matrix(vertices) || ncol(vertices) != 3L) {
@@ -32,6 +37,12 @@ render_mesh <- function(vertices, triangles, colors = NULL, normals = NULL,
         }
         mesh$colors <- colors
     }
+    if (!is.null(face_colors)) {
+        if (!is.matrix(face_colors) || ncol(face_colors) < 3L || ncol(face_colors) > 4L) {
+            stop("face_colors must be an Mx3 or Mx4 numeric matrix")
+        }
+        mesh$face_colors <- face_colors
+    }
     if (!is.null(normals)) {
         if (!is.matrix(normals) || ncol(normals) != 3L) {
             stop("normals must be an Nx3 numeric matrix")
@@ -49,8 +60,8 @@ render_mesh <- function(vertices, triangles, colors = NULL, normals = NULL,
 #'
 #' @param meshes A list of mesh descriptors. Each element is a list
 #'   with components \code{vertices} (Nx3 matrix), \code{triangles}
-#'   (Mx3 integer matrix), and optionally \code{colors}, \code{normals},
-#'   and \code{default_color}.
+#'   (Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
+#'   \code{normals}, and \code{default_color}.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #' @param options A render options list from \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
@@ -95,6 +106,13 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #' @param shininess Specular exponent controlling highlight sharpness.
 #'   Higher values produce a tighter spot.  Typical values: 32 (soft
 #'   plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).
+#' @param lights A list of light descriptors, each a list with
+#'   \code{position} (length-3 direction vector or point position),
+#'   \code{color} (length-4 RGBA, 0-1 scale), \code{intensity}
+#'   (numeric, default 1), and \code{directional} (logical, default
+#'   \code{TRUE}).  When empty or \code{NULL}, a single headlight at
+#'   \code{c(0, 0, 1)} is used (the original behaviour).
+#' @param ambient Ambient light contribution (0-1).  Default 0.3.
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
@@ -115,6 +133,8 @@ render_options <- function(width = 800L, height = 600L,
                            projection = c("perspective", "orthographic"),
                            specular_color = c(0, 0, 0, 0),
                            shininess = 0,
+                           lights = NULL,
+                           ambient = 0.3,
                            aa_samples = 1L) {
     shading <- match.arg(shading)
     list(
@@ -130,6 +150,8 @@ render_options <- function(width = 800L, height = 600L,
         projection = match.arg(projection),
         specular_color = as.numeric(specular_color),
         shininess = as.numeric(shininess),
+        lights = lights,
+        ambient = as.numeric(ambient),
         aa_samples = as.integer(aa_samples)
     )
 }

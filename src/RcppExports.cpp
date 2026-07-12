@@ -216,6 +216,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_read_stl
+List scimesh_read_stl(CharacterVector path);
+RcppExport SEXP _scimesh_scimesh_read_stl(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_read_stl(path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_write_stl
+void scimesh_write_stl(List mesh_data, CharacterVector path, String format);
+RcppExport SEXP _scimesh_scimesh_write_stl(SEXP mesh_dataSEXP, SEXP pathSEXP, SEXP formatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< String >::type format(formatSEXP);
+    scimesh_write_stl(mesh_data, path, format);
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -233,6 +256,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_generate_tetrahedron", (DL_FUNC) &_scimesh_scimesh_generate_tetrahedron, 5},
     {"_scimesh_scimesh_generate_torus", (DL_FUNC) &_scimesh_scimesh_generate_torus, 6},
     {"_scimesh_scimesh_generate_plane", (DL_FUNC) &_scimesh_scimesh_generate_plane, 5},
+    {"_scimesh_scimesh_read_stl", (DL_FUNC) &_scimesh_scimesh_read_stl, 1},
+    {"_scimesh_scimesh_write_stl", (DL_FUNC) &_scimesh_scimesh_write_stl, 3},
     {NULL, NULL, 0}
 };
 

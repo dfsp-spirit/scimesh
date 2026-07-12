@@ -251,3 +251,140 @@ generate_plane <- function(center = c(0, 0, 0), normal = c(0, 1, 0),
                            color = c(0.7, 0.7, 0.7, 1)) {
     scimesh_generate_plane(center, normal, half_size_x, half_size_y, color)
 }
+
+#' Read an STL file
+#'
+#' Reads an ASCII or binary STL file and returns a scimesh mesh
+#' descriptor list with \code{vertices}, \code{triangles}, and
+#' \code{normals}.
+#'
+#' @param path Path to the STL file.
+#' @return A mesh descriptor list.
+#'
+#' @export
+read_stl <- function(path) {
+    scimesh_read_stl(path)
+}
+
+#' Write a mesh to an STL file
+#'
+#' Writes a scimesh mesh descriptor to an ASCII or binary STL file.
+#'
+#' @param mesh A mesh descriptor list.
+#' @param path Path to the output STL file.
+#' @param format \code{"binary"} (default) or \code{"ascii"}.
+#'
+#' @export
+write_stl <- function(mesh, path, format = c("binary", "ascii")) {
+    format <- match.arg(format)
+    scimesh_write_stl(mesh, path, format)
+    invisible(NULL)
+}
+
+#' Compute the axis-aligned bounding box of a mesh
+#'
+#' @param mesh A mesh descriptor list with \code{vertices}.
+#' @return A list with \code{min} and \code{max} (each length-3 numeric).
+#'
+#' @export
+mesh_bbox <- function(mesh) {
+    if (!is.list(mesh) || is.null(mesh$vertices)) {
+        stop("mesh must be a list with 'vertices'")
+    }
+    v <- mesh$vertices
+    list(
+        min = apply(v, 2, min),
+        max = apply(v, 2, max)
+    )
+}
+
+#' Generate a wireframe bounding box mesh
+#'
+#' Creates 12 edge segments around an axis-aligned bounding box.
+#'
+#' @param bbox A bounding box list from \code{mesh_bbox()}, or a mesh
+#'   descriptor (in which case \code{mesh_bbox()} is called).
+#' @param color RGBA colour for the edges (length 4, 0-1 scale).
+#' @param radius Cylinder radius for the edges.
+#' @return A mesh descriptor list suitable for \code{render_mesh()}
+#'   or inclusion in a scene list.
+#'
+#' @export
+generate_bbox <- function(bbox, color = c(0, 0, 0, 1), radius = 0.01) {
+    if (is.list(bbox) && !is.null(bbox$vertices)) {
+        bbox <- mesh_bbox(bbox)
+    }
+    if (!is.list(bbox) || is.null(bbox$min) || is.null(bbox$max)) {
+        stop("bbox must be a list with 'min' and 'max'")
+    }
+    bmin <- bbox$min
+    bmax <- bbox$max
+
+    corners <- matrix(c(
+        bmin[1], bmin[2], bmin[3],
+        bmax[1], bmin[2], bmin[3],
+        bmin[1], bmax[2], bmin[3],
+        bmax[1], bmax[2], bmin[3],
+        bmin[1], bmin[2], bmax[3],
+        bmax[1], bmin[2], bmax[3],
+        bmin[1], bmax[2], bmax[3],
+        bmax[1], bmax[2], bmax[3]
+    ), ncol = 3, byrow = TRUE)
+
+    edges <- matrix(c(
+        0, 1, 1, 3, 3, 2, 2, 0,
+        4, 5, 5, 7, 7, 6, 6, 4,
+        0, 4, 1, 5, 2, 6, 3, 7
+    ), ncol = 2, byrow = TRUE)
+
+    edge_count <- nrow(edges)
+    from <- matrix(0, nrow = edge_count, ncol = 3)
+    to <- matrix(0, nrow = edge_count, ncol = 3)
+    for (i in seq_len(edge_count)) {
+        from[i, ] <- corners[edges[i, 1] + 1L, ]
+        to[i, ] <- corners[edges[i, 2] + 1L, ]
+    }
+
+    edge_cols <- matrix(color, nrow = edge_count, ncol = 4, byrow = TRUE)
+    scimesh_generate_multi_cylinders(from, to, rep(radius, edge_count),
+                                     edge_cols, 8L)
+}
+
+#' Generate XYZ axis arrows as cylinder meshes
+#'
+#' Creates three coloured arrow meshes (red X, green Y, blue Z) from
+#' a centre point.
+#'
+#' @param center Length-3 vector: origin of the axes.
+#' @param size Length of each axis.
+#' @param shaft_radius Cylinder radius for axis shafts.
+#' @return A mesh descriptor list suitable for \code{render_mesh()}
+#'   or inclusion in a scene list.
+#'
+#' @export
+generate_axes <- function(center = c(0, 0, 0), size = 1,
+                          shaft_radius = 0.02) {
+    cx <- center[1]; cy <- center[2]; cz <- center[3]
+    s <- size
+    r <- shaft_radius
+
+    x_tip  <- c(cx + s, cy, cz)
+    y_tip  <- c(cx, cy + s, cz)
+    z_tip  <- c(cx, cy, cz + s)
+
+    nc <- 3L
+    from <- matrix(c(
+        cx, cy, cz,
+        cx, cy, cz,
+        cx, cy, cz
+    ), ncol = 3, byrow = TRUE)
+    to <- matrix(c(x_tip, y_tip, z_tip), ncol = 3, byrow = TRUE)
+    radii <- c(r, r, r)
+    cols <- matrix(c(
+        1, 0, 0, 1,
+        0, 1, 0, 1,
+        0, 0, 1, 1
+    ), ncol = 4, byrow = TRUE)
+
+    scimesh_generate_multi_cylinders(from, to, radii, cols, 8L)
+}

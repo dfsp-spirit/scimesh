@@ -73,8 +73,14 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     rasterizer.clear(1.0f);
     rasterizer.specular_color = options.specular_color;
     rasterizer.shininess = options.shininess;
+    rasterizer.lights = options.lights;
+    rasterizer.ambient = options.ambient;
 
     Mat4 view = camera.get_view_matrix();
+
+    for (auto &light : rasterizer.lights) {
+        light.position = glm::normalize(transform_direction(view, light.position));
+    }
     float aspect = static_cast<float>(output.width) / static_cast<float>(output.height);
     Camera proj_cam = camera;
     proj_cam.projection = options.projection;
@@ -110,14 +116,22 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
             view_normals[i] = glm::normalize(transform_direction(view, n));
         }
 
-        for (const auto &tri : mesh.triangles) {
+        for (int ti = 0; ti < static_cast<int>(mesh.triangles.size()); ++ti) {
+            const auto &tri = mesh.triangles[ti];
             Vec3 v0 = mesh.vertices[tri.v0];
             Vec3 v1 = mesh.vertices[tri.v1];
             Vec3 v2 = mesh.vertices[tri.v2];
 
-            Color c0 = mesh.has_colors() ? mesh.colors[tri.v0] : options.default_color;
-            Color c1 = mesh.has_colors() ? mesh.colors[tri.v1] : options.default_color;
-            Color c2 = mesh.has_colors() ? mesh.colors[tri.v2] : options.default_color;
+            Color c0, c1, c2;
+            if (mesh.has_face_colors()) {
+                c0 = c1 = c2 = mesh.face_colors[ti];
+            } else if (mesh.has_colors()) {
+                c0 = mesh.colors[tri.v0];
+                c1 = mesh.colors[tri.v1];
+                c2 = mesh.colors[tri.v2];
+            } else {
+                c0 = c1 = c2 = options.default_color;
+            }
 
             Vec3 n0 = view_normals[tri.v0];
             Vec3 n1 = view_normals[tri.v1];

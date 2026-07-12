@@ -25,6 +25,9 @@ struct RenderOptions {
     float shininess = 0.0f;
     ProjectionType projection = ProjectionType::PERSPECTIVE;
 
+    std::vector<Light> lights;
+    float ambient = 0.3f;
+
     float near_plane = 0.1f;
     float far_plane = 10000.0f;
 };

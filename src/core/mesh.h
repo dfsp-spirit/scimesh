@@ -10,11 +10,13 @@ struct Mesh {
     std::vector<Vec3> vertices;
     std::vector<Triangle> triangles;
     std::vector<Color> colors;
+    std::vector<Color> face_colors;
     std::vector<Vec3> normals;
     Color default_color = DEFAULT_COLOR;
     bool has_transparency = false;
 
     bool has_colors() const { return !colors.empty(); }
+    bool has_face_colors() const { return !face_colors.empty(); }
     bool has_normals() const { return !normals.empty(); }
 
     bool is_valid() const {

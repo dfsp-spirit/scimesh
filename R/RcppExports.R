@@ -61,3 +61,11 @@ scimesh_generate_plane <- function(center, normal, half_size_x, half_size_y, col
     .Call(`_scimesh_scimesh_generate_plane`, center, normal, half_size_x, half_size_y, color)
 }
 
+scimesh_read_stl <- function(path) {
+    .Call(`_scimesh_scimesh_read_stl`, path)
+}
+
+scimesh_write_stl <- function(mesh_data, path, format = "binary") {
+    invisible(.Call(`_scimesh_scimesh_write_stl`, mesh_data, path, format))
+}
+

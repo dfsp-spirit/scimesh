@@ -20,8 +20,14 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
 
     int idx = y * width + x;
     if (blend_mode || depth < z_buffer[idx]) {
-        Color shaded = shade_pixel(color, normal, light_direction,
-                                   specular_color, shininess);
+        Color shaded;
+        if (lights.empty()) {
+            shaded = shade_pixel(color, normal, light_direction,
+                                 specular_color, shininess);
+        } else {
+            shaded = shade_pixel_multi(color, normal, lights, ambient,
+                                       specular_color, shininess);
+        }
 
         uint8_t r = static_cast<uint8_t>(std::clamp(shaded.r, 0.0f, 1.0f) * 255.0f);
         uint8_t g = static_cast<uint8_t>(std::clamp(shaded.g, 0.0f, 1.0f) * 255.0f);

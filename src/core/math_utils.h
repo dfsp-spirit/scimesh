@@ -60,11 +60,11 @@ inline void compute_barycentric(float px, float py,
 }
 
 inline Color shade_pixel(const Color &base_color, const Vec3 &normal,
-                         const Vec3 &light_dir,
+                         const Vec3 &light_direction,
                          const Color &specular_color = Color(0, 0, 0, 0),
                          float shininess = 0.0f) {
     Vec3 n = glm::length(normal) > 1e-12f ? glm::normalize(normal) : Vec3(0.0f, 0.0f, 1.0f);
-    Vec3 l = glm::normalize(light_dir);
+    Vec3 l = glm::normalize(light_direction);
     float ndotl = std::max(0.0f, glm::dot(n, l));
     float ambient = 0.3f;
     float diffuse_term = (1.0f - ambient) * ndotl;
@@ -82,6 +82,42 @@ inline Color shade_pixel(const Color &base_color, const Vec3 &normal,
                  base_color.g * intensity + spec_g,
                  base_color.b * intensity + spec_b,
                  base_color.a);
+}
+
+inline Color shade_pixel_multi(const Color &base_color, const Vec3 &normal,
+                               const std::vector<Light> &lights,
+                               float ambient,
+                               const Color &specular_color = Color(0, 0, 0, 0),
+                               float shininess = 0.0f) {
+    Vec3 n = glm::length(normal) > 1e-12f ? glm::normalize(normal) : Vec3(0.0f, 0.0f, 1.0f);
+
+    float total_r = base_color.r * ambient;
+    float total_g = base_color.g * ambient;
+    float total_b = base_color.b * ambient;
+
+    int nlights = static_cast<int>(lights.size());
+    if (nlights == 0) return Color(total_r, total_g, total_b, base_color.a);
+
+    for (int i = 0; i < nlights; i++) {
+        const Light &light = lights[i];
+        Vec3 light_dir = glm::normalize(light.position);
+        float ndotl = std::max(0.0f, glm::dot(n, light_dir));
+        float li = light.intensity / static_cast<float>(nlights);
+        float diff = (1.0f - ambient) * ndotl * li;
+        total_r += base_color.r * diff * light.color.r;
+        total_g += base_color.g * diff * light.color.g;
+        total_b += base_color.b * diff * light.color.b;
+
+        if (shininess > 0.0f && ndotl > 0.0f) {
+            float spec = std::pow(ndotl, shininess) * li;
+            total_r += specular_color.r * spec * light.color.r;
+            total_g += specular_color.g * spec * light.color.g;
+            total_b += specular_color.b * spec * light.color.b;
+        }
+    }
+
+    return Color(std::min(total_r, 1.0f), std::min(total_g, 1.0f),
+                 std::min(total_b, 1.0f), base_color.a);
 }
 
 } // namespace scimesh
