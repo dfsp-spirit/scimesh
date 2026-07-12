@@ -40,4 +40,9 @@ struct Light {
     bool is_directional = true;
 };
 
+struct ClipPlane {
+    Vec3 normal = Vec3(0.0f, 0.0f, -1.0f);
+    float offset = 0.0f;
+};
+
 } // namespace scimesh

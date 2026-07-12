@@ -139,6 +139,33 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
     render_scene(list(mesh), camera, options)
 }
 
+#' Render screen-space point primitives
+#'
+#' Renders points as fixed-size filled circles in screen space with
+#' depth testing.  Unlike \code{render_spheres()}, point size is
+#' measured in pixels and does not change with camera distance.
+#'
+#' @param positions Nx3 numeric matrix of point positions.
+#' @param colors Nx4 numeric matrix of RGBA colours (0-1 scale).
+#' @param radius Point radius in pixels.
+#' @param camera A camera list.
+#' @param options Render options.
+#' @return An image list.
+#'
+#' @export
+render_points <- function(positions, colors, radius = 3,
+                          camera = camera_auto(positions),
+                          options = render_options()) {
+    if (!is.matrix(positions) || ncol(positions) != 3L) {
+        stop("positions must be an Nx3 numeric matrix")
+    }
+    n <- nrow(positions)
+    if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
+        stop("colors must be an Nx4 numeric matrix")
+    }
+    scimesh_render_points_raw(positions, colors, radius, camera, options)
+}
+
 #' Convert an rgl tmesh3d to scimesh mesh format
 #'
 #' Extracts vertices and triangle indices from an rgl

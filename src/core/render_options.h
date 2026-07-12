@@ -27,6 +27,14 @@ struct RenderOptions {
 
     std::vector<Light> lights;
     float ambient = 0.3f;
+    std::vector<ClipPlane> clip_planes;
+
+    bool fog_enabled = false;
+    float fog_start = 0.0f;
+    float fog_end = 1.0f;
+    Color fog_color = TRANSPARENT_BLACK;
+
+    int threads = 0;
 
     float near_plane = 0.1f;
     float far_plane = 10000.0f;

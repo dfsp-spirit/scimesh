@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace scimesh {
 
 Rasterizer::Rasterizer(int w, int h)
@@ -33,6 +37,15 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
         uint8_t g = static_cast<uint8_t>(std::clamp(shaded.g, 0.0f, 1.0f) * 255.0f);
         uint8_t b = static_cast<uint8_t>(std::clamp(shaded.b, 0.0f, 1.0f) * 255.0f);
         uint8_t a = static_cast<uint8_t>(std::clamp(shaded.a, 0.0f, 1.0f) * 255.0f);
+
+        if (fog_enabled) {
+            float fog_fac = (depth - fog_start) / (fog_end - fog_start);
+            fog_fac = std::max(0.0f, std::min(1.0f, fog_fac));
+            r = static_cast<uint8_t>(r * (1.0f - fog_fac) + fog_color.r * 255.0f * fog_fac);
+            g = static_cast<uint8_t>(g * (1.0f - fog_fac) + fog_color.g * 255.0f * fog_fac);
+            b = static_cast<uint8_t>(b * (1.0f - fog_fac) + fog_color.b * 255.0f * fog_fac);
+            a = static_cast<uint8_t>(a * (1.0f - fog_fac) + fog_color.a * 255.0f * fog_fac);
+        }
 
         if (blend_mode) {
             uint8_t dr, dg, db, da;
@@ -91,6 +104,9 @@ void Rasterizer::rasterize_triangle(
         if (wire_thresh > 0.5f) wire_thresh = 0.5f;
     }
 
+#ifdef _OPENMP
+#pragma omp parallel for if((y_end - y_start) > 16) schedule(static)
+#endif
     for (int y = y_start; y <= y_end; ++y) {
         for (int x = x_start; x <= x_end; ++x) {
             float px = static_cast<float>(x) + 0.5f;
@@ -132,6 +148,27 @@ void Rasterizer::rasterize_triangle(
             } else {
                 shade_and_write(x, y, depth, color0, normal0, light_direction, output);
             }
+        }
+    }
+}
+
+void Rasterizer::rasterize_point(float screen_x, float screen_y, float depth,
+                                 float radius, const Color &color,
+                                 const Vec3 &normal, const Vec3 &light_direction,
+                                 Image &output) {
+    int cx = static_cast<int>(std::floor(screen_x));
+    int cy = static_cast<int>(std::floor(screen_y));
+    int r = static_cast<int>(std::ceil(radius));
+    float r_sq = radius * radius;
+
+    for (int dy = -r; dy <= r; ++dy) {
+        int py = cy + dy;
+        if (py < 0 || py >= height) continue;
+        for (int dx = -r; dx <= r; ++dx) {
+            int px = cx + dx;
+            if (px < 0 || px >= width) continue;
+            if (static_cast<float>(dx*dx + dy*dy) > r_sq) continue;
+            shade_and_write(px, py, depth, color, normal, light_direction, output);
         }
     }
 }

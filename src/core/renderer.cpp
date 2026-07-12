@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace scimesh {
 
 namespace {
@@ -62,6 +66,68 @@ Image Renderer::render_triangles_raw(const std::vector<Vec3> &positions,
     return render_mesh(mesh, camera, options);
 }
 
+Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
+                                  const std::vector<Color> &colors,
+                                  float radius,
+                                  const Camera &camera,
+                                  const RenderOptions &options) {
+    int np = static_cast<int>(positions.size());
+    if (np == 0 || colors.empty()) {
+        Image img(options.width, options.height);
+        img.clear_float(options.background_color.r, options.background_color.g,
+                        options.background_color.b, options.background_color.a);
+        return img;
+    }
+
+    int aa = std::max(1, options.aa_samples);
+    Image output(options.width * aa, options.height * aa);
+    output.clear_float(options.background_color.r, options.background_color.g,
+                       options.background_color.b, options.background_color.a);
+
+    Rasterizer rasterizer(output.width, output.height);
+    rasterizer.clear(1.0f);
+    rasterizer.specular_color = options.specular_color;
+    rasterizer.shininess = options.shininess;
+    rasterizer.lights = options.lights;
+    rasterizer.ambient = options.ambient;
+    rasterizer.fog_enabled = options.fog_enabled;
+    rasterizer.fog_start = options.fog_start;
+    rasterizer.fog_end = options.fog_end;
+    rasterizer.fog_color = options.fog_color;
+
+#ifdef _OPENMP
+    if (options.threads > 0) omp_set_num_threads(options.threads);
+#endif
+
+    Mat4 view = camera.get_view_matrix();
+    float aspect = static_cast<float>(output.width) / static_cast<float>(output.height);
+    Camera proj_cam = camera;
+    proj_cam.projection = options.projection;
+    Mat4 projection = proj_cam.get_projection_matrix(aspect, options.near_plane, options.far_plane);
+    Mat4 view_projection = projection * view;
+
+    Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
+    if (!options.lights.empty()) {
+        light_direction = options.lights[0].position;
+        light_direction = glm::normalize(transform_direction(view, light_direction));
+    }
+
+    float aa_radius = radius * static_cast<float>(aa);
+
+    for (int i = 0; i < np; i++) {
+        Vec4 clip_pos = transform_point_homogeneous(view_projection, positions[i]);
+        Vec3 ndc = perspective_divide(clip_pos);
+        float sx, sy, sz;
+        ndc_to_screen(ndc, output.width, output.height, sx, sy, sz);
+
+        Vec3 normal(0.0f, 0.0f, 1.0f);
+        rasterizer.rasterize_point(sx, sy, sz, aa_radius, colors[i],
+                                    normal, light_direction, output);
+    }
+
+    return output.downsample_box(aa);
+}
+
 void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                                const Camera &camera,
                                const RenderOptions &options,
@@ -75,6 +141,14 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     rasterizer.shininess = options.shininess;
     rasterizer.lights = options.lights;
     rasterizer.ambient = options.ambient;
+    rasterizer.fog_enabled = options.fog_enabled;
+    rasterizer.fog_start = options.fog_start;
+    rasterizer.fog_end = options.fog_end;
+    rasterizer.fog_color = options.fog_color;
+
+#ifdef _OPENMP
+    if (options.threads > 0) omp_set_num_threads(options.threads);
+#endif
 
     Mat4 view = camera.get_view_matrix();
 
@@ -86,6 +160,11 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     proj_cam.projection = options.projection;
     Mat4 projection = proj_cam.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
+
+    std::vector<ClipPlane> view_clip_planes = options.clip_planes;
+    for (auto &cp : view_clip_planes) {
+        cp.normal = glm::normalize(transform_direction(view, cp.normal));
+    }
 
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
 
@@ -148,11 +227,73 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
             cv2.position = transform_point_homogeneous(view_projection, v2);
             cv2.color = c2; cv2.normal = n2;
 
+            bool has_user_clips = !view_clip_planes.empty();
+
             std::vector<ClipVertex> clipped_vertices;
             std::vector<Triangle> clipped_triangles;
-            int num_clipped = clip_triangle_near_plane(cv0, cv1, cv2,
-                clipped_vertices, clipped_triangles);
-            if (num_clipped == 0) continue;
+
+            if (has_user_clips) {
+                Vec3 vv0 = transform_point(view, v0);
+                Vec3 vv1 = transform_point(view, v1);
+                Vec3 vv2 = transform_point(view, v2);
+
+                std::vector<ClipVertex> view_clipped;
+                std::vector<Triangle> view_clip_tris;
+                int vc_count = clip_triangle_view_plane(
+                    vv0, vv1, vv2, n0, n1, n2, c0, c1, c2,
+                    view_clip_planes[0], view_clipped, view_clip_tris);
+
+                for (int ci = 1; ci < static_cast<int>(view_clip_planes.size()) && vc_count > 0; ++ci) {
+                    std::vector<ClipVertex> next_vertices;
+                    std::vector<Triangle> next_triangles;
+                    for (const auto &vt : view_clip_tris) {
+                        const ClipVertex &a = view_clipped[vt.v0];
+                        const ClipVertex &b = view_clipped[vt.v1];
+                        const ClipVertex &c = view_clipped[vt.v2];
+                        Vec3 pa(a.position.x, a.position.y, a.position.z);
+                        Vec3 pb(b.position.x, b.position.y, b.position.z);
+                        Vec3 pc(c.position.x, c.position.y, c.position.z);
+                        Vec3 na(a.normal), nb(b.normal), nc(c.normal);
+                        Color ca(a.color), cb(b.color), cc(c.color);
+                        clip_triangle_view_plane(
+                            pa, pb, pc, na, nb, nc, ca, cb, cc,
+                            view_clip_planes[ci], next_vertices, next_triangles);
+                    }
+                    view_clipped.swap(next_vertices);
+                    view_clip_tris.swap(next_triangles);
+                    vc_count = static_cast<int>(view_clip_tris.size());
+                    if (vc_count == 0) break;
+                }
+
+                if (vc_count == 0) continue;
+
+                clipped_vertices.clear();
+                clipped_triangles.clear();
+                for (const auto &vt : view_clip_tris) {
+                    const ClipVertex &a = view_clipped[vt.v0];
+                    const ClipVertex &b = view_clipped[vt.v1];
+                    const ClipVertex &c = view_clipped[vt.v2];
+
+                    ClipVertex cva, cvb, cvc;
+                    cva.position = projection * Vec4(a.position.x, a.position.y, a.position.z, 1.0f);
+                    cva.color = a.color; cva.normal = a.normal;
+                    cvb.position = projection * Vec4(b.position.x, b.position.y, b.position.z, 1.0f);
+                    cvb.color = b.color; cvb.normal = b.normal;
+                    cvc.position = projection * Vec4(c.position.x, c.position.y, c.position.z, 1.0f);
+                    cvc.color = c.color; cvc.normal = c.normal;
+
+                    int nc = clip_triangle_near_plane(cva, cvb, cvc,
+                        clipped_vertices, clipped_triangles);
+                    (void)nc;
+                }
+                if (clipped_triangles.empty()) continue;
+            } else {
+                clipped_vertices.clear();
+                clipped_triangles.clear();
+                int num_clipped = clip_triangle_near_plane(cv0, cv1, cv2,
+                    clipped_vertices, clipped_triangles);
+                if (num_clipped == 0) continue;
+            }
 
             bool smooth = (options.shading == ShadingMode::SMOOTH);
 

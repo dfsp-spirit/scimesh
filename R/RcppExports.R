@@ -41,6 +41,10 @@ scimesh_render_triangles_raw <- function(positions, colors, camera_data, options
     .Call(`_scimesh_scimesh_render_triangles_raw`, positions, colors, camera_data, options_data)
 }
 
+scimesh_render_points_raw <- function(positions, colors, radius, camera_data, options_data) {
+    .Call(`_scimesh_scimesh_render_points_raw`, positions, colors, radius, camera_data, options_data)
+}
+
 scimesh_generate_cuboid <- function(center, half_extents, color) {
     .Call(`_scimesh_scimesh_generate_cuboid`, center, half_extents, color)
 }

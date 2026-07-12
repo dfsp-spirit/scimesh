@@ -227,6 +227,46 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         opts.ambient = as<float>(opt_desc["ambient"]);
     }
 
+    if (opt_desc.containsElementNamed("fog_enabled") &&
+        !Rf_isNull(opt_desc["fog_enabled"])) {
+        opts.fog_enabled = as<bool>(opt_desc["fog_enabled"]);
+    }
+    if (opt_desc.containsElementNamed("fog_start") &&
+        !Rf_isNull(opt_desc["fog_start"])) {
+        opts.fog_start = as<float>(opt_desc["fog_start"]);
+    }
+    if (opt_desc.containsElementNamed("fog_end") &&
+        !Rf_isNull(opt_desc["fog_end"])) {
+        opts.fog_end = as<float>(opt_desc["fog_end"]);
+    }
+    if (opt_desc.containsElementNamed("fog_color") &&
+        !Rf_isNull(opt_desc["fog_color"])) {
+        opts.fog_color = color_from_r(opt_desc["fog_color"]);
+    }
+
+    if (opt_desc.containsElementNamed("threads") &&
+        !Rf_isNull(opt_desc["threads"])) {
+        opts.threads = as<int>(opt_desc["threads"]);
+    }
+
+    if (opt_desc.containsElementNamed("clip_planes") &&
+        !Rf_isNull(opt_desc["clip_planes"])) {
+        List cplanes = opt_desc["clip_planes"];
+        for (int i = 0; i < cplanes.size(); i++) {
+            List cp = cplanes[i];
+            scimesh::ClipPlane plane;
+            if (cp.containsElementNamed("normal") &&
+                !Rf_isNull(cp["normal"])) {
+                plane.normal = vec3_from_r(cp["normal"]);
+            }
+            if (cp.containsElementNamed("offset") &&
+                !Rf_isNull(cp["offset"])) {
+                plane.offset = as<float>(cp["offset"]);
+            }
+            opts.clip_planes.push_back(plane);
+        }
+    }
+
     return opts;
 }
 
@@ -467,6 +507,33 @@ List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors,
     scimesh::RenderOptions opts = build_options_from_r(options_data);
     scimesh::Renderer renderer;
     scimesh::Image img = renderer.render_triangles_raw(verts, cols, cam, opts);
+    return image_to_r_list(img);
+}
+
+// ---- Points ------------------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_render_points_raw(NumericMatrix positions, NumericMatrix colors,
+                               double radius,
+                               List camera_data, List options_data) {
+    int n = positions.nrow();
+    std::vector<scimesh::Vec3> verts;
+    std::vector<scimesh::Color> cols;
+    for (int i = 0; i < n; i++) {
+        verts.push_back(scimesh::Vec3(
+            static_cast<float>(positions(i, 0)),
+            static_cast<float>(positions(i, 1)),
+            static_cast<float>(positions(i, 2))));
+        cols.push_back(scimesh::Color(
+            static_cast<float>(colors(i, 0)),
+            static_cast<float>(colors(i, 1)),
+            static_cast<float>(colors(i, 2)),
+            static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+    }
+    scimesh::Camera cam = build_camera_from_r(camera_data);
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+    scimesh::Renderer renderer;
+    scimesh::Image img = renderer.render_points_raw(verts, cols,
+        static_cast<float>(radius), cam, opts);
     return image_to_r_list(img);
 }
 

@@ -22,4 +22,17 @@ int clip_triangle_near_plane(
     std::vector<ClipVertex> &output_vertices,
     std::vector<Triangle> &output_triangles);
 
+// Clip a triangle against an arbitrary plane in view space.
+// A vertex is "inside" if dot(view_pos, plane.normal) + plane.offset >= 0.
+// Returns number of output triangles (0, 1, or 2).
+// Output vertices have POSITION in VIEW space; caller must transform to
+// clip space.
+int clip_triangle_view_plane(
+    const Vec3 &v0, const Vec3 &v1, const Vec3 &v2,
+    const Vec3 &n0, const Vec3 &n1, const Vec3 &n2,
+    const Color &c0, const Color &c1, const Color &c2,
+    const ClipPlane &plane,
+    std::vector<ClipVertex> &output_vertices,
+    std::vector<Triangle> &output_triangles);
+
 } // namespace scimesh

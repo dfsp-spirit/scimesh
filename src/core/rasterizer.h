@@ -16,6 +16,11 @@ struct Rasterizer {
     std::vector<Light> lights;
     float ambient = 0.3f;
 
+    bool fog_enabled = false;
+    float fog_start = 0.0f;
+    float fog_end = 1.0f;
+    Color fog_color = TRANSPARENT_BLACK;
+
     Rasterizer(int w, int h);
 
     void clear(float clear_depth = 1.0f);
@@ -31,6 +36,11 @@ struct Rasterizer {
         bool wireframe,
         const Color &wireframe_color,
         Image &output);
+
+    void rasterize_point(float screen_x, float screen_y, float depth,
+                         float radius, const Color &color,
+                         const Vec3 &normal, const Vec3 &light_direction,
+                         Image &output);
 
 private:
     void shade_and_write(int x, int y, float depth,

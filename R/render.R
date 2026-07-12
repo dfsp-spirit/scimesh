@@ -113,6 +113,19 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #'   \code{TRUE}).  When empty or \code{NULL}, a single headlight at
 #'   \code{c(0, 0, 1)} is used (the original behaviour).
 #' @param ambient Ambient light contribution (0-1).  Default 0.3.
+#' @param fog_enabled Enable depth cueing (fog).  Default \code{FALSE}.
+#' @param fog_start Z-depth where fog begins (0 = near plane, 1 = far
+#'   plane).  Default 0.
+#' @param fog_end Z-depth where fog is fully opaque.  Default 1.
+#' @param fog_color RGBA fog colour (0-1 scale).  Defaults to
+#'   \code{background_color}.
+#' @param threads Number of render threads.  0 = auto-detect (use all
+#'   cores), 1 = single-threaded (deterministic).  Default 0.
+#'   Requires OpenMP at compile time.
+#' @param clip_planes A list of clip plane descriptors, each a list
+#'   with \code{normal} (length-3 vector) and \code{offset} (numeric).
+#'   Points satisfying \code{dot(normal, position) + offset >= 0} are
+#'   kept.  Default \code{NULL} (no clipping).
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
@@ -135,6 +148,12 @@ render_options <- function(width = 800L, height = 600L,
                            shininess = 0,
                            lights = NULL,
                            ambient = 0.3,
+                           fog_enabled = FALSE,
+                           fog_start = 0,
+                           fog_end = 1,
+                           fog_color = c(0, 0, 0, 0),
+                           threads = 0L,
+                           clip_planes = NULL,
                            aa_samples = 1L) {
     shading <- match.arg(shading)
     list(
@@ -152,6 +171,12 @@ render_options <- function(width = 800L, height = 600L,
         shininess = as.numeric(shininess),
         lights = lights,
         ambient = as.numeric(ambient),
+        fog_enabled = isTRUE(fog_enabled),
+        fog_start = as.numeric(fog_start),
+        fog_end = as.numeric(fog_end),
+        fog_color = as.numeric(fog_color),
+        threads = as.integer(threads),
+        clip_planes = clip_planes,
         aa_samples = as.integer(aa_samples)
     )
 }
