@@ -1,4 +1,5 @@
-/// Demo: render a protein (PDB file) as atom spheres with CPK coloring.
+/// Demo: render a protein (PDB file) as atom spheres with CPK coloring
+/// and a C-alpha backbone trace.
 ///
 /// Uses the tiny_pdb.hpp parser to read ATOM records and maps each element
 /// to a standard CPK colour.  Spheres are sized for ball-and-stick style.
@@ -20,6 +21,7 @@
 #include "render_options.h"
 #include "image.h"
 #include "primitives.h"
+#include "scene.h"
 
 #include <string>
 #include <iostream>
@@ -40,8 +42,6 @@ using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
 
-// ---- CPK colour map ---------------------------------------------------------
-
 static Color cpk_color(const std::string &element) {
     static const std::map<std::string, Color> map = {
         {"H",  Color(1.00f, 1.00f, 1.00f)},  {"C",  Color(0.20f, 0.20f, 0.20f)},
@@ -57,10 +57,8 @@ static Color cpk_color(const std::string &element) {
     };
     auto it = map.find(element);
     if (it != map.end()) return it->second;
-    return Color(1.0f, 0.08f, 0.58f);  // magenta for unknown
+    return Color(1.0f, 0.08f, 0.58f);
 }
-
-// ---- Artistic atom radii (ball-and-stick style, in PDB coordinate units) ----
 
 static float atom_radius(const std::string &element) {
     static const std::map<std::string, float> map = {
@@ -73,25 +71,6 @@ static float atom_radius(const std::string &element) {
     if (it != map.end()) return it->second;
     return 0.50f;
 }
-
-// ---- Bounding box of a set of points ----------------------------------------
-
-static void compute_bbox(const std::vector<TinyPDB::Atom> &atoms,
-                         Vec3 &bmin, Vec3 &bmax) {
-    bmin = Vec3(std::numeric_limits<float>::max());
-    bmax = Vec3(std::numeric_limits<float>::lowest());
-    for (const auto &a : atoms) {
-        Vec3 p(a.x, a.y, a.z);
-        bmin.x = std::min(bmin.x, p.x);
-        bmin.y = std::min(bmin.y, p.y);
-        bmin.z = std::min(bmin.z, p.z);
-        bmax.x = std::max(bmax.x, p.x);
-        bmax.y = std::max(bmax.y, p.y);
-        bmax.z = std::max(bmax.z, p.z);
-    }
-}
-
-// ---- Main -------------------------------------------------------------------
 
 int main(int argc, char *argv[]) {
     std::string pdb_path = "1CRN.pdb";
@@ -114,31 +93,49 @@ int main(int argc, char *argv[]) {
     std::vector<Vec3> centers;
     std::vector<float> radii;
     std::vector<Color> colors;
+    std::vector<Vec3> ca_positions;
+    std::vector<char> ca_chains;
+
     for (const auto &a : atoms) {
         centers.push_back(Vec3(a.x, a.y, a.z));
         radii.push_back(atom_radius(a.element));
         colors.push_back(cpk_color(a.element));
+        if (a.name == "CA") {
+            ca_positions.push_back(Vec3(a.x, a.y, a.z));
+            ca_chains.push_back(a.chain);
+        }
     }
 
     Mesh atom_mesh = scimesh::generate_multi_spheres(centers, radii, colors, 14);
-    std::cout << "Generated mesh: " << atom_mesh.vertices.size()
-              << " vertices, " << atom_mesh.triangles.size() << " triangles\n";
+    std::cout << "Atoms: " << atom_mesh.vertices.size() << " vertices, "
+              << atom_mesh.triangles.size() << " triangles\n";
+    std::cout << "Backbone: " << ca_positions.size() << " CA atoms\n";
 
-    Vec3 bmin, bmax;
-    compute_bbox(atoms, bmin, bmax);
-    Vec3 center = (bmin + bmax) * 0.5f;
-    Vec3 size   = bmax - bmin;
-    float bbox_radius = std::sqrt(size.x * size.x + size.y * size.y + size.z * size.z) * 0.5f;
+    Mesh backbone_mesh;
+    if (ca_positions.size() >= 2) {
+        std::vector<Vec3> bstarts, bends;
+        std::vector<Color> bcolors;
+        std::vector<float> bradii;
+        for (size_t i = 0; i + 1 < ca_positions.size(); ++i) {
+            if (ca_chains[i] != ca_chains[i + 1]) continue;
+            bstarts.push_back(ca_positions[i]);
+            bends.push_back(ca_positions[i + 1]);
+            bradii.push_back(0.12f);
+            bcolors.push_back(Color(0.1f, 0.7f, 0.8f));
+        }
+        backbone_mesh = scimesh::generate_multi_cylinders(
+            bstarts, bends, bradii, bcolors, 8);
+    }
 
-    Camera cam;
-    cam.center = center;
-    cam.up     = Vec3(0.0f, 1.0f, 0.0f);
-    cam.fov_degrees = 40.0f;
-    float margin = 1.3f;
-    float fov_rad = cam.fov_degrees * 3.14159265f / 180.0f;
-    float dist = bbox_radius / std::sin(fov_rad * 0.5f) * margin;
+    Scene scene;
+    scene.meshes.push_back(atom_mesh);
+    if (!backbone_mesh.triangles.empty()) {
+        scene.meshes.push_back(backbone_mesh);
+    }
+
     Vec3 eye_dir = glm::normalize(Vec3(0.5f, 0.4f, -1.0f));
-    cam.eye = center + eye_dir * dist;
+    Camera cam = scimesh::camera_fit_mesh(atom_mesh, eye_dir,
+        Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.3f);
 
     scimesh::Light key_light;
     key_light.position = Vec3(0.5f, 1.0f, 1.0f);
@@ -168,13 +165,15 @@ int main(int argc, char *argv[]) {
     opts.aa_samples = 2;
 
     Renderer renderer;
-    Image img = renderer.render_mesh(atom_mesh, cam, opts);
+    Image img = renderer.render_scene(scene, cam, opts);
 
-    std::string out_name = "protein.ppm";
+    std::string out_name;
     {
         auto slash = pdb_path.find_last_of("/\\");
         auto dot   = pdb_path.find_last_of('.');
-        std::string base = pdb_path.substr(slash + 1, dot - slash - 1);
+        std::string base = (slash == std::string::npos)
+            ? pdb_path.substr(0, dot)
+            : pdb_path.substr(slash + 1, dot - slash - 1);
         out_name = base + ".ppm";
     }
 

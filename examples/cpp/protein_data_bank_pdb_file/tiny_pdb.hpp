@@ -5,7 +5,9 @@
 
 namespace TinyPDB {
     struct Atom {
+        std::string name;
         std::string element;
+        char chain = ' ';
         float x, y, z;
     };
 
@@ -32,6 +34,16 @@ namespace TinyPDB {
                     }
                 }
 
+                // Extract Atom Name (Columns 13-16)
+                std::string name;
+                if (line.size() >= 16) {
+                    name = line.substr(12, 4);
+                    name.erase(0, name.find_first_not_of(" "));
+                    name.erase(name.find_last_not_of(" ") + 1);
+                }
+
+                char chain = (line.size() > 21) ? line[21] : ' ';
+
                 // Extract Element (Columns 77-78)
                 std::string element = (line.size() >= 78) ? line.substr(76, 2) : "";
                 element.erase(0, element.find_first_not_of(" "));
@@ -50,6 +62,8 @@ namespace TinyPDB {
 
                 try {
                     Atom atom;
+                    atom.name = name;
+                    atom.chain = chain;
                     atom.element = element;
                     atom.x = std::stof(line.substr(30, 8));
                     atom.y = std::stof(line.substr(38, 8));
