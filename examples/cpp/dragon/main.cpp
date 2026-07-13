@@ -21,6 +21,7 @@
 #include "types.h"
 
 #include <iostream>
+#include <chrono>
 
 using scimesh::Vec3;
 using scimesh::Color;
@@ -53,7 +54,7 @@ int main() {
     // Camera: slightly elevated, front-right view.
     Vec3 eye_dir = glm::normalize(Vec3(0.9f, 0.5f, 1.0f));
     Camera cam = scimesh::camera_fit_mesh(mesh, eye_dir,
-        Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.05f);
+        Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.01f);
 
     // Key light: warm, upper right.
     scimesh::Light key_light;
@@ -91,11 +92,15 @@ int main() {
               << " with " << opts.aa_samples << "x AA ...\n";
 
     Renderer renderer;
+    auto t0 = std::chrono::high_resolution_clock::now();
     Image img = renderer.render_mesh(mesh, cam, opts);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    double elapsed = std::chrono::duration<double>(t1 - t0).count();
 
     const char *out_file = "dragon.png";
     img.write_png(out_file);
     std::cout << "Wrote " << out_file << " (" << img.width << "x" << img.height << ")\n";
+    std::cout << "Render time: " << elapsed << "s\n";
 
     return 0;
 }

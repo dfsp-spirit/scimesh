@@ -12,9 +12,9 @@ images for scientific visualization.
 
 ![Stanford Dragon rendered with scimesh](web/images/dragon.png)
 
-*The Stanford Dragon (871k triangles), rendered with scimesh's
+*The [Stanford Dragon](https://graphics.stanford.edu/data/3Dscanrep/) (871k triangles), rendered with scimesh's
 software rasterizer using smooth shading, three-point Blinn-Phong
-lighting, screen-space ambient occlusion, and 4x anti-aliasing.
+lighting, and 4x anti-aliasing.
 [Source code](examples/cpp/dragon/main.cpp).*
 
 ## What scimesh is
