@@ -41,6 +41,43 @@ TEST_CASE("generate_sphere normals point outward", "[primitives]") {
     }
 }
 
+TEST_CASE("generate_sphere caps face outward", "[primitives]") {
+    Vec3 center(10, 20, 30);
+    Mesh s = generate_sphere(center, 2.0f, 32, Color(1, 1, 1));
+
+    int north_cap_tris = 32;
+    for (int i = 0; i < north_cap_tris; i++) {
+        const auto &t = s.triangles[i];
+        Vec3 v0 = s.vertices[t.v0];
+        Vec3 v1 = s.vertices[t.v1];
+        Vec3 v2 = s.vertices[t.v2];
+
+        Vec3 normal = glm::cross(v1 - v0, v2 - v0);
+        REQUIRE(glm::length(normal) > 0.001f);
+
+        Vec3 ctr = (v0 + v1 + v2) / 3.0f;
+        float dot = glm::dot(glm::normalize(normal),
+                             glm::normalize(ctr - center));
+        REQUIRE(dot > 0.0f);
+    }
+
+    int south_start = static_cast<int>(s.triangles.size()) - 32;
+    for (int i = south_start; i < static_cast<int>(s.triangles.size()); i++) {
+        const auto &t = s.triangles[i];
+        Vec3 v0 = s.vertices[t.v0];
+        Vec3 v1 = s.vertices[t.v1];
+        Vec3 v2 = s.vertices[t.v2];
+
+        Vec3 normal = glm::cross(v1 - v0, v2 - v0);
+        REQUIRE(glm::length(normal) > 0.001f);
+
+        Vec3 ctr = (v0 + v1 + v2) / 3.0f;
+        float dot = glm::dot(glm::normalize(normal),
+                             glm::normalize(ctr - center));
+        REQUIRE(dot > 0.0f);
+    }
+}
+
 TEST_CASE("generate_cylinder produces sane mesh", "[primitives]") {
     Mesh c = generate_cylinder(Vec3(0, 0, 0), Vec3(0, 3, 0), 1.0f, 16,
                                Color(0, 1, 0));

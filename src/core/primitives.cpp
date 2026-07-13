@@ -38,7 +38,7 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments,
         return m;
     }
 
-    int n_rings = segments + 1;
+    int n_rings = std::max(2, segments);
     int verts_per_ring = segments;
 
     uint32_t north_idx = 0;
@@ -69,12 +69,14 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments,
         m.normals[i] = glm::normalize(m.vertices[i] - center);
     }
 
+    // North cap — outward-facing triangles (CCW from above)
     for (int j = 0; j < verts_per_ring; ++j) {
         uint32_t j_next = 1 + static_cast<uint32_t>((j + 1) % verts_per_ring);
-        m.triangles.push_back({north_idx, 1 + static_cast<uint32_t>(j), j_next});
+        m.triangles.push_back({north_idx, j_next, 1 + static_cast<uint32_t>(j)});
     }
 
-    for (int ring = 0; ring < segments - 1; ++ring) {
+    // Body rings
+    for (int ring = 0; ring < n_rings - 2; ++ring) {
         uint32_t ring_start = 1 + static_cast<uint32_t>(ring) * verts_per_ring;
         uint32_t next_start =
             1 + static_cast<uint32_t>(ring + 1) * verts_per_ring;
@@ -90,8 +92,9 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments,
         }
     }
 
+    // South cap — outward-facing triangles (CCW from below)
     uint32_t last_start =
-        1 + static_cast<uint32_t>(segments - 1) * verts_per_ring;
+        1 + static_cast<uint32_t>(n_rings - 2) * verts_per_ring;
     for (int j = 0; j < verts_per_ring; ++j) {
         uint32_t j_next = last_start + (j + 1) % verts_per_ring;
         m.triangles.push_back({south_idx, last_start + j, j_next});
@@ -280,6 +283,12 @@ Mesh generate_pyramid(const Vec3 &base_center, const Vec3 &apex,
         {0,1,4}, {1,2,4}, {2,3,4}, {3,0,4},
         {0,2,3}, {0,1,2},
     };
+
+    Vec3 centroid = base_center + (apex - base_center) * 0.25f;
+    m.normals.resize(5);
+    for (int i = 0; i < 5; i++)
+        m.normals[i] = glm::normalize(m.vertices[i] - centroid);
+
     return m;
 }
 
@@ -340,6 +349,14 @@ Mesh generate_plane(const Vec3 &center, const Vec3 &normal,
     };
     for (int i = 0; i < 4; i++) m.colors.push_back(color);
     m.triangles = {{0,1,2}, {0,2,3}};
+
+    std::vector<Vec3> norms;
+    compute_vertex_normals(m, norms);
+    m.normals = norms;
+
+    m.triangles.push_back({0,2,1});
+    m.triangles.push_back({0,3,2});
+
     return m;
 }
 
