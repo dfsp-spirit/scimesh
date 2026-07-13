@@ -3,13 +3,6 @@
 \name{vis.subject.morph.native}
 \alias{vis.subject.morph.native}
 \title{Visualize native-space morphometry data on brain surfaces}
-
-\description{
-Load FreeSurfer surface and morphometry data for a subject, map the
-per-vertex values to colors, and render the result from one or more
-standard anatomical views.  Returns an in-memory image — no
-interactive 3D window or separate export step needed.
-}
 \usage{
 vis.subject.morph.native(
   subjects_dir,
@@ -45,7 +38,7 @@ file \code{surf/<hemi>.<measure>} is loaded.}
 \code{"inflated"}).  Default is \code{"white"}.}
 
 \item{views}{Character vector of view names.  Supports fsbrain-style
-shortcuts like \code{"t4"} (2×2 tile), \code{"t9"}, \code{"si"},
+shortcuts like \code{"t4"} (2x2 tile), \code{"t9"}, \code{"si"},
 and single views like \code{"lateral_lh"}, \code{"medial_rh"},
 \code{"dorsal"}, \code{"ventral"}, \code{"anterior"},
 \code{"posterior"}.  Prefixed forms like \code{"sd_lateral_lh"}
@@ -94,7 +87,12 @@ A list with \code{width}, \code{height}, and \code{pixels}
   (raw RGBA vector).  Suitable for \code{write_png()} or
   \code{image_to_array()}.
 }
-
+\description{
+Load FreeSurfer surface and morphometry data for a subject, map the
+per-vertex values to colors, and render the result from one or more
+standard anatomical views.  Returns an in-memory image -- no
+interactive 3D window or separate export step needed.
+}
 \section{Domain boundary}{
 
 This is a **neuro-specific** function. It knows about FreeSurfer

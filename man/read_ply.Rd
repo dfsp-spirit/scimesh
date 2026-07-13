@@ -3,12 +3,6 @@
 \name{read_ply}
 \alias{read_ply}
 \title{Read a Stanford PLY file}
-
-\description{
-Reads a PLY file (ASCII or binary) with optional per-vertex colors
-and returns a scimesh mesh descriptor list with \code{vertices},
-\code{triangles}, and optionally \code{colors}.
-}
 \usage{
 read_ply(path)
 }
@@ -18,7 +12,11 @@ read_ply(path)
 \value{
 A mesh descriptor list.
 }
-
+\description{
+Reads a PLY file (ASCII or binary) with optional per-vertex colors
+and returns a scimesh mesh descriptor list with \code{vertices},
+\code{triangles}, and optionally \code{colors}.
+}
 \examples{
 \dontrun{
 mesh <- read_ply("model.ply")

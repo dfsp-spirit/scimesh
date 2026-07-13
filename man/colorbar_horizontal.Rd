@@ -3,13 +3,6 @@
 \name{colorbar_horizontal}
 \alias{colorbar_horizontal}
 \title{Generate a horizontal colorbar image}
-
-\description{
-Creates a horizontal colorbar as a 4-channel RGBA array. The color
-strip and optional tick labels are rendered to PNG using base R
-graphics (headless-safe). Returns a 3D array suitable for
-\code{image_to_array()} or direct composition.
-}
 \usage{
 colorbar_horizontal(
   colormap,
@@ -55,7 +48,12 @@ Defaults to \code{c(0, 1)}.}
 A 3D array of dimensions (height, width, 4) with values in
   \code{[0, 1]}.
 }
-
+\description{
+Creates a horizontal colorbar as a 4-channel RGBA array. The color
+strip and optional tick labels are rendered to PNG using base R
+graphics (headless-safe). Returns a 3D array suitable for
+\code{image_to_array()} or direct composition.
+}
 \examples{
 cbar <- colorbar_horizontal(viridis_colormap, data_range = c(-2, 3),
     title = "Value")

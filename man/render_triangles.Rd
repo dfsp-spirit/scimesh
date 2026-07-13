@@ -3,21 +3,14 @@
 \name{render_triangles}
 \alias{render_triangles}
 \title{Render raw triangles without index buffer}
-
-\description{
-Renders triangle geometry where positions and colours are given
-as flat arrays with 3 vertices per triangle (no index buffer).
-Useful for voxel renderings, misc3d isosurfaces, and other
-dynamically generated geometry.
-}
 \usage{
 render_triangles(positions, colors, camera, options = render_options())
 }
 \arguments{
-\item{positions}{N×3 numeric matrix of vertex positions, where N
+\item{positions}{Nx3 numeric matrix of vertex positions, where N
 is a multiple of 3 (3 per triangle).}
 
-\item{colors}{N×4 numeric matrix of RGBA colours (0-1 scale).}
+\item{colors}{Nx4 numeric matrix of RGBA colours (0-1 scale).}
 
 \item{camera}{A camera list from \code{camera()} or
 \code{camera_auto()}.}
@@ -28,7 +21,12 @@ is a multiple of 3 (3 per triangle).}
 An image list with \code{width}, \code{height},
   \code{pixels}.
 }
-
+\description{
+Renders triangle geometry where positions and colours are given
+as flat arrays with 3 vertices per triangle (no index buffer).
+Useful for voxel renderings, misc3d isosurfaces, and other
+dynamically generated geometry.
+}
 \examples{
 # Render a single red triangle from raw vertices
 positions <- matrix(c(0, 0, 0, 1, 0, 0, 0.5, 1, 0), ncol = 3, byrow = TRUE)

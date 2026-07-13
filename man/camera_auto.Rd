@@ -3,12 +3,6 @@
 \name{camera_auto}
 \alias{camera_auto}
 \title{Auto-frame a camera to fit a mesh or vertex set}
-
-\description{
-Computes a camera position that frames the entire mesh in view.
-The camera looks along the given direction, positioned at a distance
-that ensures the mesh fits within the field of view.
-}
 \usage{
 camera_auto(
   mesh,
@@ -34,7 +28,11 @@ example, \code{c(0, 0, -1)} looks along the negative Z axis.}
 \value{
 A camera list.
 }
-
+\description{
+Computes a camera position that frames the entire mesh in view.
+The camera looks along the given direction, positioned at a distance
+that ensures the mesh fits within the field of view.
+}
 \examples{
 verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
                    -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)

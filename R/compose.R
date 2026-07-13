@@ -300,7 +300,7 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
 
     out_h <- dim(composite)[1L]
     out_w <- dim(composite)[2L]
-    # composite is (H,W,4). C++ pixels are (4,W,H) flattened → row-major RGBA.
+    # composite is (H,W,4). C++ pixels are (4,W,H) flattened -> row-major RGBA.
     pixels <- as.raw(round(aperm(composite, c(3L, 2L, 1L)) * 255))
 
     list(
@@ -319,7 +319,12 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
 #'   \code{render_scene()}, or a list of images.
 #' @param colorbar Optional colorbar from \code{colorbar_horizontal()}
 #'   or \code{colorbar_vertical()}.
+#' @param colorbar_height Height of the colorbar in pixels.
+#' @param colorbar_width Width of the colorbar in pixels.
 #' @param background Background RGBA color for padding.
+#' @param colorbar_side Side for the colorbar: \code{"right"} (default)
+#'   or \code{"left"}.
+#' @param crop If \code{TRUE}, crop whitespace from the output.
 #' @return A composed image list.
 #'
 #' @examples
@@ -360,7 +365,12 @@ stack_vertical <- function(..., colorbar = NULL,
 #' @param ... Images from \code{render_mesh()} or
 #'   \code{render_scene()}, or a list of images.
 #' @param colorbar Optional colorbar.
+#' @param colorbar_height Height of the colorbar in pixels.
+#' @param colorbar_width Width of the colorbar in pixels.
 #' @param background Background RGBA color for padding.
+#' @param colorbar_side Side for the colorbar: \code{"right"} (default)
+#'   or \code{"left"}.
+#' @param crop If \code{TRUE}, crop whitespace from the output.
 #' @return A composed image list.
 #'
 #' @examples

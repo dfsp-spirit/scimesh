@@ -3,10 +3,6 @@
 \name{render_options}
 \alias{render_options}
 \title{Create render options}
-
-\description{
-Create render options
-}
 \usage{
 render_options(
   width = 800L,
@@ -109,13 +105,15 @@ Default \code{FALSE}.}
 internally at \code{width * aa_samples} x
 \code{height * aa_samples}, then downsamples to the requested
 size via box averaging.  Default \code{1} (no AA), \code{2} for
-2×2 SSAA, \code{4} for 4×4.}
+2x2 SSAA, \code{4} for 4x4.}
 }
 \value{
 A render options list for use with \code{render_mesh()} or
   \code{render_scene()}.
 }
-
+\description{
+Create render options
+}
 \examples{
 # Default options
 opts <- render_options()

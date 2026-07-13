@@ -64,9 +64,22 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
             vertices = mesh,
             triangles = matrix(integer(0), nrow = 0, ncol = 3)
         )
+    } else if (is.list(mesh) && !is.null(mesh[[1]]$vertices)) {
+        all_verts <- do.call(rbind, lapply(mesh, function(m) m$vertices))
+        all_tris <- do.call(rbind, lapply(seq_along(mesh), function(i) {
+            m <- mesh[[i]]
+            if (!is.null(m$triangles) && nrow(m$triangles) > 0) {
+                offset <- if (i == 1) 0L else sum(sapply(mesh[seq_len(i - 1)],
+                    function(mm) nrow(mm$vertices)))
+                m$triangles + offset
+            } else {
+                matrix(integer(0), nrow = 0, ncol = 3)
+            }
+        }))
+        mesh_data <- list(vertices = all_verts, triangles = all_tris)
     } else {
         stop(
-            "mesh must be an Nx3 matrix of vertices or a mesh descriptor list"
+            "mesh must be an Nx3 matrix, a mesh descriptor list, or a list of mesh descriptors"
         )
     }
 

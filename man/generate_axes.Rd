@@ -3,11 +3,6 @@
 \name{generate_axes}
 \alias{generate_axes}
 \title{Generate XYZ axis arrows as cylinder meshes}
-
-\description{
-Creates three coloured arrow meshes (red X, green Y, blue Z) from
-a centre point.
-}
 \usage{
 generate_axes(center = c(0, 0, 0), size = 1, shaft_radius = 0.02)
 }
@@ -22,7 +17,10 @@ generate_axes(center = c(0, 0, 0), size = 1, shaft_radius = 0.02)
 A mesh descriptor list suitable for \code{render_mesh()}
   or inclusion in a scene list.
 }
-
+\description{
+Creates three coloured arrow meshes (red X, green Y, blue Z) from
+a centre point.
+}
 \examples{
 axes_mesh <- generate_axes(size = 2)
 nrow(axes_mesh$vertices)

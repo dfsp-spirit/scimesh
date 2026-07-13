@@ -3,10 +3,6 @@
 \name{scale_mesh}
 \alias{scale_mesh}
 \title{Scale a mesh uniformly}
-
-\description{
-Scale a mesh uniformly
-}
 \usage{
 scale_mesh(mesh, scale)
 }
@@ -18,7 +14,9 @@ scale_mesh(mesh, scale)
 \value{
 A new mesh descriptor list with scaled vertices.
 }
-
+\description{
+Scale a mesh uniformly
+}
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 big <- scale_mesh(mesh, 3)

@@ -186,7 +186,7 @@
         if (!is.null(view_hemi) && !is.null(mesh[[view_hemi]])) {
             fit_mesh <- mesh[[view_hemi]]
         } else {
-            # Global view or hemi key not present — use the first mesh
+            # Global view or hemi key not present -- use the first mesh
             fit_mesh <- mesh[[1L]]
         }
     }
@@ -298,7 +298,7 @@
 #'
 #' Load FreeSurfer surface and morphometry data for a subject, map the
 #' per-vertex values to colors, and render the result from one or more
-#' standard anatomical views.  Returns an in-memory image — no
+#' standard anatomical views.  Returns an in-memory image -- no
 #' interactive 3D window or separate export step needed.
 #'
 #' @param subjects_dir Path to the FreeSurfer SUBJECTS_DIR.
@@ -310,7 +310,7 @@
 #' @param surface Surface name (e.g. \code{"white"}, \code{"pial"},
 #'   \code{"inflated"}).  Default is \code{"white"}.
 #' @param views Character vector of view names.  Supports fsbrain-style
-#'   shortcuts like \code{"t4"} (2×2 tile), \code{"t9"}, \code{"si"},
+#'   shortcuts like \code{"t4"} (2x2 tile), \code{"t9"}, \code{"si"},
 #'   and single views like \code{"lateral_lh"}, \code{"medial_rh"},
 #'   \code{"dorsal"}, \code{"ventral"}, \code{"anterior"},
 #'   \code{"posterior"}.  Prefixed forms like \code{"sd_lateral_lh"}

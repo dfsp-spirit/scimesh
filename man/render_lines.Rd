@@ -3,11 +3,6 @@
 \name{render_lines}
 \alias{render_lines}
 \title{Render line segments as thin cylinders}
-
-\description{
-Generates a merged cylinder mesh from start/end point pairs,
-radii, and colors, then renders it.
-}
 \usage{
 render_lines(
   from,
@@ -20,14 +15,14 @@ render_lines(
 )
 }
 \arguments{
-\item{from}{N×3 numeric matrix of segment start points.}
+\item{from}{Nx3 numeric matrix of segment start points.}
 
-\item{to}{N×3 numeric matrix of segment end points.}
+\item{to}{Nx3 numeric matrix of segment end points.}
 
 \item{radii}{Numeric vector of cylinder radii (length N, or 1
 recycled to N).}
 
-\item{colors}{N×4 numeric matrix of RGBA colours, or a single
+\item{colors}{Nx4 numeric matrix of RGBA colours, or a single
 colour recycled to N.}
 
 \item{camera}{A camera list.}
@@ -39,7 +34,10 @@ colour recycled to N.}
 \value{
 An image list.
 }
-
+\description{
+Generates a merged cylinder mesh from start/end point pairs,
+radii, and colors, then renders it.
+}
 \examples{
 from <- matrix(c(0, 0, 0, 1, 1, 1), ncol = 3, byrow = TRUE)
 to   <- matrix(c(3, 0, 0, 0, 3, 0), ncol = 3, byrow = TRUE)

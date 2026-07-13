@@ -2,9 +2,9 @@
 #include "tiny_obj_loader.h"
 #include "obj_io.h"
 #include "types.h"
+#include <Rcpp.h>
 
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 
 namespace scimesh {
@@ -27,7 +27,7 @@ Mesh read_obj(const std::string &path) {
                                true, false);
 
     if (!warn.empty()) {
-        std::cerr << "OBJ warning: " << warn << std::endl;
+        Rcpp::warning("OBJ warning: " + warn);
     }
     if (!err.empty()) {
         throw std::runtime_error("Failed to load OBJ file '" + path + "': " + err);

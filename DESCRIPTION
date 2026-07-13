@@ -6,8 +6,6 @@ Authors@R: c(
     person("Tim", "Schaefer", email = "ts+code@rcmd.org",
            role = c("aut", "cre"))
     )
-Author: Tim Schaefer
-Maintainer: Tim Schaefer <ts+code@rcmd.org>
 Description: A minimal, fast, headless 3D software renderer written in modern
     C++ with native R bindings. Serves as a zero-dependency, fallback rendering
     engine for 3D meshes when traditional GPU-backed frameworks are unavailable.
@@ -32,4 +30,4 @@ SystemRequirements: C++17
 Config/testthat/edition: 3
 Encoding: UTF-8
 NeedsCompilation: yes
-Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.2

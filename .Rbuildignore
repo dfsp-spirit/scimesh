@@ -1,5 +1,6 @@
 ^\.opencode$
 ^\.git$
+^\.github$
 ^\.gitignore$
 ^\.Rbuildignore$
 ^cpp_tests$
@@ -14,10 +15,7 @@
 ^Makefile$
 ^install_manifest\.txt
 ^compile_commands\.json
-^src/core/tinyply\.
-^src/core/libfs\.h$
-^src/core/tiny_obj_loader\.h$
-^src/core/stb_image
+^src/core/tinyply\.cpp$
 ^src/core/.*\.o$
 ^src/.*\.o$
 ^src/.*\.so$
@@ -27,3 +25,6 @@
 ^\.license\.stub$
 ^doc$
 ^Meta$
+^docs$
+^examples$
+^scimesh_.*\.tar\.gz$

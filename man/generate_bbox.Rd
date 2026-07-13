@@ -3,10 +3,6 @@
 \name{generate_bbox}
 \alias{generate_bbox}
 \title{Generate a wireframe bounding box mesh}
-
-\description{
-Creates 12 edge segments around an axis-aligned bounding box.
-}
 \usage{
 generate_bbox(bbox, color = c(0, 0, 0, 1), radius = 0.01)
 }
@@ -22,7 +18,9 @@ descriptor (in which case \code{mesh_bbox()} is called).}
 A mesh descriptor list suitable for \code{render_mesh()}
   or inclusion in a scene list.
 }
-
+\description{
+Creates 12 edge segments around an axis-aligned bounding box.
+}
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 3))
 bbox_mesh <- generate_bbox(mesh)

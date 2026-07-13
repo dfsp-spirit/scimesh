@@ -1,7 +1,7 @@
 CXX_STD = CXX17
 
 PKG_CPPFLAGS = -I../src/core -I../src/core/glm
-PKG_CXXFLAGS = -O3
+PKG_CXXFLAGS = 
 
 OBJECTS = rcpp_bindings.o \
     RcppExports.o \

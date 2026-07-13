@@ -3,11 +3,6 @@
 \name{stack_horizontal}
 \alias{stack_horizontal}
 \title{Stack images horizontally}
-
-\description{
-Stacks a list of rendered images side by side. A convenience
-wrapper around \code{compose_layout()}.
-}
 \usage{
 stack_horizontal(
   ...,
@@ -25,12 +20,24 @@ stack_horizontal(
 
 \item{colorbar}{Optional colorbar.}
 
+\item{colorbar_height}{Height of the colorbar in pixels.}
+
+\item{colorbar_width}{Width of the colorbar in pixels.}
+
 \item{background}{Background RGBA color for padding.}
+
+\item{colorbar_side}{Side for the colorbar: \code{"right"} (default)
+or \code{"left"}.}
+
+\item{crop}{If \code{TRUE}, crop whitespace from the output.}
 }
 \value{
 A composed image list.
 }
-
+\description{
+Stacks a list of rendered images side by side. A convenience
+wrapper around \code{compose_layout()}.
+}
 \examples{
 mesh1 <- generate_cuboid(c(-2, 0, 0), c(0.5, 1, 1), c(1, 0, 0, 1))
 mesh2 <- generate_cuboid(c( 2, 0, 0), c(0.5, 1, 1), c(0, 0, 1, 1))

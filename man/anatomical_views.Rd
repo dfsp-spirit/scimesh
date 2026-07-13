@@ -11,14 +11,6 @@
 \alias{view_anterior}
 \alias{view_posterior}
 \title{Standard anatomical camera views for neuroimaging}
-
-\description{
-These functions compute camera parameters for standard anatomical
-views in RAS (Right-Anterior-Superior) coordinate space, as used
-by Freesurfer and standard neuroimaging software. Each function
-returns a camera list suitable for \code{render_mesh()} or
-\code{render_scene()}.
-}
 \usage{
 view_lateral_left(mesh, fov = 45, margin = 1.1)
 
@@ -48,7 +40,13 @@ or an Nx3 numeric matrix of vertex positions.}
 A camera list with \code{eye}, \code{center}, \code{up},
   \code{projection}, and \code{fov} components.
 }
-
+\description{
+These functions compute camera parameters for standard anatomical
+views in RAS (Right-Anterior-Superior) coordinate space, as used
+by Freesurfer and standard neuroimaging software. Each function
+returns a camera list suitable for \code{render_mesh()} or
+\code{render_scene()}.
+}
 \details{
 The camera is auto-framed to fit the mesh and oriented according to
 the view direction. In RAS space:

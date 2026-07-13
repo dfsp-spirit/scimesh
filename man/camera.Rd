@@ -3,11 +3,6 @@
 \name{camera}
 \alias{camera}
 \title{Create a camera specification}
-
-\description{
-Defines a camera for rendering by specifying the eye position,
-look-at center, up vector, projection type, and field of view.
-}
 \usage{
 camera(
   eye,
@@ -33,7 +28,10 @@ or \code{"orthographic"}.}
 A camera list suitable for \code{render_mesh()} or
   \code{render_scene()}.
 }
-
+\description{
+Defines a camera for rendering by specifying the eye position,
+look-at center, up vector, projection type, and field of view.
+}
 \examples{
 cam <- camera(eye = c(0, 0, 5), center = c(0, 0, 0))
 cam$eye

@@ -1,13 +1,13 @@
-#' Apply a 4×4 transformation matrix to a mesh
+#' Apply a 4x4 transformation matrix to a mesh
 #'
-#' Transforms all vertex positions in a mesh by a 4×4 homogeneous
+#' Transforms all vertex positions in a mesh by a 4x4 homogeneous
 #' matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
 #' normals are untouched.
 #'
 #' @param mesh A mesh descriptor list with \code{vertices} and
 #'   \code{triangles}, as returned by \code{render_mesh()} or built
 #'   by \code{scimesh_generate_multi_spheres()} etc.
-#' @param matrix A 4×4 numeric matrix.
+#' @param matrix A 4x4 numeric matrix.
 #' @return A new mesh descriptor list with transformed vertices.
 #'
 #' @examples
@@ -20,7 +20,7 @@
 #' @export
 transform_mesh <- function(mesh, matrix) {
     if (!is.matrix(matrix) || nrow(matrix) != 4L || ncol(matrix) != 4L) {
-        stop("matrix must be a 4×4 numeric matrix")
+        stop("matrix must be a 4x4 numeric matrix")
     }
     scimesh_transform_mesh(mesh, matrix)
 }
@@ -88,10 +88,10 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
 #' radii, and colors, then renders it with the given camera and
 #' options.
 #'
-#' @param centers N×3 numeric matrix of sphere centre coordinates.
+#' @param centers Nx3 numeric matrix of sphere centre coordinates.
 #' @param radii Numeric vector of sphere radii (length N, or 1
 #'   recycled to N).
-#' @param colors N×4 numeric matrix of RGBA colours (0-1 scale), or
+#' @param colors Nx4 numeric matrix of RGBA colours (0-1 scale), or
 #'   a single colour recycled to N.
 #' @param camera A camera list from \code{camera()} or
 #'   \code{camera_auto()}.
@@ -113,7 +113,7 @@ render_spheres <- function(centers, radii, colors, camera,
                            options = render_options(),
                            segments = 16L) {
     if (!is.matrix(centers) || ncol(centers) != 3L) {
-        stop("centers must be an N×3 numeric matrix")
+        stop("centers must be an Nx3 numeric matrix")
     }
     n <- nrow(centers)
     if (length(radii) == 1L) radii <- rep(radii, n)
@@ -122,7 +122,7 @@ render_spheres <- function(centers, radii, colors, camera,
         colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
     }
     if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
-        stop("colors must be an N×4 numeric matrix")
+        stop("colors must be an Nx4 numeric matrix")
     }
     mesh <- scimesh_generate_multi_spheres(centers, radii, colors, segments)
     render_scene(list(mesh), camera, options)
@@ -133,11 +133,11 @@ render_spheres <- function(centers, radii, colors, camera,
 #' Generates a merged cylinder mesh from start/end point pairs,
 #' radii, and colors, then renders it.
 #'
-#' @param from N×3 numeric matrix of segment start points.
-#' @param to N×3 numeric matrix of segment end points.
+#' @param from Nx3 numeric matrix of segment start points.
+#' @param to Nx3 numeric matrix of segment end points.
 #' @param radii Numeric vector of cylinder radii (length N, or 1
 #'   recycled to N).
-#' @param colors N×4 numeric matrix of RGBA colours, or a single
+#' @param colors Nx4 numeric matrix of RGBA colours, or a single
 #'   colour recycled to N.
 #' @param camera A camera list.
 #' @param options Render options.
@@ -157,10 +157,10 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
                          options = render_options(),
                          segments = 12L) {
     if (!is.matrix(from) || ncol(from) != 3L) {
-        stop("from must be an N×3 numeric matrix")
+        stop("from must be an Nx3 numeric matrix")
     }
     if (!is.matrix(to) || ncol(to) != 3L) {
-        stop("to must be an N×3 numeric matrix")
+        stop("to must be an Nx3 numeric matrix")
     }
     n <- nrow(from)
     if (nrow(to) != n) stop("from and to must have the same number of rows")
@@ -170,7 +170,7 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
         colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
     }
     if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
-        stop("colors must be an N×4 numeric matrix")
+        stop("colors must be an Nx4 numeric matrix")
     }
     mesh <- scimesh_generate_multi_cylinders(from, to, radii, colors, segments)
     render_scene(list(mesh), camera, options)
@@ -191,7 +191,7 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
 #'
 #' @examples
 #' pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0), ncol = 3)
-#' img <- render_points(pts, colors = c(0, 1, 0, 1), radius = 5)
+#' img <- render_points(pts, colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4), radius = 5)
 #' \dontrun{ write_png(img, "points.png") }
 #'
 #' @export
@@ -213,14 +213,14 @@ render_points <- function(positions, colors, radius = 3,
 #' Extracts vertices and triangle indices from an rgl
 #' \code{tmesh3d} object into the format expected by
 #' \code{render_mesh()}.  Does not require the \code{rgl}
-#' package — any list with components \code{vb} (4×N
-#' homogeneous coordinates) and \code{it} (3×M index matrix)
+#' package -- any list with components \code{vb} (4xN
+#' homogeneous coordinates) and \code{it} (3xM index matrix)
 #' works.
 #'
 #' @param tmesh A list with components \code{vb} and
 #'   \code{it}, as produced by \code{rgl::tmesh3d()}.
-#' @return A mesh descriptor list with \code{vertices} (N×3)
-#'   and \code{triangles} (M×3, 1-based indices).
+#' @return A mesh descriptor list with \code{vertices} (Nx3)
+#'   and \code{triangles} (Mx3, 1-based indices).
 #'
 #' @examples
 #' fake <- list(vb = rbind(0:3, 0:3, 0:3, rep(1, 4)),
@@ -286,7 +286,10 @@ generate_pyramid <- function(base_center, apex, half_width = 1,
 #' Creates a tetrahedron (triangular pyramid) from four arbitrary
 #' 3D points.
 #'
-#' @param p0, p1, p2, p3 Length-3 vectors: the four vertices.
+#' @param p0 Length-3 vector: first vertex.
+#' @param p1 Length-3 vector: second vertex.
+#' @param p2 Length-3 vector: third vertex.
+#' @param p3 Length-3 vector: fourth vertex.
 #' @param color Length-4 RGBA colour.
 #' @return A mesh descriptor list.
 #'

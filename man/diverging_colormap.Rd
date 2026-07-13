@@ -3,11 +3,6 @@
 \name{diverging_colormap}
 \alias{diverging_colormap}
 \title{Custom diverging colormap for neuroimaging}
-
-\description{
-Returns a blue-white-red diverging colormap suitable for displaying
-signed morphometry data (e.g. cortical thickness Z-scores).
-}
 \usage{
 diverging_colormap(n)
 }
@@ -17,7 +12,10 @@ diverging_colormap(n)
 \value{
 A character vector of hex color strings.
 }
-
+\description{
+Returns a blue-white-red diverging colormap suitable for displaying
+signed morphometry data (e.g. cortical thickness Z-scores).
+}
 \examples{
 cols <- diverging_colormap(256)
 plot(1:256, pch = 15, col = cols, cex = 2, axes = FALSE, xlab = "", ylab = "")

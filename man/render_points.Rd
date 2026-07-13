@@ -3,12 +3,6 @@
 \name{render_points}
 \alias{render_points}
 \title{Render screen-space point primitives}
-
-\description{
-Renders points as fixed-size filled circles in screen space with
-depth testing.  Unlike \code{render_spheres()}, point size is
-measured in pixels and does not change with camera distance.
-}
 \usage{
 render_points(
   positions,
@@ -32,10 +26,14 @@ render_points(
 \value{
 An image list.
 }
-
+\description{
+Renders points as fixed-size filled circles in screen space with
+depth testing.  Unlike \code{render_spheres()}, point size is
+measured in pixels and does not change with camera distance.
+}
 \examples{
 pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0), ncol = 3)
-img <- render_points(pts, colors = c(0, 1, 0, 1), radius = 5)
+img <- render_points(pts, colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4), radius = 5)
 \dontrun{ write_png(img, "points.png") }
 
 }

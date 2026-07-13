@@ -3,11 +3,6 @@
 \name{render_scene}
 \alias{render_scene}
 \title{Render multiple meshes to an image}
-
-\description{
-Renders a list of meshes as a single scene using the scimesh
-software renderer.
-}
 \usage{
 render_scene(meshes, camera, options = render_options())
 }
@@ -25,7 +20,10 @@ with components \code{vertices} (Nx3 matrix), \code{triangles}
 A list with components \code{width}, \code{height}, and
   \code{pixels} (raw vector of RGBA values).
 }
-
+\description{
+Renders a list of meshes as a single scene using the scimesh
+software renderer.
+}
 \examples{
 # Render two cubes side by side
 cube1 <- generate_cuboid(c(-1.5, 0, 0), c(0.8, 0.8, 0.8), c(1, 0, 0, 1))

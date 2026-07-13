@@ -3,23 +3,27 @@
 \name{generate_tetrahedron}
 \alias{generate_tetrahedron}
 \title{Generate a tetrahedron mesh}
-
-\description{
-Creates a tetrahedron (triangular pyramid) from four arbitrary
-3D points.
-}
 \usage{
 generate_tetrahedron(p0, p1, p2, p3, color = c(0.7, 0.7, 0.7, 1))
 }
 \arguments{
-\item{p0, }{p1, p2, p3 Length-3 vectors: the four vertices.}
+\item{p0}{Length-3 vector: first vertex.}
+
+\item{p1}{Length-3 vector: second vertex.}
+
+\item{p2}{Length-3 vector: third vertex.}
+
+\item{p3}{Length-3 vector: fourth vertex.}
 
 \item{color}{Length-4 RGBA colour.}
 }
 \value{
 A mesh descriptor list.
 }
-
+\description{
+Creates a tetrahedron (triangular pyramid) from four arbitrary
+3D points.
+}
 \examples{
 mesh <- generate_tetrahedron(
   c(0, 0, 0), c(1, 0, 0),

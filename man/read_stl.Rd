@@ -3,12 +3,6 @@
 \name{read_stl}
 \alias{read_stl}
 \title{Read an STL file}
-
-\description{
-Reads an ASCII or binary STL file and returns a scimesh mesh
-descriptor list with \code{vertices}, \code{triangles}, and
-\code{normals}.
-}
 \usage{
 read_stl(path)
 }
@@ -18,7 +12,11 @@ read_stl(path)
 \value{
 A mesh descriptor list.
 }
-
+\description{
+Reads an ASCII or binary STL file and returns a scimesh mesh
+descriptor list with \code{vertices}, \code{triangles}, and
+\code{normals}.
+}
 \examples{
 \dontrun{
 mesh <- read_stl("model.stl")

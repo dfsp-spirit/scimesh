@@ -3,11 +3,6 @@
 \name{render_hemisphere_views}
 \alias{render_hemisphere_views}
 \title{Render standard neuroimaging figure layout}
-
-\description{
-Renders a hemisphere mesh from lateral and medial views and
-composes them side by side, with an optional colorbar below.
-}
 \usage{
 render_hemisphere_views(
   mesh,
@@ -53,7 +48,10 @@ render_hemisphere_views(
 A composed image list with lateral and medial views side by
   side, with optional colorbar.
 }
-
+\description{
+Renders a hemisphere mesh from lateral and medial views and
+composes them side by side, with an optional colorbar below.
+}
 \examples{
 \dontrun{
 # Render lateral + medial views of a brain mesh

@@ -5,7 +5,7 @@
 #' @param vertices Nx3 numeric matrix of vertex positions.
 #' @param triangles Mx3 integer matrix of triangle indices (1-based).
 #' @param colors Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
-#'   Use \code{face_colors} (M×4) for per-triangle colours instead.
+#'   Use \code{face_colors} (Mx4) for per-triangle colours instead.
 #' @param face_colors Optional Mx4 numeric matrix of per-face RGBA colors,
 #'   one row per triangle.  When present, all three vertices of a triangle
 #'   use the same colour.  Takes precedence over vertex \code{colors}.
@@ -163,7 +163,7 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
 #'   size via box averaging.  Default \code{1} (no AA), \code{2} for
-#'   2×2 SSAA, \code{4} for 4×4.
+#'   2x2 SSAA, \code{4} for 4x4.
 #' @return A render options list for use with \code{render_mesh()} or
 #'   \code{render_scene()}.
 #'
@@ -242,9 +242,9 @@ render_options <- function(width = 800L, height = 600L,
 #' Useful for voxel renderings, misc3d isosurfaces, and other
 #' dynamically generated geometry.
 #'
-#' @param positions N×3 numeric matrix of vertex positions, where N
+#' @param positions Nx3 numeric matrix of vertex positions, where N
 #'   is a multiple of 3 (3 per triangle).
-#' @param colors N×4 numeric matrix of RGBA colours (0-1 scale).
+#' @param colors Nx4 numeric matrix of RGBA colours (0-1 scale).
 #' @param camera A camera list from \code{camera()} or
 #'   \code{camera_auto()}.
 #' @param options Render options from \code{render_options()}.

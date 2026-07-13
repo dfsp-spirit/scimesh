@@ -3,10 +3,6 @@
 \name{translate_mesh}
 \alias{translate_mesh}
 \title{Translate a mesh}
-
-\description{
-Translate a mesh
-}
 \usage{
 translate_mesh(mesh, translation)
 }
@@ -18,7 +14,9 @@ translate_mesh(mesh, translation)
 \value{
 A new mesh descriptor list with translated vertices.
 }
-
+\description{
+Translate a mesh
+}
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 moved <- translate_mesh(mesh, c(5, 0, 0))

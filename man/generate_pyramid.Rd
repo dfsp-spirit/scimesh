@@ -3,11 +3,6 @@
 \name{generate_pyramid}
 \alias{generate_pyramid}
 \title{Generate a square pyramid mesh}
-
-\description{
-Creates a pyramid with a square base centred at \code{base_center}
-in the XZ plane, with the apex above it along Y.
-}
 \usage{
 generate_pyramid(
   base_center,
@@ -28,7 +23,10 @@ generate_pyramid(
 \value{
 A mesh descriptor list.
 }
-
+\description{
+Creates a pyramid with a square base centred at \code{base_center}
+in the XZ plane, with the apex above it along Y.
+}
 \examples{
 mesh <- generate_pyramid(c(0, 0, 0), c(0, 2, 0), half_width = 1)
 mesh$vertices

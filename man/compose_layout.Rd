@@ -3,12 +3,6 @@
 \name{compose_layout}
 \alias{compose_layout}
 \title{Compose multiple images into a single figure}
-
-\description{
-Arranges rendered images (from \code{render_mesh()} or
-\code{render_scene()}) into a grid layout and optionally appends
-a colorbar. All composition is done with pure R array operations.
-}
 \usage{
 compose_layout(
   images,
@@ -57,7 +51,11 @@ space. Default is \code{FALSE} (images must be same size).}
 A list with \code{width}, \code{height}, \code{pixels}
   suitable for \code{write_png()} or \code{image_to_array()}.
 }
-
+\description{
+Arranges rendered images (from \code{render_mesh()} or
+\code{render_scene()}) into a grid layout and optionally appends
+a colorbar. All composition is done with pure R array operations.
+}
 \examples{
 # Compose two renders side by side
 mesh1 <- generate_cuboid(c(-1.5, 0, 0), c(0.5, 0.5, 0.5), c(1, 0, 0, 1))

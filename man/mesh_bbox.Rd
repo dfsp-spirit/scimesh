@@ -3,10 +3,6 @@
 \name{mesh_bbox}
 \alias{mesh_bbox}
 \title{Compute the axis-aligned bounding box of a mesh}
-
-\description{
-Compute the axis-aligned bounding box of a mesh
-}
 \usage{
 mesh_bbox(mesh)
 }
@@ -16,7 +12,9 @@ mesh_bbox(mesh)
 \value{
 A list with \code{min} and \code{max} (each length-3 numeric).
 }
-
+\description{
+Compute the axis-aligned bounding box of a mesh
+}
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 3))
 bb <- mesh_bbox(mesh)

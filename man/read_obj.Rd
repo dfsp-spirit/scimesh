@@ -3,12 +3,6 @@
 \name{read_obj}
 \alias{read_obj}
 \title{Read a Wavefront OBJ file}
-
-\description{
-Reads a Wavefront OBJ file (with optional UV coordinates and normals)
-and returns a scimesh mesh descriptor list with \code{vertices},
-\code{triangles}, and optionally \code{uv} and \code{normals}.
-}
 \usage{
 read_obj(path)
 }
@@ -18,7 +12,11 @@ read_obj(path)
 \value{
 A mesh descriptor list.
 }
-
+\description{
+Reads a Wavefront OBJ file (with optional UV coordinates and normals)
+and returns a scimesh mesh descriptor list with \code{vertices},
+\code{triangles}, and optionally \code{uv} and \code{normals}.
+}
 \examples{
 \dontrun{
 mesh <- read_obj("model.obj")

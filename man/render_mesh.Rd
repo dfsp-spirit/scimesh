@@ -3,10 +3,6 @@
 \name{render_mesh}
 \alias{render_mesh}
 \title{Render a 3D mesh to an image}
-
-\description{
-Renders a single mesh using the scimesh software renderer.
-}
 \usage{
 render_mesh(
   vertices,
@@ -26,7 +22,7 @@ render_mesh(
 \item{triangles}{Mx3 integer matrix of triangle indices (1-based).}
 
 \item{colors}{Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
-Use \code{face_colors} (M×4) for per-triangle colours instead.}
+Use \code{face_colors} (Mx4) for per-triangle colours instead.}
 
 \item{face_colors}{Optional Mx4 numeric matrix of per-face RGBA colors,
 one row per triangle.  When present, all three vertices of a triangle
@@ -47,7 +43,9 @@ with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.}
 A list with components \code{width}, \code{height}, and
   \code{pixels} (raw vector of RGBA values).
 }
-
+\description{
+Renders a single mesh using the scimesh software renderer.
+}
 \examples{
 # Render a simple colored triangle
 verts <- matrix(c(0, 0, 0,  1, 0, 0,  0.5, 1, 0), ncol = 3, byrow = TRUE)
