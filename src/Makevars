@@ -3,6 +3,7 @@ CXX17FLAGS = -O2
 
 PKG_CPPFLAGS = -I../src/core -I../src/core/glm -DSCIMESH_STB_WRITE_IMPL
 PKG_CXXFLAGS =
+PKG_CXXFLAGS =
 
 OBJECTS = rcpp_bindings.o \
     RcppExports.o \
