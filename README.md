@@ -105,15 +105,22 @@ details.
 ```r
 library(scimesh)
 
-# Create a colored cube
 cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.2, 0.6, 1.0, 1.0))
+cam <- camera_auto(cube, direction = c(1.2, 0.8, 1))
 
-# Render it
-cam <- camera_auto(cube, direction = c(1, 1, 1))
-img <- render_mesh(cube$vertices, cube$triangles,
-                   colors = cube$colors, camera = cam)
+# Flat-shaded cube
+img_shaded <- render_mesh(cube$vertices, cube$triangles,
+    colors = cube$colors, camera = cam,
+    options = render_options(shading = "flat"))
 
-# Save
+# Wireframe cube
+img_wire <- render_mesh(cube$vertices, cube$triangles,
+    colors = cube$colors, camera = cam,
+    options = render_options(wireframe = TRUE,
+        wireframe_color = c(0, 0, 0, 1)))
+
+# Side-by-side
+img <- stack_horizontal(img_shaded, img_wire)
 write_png(img, "cube.png")
 ```
 
