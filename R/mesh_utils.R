@@ -194,7 +194,8 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
 #' @examples
 #' pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0),
 #'  ncol = 3)
-#' img <- render_points(pts, colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4), radius = 5)
+#' colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4)
+#' img <- render_points(pts, colors = colors, radius = 5)
 #' \dontrun{ write_png(img, "points.png") }
 #'
 #' @export
