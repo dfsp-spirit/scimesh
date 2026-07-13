@@ -38,6 +38,8 @@ run_one() {
 run_one examples/R/transparency/run.R                transparency
 run_one examples/R/vis_subject_morph_native/run.R    vis_subject_morph_native
 run_one examples/R/spot_cow/run.R                    spot_cow
+run_one examples/R/dragon/run.R                      dragon
+run_one examples/R/whole_brain_sulc_single_image/run.R whole_brain_sulc_single_image
 
 echo ""
 echo "============================================"

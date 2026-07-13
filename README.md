@@ -17,14 +17,14 @@ images for scientific visualization.
 *The [Stanford Dragon](https://graphics.stanford.edu/data/3Dscanrep/) (871k triangles), rendered with scimesh's
 software rasterizer using smooth shading, three-point Blinn-Phong
 lighting, and 4x anti-aliasing. Render time 5.2 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU).
-[Source code](examples/cpp/dragon/main.cpp).*
+[Source code (R)](examples/R/dragon/run.R) / [Source code (C++)](examples/cpp/dragon/main.cpp).*
 
 
 ![FreeSurfer reconstruction of human brain rendered with scimesh](web/images/whole_brain_sulc.png)
 
 *A FreeSurfer reconstruction of a human brain surface based on an MRI scan (300k triangles), rendered with scimesh's
 software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU).
-[Source code](examples/cpp/whole_brain_sulc_single_image/main.cpp).*
+[Source code (R)](examples/R/whole_brain_sulc_single_image/run.R) / [Source code (C++)](examples/cpp/whole_brain_sulc_single_image/main.cpp).*
 
 ## What scimesh is
 
@@ -147,6 +147,8 @@ write_png(img, "cube.png")
 | [`examples/R/spot_cow/`](examples/R/spot_cow/) | R | Textured OBJ mesh (Spot cow) with multi-light setup |
 | [`examples/R/transparency/`](examples/R/transparency/) | R | Semi-transparent pial overlay on white matter |
 | [`examples/R/vis_subject_morph_native/`](examples/R/vis_subject_morph_native/) | R | FreeSurfer sulcal depth visualization with colorbar |
+| [`examples/R/dragon/`](examples/R/dragon/) | R | Stanford Dragon with SSAO, specular, and 4x AA |
+| [`examples/R/whole_brain_sulc_single_image/`](examples/R/whole_brain_sulc_single_image/) | R | Whole-brain sulcal depth rendering |
 | [`examples/cpp/spot_cow/`](examples/cpp/spot_cow/) | C++ | Textured OBJ rendering with bilinear sampling |
 | [`examples/cpp/bunny/`](examples/cpp/bunny/) | C++ | High-quality Stanford Bunny with SSAO, specular, and 4x AA |
 | [`examples/cpp/dragon/`](examples/cpp/dragon/) | C++ | Stanford Dragon with SSAO, specular, and 4x AA |
