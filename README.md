@@ -21,19 +21,6 @@ images for scientific visualization.
 - Fast enough for publication figures: a ~300k triangle cortical surface
   at 1200x900 with 2x anti-aliasing renders in 1–3 seconds on a modern CPU.
 
-## What scimesh is not
-
-- **Not a plotting framework** — use ggplot2, lattice, or plotly for
-  statistical plots.  scimesh renders 3D geometry.
-- **Not a hardware renderer** — no OpenGL, Vulkan, or Metal.  For
-  interactive 3D rotation, use rgl.
-- **Not for real-time or interactive use** — it produces static images.
-- **Not a game engine** — no PBR materials, no raytracing, no
-  physics, no animation system.
-- **Not a mesh editing/manipulation framework** — it reads, transforms,
-  and renders meshes but does not provide interactive editing, mesh
-  repair, remeshing, or boolean operations.
-
 ## Features
 
 - Software rasterization with z-buffer, smooth and flat shading
@@ -53,6 +40,20 @@ images for scientific visualization.
 - Anatomical view helpers for neuroimaging (lateral, medial, dorsal, etc.)
 - Per-vertex and per-face coloring, texture mapping with bilinear sampling
 - Mesh transforms: translate, scale, rotate, arbitrary 4x4 matrices
+
+
+## What scimesh is not
+
+- Not a plotting framework — use ggplot2, lattice, or plotly for
+  statistical plots.  scimesh renders 3D geometry.
+- Not a hardware renderer — no OpenGL, Vulkan, or Metal.  For
+  interactive 3D rotation, use rgl.
+- Not for real-time or interactive use — it produces static images, and software rendering is not fast enough for real-time use.
+- Not a system for physical based rendering — no PBR materials, no raytracing, etc.
+- Not a mesh editing/manipulation framework — it reads, transforms,
+  and renders meshes but does not provide interactive editing, mesh
+  repair, remeshing, or boolean operations.
+
 
 ## Installation
 
@@ -172,12 +173,16 @@ R CMD build . && R CMD check scimesh_*.tar.gz
 
 ## Vendored Dependencies
 
+Thanks heaps to the authors of these great software packages that scimesh is built upon -- and of course, to the authors of the dependencies of these packages.
+
 - `cpp_tests/catch_amalgamated.{h,cpp}`: [catchorg/Catch2](https://github.com/catchorg/Catch2/tree/devel/extras) — C++ test framework.
 - `src/core/glm/`: [g-truc/glm](https://github.com/g-truc/glm) — header-only C++ math library.
 - `src/core/tinyply.{h,cpp}`: [ddiakopoulos/tinyply](https://github.com/ddiakopoulos/tinyply) — PLY file reader.
 - `src/core/tiny_obj_loader.h`: [tinyobjloader/tinyobjloader](https://github.com/tinyobjloader/tinyobjloader) — Wavefront OBJ loader.
 - `src/core/libfs.h`: [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs) — FreeSurfer file format reader.
 - `cpp_tests/stb_image.h`, `cpp_tests/stb_image_write.h`: [nothings/stb](https://github.com/nothings/stb) — image loading/saving.
+
+Note: This section is to give credit only. Users do not need to worry about installing these, they come packaged (vendored) with scimesh already.
 
 ## License and Author
 
