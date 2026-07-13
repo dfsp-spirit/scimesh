@@ -10,6 +10,13 @@
 #' @param matrix A 4×4 numeric matrix.
 #' @return A new mesh descriptor list with transformed vertices.
 #'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' mat <- diag(4)
+#' mat[1:3, 4] <- c(2, 3, 4)
+#' translated <- transform_mesh(mesh, mat)
+#' translated$vertices[1, ]
+#'
 #' @export
 transform_mesh <- function(mesh, matrix) {
     if (!is.matrix(matrix) || nrow(matrix) != 4L || ncol(matrix) != 4L) {
@@ -23,6 +30,11 @@ transform_mesh <- function(mesh, matrix) {
 #' @param mesh A mesh descriptor list.
 #' @param translation Length-3 numeric vector (x, y, z).
 #' @return A new mesh descriptor list with translated vertices.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' moved <- translate_mesh(mesh, c(5, 0, 0))
+#' colMeans(moved$vertices)
 #'
 #' @export
 translate_mesh <- function(mesh, translation) {
@@ -38,6 +50,11 @@ translate_mesh <- function(mesh, translation) {
 #' @param scale A single numeric scale factor.
 #' @return A new mesh descriptor list with scaled vertices.
 #'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' big <- scale_mesh(mesh, 3)
+#' range(big$vertices[, 1])
+#'
 #' @export
 scale_mesh <- function(mesh, scale) {
     if (length(scale) != 1L || !is.numeric(scale)) {
@@ -52,6 +69,11 @@ scale_mesh <- function(mesh, scale) {
 #' @param angle_rad Rotation angle in radians.
 #' @param axis Length-3 numeric vector defining the rotation axis.
 #' @return A new mesh descriptor list with rotated vertices.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' rotated <- rotate_mesh(mesh, pi / 4, axis = c(0, 1, 0))
+#' rotated$vertices[1, ]
 #'
 #' @export
 rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
@@ -78,6 +100,13 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
 #'   (default 16).
 #' @return An image list with \code{width}, \code{height},
 #'   \code{pixels}.
+#'
+#' @examples
+#' centers <- matrix(c(0, 2, 4, 0, 0, 0, 0, 0, 0), ncol = 3)
+#' img <- render_spheres(centers, radii = 0.5,
+#'                       colors = c(1, 0, 0, 1),
+#'                       camera = camera_auto(centers))
+#' \dontrun{ write_png(img, "spheres.png") }
 #'
 #' @export
 render_spheres <- function(centers, radii, colors, camera,
@@ -114,6 +143,14 @@ render_spheres <- function(centers, radii, colors, camera,
 #' @param options Render options.
 #' @param segments Number of sides around the cylinder (default 12).
 #' @return An image list.
+#'
+#' @examples
+#' from <- matrix(c(0, 0, 0, 1, 1, 1), ncol = 3, byrow = TRUE)
+#' to   <- matrix(c(3, 0, 0, 0, 3, 0), ncol = 3, byrow = TRUE)
+#' img <- render_lines(from, to, radii = 0.05,
+#'                     colors = c(0, 0, 1, 1),
+#'                     camera = camera_auto(rbind(from, to)))
+#' \dontrun{ write_png(img, "lines.png") }
 #'
 #' @export
 render_lines <- function(from, to, radii = 0.1, colors, camera,
@@ -152,6 +189,11 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
 #' @param options Render options.
 #' @return An image list.
 #'
+#' @examples
+#' pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0), ncol = 3)
+#' img <- render_points(pts, colors = c(0, 1, 0, 1), radius = 5)
+#' \dontrun{ write_png(img, "points.png") }
+#'
 #' @export
 render_points <- function(positions, colors, radius = 3,
                           camera = camera_auto(positions),
@@ -180,6 +222,13 @@ render_points <- function(positions, colors, radius = 3,
 #' @return A mesh descriptor list with \code{vertices} (N×3)
 #'   and \code{triangles} (M×3, 1-based indices).
 #'
+#' @examples
+#' fake <- list(vb = rbind(0:3, 0:3, 0:3, rep(1, 4)),
+#'              it = matrix(1:6, nrow = 3))
+#' m <- mesh_from_rgl(fake)
+#' m$vertices
+#' m$triangles
+#'
 #' @export
 mesh_from_rgl <- function(tmesh) {
     if (!is.list(tmesh) || is.null(tmesh$vb) || is.null(tmesh$it)) {
@@ -201,6 +250,11 @@ mesh_from_rgl <- function(tmesh) {
 #' @param color Length-4 RGBA colour (0-1 scale).
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 0.5))
+#' nrow(mesh$vertices)
+#' nrow(mesh$triangles)
+#'
 #' @export
 generate_cuboid <- function(center, half_extents, color = c(0.7, 0.7, 0.7, 1)) {
     scimesh_generate_cuboid(center, half_extents, color)
@@ -217,6 +271,10 @@ generate_cuboid <- function(center, half_extents, color = c(0.7, 0.7, 0.7, 1)) {
 #' @param color Length-4 RGBA colour.
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' mesh <- generate_pyramid(c(0, 0, 0), c(0, 2, 0), half_width = 1)
+#' mesh$vertices
+#'
 #' @export
 generate_pyramid <- function(base_center, apex, half_width = 1,
                              color = c(0.7, 0.7, 0.7, 1)) {
@@ -231,6 +289,12 @@ generate_pyramid <- function(base_center, apex, half_width = 1,
 #' @param p0, p1, p2, p3 Length-3 vectors: the four vertices.
 #' @param color Length-4 RGBA colour.
 #' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_tetrahedron(
+#'   c(0, 0, 0), c(1, 0, 0),
+#'   c(0.5, 1, 0), c(0.5, 0.5, 1))
+#' nrow(mesh$vertices)
 #'
 #' @export
 generate_tetrahedron <- function(p0, p1, p2, p3,
@@ -250,6 +314,10 @@ generate_tetrahedron <- function(p0, p1, p2, p3,
 #' @param minor_segments Number of segments around the tube.
 #' @param color Length-4 RGBA colour.
 #' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_torus(major_radius = 2, minor_radius = 0.5)
+#' nrow(mesh$vertices)
 #'
 #' @export
 generate_torus <- function(center = c(0, 0, 0), major_radius = 1,
@@ -272,6 +340,11 @@ generate_torus <- function(center = c(0, 0, 0), major_radius = 1,
 #' @param color Length-4 RGBA colour.
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' mesh <- generate_plane(c(0, 0, 0), normal = c(0, 1, 0),
+#'                        half_size_x = 2, half_size_y = 1)
+#' nrow(mesh$vertices)
+#'
 #' @export
 generate_plane <- function(center = c(0, 0, 0), normal = c(0, 1, 0),
                            half_size_x = 1, half_size_y = 1,
@@ -288,6 +361,12 @@ generate_plane <- function(center = c(0, 0, 0), normal = c(0, 1, 0),
 #' @param path Path to the STL file.
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' \dontrun{
+#' mesh <- read_stl("model.stl")
+#' nrow(mesh$vertices)
+#' }
+#'
 #' @export
 read_stl <- function(path) {
     scimesh_read_stl(path)
@@ -300,6 +379,12 @@ read_stl <- function(path) {
 #' @param mesh A mesh descriptor list.
 #' @param path Path to the output STL file.
 #' @param format \code{"binary"} (default) or \code{"ascii"}.
+#'
+#' @examples
+#' \dontrun{
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' write_stl(mesh, "output.stl")
+#' }
 #'
 #' @export
 write_stl <- function(mesh, path, format = c("binary", "ascii")) {
@@ -317,6 +402,12 @@ write_stl <- function(mesh, path, format = c("binary", "ascii")) {
 #' @param path Path to the OBJ file.
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' \dontrun{
+#' mesh <- read_obj("model.obj")
+#' nrow(mesh$vertices)
+#' }
+#'
 #' @export
 read_obj <- function(path) {
     scimesh_read_obj(path)
@@ -331,6 +422,12 @@ read_obj <- function(path) {
 #' @param path Path to the PLY file.
 #' @return A mesh descriptor list.
 #'
+#' @examples
+#' \dontrun{
+#' mesh <- read_ply("model.ply")
+#' nrow(mesh$vertices)
+#' }
+#'
 #' @export
 read_ply <- function(path) {
     scimesh_read_ply(path)
@@ -340,6 +437,12 @@ read_ply <- function(path) {
 #'
 #' @param mesh A mesh descriptor list with \code{vertices}.
 #' @return A list with \code{min} and \code{max} (each length-3 numeric).
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 3))
+#' bb <- mesh_bbox(mesh)
+#' bb$min
+#' bb$max
 #'
 #' @export
 mesh_bbox <- function(mesh) {
@@ -363,6 +466,11 @@ mesh_bbox <- function(mesh) {
 #' @param radius Cylinder radius for the edges.
 #' @return A mesh descriptor list suitable for \code{render_mesh()}
 #'   or inclusion in a scene list.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 3))
+#' bbox_mesh <- generate_bbox(mesh)
+#' nrow(bbox_mesh$vertices)
 #'
 #' @export
 generate_bbox <- function(bbox, color = c(0, 0, 0, 1), radius = 0.01) {
@@ -415,6 +523,10 @@ generate_bbox <- function(bbox, color = c(0, 0, 0, 1), radius = 0.01) {
 #' @param shaft_radius Cylinder radius for axis shafts.
 #' @return A mesh descriptor list suitable for \code{render_mesh()}
 #'   or inclusion in a scene list.
+#'
+#' @examples
+#' axes_mesh <- generate_axes(size = 2)
+#' nrow(axes_mesh$vertices)
 #'
 #' @export
 generate_axes <- function(center = c(0, 0, 0), size = 1,

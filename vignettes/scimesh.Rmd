@@ -285,6 +285,192 @@ mesh <- rotate_mesh(mesh, pi / 4, c(0, 0, 1))
 mesh <- transform_mesh(mesh, my_4x4_matrix)
 ```
 
+## Mesh I/O
+
+scimesh can read and write standard 3D mesh file formats.  All readers
+return a mesh descriptor list with `vertices`, `triangles`, and
+optionally `normals`, `uv`, or `colors`.
+
+```r
+# Read a Wavefront OBJ file (with optional UVs and normals)
+mesh <- read_obj("model.obj")
+
+# Read a Stanford PLY file (with optional vertex colors)
+mesh <- read_ply("model.ply")
+
+# Read an STL file (binary or ASCII)
+mesh <- read_stl("model.stl")
+
+# Write a mesh to STL
+write_stl(mesh, "output.stl")               # binary (default)
+write_stl(mesh, "output.stl", format = "ascii")
+```
+
+The OBJ reader supports multi-shape files and texture coordinates.
+The PLY reader supports per-vertex RGB colors.  STL writes preserve
+vertex normals when available.
+
+## Face Colors
+
+Per-face coloring lets you assign a single color to every vertex of a
+triangle.  This is useful for parcellation overlays or material
+assignment:
+
+```r
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+
+# 12 triangles, each gets a color
+fc <- matrix(c(1, 0, 0, 1), nrow = 12, ncol = 4, byrow = TRUE)
+img <- render_mesh(mesh$vertices, mesh$triangles, face_colors = fc)
+```
+
+When `face_colors` is provided, it takes precedence over vertex
+`colors`.
+
+## Texture Mapping
+
+Load a texture image and assign UV coordinates to render textured
+meshes:
+
+```r
+# Requires the 'png' package
+library(png)
+tex <- readPNG("texture.png")
+
+# UV coordinates (Nx2, values 0-1) must match vertex order
+mesh <- read_obj("textured.obj")  # OBJ reader extracts UVs
+
+img <- render_mesh(mesh$vertices, mesh$triangles,
+    uv = mesh$uv, texture = tex)
+```
+
+Bilinear texture sampling is used for smooth results.
+
+## Lower-Level Rendering
+
+Beyond `render_mesh()` and `render_scene()`, scimesh provides
+lower-level functions for special use cases:
+
+### Raw Triangles (no index buffer)
+
+Render geometry where positions and colors are flat arrays with 3
+vertices per triangle — useful for dynamically generated geometry:
+
+```r
+positions <- matrix(c(0,0,0, 1,0,0, 0.5,1,0,
+                      0,0,1, 1,0,1, 0.5,1,1), ncol = 3, byrow = TRUE)
+colors <- matrix(c(1,0,0,1, 0,1,0,1, 0,0,1,1,
+                   1,1,0,1, 0,1,1,1, 1,0,1,1), ncol = 4, byrow = TRUE)
+cam <- camera_auto(positions)
+img <- render_triangles(positions, colors, cam)
+```
+
+### Points
+
+Render point cloud data with depth-tested circular markers:
+
+```r
+pts <- matrix(rnorm(300), ncol = 3)
+cols <- matrix(c(1, 0.5, 0, 1), nrow = nrow(pts), ncol = 4, byrow = TRUE)
+img <- render_points(pts, cols, radius = 4)
+```
+
+### Lines (as Cylinders)
+
+Render line segments as thin cylinders:
+
+```r
+from <- matrix(c(0,0,0, 0,0,0), ncol = 3, byrow = TRUE)
+to   <- matrix(c(1,0,0, 0,1,0), ncol = 3, byrow = TRUE)
+cols <- matrix(c(1,0,0,1, 0,1,0,1), ncol = 4, byrow = TRUE)
+img <- render_lines(from, to, radii = 0.05, colors = cols, cam)
+```
+
+## Camera Utilities
+
+### Auto-Framing
+
+`camera_auto()` computes a camera that fits any mesh or vertex set:
+
+```r
+verts <- matrix(rnorm(900), ncol = 3)
+cam <- camera_auto(verts, direction = c(1, 1, 1), fov = 45)
+```
+
+It accepts either an Nx3 matrix or a mesh descriptor list.
+
+### Manual Camera
+
+For full control, use `camera()`:
+
+```r
+cam <- camera(eye = c(0, 0, 10), center = c(0, 0, 0),
+              up = c(0, 1, 0), fov = 30)
+```
+
+## Mesh Utilities
+
+### Bounding Box
+
+Compute or visualise the axis-aligned bounding box:
+
+```r
+mesh <- generate_torus(c(0, 0, 0), 1.5, 0.4, 32, 16)
+bbox <- mesh_bbox(mesh)
+bbox$min  # c(xmin, ymin, zmin)
+bbox$max  # c(xmax, ymax, zmax)
+
+# Generate a wireframe bounding box mesh for rendering
+bbox_mesh <- generate_bbox(mesh, color = c(0, 0, 0, 1), radius = 0.02)
+```
+
+### Axis Arrows
+
+Generate coloured XYZ axis arrows (red X, green Y, blue Z):
+
+```r
+axes_mesh <- generate_axes(center = c(0, 0, 0), size = 2)
+# Render together with your mesh:
+img <- render_scene(list(mesh, axes_mesh), cam)
+```
+
+## Image Stacking
+
+Quick helpers for combining images:
+
+```r
+# Vertical stack (one below another)
+result <- stack_horizontal(img1, img2, img3)
+
+# Vertical stack
+result <- stack_vertical(img1, img2)
+
+# With a colorbar
+result <- stack_horizontal(img1, img2,
+    colorbar = colorbar_horizontal(viridis_colormap))
+```
+
+## Running the R Examples
+
+The repository includes three complete R example scripts in
+`examples/R/`:
+
+| Example | What it shows |
+|---------|--------------|
+| `spot_cow/run.R` | Textured OBJ mesh with multi-light setup and SSAO |
+| `transparency/run.R` | Semi-transparent pial overlay on white matter |
+| `vis_subject_morph_native/run.R` | FreeSurfer sulcal depth with t4/t9 views and colorbars |
+
+Run all examples at once:
+
+```sh
+cd examples/R
+bash run_all_R.sh
+```
+
+For C++ examples, see `examples/cpp/` and
+[`docs/CPP_GETTING_STARTED.md`](https://github.com/dfsp-spirit/scimesh/blob/main/docs/CPP_GETTING_STARTED.md).
+
 ## FAQ
 
 **Why is there no interactive 3D window?**  

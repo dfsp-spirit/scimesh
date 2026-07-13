@@ -348,6 +348,35 @@
 #'   (raw RGBA vector).  Suitable for \code{write_png()} or
 #'   \code{image_to_array()}.
 #'
+#' @examples
+#' \dontrun{
+#' library(scimesh)
+#'
+#' # Render sulcal depth in a 2x2 tile with colorbar
+#' img <- vis.subject.morph.native(
+#'     subjects_dir = "~/data/study1",
+#'     subject_id  = "subject1",
+#'     measure     = "sulc",
+#'     views       = "t4",
+#'     cortex_only = TRUE,
+#'     draw_colorbar = TRUE,
+#'     colorbar_title = "Sulcal depth [mm]",
+#'     aa_samples  = 2L
+#' )
+#' write_png(img, "brain_sulc_t4.png")
+#'
+#' # Single lateral view with vertical colorbar
+#' img <- vis.subject.morph.native(
+#'     subjects_dir = "~/data/study1",
+#'     subject_id  = "subject1",
+#'     measure     = "thickness",
+#'     views       = "lateral_lh",
+#'     draw_colorbar = "vertical",
+#'     colorbar_title = "Thickness [mm]"
+#' )
+#' write_png(img, "brain_thickness_lh.png")
+#' }
+#'
 #' @section Domain boundary:
 #' This is a **neuro-specific** function. It knows about FreeSurfer
 #' directory layout, RAS coordinates, cortex labels, and anatomical view

@@ -12,6 +12,10 @@
 #' @return A camera list suitable for \code{render_mesh()} or
 #'   \code{render_scene()}.
 #'
+#' @examples
+#' cam <- camera(eye = c(0, 0, 5), center = c(0, 0, 0))
+#' cam$eye
+#'
 #' @export
 camera <- function(eye, center, up = c(0, 1, 0),
                    projection = c("perspective", "orthographic"),
@@ -40,6 +44,15 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #' @param fov Field of view in degrees.
 #' @param margin Extra margin factor (1.0 = tight fit, 1.1 = 10% margin).
 #' @return A camera list.
+#'
+#' @examples
+#' verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
+#'                    -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
+#' tris <- matrix(c(0L,3L,2L, 0L,2L,1L, 4L,5L,6L, 4L,6L,7L,
+#'                   0L,1L,5L, 0L,5L,4L, 2L,3L,7L, 2L,7L,6L,
+#'                   0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
+#' mesh <- list(vertices = verts, triangles = tris)
+#' cam <- camera_auto(mesh, direction = c(1, 1, 1))
 #'
 #' @export
 camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),

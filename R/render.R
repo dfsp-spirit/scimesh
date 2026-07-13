@@ -10,10 +10,21 @@
 #'   one row per triangle.  When present, all three vertices of a triangle
 #'   use the same colour.  Takes precedence over vertex \code{colors}.
 #' @param normals Optional Nx3 numeric matrix of vertex normals.
+#' @param uv Optional Nx2 numeric matrix of texture coordinates (0-1).
+#' @param texture Optional texture image as a 3D array (H x W x 3 or 4)
+#'   with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #' @param options A render options list from \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
 #'   \code{pixels} (raw vector of RGBA values).
+#'
+#' @examples
+#' # Render a simple colored triangle
+#' verts <- matrix(c(0, 0, 0,  1, 0, 0,  0.5, 1, 0), ncol = 3, byrow = TRUE)
+#' tris  <- matrix(1L, nrow = 1, ncol = 3)
+#' cols  <- matrix(c(1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1), ncol = 4, byrow = TRUE)
+#' img <- render_mesh(verts, tris, colors = cols)
+#' \dontrun{write_png(img, "triangle.png")}
 #'
 #' @export
 render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
@@ -75,6 +86,15 @@ render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
 #' @param options A render options list from \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
 #'   \code{pixels} (raw vector of RGBA values).
+#'
+#' @examples
+#' # Render two cubes side by side
+#' cube1 <- generate_cuboid(c(-1.5, 0, 0), c(0.8, 0.8, 0.8), c(1, 0, 0, 1))
+#' cube2 <- generate_cuboid(c( 1.5, 0, 0), c(0.8, 0.8, 0.8), c(0, 0, 1, 1))
+#' cam <- camera_auto(list(cube1, cube2), direction = c(1, 1, 1))
+#' img <- render_scene(list(cube1, cube2), cam,
+#'     render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
+#' \dontrun{write_png(img, "two_cubes.png")}
 #'
 #' @export
 render_scene <- function(meshes, camera, options = render_options()) {
@@ -147,6 +167,21 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #' @return A render options list for use with \code{render_mesh()} or
 #'   \code{render_scene()}.
 #'
+#' @examples
+#' # Default options
+#' opts <- render_options()
+#'
+#' # High-resolution with anti-aliasing and specular highlights
+#' opts <- render_options(width = 1200, height = 900,
+#'     aa_samples = 2L,
+#'     specular_color = c(0.4, 0.4, 0.4, 1),
+#'     shininess = 64)
+#'
+#' # Wireframe with transparent background
+#' opts <- render_options(wireframe = TRUE,
+#'     wireframe_color = c(0, 0, 0, 1),
+#'     background_color = c(0, 0, 0, 0))
+#'
 #' @export
 render_options <- function(width = 800L, height = 600L,
                            shading = c("smooth", "flat"),
@@ -215,6 +250,14 @@ render_options <- function(width = 800L, height = 600L,
 #' @param options Render options from \code{render_options()}.
 #' @return An image list with \code{width}, \code{height},
 #'   \code{pixels}.
+#'
+#' @examples
+#' # Render a single red triangle from raw vertices
+#' positions <- matrix(c(0, 0, 0, 1, 0, 0, 0.5, 1, 0), ncol = 3, byrow = TRUE)
+#' colors <- matrix(c(1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1), ncol = 4, byrow = TRUE)
+#' cam <- camera_auto(positions)
+#' img <- render_triangles(positions, colors, cam)
+#' \dontrun{write_png(img, "raw_triangle.png")}
 #'
 #' @export
 render_triangles <- function(positions, colors, camera,

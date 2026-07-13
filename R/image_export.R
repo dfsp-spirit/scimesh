@@ -9,6 +9,12 @@
 #' @return A 3D array of dimensions (height, width, 4) with values in
 #'   \code{[0, 1]}.
 #'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' img <- render_mesh(mesh$vertices, mesh$triangles)
+#' arr <- image_to_array(img)
+#' dim(arr)  # height x width x 4
+#'
 #' @export
 image_to_array <- function(image) {
     if (!is.list(image) || is.null(image$pixels)) {
@@ -31,6 +37,13 @@ image_to_array <- function(image) {
 #' @param image An image list returned by \code{render_mesh()} or
 #'   \code{render_scene()}.
 #' @param filename Output PNG file path.
+#'
+#' @examples
+#' \dontrun{
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' img <- render_mesh(mesh$vertices, mesh$triangles)
+#' write_png(img, "cuboid.png")
+#' }
 #'
 #' @export
 write_png <- function(image, filename) {

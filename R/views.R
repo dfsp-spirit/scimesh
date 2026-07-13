@@ -23,7 +23,19 @@
 #'
 #' @name anatomical_views
 NULL
-
+#'
+#' @examples
+#' # Create a sample mesh
+#' verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
+#'                    -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
+#' tris <- matrix(c(0L,3L,2L, 0L,2L,1L, 4L,5L,6L, 4L,6L,7L,
+#'                   0L,1L,5L, 0L,5L,4L, 2L,3L,7L, 2L,7L,6L,
+#'                   0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
+#' mesh <- list(vertices = verts, triangles = tris)
+#'
+#' cam <- view_lateral_left(mesh)
+#' cam <- view_dorsal(mesh)
+#'
 #' @rdname anatomical_views
 #' @export
 view_lateral_left <- function(mesh, fov = 45, margin = 1.1) {
@@ -101,6 +113,14 @@ view_posterior <- function(mesh, fov = 45, margin = 1.1) {
 #' @param ... Additional arguments passed to \code{render_options()}.
 #' @return A composed image list with lateral and medial views side by
 #'   side, with optional colorbar.
+#'
+#' @examples
+#' \dontrun{
+#' # Render lateral + medial views of a brain mesh
+#' img <- render_hemisphere_views(brain_mesh, hemisphere = "left",
+#'     draw_colorbar = TRUE)
+#' write_png(img, "brain_views.png")
+#' }
 #'
 #' @export
 render_hemisphere_views <- function(mesh, hemisphere = c("left", "right"),

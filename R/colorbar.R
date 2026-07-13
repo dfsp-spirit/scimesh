@@ -124,6 +124,11 @@ ensure_rgba_array <- function(arr) {
 #' @return A 3D array of dimensions (height, width, 4) with values in
 #'   \code{[0, 1]}.
 #'
+#' @examples
+#' cbar <- colorbar_horizontal(viridis_colormap, data_range = c(-2, 3),
+#'     title = "Value")
+#' dim(cbar)  # height x width x 4
+#'
 #' @export
 colorbar_horizontal <- function(colormap, n_colors = 256L,
                                  width = 600L, height = 80L,
@@ -170,6 +175,11 @@ colorbar_horizontal <- function(colormap, n_colors = 256L,
 #' @return A 3D array of dimensions (height, width, 4) with values in
 #'   \code{[0, 1]}.
 #'
+#' @examples
+#' cbar <- colorbar_vertical(viridis_colormap, data_range = c(0, 100),
+#'     title = "Count")
+#' dim(cbar)
+#'
 #' @export
 colorbar_vertical <- function(colormap, n_colors = 256L,
                                width = 80L, height = 600L,
@@ -207,6 +217,10 @@ colorbar_vertical <- function(colormap, n_colors = 256L,
 #' @param direction Forward (1) or reversed (-1) direction.
 #' @return A character vector of hex color strings.
 #'
+#' @examples
+#' cols <- viridis_colormap(10)
+#' plot(1:10, pch = 19, col = cols, cex = 3)
+#'
 #' @export
 viridis_colormap <- function(n, alpha = 1, direction = 1) {
     cols <- grDevices::hcl.colors(n, palette = "viridis", alpha = alpha,
@@ -221,6 +235,10 @@ viridis_colormap <- function(n, alpha = 1, direction = 1) {
 #'
 #' @param n Number of colors.
 #' @return A character vector of hex color strings.
+#'
+#' @examples
+#' cols <- diverging_colormap(256)
+#' plot(1:256, pch = 15, col = cols, cex = 2, axes = FALSE, xlab = "", ylab = "")
 #'
 #' @export
 diverging_colormap <- function(n) {
