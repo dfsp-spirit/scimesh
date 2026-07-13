@@ -30,6 +30,9 @@ struct Image {
 
     // Write to BMP (for C++ test debugging - trivial format, no dependencies)
     bool write_bmp(const std::string &filename) const;
+
+    // Write to PNG (via stb_image_write)
+    bool write_png(const std::string &filename) const;
 };
 
 } // namespace scimesh

@@ -3,6 +3,16 @@
 #include <cstring>
 #include <algorithm>
 
+// When building standalone examples (not the test suite), define the stb
+// implementation here.  The test suite provides its own definition in
+// test_primitives.cpp, so guard against double-definition at link time.
+#ifdef SCIMESH_STB_WRITE_IMPL
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#endif
+#endif
+#include "stb_image_write.h"
+
 namespace scimesh {
 
 Image::Image(int w, int h) : width(w), height(h), pixels(w * h * 4, 0) {}
@@ -183,6 +193,14 @@ bool Image::write_bmp(const std::string &filename) const {
         }
     }
     return f.good();
+}
+
+bool Image::write_png(const std::string &filename) const {
+    if (width <= 0 || height <= 0 || pixels.empty())
+        return false;
+    int stride = width * 4;
+    return stbi_write_png(filename.c_str(), width, height, 4,
+                          pixels.data(), stride) != 0;
 }
 
 } // namespace scimesh

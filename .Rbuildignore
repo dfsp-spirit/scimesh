@@ -28,3 +28,4 @@
 ^docs$
 ^examples$
 ^scimesh_.*\.tar\.gz$
+^web$
