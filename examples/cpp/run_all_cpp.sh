@@ -59,6 +59,8 @@ run_one protein_data_bank_pdb_file        protein_demo        ../1CRN.pdb
 run_one whole_brain_annot_single_image    whole_brain_annot
 run_one whole_brain_sulc_single_image     whole_brain_sulc
 run_one whole_brain_sulc_single_image_fsaverage whole_brain_sulc_fsaverage
+run_one bunny                             bunny
+run_one dragon                            dragon
 
 echo ""
 echo "============================================"

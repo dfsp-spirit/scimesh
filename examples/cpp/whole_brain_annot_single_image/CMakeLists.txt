@@ -27,3 +27,4 @@ add_executable(whole_brain_annot
 )
 
 target_compile_features(whole_brain_annot PRIVATE cxx_std_17)
+target_compile_definitions(whole_brain_annot PRIVATE SCIMESH_STB_WRITE_IMPL)

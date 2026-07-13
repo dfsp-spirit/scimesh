@@ -28,3 +28,4 @@ add_executable(transparency_demo
 )
 
 target_compile_features(transparency_demo PRIVATE cxx_std_17)
+target_compile_definitions(transparency_demo PRIVATE SCIMESH_STB_WRITE_IMPL)

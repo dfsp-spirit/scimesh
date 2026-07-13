@@ -86,9 +86,8 @@ int main() {
     opts.specular_color = Color(0.30f, 0.30f, 0.30f);
     opts.shininess = 32.0f;
     opts.aa_samples = 4;
-    opts.ssao_enabled = true;
-    opts.ssao_radius = 14.0f;
-    opts.ssao_intensity = 0.6f;
+    opts.threads = 0;
+    opts.ssao_enabled = false;
 
     std::cout << "Rendering at " << opts.width << "x" << opts.height
               << " with " << opts.aa_samples << "x AA ...\n";

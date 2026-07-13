@@ -28,3 +28,4 @@ add_executable(spot_cow
 )
 
 target_compile_features(spot_cow PRIVATE cxx_std_17)
+target_compile_definitions(spot_cow PRIVATE SCIMESH_STB_WRITE_IMPL)

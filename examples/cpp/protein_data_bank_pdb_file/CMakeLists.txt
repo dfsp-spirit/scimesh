@@ -28,3 +28,4 @@ add_executable(protein_demo
 )
 
 target_compile_features(protein_demo PRIVATE cxx_std_17)
+target_compile_definitions(protein_demo PRIVATE SCIMESH_STB_WRITE_IMPL)

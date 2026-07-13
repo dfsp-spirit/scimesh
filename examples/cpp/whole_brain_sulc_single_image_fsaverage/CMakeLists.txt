@@ -27,3 +27,4 @@ add_executable(whole_brain_sulc_fsaverage
 )
 
 target_compile_features(whole_brain_sulc_fsaverage PRIVATE cxx_std_17)
+target_compile_definitions(whole_brain_sulc_fsaverage PRIVATE SCIMESH_STB_WRITE_IMPL)
