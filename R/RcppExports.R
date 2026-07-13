@@ -25,6 +25,10 @@ scimesh_scale_mesh <- function(mesh_data, scale) {
     .Call(`_scimesh_scimesh_scale_mesh`, mesh_data, scale)
 }
 
+scimesh_scale_mesh_nonuniform <- function(mesh_data, scale) {
+    .Call(`_scimesh_scimesh_scale_mesh_nonuniform`, mesh_data, scale)
+}
+
 scimesh_rotate_mesh <- function(mesh_data, angle_rad, axis) {
     .Call(`_scimesh_scimesh_rotate_mesh`, mesh_data, angle_rad, axis)
 }
@@ -39,6 +43,10 @@ scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segmen
 
 scimesh_generate_cone <- function(base, tip, radius, segments, color) {
     .Call(`_scimesh_scimesh_generate_cone`, base, tip, radius, segments, color)
+}
+
+scimesh_generate_arrow <- function(from, to, shaft_radius, head_radius, head_length, segments, color) {
+    .Call(`_scimesh_scimesh_generate_arrow`, from, to, shaft_radius, head_radius, head_length, segments, color)
 }
 
 scimesh_render_triangles_raw <- function(positions, colors, camera_data, options_data) {
@@ -87,5 +95,9 @@ scimesh_read_ply <- function(path) {
 
 scimesh_write_png <- function(image, filename) {
     .Call(`_scimesh_scimesh_write_png`, image, filename)
+}
+
+scimesh_compute_vertex_normals <- function(mesh_data) {
+    .Call(`_scimesh_scimesh_compute_vertex_normals`, mesh_data)
 }
 

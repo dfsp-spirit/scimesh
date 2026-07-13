@@ -44,23 +44,29 @@ translate_mesh <- function(mesh, translation) {
     scimesh_translate_mesh(mesh, translation)
 }
 
-#' Scale a mesh uniformly
+#' Scale a mesh uniformly or per-axis
 #'
 #' @param mesh A mesh descriptor list.
-#' @param scale A single numeric scale factor.
+#' @param scale A single numeric scale factor (uniform) or a
+#'   length-3 numeric vector for per-axis scaling (x, y, z).
 #' @return A new mesh descriptor list with scaled vertices.
 #'
 #' @examples
 #' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' big <- scale_mesh(mesh, 3)
-#' range(big$vertices[, 1])
+#' flat <- scale_mesh(mesh, c(2, 0.5, 1))
 #'
 #' @export
 scale_mesh <- function(mesh, scale) {
-    if (length(scale) != 1L || !is.numeric(scale)) {
-        stop("scale must be a single numeric value")
+    if (!is.numeric(scale)) stop("scale must be numeric")
+    n <- length(scale)
+    if (n == 1L) {
+        scimesh_scale_mesh(mesh, scale)
+    } else if (n == 3L) {
+        scimesh_scale_mesh_nonuniform(mesh, scale)
+    } else {
+        stop("scale must be a single value or a length-3 vector")
     }
-    scimesh_scale_mesh(mesh, scale)
 }
 
 #' Rotate a mesh around an axis
@@ -334,6 +340,32 @@ generate_cone <- function(base, tip, radius = 0.5, segments = 32,
     scimesh_generate_cone(base, tip, radius, as.integer(segments), color)
 }
 
+#' Generate an arrow mesh
+#'
+#' Creates a 3D arrow from \code{from} to \code{to}, with a cylindrical
+#' shaft and a conical head.
+#'
+#' @param from Length-3 start point.
+#' @param to Length-3 end point (tip of the arrowhead).
+#' @param shaft_radius Radius of the shaft cylinder.
+#' @param head_radius Radius at the base of the conical head.
+#' @param head_length Length of the arrowhead.
+#' @param segments Subdivision count (default 32).
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_arrow(c(0, 0, 0), c(0, 2, 0))
+#' nrow(mesh$vertices)
+#'
+#' @export
+generate_arrow <- function(from, to, shaft_radius = 0.1, head_radius = 0.3,
+                           head_length = 0.6, segments = 32,
+                           color = c(1, 1, 1, 1)) {
+    scimesh_generate_arrow(from, to, shaft_radius, head_radius,
+                           head_length, as.integer(segments), color)
+}
+
 #' Generate a square pyramid mesh
 #'
 #' Creates a pyramid with a square base centred at \code{base_center}
@@ -508,6 +540,26 @@ read_obj <- function(path) {
 #' @export
 read_ply <- function(path) {
     scimesh_read_ply(path)
+}
+
+#' Compute per-vertex normals for a mesh
+#'
+#' Computes smooth vertex normals by averaging face normals. Returns
+#' the same mesh with a \code{normals} component (Nx3 numeric matrix).
+#' Useful for imported meshes that lack pre-computed normals.
+#'
+#' @param mesh A mesh descriptor list with \code{vertices} and
+#'   \code{triangles}.
+#' @return The mesh with a \code{normals} component added.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' mesh <- compute_vertex_normals(mesh)
+#' nrow(mesh$normals)
+#'
+#' @export
+compute_vertex_normals <- function(mesh) {
+    scimesh_compute_vertex_normals(mesh)
 }
 
 #' Compute the axis-aligned bounding box of a mesh

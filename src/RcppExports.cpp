@@ -87,6 +87,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_scale_mesh_nonuniform
+List scimesh_scale_mesh_nonuniform(List mesh_data, NumericVector scale);
+RcppExport SEXP _scimesh_scimesh_scale_mesh_nonuniform(SEXP mesh_dataSEXP, SEXP scaleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type scale(scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_scale_mesh_nonuniform(mesh_data, scale));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_rotate_mesh
 List scimesh_rotate_mesh(List mesh_data, double angle_rad, NumericVector axis);
 RcppExport SEXP _scimesh_scimesh_rotate_mesh(SEXP mesh_dataSEXP, SEXP angle_radSEXP, SEXP axisSEXP) {
@@ -141,6 +153,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
     rcpp_result_gen = Rcpp::wrap(scimesh_generate_cone(base, tip, radius, segments, color));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_arrow
+List scimesh_generate_arrow(NumericVector from, NumericVector to, double shaft_radius, double head_radius, double head_length, int segments, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_arrow(SEXP fromSEXP, SEXP toSEXP, SEXP shaft_radiusSEXP, SEXP head_radiusSEXP, SEXP head_lengthSEXP, SEXP segmentsSEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type to(toSEXP);
+    Rcpp::traits::input_parameter< double >::type shaft_radius(shaft_radiusSEXP);
+    Rcpp::traits::input_parameter< double >::type head_radius(head_radiusSEXP);
+    Rcpp::traits::input_parameter< double >::type head_length(head_lengthSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_arrow(from, to, shaft_radius, head_radius, head_length, segments, color));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -303,6 +332,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_compute_vertex_normals
+List scimesh_compute_vertex_normals(List mesh_data);
+RcppExport SEXP _scimesh_scimesh_compute_vertex_normals(SEXP mesh_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_compute_vertex_normals(mesh_data));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -311,10 +351,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_transform_mesh", (DL_FUNC) &_scimesh_scimesh_transform_mesh, 2},
     {"_scimesh_scimesh_translate_mesh", (DL_FUNC) &_scimesh_scimesh_translate_mesh, 2},
     {"_scimesh_scimesh_scale_mesh", (DL_FUNC) &_scimesh_scimesh_scale_mesh, 2},
+    {"_scimesh_scimesh_scale_mesh_nonuniform", (DL_FUNC) &_scimesh_scimesh_scale_mesh_nonuniform, 2},
     {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
     {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
     {"_scimesh_scimesh_generate_cone", (DL_FUNC) &_scimesh_scimesh_generate_cone, 5},
+    {"_scimesh_scimesh_generate_arrow", (DL_FUNC) &_scimesh_scimesh_generate_arrow, 7},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {"_scimesh_scimesh_render_points_raw", (DL_FUNC) &_scimesh_scimesh_render_points_raw, 5},
     {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},
@@ -327,6 +369,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
     {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
     {"_scimesh_scimesh_write_png", (DL_FUNC) &_scimesh_scimesh_write_png, 2},
+    {"_scimesh_scimesh_compute_vertex_normals", (DL_FUNC) &_scimesh_scimesh_compute_vertex_normals, 1},
     {NULL, NULL, 0}
 };
 

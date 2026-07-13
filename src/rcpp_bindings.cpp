@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include "core/renderer.h"
 #include "core/transforms.h"
+#include "core/normals.h"
 #include "core/primitives.h"
 #include "core/stl_io.h"
 #include "core/obj_io.h"
@@ -471,6 +472,13 @@ List scimesh_scale_mesh(List mesh_data, double scale) {
 }
 
 // [[Rcpp::export]]
+List scimesh_scale_mesh_nonuniform(List mesh_data, NumericVector scale) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    scimesh::scale_mesh(mesh, vec3_from_r(scale));
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
 List scimesh_rotate_mesh(List mesh_data, double angle_rad, NumericVector axis) {
     scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
     scimesh::rotate_mesh(mesh, static_cast<float>(angle_rad), vec3_from_r(axis));
@@ -539,6 +547,20 @@ List scimesh_generate_cone(NumericVector base, NumericVector tip,
     scimesh::Color c = color_from_r(color);
     scimesh::Mesh mesh = scimesh::generate_cone(b, t, static_cast<float>(radius),
                                                 segments, c);
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_arrow(NumericVector from, NumericVector to,
+                            double shaft_radius, double head_radius,
+                            double head_length, int segments,
+                            NumericVector color) {
+    scimesh::Vec3 f = vec3_from_r(from);
+    scimesh::Vec3 t = vec3_from_r(to);
+    scimesh::Color c = color_from_r(color);
+    scimesh::Mesh mesh = scimesh::generate_arrow(f, t,
+        static_cast<float>(shaft_radius), static_cast<float>(head_radius),
+        static_cast<float>(head_length), segments, c);
     return mesh_to_r_list(mesh);
 }
 
@@ -691,4 +713,14 @@ bool scimesh_write_png(List image, CharacterVector filename) {
     img.pixels.assign(pixels.begin(), pixels.end());
 
     return img.write_png(as<std::string>(filename));
+}
+
+// ---- Normals -----------------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_compute_vertex_normals(List mesh_data) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    std::vector<scimesh::Vec3> normals;
+    scimesh::compute_vertex_normals(mesh, normals);
+    mesh.normals = normals;
+    return mesh_to_r_list(mesh);
 }

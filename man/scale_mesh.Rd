@@ -2,24 +2,25 @@
 % Please edit documentation in R/mesh_utils.R
 \name{scale_mesh}
 \alias{scale_mesh}
-\title{Scale a mesh uniformly}
+\title{Scale a mesh uniformly or per-axis}
 \usage{
 scale_mesh(mesh, scale)
 }
 \arguments{
 \item{mesh}{A mesh descriptor list.}
 
-\item{scale}{A single numeric scale factor.}
+\item{scale}{A single numeric scale factor (uniform) or a
+length-3 numeric vector for per-axis scaling (x, y, z).}
 }
 \value{
 A new mesh descriptor list with scaled vertices.
 }
 \description{
-Scale a mesh uniformly
+Scale a mesh uniformly or per-axis
 }
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 big <- scale_mesh(mesh, 3)
-range(big$vertices[, 1])
+flat <- scale_mesh(mesh, c(2, 0.5, 1))
 
 }
