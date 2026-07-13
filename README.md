@@ -10,6 +10,8 @@ scimesh provides both a **standalone C++ library** and an **R package**
 with native bindings, making it easy to render 3D surface meshes to PNG
 images for scientific visualization.
 
+## Visualization Examples
+
 ![Stanford Dragon rendered with scimesh](web/images/dragon.png)
 
 *The [Stanford Dragon](https://graphics.stanford.edu/data/3Dscanrep/) (871k triangles), rendered with scimesh's
