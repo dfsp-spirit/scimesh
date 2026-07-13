@@ -14,3 +14,6 @@ OBJECTS = rcpp_bindings.o \
     core/renderer.o \
     core/primitives.o \
     core/transforms.o
+
+all: $(SHLIB)
+	-strip --strip-debug $(SHLIB)

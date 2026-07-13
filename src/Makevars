@@ -16,3 +16,6 @@ OBJECTS = rcpp_bindings.o \
     core/transforms.o \
     core/obj_io.o \
     core/ply_io.o
+
+all: $(SHLIB)
+	strip --strip-debug $(SHLIB)
