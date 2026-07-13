@@ -13,15 +13,14 @@ images for scientific visualization.
 ## What scimesh is
 
 - A **headless software renderer** — renders 3D triangle meshes to
-  images without any GPU or display server.
-- A **drop-in fallback** for [fsbrain](https://github.com/dfsp-spirit/fsbrain)
+  images without any GPU or display server. This means you could use scimesh for non-interactive rendering
   when rgl/OpenGL is unavailable.
-- Designed for **scientific mesh visualization** (neuroimaging, molecular
-  structures, geometric primitives).
-- Fast enough for publication figures: a ~300k triangle cortical surface
-  at 1200x900 with 2x anti-aliasing renders in 1–3 seconds on a modern CPU.
+- Designed for **scientific mesh visualization** (neuroimaging, molecular structures, geometric primitives).
+- Fast enough for publication figures: a ~300k triangle cortical surface at 1200x900 with 2x anti-aliasing renders in 0.2 seconds on a modern CPU.
 
 ## Features
+
+### C++ layer
 
 - Software rasterization with z-buffer, smooth and flat shading
 - Multi-light Blinn-Phong illumination with specular highlights
@@ -34,12 +33,19 @@ images for scientific visualization.
 - Clip planes
 - Procedural geometry: spheres, cylinders, cuboids, pyramids, tetrahedra, tori, planes
 - Mesh I/O: STL (binary/ASCII), Wavefront OBJ, Stanford PLY
-- Image I/O: PNG (via R's `png` package), PPM, BMP
+- Image I/O: PNG, PPM, BMP
 - Automatic camera framing (`camera_fit_mesh`, `camera_fit_scene`)
-- Image composition: grids, cropping, stacking, colorbars
+- Per-vertex and per-face coloring (vertex colors, face colors)
+- Texture mapping with bilinear sampling
+- Mesh transform utilities: translate, scale, rotate, arbitrary 4x4 matrices
+
+### R Layer
+
+The R layer gives access to all C++ layer features, and adds on top:
+
+- Image composition: grids, cropping, stacking
+- Colorbars (and using them during image composition)
 - Anatomical view helpers for neuroimaging (lateral, medial, dorsal, etc.)
-- Per-vertex and per-face coloring, texture mapping with bilinear sampling
-- Mesh transforms: translate, scale, rotate, arbitrary 4x4 matrices
 
 
 ## What scimesh is not
