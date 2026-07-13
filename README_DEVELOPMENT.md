@@ -38,3 +38,18 @@ Or via R CMD check:
 ```r
 R CMD build . && R CMD check scimesh_*.tar.gz
 ```
+
+
+### Making a release
+
+
+* bump version in DESCRIPTION
+* make sure new additions have proper doc strings and tests, then build/refresh all docs
+* run all tests and make sure they are green (cpp and R)
+* make sure to run all examples via scripts in examples/cpp/ and examples/R/
+* run `R CMD build .` to build new package version
+* run `R CMD check scimesh_0.1.0.tar.gz`, or whatever version you are testing. This must pass without errors/warnings/notes.
+* run the even stricter `R CMD check scimesh_0.1.0.tar.gz --as-cran` and see what you can do to get as little notes and warnings as possible. Stuff in downstream code is not our problem though, but you may have to discuss that with CRAN team on submit, hf.
+* test package on CRAN winbuilder, via upload page
+* submit to CRAN when green
+
