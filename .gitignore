@@ -5,7 +5,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+# *.obj   # Disabled because of wavefront object mesh files
 
 # Precompiled Headers
 *.gch
@@ -15,7 +15,7 @@
 *.ilk
 
 # Debugger Files
-*.pdb
+# *.pdb  # Disabled because of Protein Data Bank files
 
 # Compiled Dynamic libraries
 *.so
