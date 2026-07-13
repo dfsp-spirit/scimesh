@@ -28,6 +28,7 @@
 #include "camera.h"
 #include "render_options.h"
 #include "image.h"
+#include "fs_mesh_converter.h"
 
 #include <string>
 #include <iostream>
@@ -44,41 +45,7 @@ using scimesh::RenderOptions;
 using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
-
-// Convert an fs::Mesh + annot vertex colors (uint8_t RGB interleaved)
-// to a scimesh::Mesh.
-static Mesh convert_fs_mesh(const fs::Mesh &fs_surface,
-                            const std::vector<uint8_t> &rgb_colors) {
-    Mesh out;
-    size_t nv = fs_surface.num_vertices();
-    out.vertices.reserve(nv);
-    out.colors.reserve(nv);
-
-    for (size_t i = 0; i < nv; i++) {
-        out.vertices.push_back(Vec3(
-            fs_surface.vertices[i * 3],
-            fs_surface.vertices[i * 3 + 1],
-            fs_surface.vertices[i * 3 + 2]));
-
-        out.colors.push_back(Color(
-            rgb_colors[i * 3] / 255.0f,
-            rgb_colors[i * 3 + 1] / 255.0f,
-            rgb_colors[i * 3 + 2] / 255.0f,
-            1.0f));
-    }
-
-    size_t nf = fs_surface.num_faces();
-    out.triangles.reserve(nf);
-    for (size_t i = 0; i < nf; i++) {
-        out.triangles.push_back(Triangle{
-            static_cast<uint32_t>(fs_surface.faces[i * 3]),
-            static_cast<uint32_t>(fs_surface.faces[i * 3 + 1]),
-            static_cast<uint32_t>(fs_surface.faces[i * 3 + 2])});
-    }
-
-    return out;
-}
-
+using scimesh::convert_fs_mesh;
 
 int main(int argc, char **argv) {
     // ---- Default paths ----
@@ -202,6 +169,10 @@ int main(int argc, char **argv) {
     std::string out_bmp = "whole_brain_annot.bmp";
     if (img.write_bmp(out_bmp)) {
         std::cout << "  Wrote " << out_bmp << "\n";
+    }
+    std::string out_png = "whole_brain_annot.png";
+    if (img.write_png(out_png)) {
+        std::cout << "  Wrote " << out_png << "\n";
     }
 
     std::cout << "\nDone.\n";

@@ -167,19 +167,25 @@ int main(int argc, char *argv[]) {
     Renderer renderer;
     Image img = renderer.render_scene(scene, cam, opts);
 
-    std::string out_name;
+    std::string out_base;
     {
         auto slash = pdb_path.find_last_of("/\\");
         auto dot   = pdb_path.find_last_of('.');
-        std::string base = (slash == std::string::npos)
+        out_base = (slash == std::string::npos)
             ? pdb_path.substr(0, dot)
             : pdb_path.substr(slash + 1, dot - slash - 1);
-        out_name = base + ".ppm";
     }
 
-    img.write_ppm(out_name);
-    std::cout << "Wrote " << out_name << " (" << img.width
-              << "x" << img.height << ")\n";
+    std::string out_ppm = out_base + ".ppm";
+    img.write_ppm(out_ppm);
+    std::cout << "Wrote " << out_ppm << "\n";
+
+    std::string out_png = out_base + ".png";
+    img.write_png(out_png);
+    std::cout << "Wrote " << out_png << "\n";
+
+    std::cout << "Image size: " << img.width
+              << "x" << img.height << "\n";
 
     return 0;
 }

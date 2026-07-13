@@ -159,7 +159,8 @@ int main() {
 
     img.write_ppm("spot_cow.ppm");
     img.write_bmp("spot_cow.bmp");
-    std::cout << "Wrote spot_cow.ppm, spot_cow.bmp ("
+    img.write_png("spot_cow.png");
+    std::cout << "Wrote spot_cow.ppm, spot_cow.bmp, spot_cow.png ("
               << img.width << "x" << img.height << ")\n";
 
     return 0;

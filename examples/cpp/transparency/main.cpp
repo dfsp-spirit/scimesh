@@ -19,6 +19,7 @@
 #include "camera.h"
 #include "render_options.h"
 #include "image.h"
+#include "fs_mesh_converter.h"
 
 #include <string>
 #include <iostream>
@@ -36,33 +37,6 @@ using scimesh::RenderOptions;
 using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
-
-static Mesh convert_fs_mesh(const fs::Mesh &fs_mesh, const Color &solid_color) {
-    Mesh out;
-    size_t nv = fs_mesh.num_vertices();
-    out.vertices.reserve(nv);
-    out.colors.reserve(nv);
-
-    for (size_t i = 0; i < nv; i++) {
-        out.vertices.push_back(Vec3(
-            fs_mesh.vertices[i * 3],
-            fs_mesh.vertices[i * 3 + 1],
-            fs_mesh.vertices[i * 3 + 2]));
-        out.colors.push_back(solid_color);
-    }
-
-    size_t nf = fs_mesh.num_faces();
-    out.triangles.reserve(nf);
-    for (size_t i = 0; i < nf; i++) {
-        out.triangles.push_back(Triangle{
-            static_cast<uint32_t>(fs_mesh.faces[i * 3]),
-            static_cast<uint32_t>(fs_mesh.faces[i * 3 + 1]),
-            static_cast<uint32_t>(fs_mesh.faces[i * 3 + 2])});
-    }
-
-    return out;
-}
-
 
 int main(int argc, char **argv) {
     std::string subjects_dir = "../../../../test_data/freesurfer/subjects_dir";
@@ -144,6 +118,10 @@ int main(int argc, char **argv) {
     std::string out_bmp = "transparency_demo.bmp";
     if (img.write_bmp(out_bmp)) {
         std::cout << "  Wrote " << out_bmp << "\n";
+    }
+    std::string out_png = "transparency_demo.png";
+    if (img.write_png(out_png)) {
+        std::cout << "  Wrote " << out_png << "\n";
     }
 
     std::cout << "Done.\n";
