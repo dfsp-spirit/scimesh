@@ -1,6 +1,6 @@
 ---
 title: "Getting Started with scimesh"
-author: "scimesh authors"
+author: "Tim Schaefer"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -473,28 +473,28 @@ For C++ examples, see `examples/cpp/` and
 
 ## FAQ
 
-**Why is there no interactive 3D window?**  
+**Why is there no interactive 3D window?**
 scimesh is a headless (off-screen) renderer.  It produces static images.
 For interactive rotation or real-time animation you still need rgl/OpenGL.
 
-**How fast is it?**  
+**How fast is it?**
 A typical cortical surface (~300k triangles) at 1200×900 with 2× SSAA
 renders in 1–3 seconds on a modern CPU.
 
-**What about volume data?**  
+**What about volume data?**
 scimesh renders 3D surface meshes.  Volume slice visualisation
 (e.g., `volvis.lb.with.surface()` in fsbrain) is done entirely in R/magick
 without 3D rendering — it works independently of the renderer backend.
 
-**Can I use it from Python?**  
+**Can I use it from Python?**
 Not yet — but the C++ core is language-agnostic.  A pybind11 wrapper
 would be straightforward.
 
-**My images look pixelated/jagged — how do I fix this?**  
+**My images look pixelated/jagged — how do I fix this?**
 Enable anti-aliasing: `render_options(aa_samples = 2L)` or
 `vis.subject.morph.native(..., aa_samples = 2L)`.
 
-**How do I get a transparent background?**  
+**How do I get a transparent background?**
 ```r
 render_options(background_color = c(0, 0, 0, 0))
 ```
