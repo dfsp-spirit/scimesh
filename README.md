@@ -23,7 +23,7 @@ lighting, and 4x anti-aliasing. Render time 5.2 seconds on the author's mini PC 
 ![FreeSurfer reconstruction of human brain rendered with scimesh](web/images/whole_brain_sulc.png)
 
 *A FreeSurfer reconstruction of a human brain surface based on an MRI scan (300k triangles), rendered with scimesh's
-software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU).
+software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on the author's mini PC.
 [Source code (R)](examples/R/whole_brain_sulc_single_image/run.R) / [Source code (C++)](examples/cpp/whole_brain_sulc_single_image/main.cpp).*
 
 ## What scimesh is
@@ -32,7 +32,7 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
   images without any GPU or display server. This means you could use scimesh for non-interactive rendering
   when rgl/OpenGL is unavailable.
 - Designed for **scientific mesh visualization** (neuroimaging, molecular structures, geometric primitives).
-- Beautiful enough for publication figures but still fast enough for batch processing on headless servers: all rendering is done in optimized C++, optionally with OpenMP parallelization.
+- **Beautiful** enough for publication figures, and still **fast** enough for batch processing on headless servers: all rendering is done in optimized C++, optionally with OpenMP parallelization.
 
 ## Features
 
@@ -59,9 +59,9 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
 
 The R layer gives access to all C++ layer features, and adds on top:
 
+- Easy, high-level access from R
 - Image composition: grids, cropping, stacking
 - Colorbars (and using them during image composition)
-- Anatomical view helpers for neuroimaging (lateral, medial, dorsal, etc.)
 
 
 ## What scimesh is not
@@ -115,16 +115,6 @@ img <- render_mesh(cube$vertices, cube$triangles,
 
 # Save
 write_png(img, "cube.png")
-```
-
-### C++
-
-```cpp
-#include "renderer.h"
-#include "primitives.h"
-
-// Build a mesh, set up camera and options, render, save.
-// See docs/CPP_GETTING_STARTED.md for a full walkthrough.
 ```
 
 ## Documentation
