@@ -664,3 +664,18 @@ List scimesh_read_ply(CharacterVector path) {
     scimesh::Mesh mesh = scimesh::ply_io::read_ply(p);
     return mesh_to_r_list(mesh);
 }
+
+// ---- Image I/O --------------------------------------------------------------
+// [[Rcpp::export]]
+bool scimesh_write_png(List image, CharacterVector filename) {
+    int width = as<int>(image["width"]);
+    int height = as<int>(image["height"]);
+    RawVector pixels = image["pixels"];
+
+    scimesh::Image img;
+    img.width = width;
+    img.height = height;
+    img.pixels.assign(pixels.begin(), pixels.end());
+
+    return img.write_png(as<std::string>(filename));
+}

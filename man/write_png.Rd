@@ -14,7 +14,8 @@ write_png(image, filename)
 }
 \description{
 Writes the output of \code{render_mesh()} or \code{render_scene()}
-to a PNG file. Requires the \code{png} package.
+to a PNG file using the built-in C++ PNG writer (stb_image_write).
+No additional R packages are required.
 }
 \examples{
 \dontrun{

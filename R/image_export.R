@@ -32,7 +32,8 @@ image_to_array <- function(image) {
 #' Write a rendered image to a PNG file
 #'
 #' Writes the output of \code{render_mesh()} or \code{render_scene()}
-#' to a PNG file. Requires the \code{png} package.
+#' to a PNG file using the built-in C++ PNG writer (stb_image_write).
+#' No additional R packages are required.
 #'
 #' @param image An image list returned by \code{render_mesh()} or
 #'   \code{render_scene()}.
@@ -47,11 +48,5 @@ image_to_array <- function(image) {
 #'
 #' @export
 write_png <- function(image, filename) {
-    if (!requireNamespace("png", quietly = TRUE)) {
-        stop("The 'png' package is required to write PNG files. ",
-             "Install it with: install.packages(\"png\")")
-    }
-    arr <- image_to_array(image)
-    png::writePNG(arr, filename)
-    invisible(filename)
+    invisible(scimesh_write_png(image, filename))
 }

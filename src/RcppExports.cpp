@@ -276,6 +276,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_write_png
+bool scimesh_write_png(List image, CharacterVector filename);
+RcppExport SEXP _scimesh_scimesh_write_png(SEXP imageSEXP, SEXP filenameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type filename(filenameSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_write_png(image, filename));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -298,6 +310,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_write_stl", (DL_FUNC) &_scimesh_scimesh_write_stl, 3},
     {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
     {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
+    {"_scimesh_scimesh_write_png", (DL_FUNC) &_scimesh_scimesh_write_png, 2},
     {NULL, NULL, 0}
 };
 

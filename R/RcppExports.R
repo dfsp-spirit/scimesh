@@ -81,3 +81,7 @@ scimesh_read_ply <- function(path) {
     .Call(`_scimesh_scimesh_read_ply`, path)
 }
 
+scimesh_write_png <- function(image, filename) {
+    .Call(`_scimesh_scimesh_write_png`, image, filename)
+}
+
