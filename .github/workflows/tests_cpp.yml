@@ -1,0 +1,24 @@
+name: C++ Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-cpp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build C++ tests
+        working-directory: cpp_tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+
+      - name: Run C++ tests
+        working-directory: cpp_tests/build
+        run: ./scimesh_tests
