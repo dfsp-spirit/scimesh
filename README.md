@@ -16,14 +16,14 @@ images for scientific visualization.
 
 *The [Stanford Dragon](https://graphics.stanford.edu/data/3Dscanrep/) (871k triangles), rendered with scimesh's
 software rasterizer using smooth shading, three-point Blinn-Phong
-lighting, and 4x anti-aliasing. Render time 5.2 seconds on my mini PC.
+lighting, and 4x anti-aliasing. Render time 5.2 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU).
 [Source code](examples/cpp/dragon/main.cpp).*
 
 
 ![FreeSurfer reconstruction of human brain rendered with scimesh](web/images/whole_brain_sulc.png)
 
 *A FreeSurfer reconstruction of a human brain surface based on an MRI scan (300k triangles), rendered with scimesh's
-software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on my mini PC.
+software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU).
 [Source code](examples/cpp/whole_brain_sulc_single_image/main.cpp).*
 
 ## What scimesh is
