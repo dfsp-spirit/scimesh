@@ -34,6 +34,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <chrono>
 
 using scimesh::Vec3;
 using scimesh::Color;
@@ -159,7 +160,11 @@ int main(int argc, char **argv) {
               << "...\n";
 
     Renderer renderer;
+    auto t_start = std::chrono::high_resolution_clock::now();
     Image img = renderer.render_scene(scene, cam, opts);
+    auto t_end = std::chrono::high_resolution_clock::now();
+    double t_sec = std::chrono::duration<double>(t_end - t_start).count();
+    std::cout << "  Render time: " << t_sec << " s\n";
 
     // ---- Write output ----
     std::string out_ppm = "whole_brain_annot.ppm";
