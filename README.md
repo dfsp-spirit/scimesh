@@ -66,6 +66,8 @@ The R layer gives access to all C++ layer features, and adds on top:
 - Not a mesh editing/manipulation framework — it reads, transforms,
   and renders meshes but does not provide interactive editing, mesh
   repair, remeshing, or boolean operations.
+  For mesh repair and remeshing in R, see the
+  [Rvcg](https://cran.r-project.org/package=Rvcg) package (wraps VCGLib).
 
 
 ## Installation
