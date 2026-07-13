@@ -3,12 +3,19 @@
 \name{render_mesh}
 \alias{render_mesh}
 \title{Render a 3D mesh to an image}
+
+\description{
+Renders a single mesh using the scimesh software renderer.
+}
 \usage{
 render_mesh(
   vertices,
   triangles,
   colors = NULL,
+  face_colors = NULL,
   normals = NULL,
+  uv = NULL,
+  texture = NULL,
   camera = camera_auto(vertices),
   options = render_options()
 )
@@ -18,9 +25,19 @@ render_mesh(
 
 \item{triangles}{Mx3 integer matrix of triangle indices (1-based).}
 
-\item{colors}{Optional Nx4 numeric matrix of RGBA vertex colors (0-1).}
+\item{colors}{Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
+Use \code{face_colors} (M×4) for per-triangle colours instead.}
+
+\item{face_colors}{Optional Mx4 numeric matrix of per-face RGBA colors,
+one row per triangle.  When present, all three vertices of a triangle
+use the same colour.  Takes precedence over vertex \code{colors}.}
 
 \item{normals}{Optional Nx3 numeric matrix of vertex normals.}
+
+\item{uv}{Optional Nx2 numeric matrix of texture coordinates (0-1).}
+
+\item{texture}{Optional texture image as a 3D array (H x W x 3 or 4)
+with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
 
@@ -30,6 +47,13 @@ render_mesh(
 A list with components \code{width}, \code{height}, and
   \code{pixels} (raw vector of RGBA values).
 }
-\description{
-Renders a single mesh using the scimesh software renderer.
+
+\examples{
+# Render a simple colored triangle
+verts <- matrix(c(0, 0, 0,  1, 0, 0,  0.5, 1, 0), ncol = 3, byrow = TRUE)
+tris  <- matrix(1L, nrow = 1, ncol = 3)
+cols  <- matrix(c(1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1), ncol = 4, byrow = TRUE)
+img <- render_mesh(verts, tris, colors = cols)
+\dontrun{write_png(img, "triangle.png")}
+
 }

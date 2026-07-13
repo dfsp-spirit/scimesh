@@ -3,6 +3,12 @@
 \name{viridis_colormap}
 \alias{viridis_colormap}
 \title{Viridis colormap}
+
+\description{
+Returns the viridis color palette. A convenience wrapper around
+\code{grDevices::hcl.colors} that mimics the viridis color scheme
+without requiring extra packages.
+}
 \usage{
 viridis_colormap(n, alpha = 1, direction = 1)
 }
@@ -16,8 +22,9 @@ viridis_colormap(n, alpha = 1, direction = 1)
 \value{
 A character vector of hex color strings.
 }
-\description{
-Returns the viridis color palette. A convenience wrapper around
-\code{grDevices::hcl.colors} that mimics the viridis color scheme
-without requiring extra packages.
+
+\examples{
+cols <- viridis_colormap(10)
+plot(1:10, pch = 19, col = cols, cex = 3)
+
 }

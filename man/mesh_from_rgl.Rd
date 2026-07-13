@@ -3,6 +3,15 @@
 \name{mesh_from_rgl}
 \alias{mesh_from_rgl}
 \title{Convert an rgl tmesh3d to scimesh mesh format}
+
+\description{
+Extracts vertices and triangle indices from an rgl
+\code{tmesh3d} object into the format expected by
+\code{render_mesh()}.  Does not require the \code{rgl}
+package — any list with components \code{vb} (4×N
+homogeneous coordinates) and \code{it} (3×M index matrix)
+works.
+}
 \usage{
 mesh_from_rgl(tmesh)
 }
@@ -14,11 +23,12 @@ mesh_from_rgl(tmesh)
 A mesh descriptor list with \code{vertices} (N×3)
   and \code{triangles} (M×3, 1-based indices).
 }
-\description{
-Extracts vertices and triangle indices from an rgl
-\code{tmesh3d} object into the format expected by
-\code{render_mesh()}.  Does not require the \code{rgl}
-package — any list with components \code{vb} (4×N
-homogeneous coordinates) and \code{it} (3×M index matrix)
-works.
+
+\examples{
+fake <- list(vb = rbind(0:3, 0:3, 0:3, rep(1, 4)),
+             it = matrix(1:6, nrow = 3))
+m <- mesh_from_rgl(fake)
+m$vertices
+m$triangles
+
 }

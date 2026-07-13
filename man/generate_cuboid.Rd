@@ -3,6 +3,11 @@
 \name{generate_cuboid}
 \alias{generate_cuboid}
 \title{Generate a cuboid mesh}
+
+\description{
+Creates an axis-aligned cuboid (box) centred at \code{center}
+with the given half-extents along each axis.
+}
 \usage{
 generate_cuboid(center, half_extents, color = c(0.7, 0.7, 0.7, 1))
 }
@@ -17,7 +22,10 @@ half-depth.}
 \value{
 A mesh descriptor list.
 }
-\description{
-Creates an axis-aligned cuboid (box) centred at \code{center}
-with the given half-extents along each axis.
+
+\examples{
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 2, 0.5))
+nrow(mesh$vertices)
+nrow(mesh$triangles)
+
 }

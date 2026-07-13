@@ -3,6 +3,12 @@
 \name{camera_auto}
 \alias{camera_auto}
 \title{Auto-frame a camera to fit a mesh or vertex set}
+
+\description{
+Computes a camera position that frames the entire mesh in view.
+The camera looks along the given direction, positioned at a distance
+that ensures the mesh fits within the field of view.
+}
 \usage{
 camera_auto(
   mesh,
@@ -23,13 +29,19 @@ example, \code{c(0, 0, -1)} looks along the negative Z axis.}
 
 \item{fov}{Field of view in degrees.}
 
-\item{margin}{Extra margin factor (1.0 = tight fit, 1.1 = 10% margin).}
+\item{margin}{Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).}
 }
 \value{
 A camera list.
 }
-\description{
-Computes a camera position that frames the entire mesh in view.
-The camera looks along the given direction, positioned at a distance
-that ensures the mesh fits within the field of view.
+
+\examples{
+verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
+                   -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
+tris <- matrix(c(0L,3L,2L, 0L,2L,1L, 4L,5L,6L, 4L,6L,7L,
+                  0L,1L,5L, 0L,5L,4L, 2L,3L,7L, 2L,7L,6L,
+                  0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
+mesh <- list(vertices = verts, triangles = tris)
+cam <- camera_auto(mesh, direction = c(1, 1, 1))
+
 }

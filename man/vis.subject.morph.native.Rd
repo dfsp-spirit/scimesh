@@ -3,6 +3,13 @@
 \name{vis.subject.morph.native}
 \alias{vis.subject.morph.native}
 \title{Visualize native-space morphometry data on brain surfaces}
+
+\description{
+Load FreeSurfer surface and morphometry data for a subject, map the
+per-vertex values to colors, and render the result from one or more
+standard anatomical views.  Returns an in-memory image — no
+interactive 3D window or separate export step needed.
+}
 \usage{
 vis.subject.morph.native(
   subjects_dir,
@@ -87,12 +94,7 @@ A list with \code{width}, \code{height}, and \code{pixels}
   (raw RGBA vector).  Suitable for \code{write_png()} or
   \code{image_to_array()}.
 }
-\description{
-Load FreeSurfer surface and morphometry data for a subject, map the
-per-vertex values to colors, and render the result from one or more
-standard anatomical views.  Returns an in-memory image — no
-interactive 3D window or separate export step needed.
-}
+
 \section{Domain boundary}{
 
 This is a **neuro-specific** function. It knows about FreeSurfer
@@ -101,3 +103,33 @@ names.  All rendering is delegated to the domain-agnostic
 \code{render_mesh()} / \code{render_scene()} layer.
 }
 
+\examples{
+\dontrun{
+library(scimesh)
+
+# Render sulcal depth in a 2x2 tile with colorbar
+img <- vis.subject.morph.native(
+    subjects_dir = "~/data/study1",
+    subject_id  = "subject1",
+    measure     = "sulc",
+    views       = "t4",
+    cortex_only = TRUE,
+    draw_colorbar = TRUE,
+    colorbar_title = "Sulcal depth [mm]",
+    aa_samples  = 2L
+)
+write_png(img, "brain_sulc_t4.png")
+
+# Single lateral view with vertical colorbar
+img <- vis.subject.morph.native(
+    subjects_dir = "~/data/study1",
+    subject_id  = "subject1",
+    measure     = "thickness",
+    views       = "lateral_lh",
+    draw_colorbar = "vertical",
+    colorbar_title = "Thickness [mm]"
+)
+write_png(img, "brain_thickness_lh.png")
+}
+
+}

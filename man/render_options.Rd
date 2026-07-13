@@ -3,6 +3,10 @@
 \name{render_options}
 \alias{render_options}
 \title{Create render options}
+
+\description{
+Create render options
+}
 \usage{
 render_options(
   width = 800L,
@@ -17,6 +21,17 @@ render_options(
   projection = c("perspective", "orthographic"),
   specular_color = c(0, 0, 0, 0),
   shininess = 0,
+  lights = NULL,
+  ambient = 0.3,
+  fog_enabled = FALSE,
+  fog_start = 0,
+  fog_end = 1,
+  fog_color = c(0, 0, 0, 0),
+  threads = 0L,
+  clip_planes = NULL,
+  ssao_enabled = FALSE,
+  ssao_radius = 16,
+  ssao_intensity = 0.8,
   aa_samples = 1L
 )
 }
@@ -55,6 +70,41 @@ added where the surface faces the camera.  Default
 Higher values produce a tighter spot.  Typical values: 32 (soft
 plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).}
 
+\item{lights}{A list of light descriptors, each a list with
+\code{position} (length-3 direction vector or point position),
+\code{color} (length-4 RGBA, 0-1 scale), \code{intensity}
+(numeric, default 1), and \code{directional} (logical, default
+\code{TRUE}).  When empty or \code{NULL}, a single headlight at
+\code{c(0, 0, 1)} is used (the original behaviour).}
+
+\item{ambient}{Ambient light contribution (0-1).  Default 0.3.}
+
+\item{fog_enabled}{Enable depth cueing (fog).  Default \code{FALSE}.}
+
+\item{fog_start}{Z-depth where fog begins (0 = near plane, 1 = far
+plane).  Default 0.}
+
+\item{fog_end}{Z-depth where fog is fully opaque.  Default 1.}
+
+\item{fog_color}{RGBA fog colour (0-1 scale).  Defaults to
+\code{background_color}.}
+
+\item{threads}{Number of render threads.  0 = auto-detect (use all
+cores), 1 = single-threaded (deterministic).  Default 0.
+Requires OpenMP at compile time.}
+
+\item{clip_planes}{A list of clip plane descriptors, each a list
+with \code{normal} (length-3 vector) and \code{offset} (numeric).
+Points satisfying \code{dot(normal, position) + offset >= 0} are
+kept.  Default \code{NULL} (no clipping).}
+
+\item{ssao_enabled}{Enable screen-space ambient occlusion.
+Default \code{FALSE}.}
+
+\item{ssao_radius}{Screen-space sample radius in pixels.  Default 16.}
+
+\item{ssao_intensity}{Occlusion strength (0-1).  Default 0.8.}
+
 \item{aa_samples}{Anti-aliasing supersampling factor.  Renders
 internally at \code{width * aa_samples} x
 \code{height * aa_samples}, then downsamples to the requested
@@ -65,6 +115,20 @@ size via box averaging.  Default \code{1} (no AA), \code{2} for
 A render options list for use with \code{render_mesh()} or
   \code{render_scene()}.
 }
-\description{
-Create render options
+
+\examples{
+# Default options
+opts <- render_options()
+
+# High-resolution with anti-aliasing and specular highlights
+opts <- render_options(width = 1200, height = 900,
+    aa_samples = 2L,
+    specular_color = c(0.4, 0.4, 0.4, 1),
+    shininess = 64)
+
+# Wireframe with transparent background
+opts <- render_options(wireframe = TRUE,
+    wireframe_color = c(0, 0, 0, 1),
+    background_color = c(0, 0, 0, 0))
+
 }

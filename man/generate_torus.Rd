@@ -3,6 +3,11 @@
 \name{generate_torus}
 \alias{generate_torus}
 \title{Generate a torus mesh}
+
+\description{
+Creates a torus (donut shape) centred at \code{center}, lying in
+the XZ plane.
+}
 \usage{
 generate_torus(
   center = c(0, 0, 0),
@@ -29,7 +34,9 @@ generate_torus(
 \value{
 A mesh descriptor list.
 }
-\description{
-Creates a torus (donut shape) centred at \code{center}, lying in
-the XZ plane.
+
+\examples{
+mesh <- generate_torus(major_radius = 2, minor_radius = 0.5)
+nrow(mesh$vertices)
+
 }

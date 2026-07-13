@@ -42,7 +42,7 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #'   example, \code{c(0, 0, -1)} looks along the negative Z axis.
 #' @param up The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
 #' @param fov Field of view in degrees.
-#' @param margin Extra margin factor (1.0 = tight fit, 1.1 = 10% margin).
+#' @param margin Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).
 #' @return A camera list.
 #'
 #' @examples

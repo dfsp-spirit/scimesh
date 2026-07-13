@@ -3,6 +3,11 @@
 \name{stack_horizontal}
 \alias{stack_horizontal}
 \title{Stack images horizontally}
+
+\description{
+Stacks a list of rendered images side by side. A convenience
+wrapper around \code{compose_layout()}.
+}
 \usage{
 stack_horizontal(
   ...,
@@ -25,7 +30,13 @@ stack_horizontal(
 \value{
 A composed image list.
 }
-\description{
-Stacks a list of rendered images side by side. A convenience
-wrapper around \code{compose_layout()}.
+
+\examples{
+mesh1 <- generate_cuboid(c(-2, 0, 0), c(0.5, 1, 1), c(1, 0, 0, 1))
+mesh2 <- generate_cuboid(c( 2, 0, 0), c(0.5, 1, 1), c(0, 0, 1, 1))
+img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
+img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
+result <- stack_horizontal(img1, img2)
+\dontrun{write_png(result, "stacked_h.png")}
+
 }

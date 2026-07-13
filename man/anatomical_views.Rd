@@ -11,6 +11,14 @@
 \alias{view_anterior}
 \alias{view_posterior}
 \title{Standard anatomical camera views for neuroimaging}
+
+\description{
+These functions compute camera parameters for standard anatomical
+views in RAS (Right-Anterior-Superior) coordinate space, as used
+by Freesurfer and standard neuroimaging software. Each function
+returns a camera list suitable for \code{render_mesh()} or
+\code{render_scene()}.
+}
 \usage{
 view_lateral_left(mesh, fov = 45, margin = 1.1)
 
@@ -40,13 +48,7 @@ or an Nx3 numeric matrix of vertex positions.}
 A camera list with \code{eye}, \code{center}, \code{up},
   \code{projection}, and \code{fov} components.
 }
-\description{
-These functions compute camera parameters for standard anatomical
-views in RAS (Right-Anterior-Superior) coordinate space, as used
-by Freesurfer and standard neuroimaging software. Each function
-returns a camera list suitable for \code{render_mesh()} or
-\code{render_scene()}.
-}
+
 \details{
 The camera is auto-framed to fit the mesh and oriented according to
 the view direction. In RAS space:
@@ -55,4 +57,17 @@ the view direction. In RAS space:
   \item +Y = Anterior
   \item +Z = Superior
 }
+}
+\examples{
+# Create a sample mesh
+verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
+                   -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
+tris <- matrix(c(0L,3L,2L, 0L,2L,1L, 4L,5L,6L, 4L,6L,7L,
+                  0L,1L,5L, 0L,5L,4L, 2L,3L,7L, 2L,7L,6L,
+                  0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
+mesh <- list(vertices = verts, triangles = tris)
+
+cam <- view_lateral_left(mesh)
+cam <- view_dorsal(mesh)
+
 }

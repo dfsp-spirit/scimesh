@@ -3,14 +3,19 @@
 \name{render_scene}
 \alias{render_scene}
 \title{Render multiple meshes to an image}
+
+\description{
+Renders a list of meshes as a single scene using the scimesh
+software renderer.
+}
 \usage{
 render_scene(meshes, camera, options = render_options())
 }
 \arguments{
 \item{meshes}{A list of mesh descriptors. Each element is a list
 with components \code{vertices} (Nx3 matrix), \code{triangles}
-(Mx3 integer matrix), and optionally \code{colors}, \code{normals},
-and \code{default_color}.}
+(Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
+\code{normals}, and \code{default_color}.}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
 
@@ -20,7 +25,14 @@ and \code{default_color}.}
 A list with components \code{width}, \code{height}, and
   \code{pixels} (raw vector of RGBA values).
 }
-\description{
-Renders a list of meshes as a single scene using the scimesh
-software renderer.
+
+\examples{
+# Render two cubes side by side
+cube1 <- generate_cuboid(c(-1.5, 0, 0), c(0.8, 0.8, 0.8), c(1, 0, 0, 1))
+cube2 <- generate_cuboid(c( 1.5, 0, 0), c(0.8, 0.8, 0.8), c(0, 0, 1, 1))
+cam <- camera_auto(list(cube1, cube2), direction = c(1, 1, 1))
+img <- render_scene(list(cube1, cube2), cam,
+    render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
+\dontrun{write_png(img, "two_cubes.png")}
+
 }

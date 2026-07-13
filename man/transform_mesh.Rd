@@ -3,6 +3,12 @@
 \name{transform_mesh}
 \alias{transform_mesh}
 \title{Apply a 4×4 transformation matrix to a mesh}
+
+\description{
+Transforms all vertex positions in a mesh by a 4×4 homogeneous
+matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
+normals are untouched.
+}
 \usage{
 transform_mesh(mesh, matrix)
 }
@@ -16,8 +22,12 @@ by \code{scimesh_generate_multi_spheres()} etc.}
 \value{
 A new mesh descriptor list with transformed vertices.
 }
-\description{
-Transforms all vertex positions in a mesh by a 4×4 homogeneous
-matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
-normals are untouched.
+
+\examples{
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+mat <- diag(4)
+mat[1:3, 4] <- c(2, 3, 4)
+translated <- transform_mesh(mesh, mat)
+translated$vertices[1, ]
+
 }

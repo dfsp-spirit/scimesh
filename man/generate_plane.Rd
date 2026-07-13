@@ -3,6 +3,11 @@
 \name{generate_plane}
 \alias{generate_plane}
 \title{Generate a planar quad mesh}
+
+\description{
+Creates a flat rectangular plane centred at \code{center} and
+oriented perpendicular to \code{normal}.
+}
 \usage{
 generate_plane(
   center = c(0, 0, 0),
@@ -26,7 +31,10 @@ generate_plane(
 \value{
 A mesh descriptor list.
 }
-\description{
-Creates a flat rectangular plane centred at \code{center} and
-oriented perpendicular to \code{normal}.
+
+\examples{
+mesh <- generate_plane(c(0, 0, 0), normal = c(0, 1, 0),
+                       half_size_x = 2, half_size_y = 1)
+nrow(mesh$vertices)
+
 }

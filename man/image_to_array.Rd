@@ -3,6 +3,12 @@
 \name{image_to_array}
 \alias{image_to_array}
 \title{Convert a rendered image to an RGBA array}
+
+\description{
+Converts the output of \code{render_mesh()} or \code{render_scene()}
+into a 3-dimensional R array of dimensions (height x width x 4) with
+RGBA channels.
+}
 \usage{
 image_to_array(image)
 }
@@ -14,8 +20,11 @@ image_to_array(image)
 A 3D array of dimensions (height, width, 4) with values in
   \code{[0, 1]}.
 }
-\description{
-Converts the output of \code{render_mesh()} or \code{render_scene()}
-into a 3-dimensional R array of dimensions (height x width x 4) with
-RGBA channels.
+
+\examples{
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+img <- render_mesh(mesh$vertices, mesh$triangles)
+arr <- image_to_array(img)
+dim(arr)  # height x width x 4
+
 }

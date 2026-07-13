@@ -3,6 +3,11 @@
 \name{render_lines}
 \alias{render_lines}
 \title{Render line segments as thin cylinders}
+
+\description{
+Generates a merged cylinder mesh from start/end point pairs,
+radii, and colors, then renders it.
+}
 \usage{
 render_lines(
   from,
@@ -34,7 +39,13 @@ colour recycled to N.}
 \value{
 An image list.
 }
-\description{
-Generates a merged cylinder mesh from start/end point pairs,
-radii, and colors, then renders it.
+
+\examples{
+from <- matrix(c(0, 0, 0, 1, 1, 1), ncol = 3, byrow = TRUE)
+to   <- matrix(c(3, 0, 0, 0, 3, 0), ncol = 3, byrow = TRUE)
+img <- render_lines(from, to, radii = 0.05,
+                    colors = c(0, 0, 1, 1),
+                    camera = camera_auto(rbind(from, to)))
+\dontrun{ write_png(img, "lines.png") }
+
 }

@@ -3,6 +3,10 @@
 \name{colorbar_vertical}
 \alias{colorbar_vertical}
 \title{Generate a vertical colorbar image}
+
+\description{
+Creates a vertical colorbar as a 4-channel RGBA array.
+}
 \usage{
 colorbar_vertical(
   colormap,
@@ -45,6 +49,10 @@ color strip.}
 A 3D array of dimensions (height, width, 4) with values in
   \code{[0, 1]}.
 }
-\description{
-Creates a vertical colorbar as a 4-channel RGBA array.
+
+\examples{
+cbar <- colorbar_vertical(viridis_colormap, data_range = c(0, 100),
+    title = "Count")
+dim(cbar)
+
 }

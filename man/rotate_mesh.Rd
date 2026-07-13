@@ -3,6 +3,10 @@
 \name{rotate_mesh}
 \alias{rotate_mesh}
 \title{Rotate a mesh around an axis}
+
+\description{
+Rotate a mesh around an axis
+}
 \usage{
 rotate_mesh(mesh, angle_rad, axis = c(0, 0, 1))
 }
@@ -16,6 +20,10 @@ rotate_mesh(mesh, angle_rad, axis = c(0, 0, 1))
 \value{
 A new mesh descriptor list with rotated vertices.
 }
-\description{
-Rotate a mesh around an axis
+
+\examples{
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+rotated <- rotate_mesh(mesh, pi / 4, axis = c(0, 1, 0))
+rotated$vertices[1, ]
+
 }

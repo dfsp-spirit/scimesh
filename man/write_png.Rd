@@ -16,3 +16,11 @@ write_png(image, filename)
 Writes the output of \code{render_mesh()} or \code{render_scene()}
 to a PNG file. Requires the \code{png} package.
 }
+\examples{
+\dontrun{
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+img <- render_mesh(mesh$vertices, mesh$triangles)
+write_png(img, "cuboid.png")
+}
+
+}

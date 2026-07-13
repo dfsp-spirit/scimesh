@@ -3,6 +3,12 @@
 \name{render_spheres}
 \alias{render_spheres}
 \title{Render multiple spheres from point data}
+
+\description{
+Generates a merged sphere mesh from a set of center points,
+radii, and colors, then renders it with the given camera and
+options.
+}
 \usage{
 render_spheres(
   centers,
@@ -34,8 +40,12 @@ a single colour recycled to N.}
 An image list with \code{width}, \code{height},
   \code{pixels}.
 }
-\description{
-Generates a merged sphere mesh from a set of center points,
-radii, and colors, then renders it with the given camera and
-options.
+
+\examples{
+centers <- matrix(c(0, 2, 4, 0, 0, 0, 0, 0, 0), ncol = 3)
+img <- render_spheres(centers, radii = 0.5,
+                      colors = c(1, 0, 0, 1),
+                      camera = camera_auto(centers))
+\dontrun{ write_png(img, "spheres.png") }
+
 }
