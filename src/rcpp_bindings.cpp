@@ -529,6 +529,19 @@ List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends,
     return mesh_to_r_list(mesh);
 }
 
+// ---- Procedural primitives (single) -----------------------------------------
+// [[Rcpp::export]]
+List scimesh_generate_cone(NumericVector base, NumericVector tip,
+                           double radius, int segments,
+                           NumericVector color) {
+    scimesh::Vec3 b = vec3_from_r(base);
+    scimesh::Vec3 t = vec3_from_r(tip);
+    scimesh::Color c = color_from_r(color);
+    scimesh::Mesh mesh = scimesh::generate_cone(b, t, static_cast<float>(radius),
+                                                segments, c);
+    return mesh_to_r_list(mesh);
+}
+
 // ---- Raw triangles ----------------------------------------------------------
 // [[Rcpp::export]]
 List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors,

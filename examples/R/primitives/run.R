@@ -13,10 +13,18 @@
 
 library(scimesh)
 
-opts_shaded <- render_options(width = 300L, height = 300L, shading = "flat",
-                              background_color = c(0.92, 0.93, 0.95, 1))
+opts_shaded <- render_options(
+    width = 300L, height = 300L, shading = "flat",
+    background_color = c(0.92, 0.93, 0.95, 1),
+    ambient = 0.15,
+    lights = list(
+        list(position = c(0.5, 1.0, 0.8),  color = c(1.0, 0.95, 0.9, 1), intensity = 1.5),
+        list(position = c(-0.5, 0.2, 0.6), color = c(0.4, 0.5, 0.8, 1), intensity = 0.5)
+    )
+)
 opts_wire   <- render_options(width = 300L, height = 300L, wireframe = TRUE,
                               wireframe_color = c(0, 0, 0, 1),
+                              backface_culling = FALSE,
                               background_color = c(0.92, 0.93, 0.95, 1))
 
 render_pair <- function(mesh, cam_dir = c(1.2, 0.8, 1), label = "") {
@@ -32,23 +40,17 @@ render_pair <- function(mesh, cam_dir = c(1.2, 0.8, 1), label = "") {
     pair
 }
 
-.msh <- function(raw) list(vertices = raw$vertices, triangles = raw$triangles,
-                           colors = raw$colors)
-
 cat("Generating primitives:\n")
 
 cuboid <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.2, 0.6, 1.0, 1.0))
 
-sphere <- .msh(scimesh:::scimesh_generate_multi_spheres(
-    rbind(c(0, 0, 0)), 1.2, matrix(c(0.9, 0.3, 0.2, 1.0), nrow = 1), 32L))
+sphere <- generate_sphere(c(0, 0, 0), 1.2, 32L, c(0.9, 0.3, 0.2, 1.0))
 
-cyl <- .msh(scimesh:::scimesh_generate_multi_cylinders(
-    rbind(c(0, -1, 0)), rbind(c(0, 1, 0)), 0.5,
-    matrix(c(0.1, 0.7, 0.3, 1.0), nrow = 1), 32L))
+cyl <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), 0.5, 32L,
+                         c(0.1, 0.7, 0.3, 1.0))
 
-cone <- .msh(scimesh:::scimesh_generate_multi_cylinders(
-    rbind(c(0, -1.2, 0)), rbind(c(0, 1.2, 0)), 0.01,
-    matrix(c(0.9, 0.7, 0.1, 1.0), nrow = 1), 32L))
+cone <- generate_cone(c(0, -1.2, 0), c(0, 1.2, 0), 0.6, 32L,
+                      c(0.9, 0.7, 0.1, 1.0))
 
 pyramid <- generate_pyramid(c(0, 0, 0), c(0, 1.5, 0), 1,
                             c(0.7, 0.2, 0.8, 1.0))

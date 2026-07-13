@@ -264,6 +264,76 @@ generate_cuboid <- function(center, half_extents, color = c(0.7, 0.7, 0.7, 1)) {
     scimesh_generate_cuboid(center, half_extents, color)
 }
 
+#' Generate a sphere mesh
+#'
+#' Creates a UV sphere centred at \code{center} with the given
+#' \code{radius}.  The sphere is subdivided into \code{segments}
+#' rings and segments per ring.
+#'
+#' @param center Length-3 vector: sphere centre.
+#' @param radius Sphere radius.
+#' @param segments Subdivision count (default 32).
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_sphere(c(0, 0, 0), radius = 1.5, segments = 32)
+#' nrow(mesh$vertices)
+#'
+#' @export
+generate_sphere <- function(center, radius = 1, segments = 32,
+                            color = c(1, 1, 1, 1)) {
+    scimesh_generate_multi_spheres(
+        rbind(center), radius, matrix(color, nrow = 1), segments)
+}
+
+#' Generate a cylinder mesh
+#'
+#' Creates a cylinder from \code{start} to \code{end} with the given
+#' \code{radius}, subdivided into \code{segments} around the axis.
+#' Both end caps are included.
+#'
+#' @param start Length-3 vector: cylinder start point.
+#' @param end Length-3 vector: cylinder end point.
+#' @param radius Cylinder radius.
+#' @param segments Subdivision count (default 32).
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), radius = 0.5)
+#' nrow(mesh$vertices)
+#'
+#' @export
+generate_cylinder <- function(start, end, radius = 0.5, segments = 32,
+                              color = c(1, 1, 1, 1)) {
+    scimesh_generate_multi_cylinders(
+        rbind(start), rbind(end), radius, matrix(color, nrow = 1), segments)
+}
+
+#' Generate a cone mesh
+#'
+#' Creates a cone from \code{base} to \code{tip} with the given base
+#' \code{radius}, subdivided into \code{segments} around the axis.
+#' The base cap is included.
+#'
+#' @param base Length-3 vector: centre of the circular base.
+#' @param tip Length-3 vector: tip of the cone.
+#' @param radius Base radius.
+#' @param segments Subdivision count (default 32).
+#' @param color Length-4 RGBA colour.
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' mesh <- generate_cone(c(0, -1, 0), c(0, 1, 0), radius = 0.8)
+#' nrow(mesh$vertices)
+#'
+#' @export
+generate_cone <- function(base, tip, radius = 0.5, segments = 32,
+                          color = c(1, 1, 1, 1)) {
+    scimesh_generate_cone(base, tip, radius, as.integer(segments), color)
+}
+
 #' Generate a square pyramid mesh
 #'
 #' Creates a pyramid with a square base centred at \code{base_center}

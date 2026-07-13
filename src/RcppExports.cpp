@@ -129,6 +129,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_generate_cone
+List scimesh_generate_cone(NumericVector base, NumericVector tip, double radius, int segments, NumericVector color);
+RcppExport SEXP _scimesh_scimesh_generate_cone(SEXP baseSEXP, SEXP tipSEXP, SEXP radiusSEXP, SEXP segmentsSEXP, SEXP colorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type base(baseSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type tip(tipSEXP);
+    Rcpp::traits::input_parameter< double >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_cone(base, tip, radius, segments, color));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_render_triangles_raw
 List scimesh_render_triangles_raw(NumericMatrix positions, NumericMatrix colors, List camera_data, List options_data);
 RcppExport SEXP _scimesh_scimesh_render_triangles_raw(SEXP positionsSEXP, SEXP colorsSEXP, SEXP camera_dataSEXP, SEXP options_dataSEXP) {
@@ -299,6 +314,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
     {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
+    {"_scimesh_scimesh_generate_cone", (DL_FUNC) &_scimesh_scimesh_generate_cone, 5},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {"_scimesh_scimesh_render_points_raw", (DL_FUNC) &_scimesh_scimesh_render_points_raw, 5},
     {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},

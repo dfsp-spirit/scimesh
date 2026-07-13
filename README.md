@@ -105,23 +105,28 @@ details.
 ```r
 library(scimesh)
 
-cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.2, 0.6, 1.0, 1.0))
-cam <- camera_auto(cube, direction = c(1.2, 0.8, 1))
+sphere <- generate_sphere(c(0, 0, 0), radius = 1.2,
+                          segments = 32, color = c(0.9, 0.3, 0.2, 1.0))
+cam <- camera_auto(sphere, direction = c(1.2, 0.8, 1))
 
-# Flat-shaded cube
-img_shaded <- render_mesh(cube$vertices, cube$triangles,
-    colors = cube$colors, camera = cam,
-    options = render_options(shading = "flat"))
+# Flat-shaded sphere
+img_shaded <- render_mesh(sphere$vertices, sphere$triangles,
+    colors = sphere$colors, camera = cam,
+    options = render_options(
+        lights = list(
+            list(position = c(0.5, 1.0, 0.8), intensity = 1.5),
+            list(position = c(-0.5, 0.2, 0.6), intensity = 0.5))))
 
-# Wireframe cube
-img_wire <- render_mesh(cube$vertices, cube$triangles,
-    colors = cube$colors, camera = cam,
+# Wireframe sphere
+img_wire <- render_mesh(sphere$vertices, sphere$triangles,
+    colors = sphere$colors, camera = cam,
     options = render_options(wireframe = TRUE,
-        wireframe_color = c(0, 0, 0, 1)))
+        wireframe_color = c(0, 0, 0, 1),
+        backface_culling = FALSE))
 
 # Side-by-side
 img <- stack_horizontal(img_shaded, img_wire)
-write_png(img, "cube.png")
+write_png(img, "sphere.png")
 ```
 
 ## Documentation
