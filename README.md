@@ -2,7 +2,7 @@
 
 **scimesh** is a headless, GPU-free software renderer for 3D meshes. It
 produces publication-quality images entirely on the CPU — no OpenGL, no
-X11, no GPU drivers required.  Works anywhere a C++17 compiler or R
+X11, no GPU drivers required.  Works anywhere a C++17 compiler **or** R
 runs: HPC clusters, headless servers, macOS without XQuartz, containers,
 and CI pipelines.
 
