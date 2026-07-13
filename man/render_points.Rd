@@ -32,7 +32,8 @@ depth testing.  Unlike \code{render_spheres()}, point size is
 measured in pixels and does not change with camera distance.
 }
 \examples{
-pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0), ncol = 3)
+pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0),
+ ncol = 3)
 img <- render_points(pts, colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4), radius = 5)
 \dontrun{ write_png(img, "points.png") }
 

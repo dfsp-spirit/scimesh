@@ -118,7 +118,8 @@ render_spheres <- function(centers, radii, colors, camera,
     n <- nrow(centers)
     if (length(radii) == 1L) radii <- rep(radii, n)
     if (length(radii) != n) stop("radii must be length N or 1")
-    if (is.vector(colors) && length(colors) == 4L && ncol(centers) != n) {
+    if (is.vector(colors) && length(colors) %in% c(3L, 4L)) {
+        if (length(colors) == 3L) colors <- c(colors, 1)
         colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
     }
     if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
@@ -166,7 +167,8 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
     if (nrow(to) != n) stop("from and to must have the same number of rows")
     if (length(radii) == 1L) radii <- rep(radii, n)
     if (length(radii) != n) stop("radii must be length N or 1")
-    if (is.vector(colors) && length(colors) == 4L && ncol(from) != n) {
+    if (is.vector(colors) && length(colors) %in% c(3L, 4L)) {
+        if (length(colors) == 3L) colors <- c(colors, 1)
         colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
     }
     if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
@@ -190,7 +192,8 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
 #' @return An image list.
 #'
 #' @examples
-#' pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0), ncol = 3)
+#' pts <- matrix(c(0, 1, 2, 0, 1, 2, 0, 0, 0),
+#'  ncol = 3)
 #' img <- render_points(pts, colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4), radius = 5)
 #' \dontrun{ write_png(img, "points.png") }
 #'

@@ -137,10 +137,14 @@ write_png(img, "cube.png")
 To build and check the R package, you will need these:
 
 ```shell
-sudo apt install qpdf tidy pandoc
+sudo apt install build-essential qpdf tidy pandoc libuv1-dev libharfbuzz-dev libfribidi-dev
 ```
 
-You must also install all R packages which are `suggested` by scimesh, see the [package DESCRIPTION](./DESCRIPTION).
+You must also install all R packages which are `suggested` by scimesh, see the [package DESCRIPTION](./DESCRIPTION). Also make sure you have the basics, in R:
+
+```R
+install.packages(c("devtools", "knitr", "remotes"))
+```
 
 ### Running the C++ unit tests
 
