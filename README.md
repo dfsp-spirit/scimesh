@@ -32,7 +32,7 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
   images without any GPU or display server. This means you could use scimesh for non-interactive rendering
   when rgl/OpenGL is unavailable.
 - Designed for **scientific mesh visualization** (neuroimaging, molecular structures, geometric primitives).
-- Fast enough for publication figures: a ~300k triangle cortical surface at 1200x900 with 2x anti-aliasing renders in 0.2 seconds on a modern CPU.
+- Beautiful enough for publication figures but still fast enough for batch processing on headless servers: all rendering is done in optimized C++, optionally with OpenMP parallelization.
 
 ## Features
 
