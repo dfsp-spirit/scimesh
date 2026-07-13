@@ -53,8 +53,8 @@ int main() {
     scimesh::compute_vertex_normals(mesh, normals);
     mesh.normals = normals;
 
-    // Camera: 3/4 elevated view, slightly from the right.
-    Vec3 eye_dir = glm::normalize(Vec3(0.8f, 0.55f, -1.0f));
+    // Camera: 3/4 elevated view, from the front-right.
+    Vec3 eye_dir = glm::normalize(Vec3(0.8f, 0.55f, 1.0f));
     Camera cam = scimesh::camera_fit_mesh(mesh, eye_dir,
         Vec3(0.0f, 1.0f, 0.0f), 35.0f, 1.08f);
 
@@ -80,7 +80,7 @@ int main() {
     opts.height = 1020;
     opts.shading = ShadingMode::SMOOTH;
     opts.backface_culling = true;
-    opts.background_color = Color(0.12f, 0.12f, 0.16f, 1.0f);
+    opts.background_color = Color(0.90f, 0.91f, 0.93f, 1.0f);
     opts.ambient = 0.25f;
     opts.lights = {key_light, fill_light, rim_light};
     opts.specular_color = Color(0.30f, 0.30f, 0.30f);
