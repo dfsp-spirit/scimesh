@@ -29,3 +29,10 @@
 ^examples$
 ^scimesh_.*\.tar\.gz$
 ^web$
+^scimesh_spot_cow.png
+^scimesh_subject1_sulc_lateral_lh.png
+^scimesh_subject1_sulc_t4.png
+^scimesh_subject1_sulc_t4_vertical.png
+^scimesh_subject1_sulc_t9.png
+^scimesh_transparency_lh.png
+
