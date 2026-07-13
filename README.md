@@ -10,12 +10,12 @@ scimesh provides both a **standalone C++ library** and an **R package**
 with native bindings, making it easy to render 3D surface meshes to PNG
 images for scientific visualization.
 
-![Stanford Bunny rendered with scimesh](web/images/bunny.png)
+![Stanford Dragon rendered with scimesh](web/images/dragon.png)
 
-*The classic Stanford Bunny (69k triangles), rendered with scimesh's
+*The Stanford Dragon (871k triangles), rendered with scimesh's
 software rasterizer using smooth shading, three-point Blinn-Phong
 lighting, screen-space ambient occlusion, and 4x anti-aliasing.
-[Source code](examples/cpp/bunny/main.cpp).*
+[Source code](examples/cpp/dragon/main.cpp).*
 
 ## What scimesh is
 
@@ -140,6 +140,7 @@ write_png(img, "cube.png")
 | [`examples/R/vis_subject_morph_native/`](examples/R/vis_subject_morph_native/) | R | FreeSurfer sulcal depth visualization with colorbar |
 | [`examples/cpp/spot_cow/`](examples/cpp/spot_cow/) | C++ | Textured OBJ rendering with bilinear sampling |
 | [`examples/cpp/bunny/`](examples/cpp/bunny/) | C++ | High-quality Stanford Bunny with SSAO, specular, and 4x AA |
+| [`examples/cpp/dragon/`](examples/cpp/dragon/) | C++ | Stanford Dragon with SSAO, specular, and 4x AA |
 | [`examples/cpp/transparency/`](examples/cpp/transparency/) | C++ | Multi-mesh alpha blending with FreeSurfer data |
 | [`examples/cpp/protein_data_bank_pdb_file/`](examples/cpp/protein_data_bank_pdb_file/) | C++ | Protein ball-and-stick visualization from PDB files |
 | [`examples/cpp/whole_brain_sulc_single_image/`](examples/cpp/whole_brain_sulc_single_image/) | C++ | Whole-brain sulcal depth rendering |
