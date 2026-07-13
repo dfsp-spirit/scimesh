@@ -2,10 +2,21 @@ scimesh Changes
 ===============
 
 
+Version 0.2.1 -- Primitive fixes, bridge more cpp functions to R
+-----------------------------------------------------------------
+- NEW: expose 4 more cpp functions to R layer, mostly mesh transforms
+- NEW: export primitive generation functions to R
+- FIX: fix face winding order of some primitives, add more primitive tests and example
+
+
+Version 0.2.0 -- Remove neuro layer
+-----------------------------------
+* BRK: Braking change: remove neuro-specific functions from renderer package, will be republished as separate package neuromesh
+
 
 Version 0.1.0 -- Initial release
------------------------------------
-- First release on Github.
+--------------------------------
+- NEW: First release on Github
 
 
 
