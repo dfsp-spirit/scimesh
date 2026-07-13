@@ -39,69 +39,43 @@ For FreeSurfer neuroimaging data, also install:
 remotes::install_github("dfsp-spirit/freesurferformats")
 ```
 
-## Quick Start: Render a Brain
-
-The simplest entry point is `vis.subject.morph.native()`, which loads
-FreeSurfer surface data, maps per-vertex values to colors, and renders
-standard anatomical views:
+## Quick Start: Render a Cube
 
 ```{r, eval=FALSE}
 library(scimesh)
 
-img <- vis.subject.morph.native(
-    subjects_dir = "~/data/study1",
-    subject_id  = "subject1",
-    measure     = "sulc",
-    views       = "t4",
-    cortex_only = TRUE,
-    draw_colorbar = TRUE,
-    colorbar_title = "Sulcal depth [mm]",
-    aa_samples  = 2L                       # 2×2 supersampling anti-aliasing
-)
+cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.2, 0.6, 1.0, 1.0))
+cam <- camera_auto(cube, direction = c(1, 1, 1))
+img <- render_mesh(cube$vertices, cube$triangles,
+                   colors = cube$colors, camera = cam)
 
-write_png(img, "brain_sulc_t4.png")
+write_png(img, "cube.png")
 ```
 
-This produces a tight 2×2 grid (lateral + medial, both hemispheres) with
-a horizontal colour bar below.
+For neuroimaging visualisation (FreeSurfer data, anatomical views, cortex
+masking), see the **neuromesh** package which builds on scimesh:
+```r
+remotes::install_github("dfsp-spirit/neuromesh")
+```
 
 ## Anatomical Views
 
-Pre-defined view shortcuts map directly to standard neuroimaging angles:
-
-| Shortcut | Views included |
-|----------|---------------|
-| `"t4"` | lateral lh, lateral rh, medial lh, medial rh (2×2 grid) |
-| `"t9"` | All 9 cardinal directions (3×3 grid) |
-| `"si"` | Single interactive-equivalent (default lateral for given hemi) |
-
-Single views are also available:
-```r
-vis.subject.morph.native(..., views = "lateral_lh")
-vis.subject.morph.native(..., views = "medial_rh")
-vis.subject.morph.native(..., views = "dorsal")
-vis.subject.morph.native(..., views = "ventral")
-vis.subject.morph.native(..., views = "anterior")
-vis.subject.morph.native(..., views = "posterior")
-```
+Standard neuroimaging camera views (lateral, medial, dorsal, ventral,
+anterior, posterior) and the `vis.subject.morph.native()` one-shot
+visualisation function are provided by the **neuromesh** package.
+See its vignette for examples.
 
 ## Colour Bars
 
-Horizontal (default) or vertical colour bars are placed below or to the
-right of the brain images.  Ticks and labels are auto-computed from the
-data range using `pretty()`.
+Horizontal or vertical colour bars are produced in pure R (no X11) and
+can be composed alongside rendered images:
 
 ```r
-# Horizontal colour bar (default)
-vis.subject.morph.native(..., draw_colorbar = TRUE,
-    colorbar_title = "Thickness [mm]")
-
-# Vertical colour bar on the right
-vis.subject.morph.native(..., draw_colorbar = "vertical",
-    colorbar_title = "Thickness [mm]")
-
-# Vertical colour bar on the left
-# (via compose_layout's colorbar_side parameter)
+cbar <- colorbar_horizontal(viridis_colormap,
+    n_colors = 256, width = 600, height = 80,
+    ticks = c(0, 0.5, 1),
+    tick_labels = c("min", "mid", "max"),
+    title = "Value")
 ```
 
 ## Anti-Aliasing
@@ -111,7 +85,7 @@ for 2×2 SSAA (renders internally at double resolution, downsamples by
 box averaging):
 
 ```r
-vis.subject.morph.native(..., aa_samples = 2L)
+render_options(aa_samples = 2L)
 ```
 
 Values of 1 (off), 2, or 4 are supported.  Higher values give smoother
@@ -195,16 +169,12 @@ For signed data (Z-scores, cluster maps), use the built-in
 blue–white–red diverging colormap:
 
 ```r
-vis.subject.morph.native(...,
-    makecmap_options = list(
-        colFn = diverging_colormap,
-        symm  = TRUE))
+my_cmap <- diverging_colormap
 ```
 
 Or bring your own colormap function:
 ```r
 my_cmap <- function(n) grDevices::hcl.colors(n, palette = "Blue-Red 3")
-vis.subject.morph.native(..., makecmap_options = list(colFn = my_cmap))
 ```
 
 ## Compositing Multiple Images
@@ -236,9 +206,9 @@ img  <- render_mesh(mesh$vertices, mesh$triangles)
 
 ### freesurferformats
 
-`vis.subject.morph.native()` internally loads surface meshes, morphometry
-data, and cortex labels via `freesurferformats`.  For custom pipelines,
-use the library directly:
+The **neuromesh** package provides FreeSurfer-aware loading, cortex
+masking, anatomical views, and colour bar integration on top of scimesh.
+For lower-level access, use the `freesurferformats` package directly:
 
 ```r
 surf  <- freesurferformats::read.fs.surface("lh.white")
@@ -452,14 +422,14 @@ result <- stack_horizontal(img1, img2,
 
 ## Running the R Examples
 
-The repository includes three complete R example scripts in
-`examples/R/`:
+The repository includes runnable R example scripts in `examples/R/`:
 
 | Example | What it shows |
 |---------|--------------|
 | `spot_cow/run.R` | Textured OBJ mesh with multi-light setup and SSAO |
 | `transparency/run.R` | Semi-transparent pial overlay on white matter |
-| `vis_subject_morph_native/run.R` | FreeSurfer sulcal depth with t4/t9 views and colorbars |
+| `dragon/run.R` | Stanford Dragon with specular highlights and 4x AA |
+| `whole_brain_sulc_single_image/run.R` | Whole-brain sulcal depth with cortex masking |
 
 Run all examples at once:
 
@@ -491,8 +461,7 @@ Not yet — but the C++ core is language-agnostic.  A pybind11 wrapper
 would be straightforward.
 
 **My images look pixelated/jagged — how do I fix this?**
-Enable anti-aliasing: `render_options(aa_samples = 2L)` or
-`vis.subject.morph.native(..., aa_samples = 2L)`.
+Enable anti-aliasing: `render_options(aa_samples = 2L)`.
 
 **How do I get a transparent background?**
 ```r

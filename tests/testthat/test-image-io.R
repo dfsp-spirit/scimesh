@@ -110,71 +110,9 @@ test_that("rendered image pixel count is consistent with simple geometry", {
     }
 })
 
-test_that("FS mesh individual views have sufficient content", {
-    skip_if_not_installed("freesurferformats")
-    sjd <- file.path("..", "..", "test_data", "freesurfer", "subjects_dir")
-    sj  <- "subject1"
-    if (!file.exists(file.path(sjd, sj, "surf", "lh.sulc"))) {
-        skip("Test FreeSurfer data not found")
-    }
-
-    library(freesurferformats)
-    surf <- read.fs.surface(file.path(sjd, sj, "surf", "lh.white"))
-    morph <- read.fs.morph(file.path(sjd, sj, "surf", "lh.sulc"))
-
-    label_file <- file.path(sjd, sj, "label", "lh.cortex.label")
-    cort <- read.fs.label(label_file)
-    mask <- rep(FALSE, nrow(surf$vertices))
-    mask[cort] <- TRUE
-    morph[!mask] <- NA_real_
-
-    cols <- scimesh:::.apply_colormap(morph, list(colFn = viridis_colormap, n = 64))
-    rgba <- scimesh:::.hex_to_rgba_matrix(cols)
-
-    mesh <- list(vertices = surf$vertices, triangles = surf$faces,
-                 colors = rgba)
-
-    views_list <- list(
-        lateral_lh = view_lateral_left(mesh),
-        medial_lh  = view_medial_left(mesh),
-        dorsal     = view_dorsal(mesh),
-        ventral    = view_ventral(mesh)
-    )
-
-    outfiles <- c()
-    for (vn in names(views_list)) {
-        cam <- views_list[[vn]]
-        opts <- render_options(width = 200, height = 150,
-                               background_color = c(0, 0, 0, 0))
-        img <- render_mesh(mesh$vertices, mesh$triangles,
-                           colors = mesh$colors, camera = cam, options = opts)
-        arr <- image_to_array(img)
-        n_col <- sum(arr[, , 1L] > 0.01 | arr[, , 2L] > 0.01 |
-                     arr[, , 3L] > 0.01)
-        cat(sprintf("  %s: colored=%d (%.1f%%)\n", vn, n_col,
-                    100 * n_col / length(arr[, , 1L])))
-        expect_true(n_col > 200L)
-
-        if (requireNamespace("png", quietly = TRUE)) {
-            fname <- file.path(tempdir(),
-                               paste0("scimesh_test_lh_", vn, ".png"))
-            write_png(img, fname)
-            expect_true(file.exists(fname))
-            outfiles <- c(outfiles, fname)
-        }
-    }
-
-    unlink(outfiles)
-    succeed()
-})
-
-
 # --- Category 2: image merging with known color patterns ---------------------
 
 .make_solid_image <- function(width, height, rgba) {
-    # Produce C++-compatible row-major RGBA interleaved raw vector.
-    # The layout expected by image_to_array is: pixel(y,x) = bytes at
-    # (y*W+x)*4:(y*W+x)*4+3 for R,G,B,A.
     npix <- width * height
     pixels <- raw(npix * 4L)
     for (i in seq_len(npix)) {
@@ -351,66 +289,6 @@ test_that("image_to_array produces (H,W,4) from render output", {
     expect_equal(dim(arr)[2L], 16L)
     expect_equal(dim(arr)[3L], 4L)
     expect_true(all(arr >= 0 & arr <= 1))
-})
-
-test_that("t4 view bounding boxes are measured per tile", {
-    skip_if_not_installed("freesurferformats")
-    sjd <- file.path("..", "..", "test_data", "freesurfer", "subjects_dir")
-    sj  <- "subject1"
-    if (!file.exists(file.path(sjd, sj, "surf", "lh.sulc"))) {
-        skip("Test FreeSurfer data not found")
-    }
-
-    # Render t4 and inspect each tile
-    img <- vis.subject.morph.native(sjd, sj, "sulc", views = "t4",
-                                     cortex_only = TRUE,
-                                     width = 200L, height = 150L,
-                                     background = c(0, 0, 0, 0))
-    arr <- image_to_array(img)
-
-    # After uniform-crop, tiles may not be exactly 200x150.
-    # Find each tile by splitting the composed array at the midpoint.
-    out_h <- dim(arr)[1L]; out_w <- dim(arr)[2L]
-    mid_h <- out_h %/% 2L; mid_w <- out_w %/% 2L
-
-    tiles <- list(
-        lateral_lh = arr[1L:mid_h, 1L:mid_w, ],
-        lateral_rh = arr[1L:mid_h, (mid_w + 1L):out_w, ],
-        medial_lh  = arr[(mid_h + 1L):out_h, 1L:mid_w, ],
-        medial_rh  = arr[(mid_h + 1L):out_h, (mid_w + 1L):out_w, ]
-    )
-
-    cat("\nt4 per-tile bounding boxes (composed dims:", out_h, "x", out_w, "):\n")
-    cat("Tile           width height   fill   bbox(l,t,r,b)   loss(l,t,r,b)\n")
-    cat("-------------  ----- ------  ------  ---------------  --------------\n")
-
-    for (nm in names(tiles)) {
-        tile <- tiles[[nm]]
-        tile_h <- dim(tile)[1L]; tile_w <- dim(tile)[2L]
-        alpha <- tile[, , 4L]
-        rows <- which(rowSums(alpha > 0.01) > 0L)
-        cols <- which(colSums(alpha > 0.01) > 0L)
-
-        if (length(rows) > 0L && length(cols) > 0L) {
-            t <- min(rows); b <- max(rows)
-            l <- min(cols); r <- max(cols)
-            bw <- r - l + 1L; bh <- b - t + 1L
-            npix <- sum(alpha > 0.01)
-            fill <- 100 * npix / (tile_w * tile_h)
-            loss_t <- t - 1L; loss_b <- tile_h - b
-            loss_l <- l - 1L; loss_r <- tile_w - r
-            cat(sprintf("%-13s  %5d %5d  %5.1f%%  (%d,%d,%d,%d)  (%d,%d,%d,%d)\n",
-                nm, bw, bh, fill, l, t, r, b,
-                loss_l, loss_t, loss_r, loss_b))
-        }
-    }
-
-    # Each tile should have non-zero content
-    for (nm in names(tiles)) {
-        n_col <- sum(tiles[[nm]][, , 1L] > 0.01 | tiles[[nm]][, , 2L] > 0.01 |
-                     tiles[[nm]][, , 3L] > 0.01)
-        expect_true(n_col > 100L)
-    }
 })
 
 test_that("image_to_array correctly separates channels from raw bytes", {
