@@ -37,6 +37,7 @@ run_one() {
 
 run_one examples/R/transparency/run.R                transparency
 run_one examples/R/vis_subject_morph_native/run.R    vis_subject_morph_native
+run_one examples/R/spot_cow/run.R                    spot_cow
 
 echo ""
 echo "============================================"

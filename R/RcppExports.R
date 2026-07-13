@@ -73,3 +73,11 @@ scimesh_write_stl <- function(mesh_data, path, format = "binary") {
     invisible(.Call(`_scimesh_scimesh_write_stl`, mesh_data, path, format))
 }
 
+scimesh_read_obj <- function(path) {
+    .Call(`_scimesh_scimesh_read_obj`, path)
+}
+
+scimesh_read_ply <- function(path) {
+    .Call(`_scimesh_scimesh_read_ply`, path)
+}
+

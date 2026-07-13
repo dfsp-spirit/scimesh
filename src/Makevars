@@ -12,4 +12,6 @@ OBJECTS = rcpp_bindings.o \
     core/rasterizer.o \
     core/renderer.o \
     core/primitives.o \
-    core/transforms.o
+    core/transforms.o \
+    core/obj_io.o \
+    core/ply_io.o

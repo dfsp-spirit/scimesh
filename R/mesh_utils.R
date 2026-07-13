@@ -308,6 +308,34 @@ write_stl <- function(mesh, path, format = c("binary", "ascii")) {
     invisible(NULL)
 }
 
+#' Read a Wavefront OBJ file
+#'
+#' Reads a Wavefront OBJ file (with optional UV coordinates and normals)
+#' and returns a scimesh mesh descriptor list with \code{vertices},
+#' \code{triangles}, and optionally \code{uv} and \code{normals}.
+#'
+#' @param path Path to the OBJ file.
+#' @return A mesh descriptor list.
+#'
+#' @export
+read_obj <- function(path) {
+    scimesh_read_obj(path)
+}
+
+#' Read a Stanford PLY file
+#'
+#' Reads a PLY file (ASCII or binary) with optional per-vertex colors
+#' and returns a scimesh mesh descriptor list with \code{vertices},
+#' \code{triangles}, and optionally \code{colors}.
+#'
+#' @param path Path to the PLY file.
+#' @return A mesh descriptor list.
+#'
+#' @export
+read_ply <- function(path) {
+    scimesh_read_ply(path)
+}
+
 #' Compute the axis-aligned bounding box of a mesh
 #'
 #' @param mesh A mesh descriptor list with \code{vertices}.

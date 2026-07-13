@@ -3,6 +3,8 @@
 #include "core/transforms.h"
 #include "core/primitives.h"
 #include "core/stl_io.h"
+#include "core/obj_io.h"
+#include "core/ply_io.h"
 
 using namespace Rcpp;
 
@@ -645,4 +647,20 @@ void scimesh_write_stl(List mesh_data, CharacterVector path,
     std::string p = as<std::string>(path);
     std::string fmt = format;
     scimesh::stl_io::write_stl(p, mesh, fmt);
+}
+
+// ---- OBJ I/O ----------------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_read_obj(CharacterVector path) {
+    std::string p = as<std::string>(path);
+    scimesh::Mesh mesh = scimesh::obj_io::read_obj(p);
+    return mesh_to_r_list(mesh);
+}
+
+// ---- PLY I/O ----------------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_read_ply(CharacterVector path) {
+    std::string p = as<std::string>(path);
+    scimesh::Mesh mesh = scimesh::ply_io::read_ply(p);
+    return mesh_to_r_list(mesh);
 }

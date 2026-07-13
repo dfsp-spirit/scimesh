@@ -254,6 +254,28 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// scimesh_read_obj
+List scimesh_read_obj(CharacterVector path);
+RcppExport SEXP _scimesh_scimesh_read_obj(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_read_obj(path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_read_ply
+List scimesh_read_ply(CharacterVector path);
+RcppExport SEXP _scimesh_scimesh_read_ply(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_read_ply(path));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -274,6 +296,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_generate_plane", (DL_FUNC) &_scimesh_scimesh_generate_plane, 5},
     {"_scimesh_scimesh_read_stl", (DL_FUNC) &_scimesh_scimesh_read_stl, 1},
     {"_scimesh_scimesh_write_stl", (DL_FUNC) &_scimesh_scimesh_write_stl, 3},
+    {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
+    {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
     {NULL, NULL, 0}
 };
 
