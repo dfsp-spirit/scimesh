@@ -131,6 +131,17 @@ write_png(img, "cube.png")
 
 ## Development
 
+
+### Required system dev dependencies
+
+To build and check the R package, you will need these:
+
+```shell
+sudo apt install qpdf tidy pandoc
+```
+
+You must also install all R packages which are `suggested` by scimesh, see the [package DESCRIPTION](./DESCRIPTION).
+
 ### Running the C++ unit tests
 
 The C++ tests use [Catch2](https://github.com/catchorg/Catch2) (amalgamated)
@@ -164,6 +175,9 @@ R CMD build . && R CMD check scimesh_*.tar.gz
 - `src/core/libfs.h`: [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs) — FreeSurfer file format reader.
 - `cpp_tests/stb_image.h`, `cpp_tests/stb_image_write.h`: [nothings/stb](https://github.com/nothings/stb) — image loading/saving.
 
-## License
+## License and Author
 
-MIT
+License: [MIT](./LICENSE)
+
+Author: [Tim Schäfer](https://ts.rcmd.org/)
+
