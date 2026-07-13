@@ -33,7 +33,7 @@ using scimesh::Renderer;
 using scimesh::Image;
 
 int main() {
-    const char *ply_path = "../../../../test_data/stanford_3d_scanning_repo/bun_zipper.ply";
+    const char *ply_path = "../../../../test_data/stanford_3d_scanning_repo/bunny/bun_zipper.ply";
 
     std::cout << "Loading " << ply_path << " ...\n";
     Mesh mesh = scimesh::ply_io::read_ply(ply_path);
