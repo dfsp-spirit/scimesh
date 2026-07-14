@@ -44,12 +44,27 @@ R CMD build . && R CMD check scimesh_*.tar.gz
 
 
 * bump version in DESCRIPTION
-* make sure new additions have proper doc strings and tests, then build/refresh all docs
-* run all tests and make sure they are green (cpp and R)
-* make sure to run all examples via scripts in examples/cpp/ and examples/R/
+* make sure new additions have proper doc strings and tests, then build/refresh all docs. In R, run `devtools::document()` to re-generate docs.
+* run all tests and make sure they are green:
+
+    C++ unit tests:
+    ```
+    cd cpp_tests && cmake -B build && cmake --build build && ./build/scimesh_tests
+    ```
+
+    R unit tests:
+    ```
+    devtools::test()
+    ```
+
+* make sure to run all examples:
+    ```
+    ./examples/cpp/run_all_cpp.sh
+    ./examples/R/run_all_R.sh
+    ```
 * run `R CMD build .` to build new package version
 * run `R CMD check scimesh_0.1.0.tar.gz`, or whatever version you are testing. This must pass without errors/warnings/notes.
 * run the even stricter `R CMD check scimesh_0.1.0.tar.gz --as-cran` and see what you can do to get as little notes and warnings as possible. Stuff in downstream code is not our problem though, but you may have to discuss that with CRAN team on submit, hf.
-* test package on CRAN winbuilder, via upload page
-* submit to CRAN when green
+* test package on [winbuilder](https://win-builder.r-project.org/upload.aspx)
+* [submit to CRAN](https://cran.r-project.org/submit.html) when green
 
