@@ -45,7 +45,7 @@ Camera camera_look_at(const Vec3 &center, float radius,
 Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
                         const Vec3 &up, float fov_degrees, float margin,
                         ProjectionType projection) {
-    Vec3 bmin, bmax;
+    Vec3 bmin(0.0f), bmax(0.0f);
     scene.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
     Vec3 dir = glm::normalize(direction);
@@ -62,7 +62,7 @@ Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
 Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
                        const Vec3 &up, float fov_degrees, float margin,
                        ProjectionType projection) {
-    Vec3 bmin, bmax;
+    Vec3 bmin(0.0f), bmax(0.0f);
     mesh.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
     Vec3 dir = glm::normalize(direction);

@@ -124,7 +124,7 @@ void Image::crop(int x, int y, int w, int h) {
 void Image::merge(const Image &other, MergeDirection direction) {
     if (other.width <= 0 || other.height <= 0) return;
 
-    int new_w, new_h;
+    int new_w = 0, new_h = 0;
     int this_off_x = 0, this_off_y = 0;
     int other_off_x = 0, other_off_y = 0;
 

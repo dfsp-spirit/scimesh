@@ -16,18 +16,6 @@ static inline void make_basis(const Vec3 &dir, Vec3 &u, Vec3 &v) {
     v = glm::cross(dir, u);
 }
 
-static std::vector<Vec3> make_ring(const Vec3 &center, float radius,
-                                   const Vec3 &dir, int segments) {
-    Vec3 uu, vv;
-    make_basis(dir, uu, vv);
-    std::vector<Vec3> result(segments);
-    float step = glm::two_pi<float>() / static_cast<float>(segments);
-    for (int i = 0; i < segments; ++i) {
-        float a = step * static_cast<float>(i);
-        result[i] = center + radius * (std::cos(a) * uu + std::sin(a) * vv);
-    }
-    return result;
-}
 
 Mesh generate_sphere(const Vec3 &center, float radius, int segments,
                      const Color &color) {
