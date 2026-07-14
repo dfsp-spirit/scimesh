@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/../../../src/core
+)
+include_directories(SYSTEM
     ${CMAKE_SOURCE_DIR}/../../../src/third_party
     ${CMAKE_SOURCE_DIR}/../../../src/third_party/glm
 )

@@ -82,15 +82,15 @@ namespace tinyobj {
 #error "tinyobjloader requires C++11 or later. Compile with -std=c++11 or higher."
 #endif
 
-//#ifdef __clang__
-//#pragma clang diagnostic push
-//#if __has_warning("-Wzero-as-null-pointer-constant")
-//#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-//#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#if __has_warning("-Wzero-as-null-pointer-constant")
+#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
 
-//#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wpadded"
 
-//#endif
+#endif
 
 // https://en.wikipedia.org/wiki/Wavefront_.obj_file says ...
 //
@@ -6884,7 +6884,7 @@ static inline texture_type_t parseTextureType(
   return ty;
 }
 
-static tag_sizes parseTagTriple(const char **token) {
+static tag_sizes parseTagTriple [[maybe_unused]] (const char **token) {
   tag_sizes ts;
 
   (*token) += strspn((*token), " \t");
@@ -6910,7 +6910,7 @@ static tag_sizes parseTagTriple(const char **token) {
 }
 
 // Parse triples with index offsets: i, i/j/k, i//k, i/j
-static bool parseTriple(const char **token, int vsize, int vnsize, int vtsize,
+static bool parseTriple [[maybe_unused]] (const char **token, int vsize, int vnsize, int vtsize,
                         vertex_index_t *ret, const warning_context &context) {
   if (!ret) {
     return false;
@@ -6964,7 +6964,7 @@ static bool parseTriple(const char **token, int vsize, int vnsize, int vtsize,
 }
 
 // Parse raw triples: i, i/j/k, i//k, i/j
-static vertex_index_t parseRawTriple(const char **token) {
+static vertex_index_t parseRawTriple [[maybe_unused]] (const char **token) {
   vertex_index_t vi(static_cast<int>(0));  // 0 is an invalid index in OBJ
 
   vi.v_idx = atoi((*token));

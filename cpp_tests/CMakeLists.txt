@@ -7,9 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include paths: core renderer headers and vendored GLM
 include_directories(
     ${CMAKE_SOURCE_DIR}/../src/core
+    ${CMAKE_SOURCE_DIR}
+)
+include_directories(SYSTEM
     ${CMAKE_SOURCE_DIR}/../src/third_party
     ${CMAKE_SOURCE_DIR}/../src/third_party/glm
-    ${CMAKE_SOURCE_DIR}
 )
 
 # Optimization flags
