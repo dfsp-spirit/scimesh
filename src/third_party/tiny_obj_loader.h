@@ -82,15 +82,15 @@ namespace tinyobj {
 #error "tinyobjloader requires C++11 or later. Compile with -std=c++11 or higher."
 #endif
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#if __has_warning("-Wzero-as-null-pointer-constant")
-#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#endif
+//#ifdef __clang__
+//#pragma clang diagnostic push
+//#if __has_warning("-Wzero-as-null-pointer-constant")
+//#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+//#endif
 
-#pragma clang diagnostic ignored "-Wpadded"
+//#pragma clang diagnostic ignored "-Wpadded"
 
-#endif
+//#endif
 
 // https://en.wikipedia.org/wiki/Wavefront_.obj_file says ...
 //
