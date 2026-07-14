@@ -69,7 +69,7 @@ The R layer gives access to all C++ layer features, and adds on top:
 - Not a plotting framework — use ggplot2, lattice, or plotly for
   statistical plots.  scimesh renders 3D geometry.
 - Not a hardware renderer — no OpenGL, Vulkan, or Metal.  For
-  interactive 3D rotation, use rgl. Real-time rendering requires hardware support.
+  interactive 3D rotation, use rgl. In general, real-time rendering requires hardware support (a graphics card and the full associated software stack).
 - Not a system for physical based rendering — no PBR materials, no raytracing, etc.
 - Not a mesh editing/manipulation framework — it reads, transforms,
   and renders meshes but does not provide interactive editing, mesh
