@@ -25,7 +25,6 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-#include <cstring>
 #include <cstdint>
 
 using scimesh::Vec3;
@@ -36,6 +35,7 @@ using scimesh::RenderOptions;
 using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
+using scimesh::MergeDirection;
 
 static void ensure_normals(Mesh &mesh) {
     if (!mesh.has_normals()) {
@@ -43,26 +43,6 @@ static void ensure_normals(Mesh &mesh) {
         scimesh::compute_vertex_normals(mesh, norms);
         mesh.normals = norms;
     }
-}
-
-static Image compose_side_by_side(const Image &left, const Image &right) {
-    int lw = left.width, lh = left.height;
-    int rw = right.width, rh = right.height;
-    int out_w = lw + rw;
-    int out_h = std::max(lh, rh);
-    Image out(out_w, out_h);
-
-    for (int y = 0; y < lh; y++) {
-        std::memcpy(&out.pixels[(y * out_w) * 4],
-                    &left.pixels[(y * lw) * 4],
-                    lw * 4);
-    }
-    for (int y = 0; y < rh; y++) {
-        std::memcpy(&out.pixels[(y * out_w + lw) * 4],
-                    &right.pixels[(y * rw) * 4],
-                    rw * 4);
-    }
-    return out;
 }
 
 static Vec3 opposite(const Vec3 &d) {
@@ -109,22 +89,22 @@ static void render_mesh_front_back(const char *name, Mesh &mesh,
     {
         Image shaded = renderer.render_mesh(mesh, cam_front, opts_shaded);
         Image wire   = renderer.render_mesh(mesh, cam_front, opts_wire);
-        Image comp   = compose_side_by_side(shaded, wire);
+        shaded.merge(wire, MergeDirection::RIGHT);
 
         std::string fname = std::string(name) + "_front.png";
-        comp.write_png(fname);
-        std::cout << "  " << fname << " (" << comp.width << "x" << comp.height << ")\n";
+        shaded.write_png(fname);
+        std::cout << "  " << fname << " (" << shaded.width << "x" << shaded.height << ")\n";
     }
 
     // ---- Back ----
     {
         Image shaded = renderer.render_mesh(mesh, cam_back, opts_shaded);
         Image wire   = renderer.render_mesh(mesh, cam_back, opts_wire);
-        Image comp   = compose_side_by_side(shaded, wire);
+        shaded.merge(wire, MergeDirection::RIGHT);
 
         std::string fname = std::string(name) + "_back.png";
-        comp.write_png(fname);
-        std::cout << "  " << fname << " (" << comp.width << "x" << comp.height << ")\n";
+        shaded.write_png(fname);
+        std::cout << "  " << fname << " (" << shaded.width << "x" << shaded.height << ")\n";
     }
 }
 

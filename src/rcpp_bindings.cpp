@@ -318,6 +318,15 @@ List image_to_r_list(const scimesh::Image &img) {
         Named("pixels") = pixels);
 }
 
+scimesh::Image r_list_to_image(List r_img) {
+    scimesh::Image img;
+    img.width = as<int>(r_img["width"]);
+    img.height = as<int>(r_img["height"]);
+    RawVector r_pixels = r_img["pixels"];
+    img.pixels.assign(r_pixels.begin(), r_pixels.end());
+    return img;
+}
+
 List mesh_to_r_list(const scimesh::Mesh &mesh) {
     int nv = static_cast<int>(mesh.vertices.size());
     NumericMatrix verts(nv, 3);
@@ -713,6 +722,60 @@ bool scimesh_write_png(List image, CharacterVector filename) {
     img.pixels.assign(pixels.begin(), pixels.end());
 
     return img.write_png(as<std::string>(filename));
+}
+
+// ---- Image manipulation -------------------------------------------------------
+// [[Rcpp::export]]
+List scimesh_image_crop(List image, int x, int y, int w, int h) {
+    scimesh::Image img = r_list_to_image(image);
+    img.crop(x, y, w, h);
+    return image_to_r_list(img);
+}
+
+// [[Rcpp::export]]
+List scimesh_image_merge(List image, List other, CharacterVector direction) {
+    std::string dir = as<std::string>(direction);
+    scimesh::MergeDirection md;
+    if (dir == "left")       md = scimesh::MergeDirection::LEFT;
+    else if (dir == "right") md = scimesh::MergeDirection::RIGHT;
+    else if (dir == "top")   md = scimesh::MergeDirection::TOP;
+    else if (dir == "bottom") md = scimesh::MergeDirection::BOTTOM;
+    else {
+        Rcpp::stop("direction must be 'left', 'right', 'top', or 'bottom'");
+    }
+    scimesh::Image img = r_list_to_image(image);
+    scimesh::Image oth = r_list_to_image(other);
+    img.merge(oth, md);
+    return image_to_r_list(img);
+}
+
+// [[Rcpp::export]]
+List scimesh_image_grow(List image, int top, int bottom, int left, int right,
+                         NumericVector background) {
+    if (background.size() != 4) {
+        Rcpp::stop("background must be a numeric vector of length 4 (RGBA)");
+    }
+    scimesh::Image img = r_list_to_image(image);
+    scimesh::Color bg(static_cast<float>(background[0]),
+                      static_cast<float>(background[1]),
+                      static_cast<float>(background[2]),
+                      static_cast<float>(background[3]));
+    img.grow(top, bottom, left, right, bg);
+    return image_to_r_list(img);
+}
+
+// [[Rcpp::export]]
+List scimesh_image_rotate_90(List image, bool clockwise) {
+    scimesh::Image img = r_list_to_image(image);
+    img.rotate_90(clockwise);
+    return image_to_r_list(img);
+}
+
+// [[Rcpp::export]]
+List scimesh_image_scale(List image, int new_width, int new_height) {
+    scimesh::Image img = r_list_to_image(image);
+    img.scale(new_width, new_height);
+    return image_to_r_list(img);
 }
 
 // ---- Normals -----------------------------------------------------------------

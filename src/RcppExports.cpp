@@ -332,6 +332,75 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_image_crop
+List scimesh_image_crop(List image, int x, int y, int w, int h);
+RcppExport SEXP _scimesh_scimesh_image_crop(SEXP imageSEXP, SEXP xSEXP, SEXP ySEXP, SEXP wSEXP, SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type w(wSEXP);
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_crop(image, x, y, w, h));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_image_merge
+List scimesh_image_merge(List image, List other, CharacterVector direction);
+RcppExport SEXP _scimesh_scimesh_image_merge(SEXP imageSEXP, SEXP otherSEXP, SEXP directionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< List >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type direction(directionSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_merge(image, other, direction));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_image_grow
+List scimesh_image_grow(List image, int top, int bottom, int left, int right, NumericVector background);
+RcppExport SEXP _scimesh_scimesh_image_grow(SEXP imageSEXP, SEXP topSEXP, SEXP bottomSEXP, SEXP leftSEXP, SEXP rightSEXP, SEXP backgroundSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< int >::type top(topSEXP);
+    Rcpp::traits::input_parameter< int >::type bottom(bottomSEXP);
+    Rcpp::traits::input_parameter< int >::type left(leftSEXP);
+    Rcpp::traits::input_parameter< int >::type right(rightSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type background(backgroundSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_grow(image, top, bottom, left, right, background));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_image_rotate_90
+List scimesh_image_rotate_90(List image, bool clockwise);
+RcppExport SEXP _scimesh_scimesh_image_rotate_90(SEXP imageSEXP, SEXP clockwiseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< bool >::type clockwise(clockwiseSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_rotate_90(image, clockwise));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_image_scale
+List scimesh_image_scale(List image, int new_width, int new_height);
+RcppExport SEXP _scimesh_scimesh_image_scale(SEXP imageSEXP, SEXP new_widthSEXP, SEXP new_heightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< int >::type new_width(new_widthSEXP);
+    Rcpp::traits::input_parameter< int >::type new_height(new_heightSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_scale(image, new_width, new_height));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_compute_vertex_normals
 List scimesh_compute_vertex_normals(List mesh_data);
 RcppExport SEXP _scimesh_scimesh_compute_vertex_normals(SEXP mesh_dataSEXP) {
@@ -369,6 +438,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
     {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
     {"_scimesh_scimesh_write_png", (DL_FUNC) &_scimesh_scimesh_write_png, 2},
+    {"_scimesh_scimesh_image_crop", (DL_FUNC) &_scimesh_scimesh_image_crop, 5},
+    {"_scimesh_scimesh_image_merge", (DL_FUNC) &_scimesh_scimesh_image_merge, 3},
+    {"_scimesh_scimesh_image_grow", (DL_FUNC) &_scimesh_scimesh_image_grow, 6},
+    {"_scimesh_scimesh_image_rotate_90", (DL_FUNC) &_scimesh_scimesh_image_rotate_90, 2},
+    {"_scimesh_scimesh_image_scale", (DL_FUNC) &_scimesh_scimesh_image_scale, 3},
     {"_scimesh_scimesh_compute_vertex_normals", (DL_FUNC) &_scimesh_scimesh_compute_vertex_normals, 1},
     {NULL, NULL, 0}
 };

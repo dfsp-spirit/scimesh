@@ -97,6 +97,26 @@ scimesh_write_png <- function(image, filename) {
     .Call(`_scimesh_scimesh_write_png`, image, filename)
 }
 
+scimesh_image_crop <- function(image, x, y, w, h) {
+    .Call(`_scimesh_scimesh_image_crop`, image, x, y, w, h)
+}
+
+scimesh_image_merge <- function(image, other, direction) {
+    .Call(`_scimesh_scimesh_image_merge`, image, other, direction)
+}
+
+scimesh_image_grow <- function(image, top, bottom, left, right, background) {
+    .Call(`_scimesh_scimesh_image_grow`, image, top, bottom, left, right, background)
+}
+
+scimesh_image_rotate_90 <- function(image, clockwise) {
+    .Call(`_scimesh_scimesh_image_rotate_90`, image, clockwise)
+}
+
+scimesh_image_scale <- function(image, new_width, new_height) {
+    .Call(`_scimesh_scimesh_image_scale`, image, new_width, new_height)
+}
+
 scimesh_compute_vertex_normals <- function(mesh_data) {
     .Call(`_scimesh_scimesh_compute_vertex_normals`, mesh_data)
 }

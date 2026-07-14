@@ -50,3 +50,104 @@ image_to_array <- function(image) {
 write_png <- function(image, filename) {
     invisible(scimesh_write_png(image, filename))
 }
+
+#' Crop an image to a rectangular region
+#'
+#' @param image An image list returned by \code{render_mesh()} or similar.
+#' @param x Left edge of the crop region (0-based pixel coordinate).
+#' @param y Top edge of the crop region (0-based pixel coordinate).
+#' @param w Crop width in pixels.
+#' @param h Crop height in pixels.
+#' @return A new image list with the cropped dimensions.
+#'
+#' @examples
+#' \dontrun{
+#' img <- render_mesh(cube$vertices, cube$triangles)
+#' img <- image_crop(img, 100, 50, 400, 300)
+#' }
+#'
+#' @export
+image_crop <- function(image, x, y, w, h) {
+    scimesh_image_crop(image, as.integer(x), as.integer(y),
+                       as.integer(w), as.integer(h))
+}
+
+#' Merge two images side by side or stacked
+#'
+#' Merges another image into this one at the specified edge.
+#' For left/right merging, the heights must match. For top/bottom, the
+#' widths must match.
+#'
+#' @param image An image list.
+#' @param other Another image list.
+#' @param direction One of \code{"left"}, \code{"right"}, \code{"top"}, \code{"bottom"}.
+#' @return A new image list with the merged dimensions.
+#'
+#' @examples
+#' \dontrun{
+#' left  <- render_mesh(sphere$vertices, sphere$triangles)
+#' right <- render_mesh(cube$vertices, cube$triangles)
+#' merged <- image_merge(left, right, "right")
+#' }
+#'
+#' @export
+image_merge <- function(image, other, direction) {
+    direction <- match.arg(direction, c("left", "right", "top", "bottom"))
+    scimesh_image_merge(image, other, direction)
+}
+
+#' Grow an image by adding padding
+#'
+#' Expands the canvas by adding pixel rows/columns filled with a
+#' background colour.
+#'
+#' @param image An image list.
+#' @param top Number of pixel rows to add above.
+#' @param bottom Number of pixel rows to add below.
+#' @param left Number of pixel columns to add to the left.
+#' @param right Number of pixel columns to add to the right.
+#' @param background Numeric vector of length 4 with RGBA values in
+#'   \code{[0, 1]}.
+#' @return A new image list with the expanded dimensions.
+#'
+#' @examples
+#' \dontrun{
+#' img <- render_mesh(cube$vertices, cube$triangles)
+#' img <- image_grow(img, 10, 10, 20, 20, c(1, 1, 1, 1))
+#' }
+#'
+#' @export
+image_grow <- function(image, top, bottom, left, right, background) {
+    if (!is.numeric(background) || length(background) != 4) {
+        stop("background must be a numeric vector of length 4 (RGBA)")
+    }
+    scimesh_image_grow(image, as.integer(top), as.integer(bottom),
+                       as.integer(left), as.integer(right), background)
+}
+
+#' Rotate an image by 90 degrees
+#'
+#' @param image An image list.
+#' @param clockwise Logical, if \code{TRUE} (default) rotates clockwise,
+#'   otherwise counter-clockwise.
+#' @return A new image list with width and height swapped.
+#'
+#' @export
+image_rotate_90 <- function(image, clockwise = TRUE) {
+    scimesh_image_rotate_90(image, isTRUE(clockwise))
+}
+
+#' Scale an image (nearest-neighbour)
+#'
+#' Resizes the image to the given dimensions using nearest-neighbour
+#' interpolation.
+#'
+#' @param image An image list.
+#' @param new_width Target width in pixels.
+#' @param new_height Target height in pixels.
+#' @return A new image list with the new dimensions.
+#'
+#' @export
+image_scale <- function(image, new_width, new_height) {
+    scimesh_image_scale(image, as.integer(new_width), as.integer(new_height))
+}

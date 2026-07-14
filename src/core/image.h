@@ -7,6 +7,8 @@
 
 namespace scimesh {
 
+enum class MergeDirection { LEFT, RIGHT, TOP, BOTTOM };
+
 struct Image {
     int width = 0;
     int height = 0;
@@ -24,6 +26,12 @@ struct Image {
     Color sample_bilinear(float u, float v) const;
 
     Image downsample_box(int factor) const;
+
+    void crop(int x, int y, int w, int h);
+    void merge(const Image &other, MergeDirection direction);
+    void grow(int top, int bottom, int left, int right, const Color &background);
+    void rotate_90(bool clockwise = true);
+    void scale(int new_width, int new_height);
 
     // Write to PPM (for C++ test debugging - trivial format, no dependencies)
     bool write_ppm(const std::string &filename) const;

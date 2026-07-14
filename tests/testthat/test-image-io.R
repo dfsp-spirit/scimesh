@@ -310,3 +310,110 @@ test_that("image_to_array correctly separates channels from raw bytes", {
     expect_equal(arr[2,1,], c(90,100,110,120)/255)
     expect_equal(arr[2,2,], c(130,140,150,160)/255)
 })
+
+# --- Category: C++ image manipulation (crop, merge, grow, rotate, scale) ------
+
+.make_test_image <- function(w, h, r, g, b, a) {
+    npix <- w * h * 4L
+    raw_vals <- rep(c(as.raw(r), as.raw(g), as.raw(b), as.raw(a)),
+                    times = w * h)
+    list(width = w, height = h, pixels = as.raw(raw_vals))
+}
+
+test_that("image_crop extracts subregion", {
+    img <- .make_test_image(4, 4, 255, 0, 0, 255)
+    cropped <- image_crop(img, 1, 1, 2, 2)
+    expect_equal(cropped$width, 2L)
+    expect_equal(cropped$height, 2L)
+    arr <- image_to_array(cropped)
+    expect_equal(arr[1, 1, 1], 1)
+})
+
+test_that("image_crop out-of-bounds clamps", {
+    img <- .make_test_image(4, 4, 255, 0, 0, 255)
+    cropped <- image_crop(img, -1, -1, 10, 10)
+    expect_equal(cropped$width, 4L)
+    expect_equal(cropped$height, 4L)
+})
+
+test_that("image_merge LEFT places other on left", {
+    a <- .make_test_image(2, 2, 255, 0, 0, 255)
+    b <- .make_test_image(1, 2, 0, 255, 0, 255)
+    merged <- image_merge(a, b, "left")
+    expect_equal(merged$width, 3L)
+    expect_equal(merged$height, 2L)
+    arr <- image_to_array(merged)
+    expect_equal(arr[1, 1, 1], 0)  # left column = green
+    expect_equal(arr[1, 1, 2], 1)
+    expect_equal(arr[1, 3, 1], 1)  # right column = red
+})
+
+test_that("image_merge RIGHT places other on right", {
+    a <- .make_test_image(2, 2, 255, 0, 0, 255)
+    b <- .make_test_image(1, 2, 0, 255, 0, 255)
+    merged <- image_merge(a, b, "right")
+    expect_equal(merged$width, 3L)
+    arr <- image_to_array(merged)
+    expect_equal(arr[1, 1, 1], 1)  # left column = red
+    expect_equal(arr[1, 3, 2], 1)  # right column = green
+})
+
+test_that("image_merge height mismatch errors", {
+    a <- .make_test_image(2, 2, 255, 0, 0, 255)
+    b <- .make_test_image(1, 3, 0, 255, 0, 255)
+    merged <- image_merge(a, b, "left")  # no-op
+    expect_equal(merged$width, 2L)
+    expect_equal(merged$height, 2L)
+})
+
+test_that("image_merge invalid direction errors", {
+    a <- .make_test_image(2, 2, 255, 0, 0, 255)
+    b <- .make_test_image(2, 2, 0, 255, 0, 255)
+    expect_error(image_merge(a, b, "diagonal"))
+})
+
+test_that("image_grow adds padding with background colour", {
+    img <- .make_test_image(2, 2, 255, 0, 0, 255)
+    grown <- image_grow(img, 1, 1, 1, 1, c(0, 1, 0, 1))
+    expect_equal(grown$width, 4L)
+    expect_equal(grown$height, 4L)
+    arr <- image_to_array(grown)
+    expect_equal(arr[1, 1, 2], 1)  # top-left = green bg
+    expect_equal(arr[2, 2, 1], 1)  # center = red from original
+})
+
+test_that("image_grow errors on bad background", {
+    img <- .make_test_image(2, 2, 255, 0, 0, 255)
+    expect_error(image_grow(img, 1, 1, 1, 1, c(0, 1)))
+})
+
+test_that("image_rotate_90 clockwise swaps dimensions", {
+    img <- .make_test_image(3, 1, 255, 0, 0, 255)
+    rotated <- image_rotate_90(img, TRUE)
+    expect_equal(rotated$width, 1L)
+    expect_equal(rotated$height, 3L)
+})
+
+test_that("image_rotate_90 four CCW rotations restores image", {
+    img <- .make_test_image(2, 2, 255, 128, 64, 255)
+    orig <- image_to_array(img)
+    for (i in 1:4) img <- image_rotate_90(img, FALSE)
+    arr <- image_to_array(img)
+    expect_equal(arr, orig, tolerance = 0)
+})
+
+test_that("image_scale upscale 2x preserves centre pixel colour", {
+    img <- .make_test_image(2, 2, 255, 0, 0, 255)
+    scaled <- image_scale(img, 4, 4)
+    expect_equal(scaled$width, 4L)
+    expect_equal(scaled$height, 4L)
+    arr <- image_to_array(scaled)
+    expect_equal(arr[1, 1, 1], 1)  # nearest-neighbour copies top-left
+})
+
+test_that("image_scale downscale reduces dimensions", {
+    img <- .make_test_image(4, 4, 128, 0, 0, 255)
+    scaled <- image_scale(img, 2, 2)
+    expect_equal(scaled$width, 2L)
+    expect_equal(scaled$height, 2L)
+})

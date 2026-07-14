@@ -88,6 +88,169 @@ Image Image::downsample_box(int factor) const {
     return result;
 }
 
+void Image::crop(int x, int y, int w, int h) {
+    if (w <= 0 || h <= 0) {
+        width = height = 0;
+        pixels.clear();
+        return;
+    }
+    int x0 = std::max(0, x);
+    int y0 = std::max(0, y);
+    int x1 = std::min(width, x + w);
+    int y1 = std::min(height, y + h);
+    int new_w = std::max(0, x1 - x0);
+    int new_h = std::max(0, y1 - y0);
+
+    if (new_w == 0 || new_h == 0) {
+        width = height = 0;
+        pixels.clear();
+        return;
+    }
+
+    std::vector<uint8_t> new_pixels(new_w * new_h * 4);
+    for (int cy = 0; cy < new_h; ++cy) {
+        int src_y = y0 + cy;
+        int src_offset = (src_y * width + x0) * 4;
+        int dst_offset = cy * new_w * 4;
+        std::memcpy(new_pixels.data() + dst_offset,
+                    pixels.data() + src_offset,
+                    new_w * 4);
+    }
+    width = new_w;
+    height = new_h;
+    pixels = std::move(new_pixels);
+}
+
+void Image::merge(const Image &other, MergeDirection direction) {
+    if (other.width <= 0 || other.height <= 0) return;
+
+    int new_w, new_h;
+    int this_off_x = 0, this_off_y = 0;
+    int other_off_x = 0, other_off_y = 0;
+
+    switch (direction) {
+        case MergeDirection::LEFT:
+        case MergeDirection::RIGHT:
+            if (height != other.height) return;
+            new_w = width + other.width;
+            new_h = height;
+            if (direction == MergeDirection::LEFT) {
+                other_off_x = 0;
+                this_off_x = other.width;
+            } else {
+                this_off_x = 0;
+                other_off_x = width;
+            }
+            break;
+        case MergeDirection::TOP:
+        case MergeDirection::BOTTOM:
+            if (width != other.width) return;
+            new_w = width;
+            new_h = height + other.height;
+            if (direction == MergeDirection::TOP) {
+                other_off_y = 0;
+                this_off_y = other.height;
+            } else {
+                this_off_y = 0;
+                other_off_y = height;
+            }
+            break;
+    }
+
+    std::vector<uint8_t> new_pixels(new_w * new_h * 4, 0);
+
+    for (int y = 0; y < height; ++y) {
+        std::memcpy(new_pixels.data() + ((y + this_off_y) * new_w + this_off_x) * 4,
+                    pixels.data() + y * width * 4,
+                    width * 4);
+    }
+    for (int y = 0; y < other.height; ++y) {
+        std::memcpy(new_pixels.data() + ((y + other_off_y) * new_w + other_off_x) * 4,
+                    other.pixels.data() + y * other.width * 4,
+                    other.width * 4);
+    }
+
+    width = new_w;
+    height = new_h;
+    pixels = std::move(new_pixels);
+}
+
+void Image::grow(int top, int bottom, int left, int right, const Color &background) {
+    if (top < 0 || bottom < 0 || left < 0 || right < 0) return;
+
+    int new_w = width + left + right;
+    int new_h = height + top + bottom;
+    if (new_w <= 0 || new_h <= 0) return;
+
+    uint8_t br = static_cast<uint8_t>(std::clamp(background.r, 0.0f, 1.0f) * 255.0f);
+    uint8_t bg = static_cast<uint8_t>(std::clamp(background.g, 0.0f, 1.0f) * 255.0f);
+    uint8_t bb = static_cast<uint8_t>(std::clamp(background.b, 0.0f, 1.0f) * 255.0f);
+    uint8_t ba = static_cast<uint8_t>(std::clamp(background.a, 0.0f, 1.0f) * 255.0f);
+
+    std::vector<uint8_t> new_pixels(new_w * new_h * 4);
+    for (int i = 0; i < new_w * new_h; ++i) {
+        new_pixels[i * 4]     = br;
+        new_pixels[i * 4 + 1] = bg;
+        new_pixels[i * 4 + 2] = bb;
+        new_pixels[i * 4 + 3] = ba;
+    }
+
+    for (int y = 0; y < height; ++y) {
+        std::memcpy(new_pixels.data() + ((y + top) * new_w + left) * 4,
+                    pixels.data() + y * width * 4,
+                    width * 4);
+    }
+
+    width = new_w;
+    height = new_h;
+    pixels = std::move(new_pixels);
+}
+
+void Image::rotate_90(bool clockwise) {
+    int new_w = height;
+    int new_h = width;
+    std::vector<uint8_t> new_pixels(new_w * new_h * 4);
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int dst_x, dst_y;
+            if (clockwise) {
+                dst_x = height - 1 - y;
+                dst_y = x;
+            } else {
+                dst_x = y;
+                dst_y = width - 1 - x;
+            }
+            std::memcpy(new_pixels.data() + (dst_y * new_w + dst_x) * 4,
+                        pixels.data() + (y * width + x) * 4, 4);
+        }
+    }
+    width = new_w;
+    height = new_h;
+    pixels = std::move(new_pixels);
+}
+
+void Image::scale(int new_width, int new_height) {
+    if (new_width <= 0 || new_height <= 0) {
+        width = height = 0;
+        pixels.clear();
+        return;
+    }
+    if (new_width == width && new_height == height) return;
+
+    std::vector<uint8_t> new_pixels(new_width * new_height * 4);
+    for (int dy = 0; dy < new_height; ++dy) {
+        int src_y = dy * height / new_height;
+        for (int dx = 0; dx < new_width; ++dx) {
+            int src_x = dx * width / new_width;
+            std::memcpy(new_pixels.data() + (dy * new_width + dx) * 4,
+                        pixels.data() + (src_y * width + src_x) * 4, 4);
+        }
+    }
+    width = new_width;
+    height = new_height;
+    pixels = std::move(new_pixels);
+}
+
 Color Image::sample_bilinear(float u, float v) const {
     if (width < 1 || height < 1) return Color();
     u = std::max(0.0f, std::min(1.0f, u));
