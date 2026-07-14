@@ -155,6 +155,9 @@ int main(int argc, char **argv) {
     opts.background_color = Color(0.0f, 0.0f, 0.0f, 1.0f); // black BG for parcellation contrast
     opts.near_plane = 0.1f;
     opts.far_plane = glm::length(cam.eye - cam.center) * 4.0f;
+    opts.ssao_enabled = true;
+    opts.ssao_radius = 4.0f;
+    opts.ssao_intensity = 0.6f;
 
     std::cout << "  Rendering at " << opts.width << "x" << opts.height
               << "...\n";

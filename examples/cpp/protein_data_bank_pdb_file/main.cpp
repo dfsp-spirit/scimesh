@@ -1,19 +1,19 @@
-/// Demo: render a protein (PDB file) as atom spheres with CPK coloring
-/// and a C-alpha backbone trace.
+/// Demo: render two protein views for SSAO testing.
 ///
-/// Uses the tiny_pdb.hpp parser to read ATOM records and maps each element
-/// to a standard CPK colour.  Spheres are sized for ball-and-stick style.
+/// - 7TIM_stick.png : ball-and-stick style with C-alpha backbone trace
+/// - 1CRN_spheres.png : inflated atom spheres (3x radius) — tight
+///   inter-atom contacts create pronounced SSAO cavities
 ///
-/// Usage:
-///   ./protein_demo [path/to/file.pdb]
+/// Uses tiny_pdb.hpp parser, CPK coloring, and the scimesh renderer.
 ///
-/// Default: 1CRN.pdb (in the current directory).
-///
-/// To compile (from the project root):
+/// Build:
 ///   cd examples/cpp/protein_data_bank_pdb_file && mkdir -p build && cd build
 ///   cmake .. && make
 ///
-/// Output: <basename>.ppm
+/// Run (from build/):
+///   ./protein_demo
+///
+/// Output: 7TIM_stick.png, 1CRN_spheres.png
 
 #include "tiny_pdb.hpp"
 #include "renderer.h"
@@ -72,23 +72,17 @@ static float atom_radius(const std::string &element) {
     return 0.50f;
 }
 
-int main(int argc, char *argv[]) {
-    std::string pdb_path = "1CRN.pdb";
-    if (argc > 1) pdb_path = argv[1];
-
-    std::ifstream check(pdb_path);
-    if (!check.good()) {
-        std::cerr << "Error: file not found: " << pdb_path << "\n";
-        return 1;
-    }
-    check.close();
+static void render_protein(const char *pdb_path, float radius_scale,
+                           bool with_backbone, const char *out_label) {
+    std::cout << "\n=== " << out_label << " ===\n";
+    std::cout << "  Loading " << pdb_path << " (radius x" << radius_scale << ")\n";
 
     auto atoms = TinyPDB::parse(pdb_path);
     if (atoms.empty()) {
-        std::cerr << "Error: no atoms loaded from " << pdb_path << "\n";
-        return 1;
+        std::cerr << "  Error: no atoms loaded\n";
+        return;
     }
-    std::cout << "Loaded " << atoms.size() << " atoms from " << pdb_path << "\n";
+    std::cout << "  Loaded " << atoms.size() << " atoms\n";
 
     std::vector<Vec3> centers;
     std::vector<float> radii;
@@ -98,21 +92,23 @@ int main(int argc, char *argv[]) {
 
     for (const auto &a : atoms) {
         centers.push_back(Vec3(a.x, a.y, a.z));
-        radii.push_back(atom_radius(a.element));
+        radii.push_back(atom_radius(a.element) * radius_scale);
         colors.push_back(cpk_color(a.element));
-        if (a.name == "CA") {
+        if (with_backbone && a.name == "CA") {
             ca_positions.push_back(Vec3(a.x, a.y, a.z));
             ca_chains.push_back(a.chain);
         }
     }
 
-    Mesh atom_mesh = scimesh::generate_multi_spheres(centers, radii, colors, 14);
-    std::cout << "Atoms: " << atom_mesh.vertices.size() << " vertices, "
-              << atom_mesh.triangles.size() << " triangles\n";
-    std::cout << "Backbone: " << ca_positions.size() << " CA atoms\n";
+    int sphere_segments = (radius_scale >= 2.0f) ? 20 : 14;
+    Mesh atom_mesh = scimesh::generate_multi_spheres(centers, radii, colors, sphere_segments);
+    std::cout << "  Atoms: " << atom_mesh.vertices.size() << " verts, "
+              << atom_mesh.triangles.size() << " tris\n";
 
-    Mesh backbone_mesh;
-    if (ca_positions.size() >= 2) {
+    Scene scene;
+    scene.meshes.push_back(atom_mesh);
+
+    if (with_backbone && ca_positions.size() >= 2) {
         std::vector<Vec3> bstarts, bends;
         std::vector<Color> bcolors;
         std::vector<float> bradii;
@@ -123,18 +119,17 @@ int main(int argc, char *argv[]) {
             bradii.push_back(0.12f);
             bcolors.push_back(Color(0.1f, 0.7f, 0.8f));
         }
-        backbone_mesh = scimesh::generate_multi_cylinders(
+        Mesh backbone_mesh = scimesh::generate_multi_cylinders(
             bstarts, bends, bradii, bcolors, 8);
-    }
-
-    Scene scene;
-    scene.meshes.push_back(atom_mesh);
-    if (!backbone_mesh.triangles.empty()) {
-        scene.meshes.push_back(backbone_mesh);
+        if (!backbone_mesh.triangles.empty()) {
+            scene.meshes.push_back(backbone_mesh);
+            std::cout << "  Backbone: " << ca_positions.size() << " CA atoms, "
+                      << backbone_mesh.triangles.size() << " tris\n";
+        }
     }
 
     Vec3 eye_dir = glm::normalize(Vec3(0.5f, 0.4f, -1.0f));
-    Camera cam = scimesh::camera_fit_mesh(atom_mesh, eye_dir,
+    Camera cam = scimesh::camera_fit_scene(scene, eye_dir,
         Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.05f);
 
     scimesh::Light key_light;
@@ -163,29 +158,21 @@ int main(int argc, char *argv[]) {
     opts.specular_color = Color(1.0f, 1.0f, 1.0f);
     opts.shininess = 64.0f;
     opts.aa_samples = 2;
+    opts.ssao_enabled = true;
+    opts.ssao_radius = (radius_scale >= 2.0f) ? 2.5f : 1.0f;
+    opts.ssao_intensity = 0.6f;
 
     Renderer renderer;
     Image img = renderer.render_scene(scene, cam, opts);
 
-    std::string out_base;
-    {
-        auto slash = pdb_path.find_last_of("/\\");
-        auto dot   = pdb_path.find_last_of('.');
-        out_base = (slash == std::string::npos)
-            ? pdb_path.substr(0, dot)
-            : pdb_path.substr(slash + 1, dot - slash - 1);
-    }
-
-    std::string out_ppm = out_base + ".ppm";
-    img.write_ppm(out_ppm);
-    std::cout << "Wrote " << out_ppm << "\n";
-
-    std::string out_png = out_base + ".png";
+    std::string out_png = std::string(out_label) + ".png";
     img.write_png(out_png);
-    std::cout << "Wrote " << out_png << "\n";
+    std::cout << "  Wrote " << out_png << " (" << img.width << "x" << img.height << ")\n";
+}
 
-    std::cout << "Image size: " << img.width
-              << "x" << img.height << "\n";
-
+int main() {
+    render_protein("../7TIM.pdb", 1.0f, true,  "7TIM_stick");
+    render_protein("../1CRN.pdb", 3.0f, false, "1CRN_spheres");
+    std::cout << "\nDone.\n";
     return 0;
 }

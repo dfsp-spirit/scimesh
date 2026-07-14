@@ -66,7 +66,7 @@ if [[ -z "$FILTER" || "$FILTER" == "transparency" ]]; then
     run_one transparency                      transparency_demo
 fi
 if [[ -z "$FILTER" || "$FILTER" == "protein_data_bank_pdb_file" ]]; then
-    run_one protein_data_bank_pdb_file        protein_demo        ../1CRN.pdb
+    run_one protein_data_bank_pdb_file        protein_demo
 fi
 if [[ -z "$FILTER" || "$FILTER" == "whole_brain_annot_single_image" ]]; then
     run_one whole_brain_annot_single_image    whole_brain_annot
