@@ -6,6 +6,8 @@ We provide both a C++ library and an R package.  No OpenGL, no X11, no GPU drive
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml)
+  [![tests_cpp](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_cpp.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
+  [![tests_R](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_R.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
 <!-- badges: end -->
 
 ## Visualization Examples
