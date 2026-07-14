@@ -3,13 +3,16 @@
 # run_all_cpp.sh — Build and run all scimesh C++ example apps
 #
 # Usage:
-#   ./examples/cpp/run_all_cpp.sh
+#   ./examples/cpp/run_all_cpp.sh                # run all
+#   ./examples/cpp/run_all_cpp.sh spot_cow       # run only spot_cow
 #
 # Prints a summary at the end showing how many examples passed / failed.
 
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+FILTER="${1:-}"
 
 PASSED=()
 FAILED=()
@@ -53,15 +56,33 @@ run_one() {
     fi
 }
 
-run_one all_primitives                    all_primitives
-run_one spot_cow                          spot_cow
-run_one transparency                      transparency_demo
-run_one protein_data_bank_pdb_file        protein_demo        ../1CRN.pdb
-run_one whole_brain_annot_single_image    whole_brain_annot
-run_one whole_brain_sulc_single_image     whole_brain_sulc
-run_one whole_brain_sulc_single_image_fsaverage whole_brain_sulc_fsaverage
-run_one bunny                             bunny
-run_one dragon                            dragon
+if [[ -z "$FILTER" || "$FILTER" == "all_primitives" ]]; then
+    run_one all_primitives                    all_primitives
+fi
+if [[ -z "$FILTER" || "$FILTER" == "spot_cow" ]]; then
+    run_one spot_cow                          spot_cow
+fi
+if [[ -z "$FILTER" || "$FILTER" == "transparency" ]]; then
+    run_one transparency                      transparency_demo
+fi
+if [[ -z "$FILTER" || "$FILTER" == "protein_data_bank_pdb_file" ]]; then
+    run_one protein_data_bank_pdb_file        protein_demo        ../1CRN.pdb
+fi
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_annot_single_image" ]]; then
+    run_one whole_brain_annot_single_image    whole_brain_annot
+fi
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_single_image" ]]; then
+    run_one whole_brain_sulc_single_image     whole_brain_sulc
+fi
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_single_image_fsaverage" ]]; then
+    run_one whole_brain_sulc_single_image_fsaverage whole_brain_sulc_fsaverage
+fi
+if [[ -z "$FILTER" || "$FILTER" == "bunny" ]]; then
+    run_one bunny                             bunny
+fi
+if [[ -z "$FILTER" || "$FILTER" == "dragon" ]]; then
+    run_one dragon                            dragon
+fi
 
 echo ""
 echo "============================================"
@@ -75,6 +96,12 @@ echo "  Failed: ${#FAILED[@]}"
 for f in "${FAILED[@]}"; do
     echo "    FAIL  $f"
 done
+
+if [[ -n "$FILTER" && ${#PASSED[@]} -eq 0 && ${#FAILED[@]} -eq 0 ]]; then
+    echo "  WARNING: no example matched filter '$FILTER'"
+    echo "  Available: all_primitives spot_cow transparency protein_data_bank_pdb_file whole_brain_annot_single_image whole_brain_sulc_single_image whole_brain_sulc_single_image_fsaverage bunny dragon"
+    exit 2
+fi
 
 if [[ ${#FAILED[@]} -gt 0 ]]; then
     exit 1

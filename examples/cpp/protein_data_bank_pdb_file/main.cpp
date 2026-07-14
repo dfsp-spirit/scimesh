@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     RenderOptions opts;
     opts.width  = 1200;
     opts.height = 900;
-    opts.background_color = Color(0.12f, 0.12f, 0.15f);
+    opts.background_color = Color(1.0f, 1.0f, 1.0f);
     opts.shading = ShadingMode::SMOOTH;
     opts.backface_culling = true;
     opts.ambient = 0.28f;
