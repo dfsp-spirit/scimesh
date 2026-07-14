@@ -1,6 +1,11 @@
 scimesh Changes
 ===============
 
+Version 0.2.2 -- Better SSOA and primitives
+-------------------------------------------
+- NEW: improve SSOA quality dramatically by adding depth buffer
+- FIX: fix various primitive generation algos, use duplicate vertices to get proper edge rendering where appropriate
+
 
 Version 0.2.1 -- Primitive fixes, bridge more cpp functions to R
 -----------------------------------------------------------------
