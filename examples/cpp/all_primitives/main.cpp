@@ -82,8 +82,9 @@ static void render_mesh_front_back(const char *name, Mesh &mesh,
     Camera cam_front = scimesh::camera_fit_mesh(mesh, front_dir, up, fov, margin);
     Camera cam_back  = scimesh::camera_fit_mesh(mesh, opposite(front_dir), up, fov, margin);
 
-    scimesh::Light key = {Vec3(0.5f, 1.0f, 0.8f), Color(1.0f, 0.95f, 0.9f), 1.5f};
-    scimesh::Light fill = {Vec3(-0.5f, 0.2f, 0.6f), Color(0.4f, 0.5f, 0.8f), 0.5f};
+    scimesh::Light key  = {Vec3(0.5f,  1.0f,  0.8f), Color(1.0f, 0.95f, 0.9f), 1.5f};
+    scimesh::Light fill = {Vec3(-0.5f, 0.2f,  0.6f), Color(0.4f, 0.5f,  0.8f), 0.5f};
+    scimesh::Light rim  = {Vec3(0.0f, -0.4f,  0.0f), Color(0.5f, 0.5f,  0.6f), 0.6f};
 
     // ---- Shaded options ----
     RenderOptions opts_shaded;
@@ -93,7 +94,7 @@ static void render_mesh_front_back(const char *name, Mesh &mesh,
     opts_shaded.backface_culling = true;
     opts_shaded.background_color = Color(0.92f, 0.93f, 0.95f, 1.0f);
     opts_shaded.ambient = 0.2f;
-    opts_shaded.lights = {key, fill};
+    opts_shaded.lights = {key, fill, rim};
     opts_shaded.specular_color = Color(0.3f, 0.3f, 0.3f);
     opts_shaded.shininess = 32;
 
