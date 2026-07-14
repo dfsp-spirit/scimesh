@@ -6,12 +6,16 @@ Authors@R: c(
     person("Tim", "Schaefer", email = "ts+code@rcmd.org",
            role = c("aut", "cre"))
     )
-Description: A minimal, fast, headless 3D software renderer written in modern
-    C++ with native R bindings. Serves as a zero-dependency, fallback rendering
-    engine for 3D meshes when traditional GPU-backed frameworks are unavailable.
-    Produces in-memory RGBA images or PNGs suitable for scientific mesh
-    visualization, e.g., in neuroimaging applications. Supports basic lighting,
-    shading, and camera controls.
+Description: A fast, GPU-free 3D software rasterizer written in modern C++17 with
+    native R bindings. Renders triangle meshes to publication-quality images
+    entirely on the CPU, requiring no OpenGL, GPU, or display server.
+    Features multi-light Blinn-Phong shading, screen-space ambient occlusion,
+    anti-aliasing, depth cueing, transparency, wireframe rendering, texture
+    mapping, and procedural geometry generation. Supports STL, OBJ, and PLY
+    mesh formats with PNG, PPM, and BMP output. Works on HPC clusters,
+    headless servers, containers, and CI pipelines, making it suitable for
+    scientific visualization across neuroimaging, molecular structures, and
+    general 3D graphics.
 License: MIT + file LICENSE
 URL: https://github.com/dfsp-spirit/scimesh
 BugReports: https://github.com/dfsp-spirit/scimesh/issues
