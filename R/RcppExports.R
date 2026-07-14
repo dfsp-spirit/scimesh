@@ -121,6 +121,22 @@ scimesh_image_crop_to_content <- function(image, direction, background) {
     .Call(`_scimesh_scimesh_image_crop_to_content`, image, direction, background)
 }
 
+scimesh_print_image <- function(image) {
+    .Call(`_scimesh_scimesh_print_image`, image)
+}
+
+scimesh_print_camera <- function(camera_data) {
+    .Call(`_scimesh_scimesh_print_camera`, camera_data)
+}
+
+scimesh_print_options <- function(options_data) {
+    .Call(`_scimesh_scimesh_print_options`, options_data)
+}
+
+scimesh_print_mesh <- function(mesh_data) {
+    .Call(`_scimesh_scimesh_print_mesh`, mesh_data)
+}
+
 scimesh_compute_vertex_normals <- function(mesh_data) {
     .Call(`_scimesh_scimesh_compute_vertex_normals`, mesh_data)
 }

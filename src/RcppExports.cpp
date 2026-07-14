@@ -415,6 +415,50 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_print_image
+std::string scimesh_print_image(List image);
+RcppExport SEXP _scimesh_scimesh_print_image(SEXP imageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_print_image(image));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_print_camera
+std::string scimesh_print_camera(List camera_data);
+RcppExport SEXP _scimesh_scimesh_print_camera(SEXP camera_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_print_camera(camera_data));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_print_options
+std::string scimesh_print_options(List options_data);
+RcppExport SEXP _scimesh_scimesh_print_options(SEXP options_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_print_options(options_data));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_print_mesh
+std::string scimesh_print_mesh(List mesh_data);
+RcppExport SEXP _scimesh_scimesh_print_mesh(SEXP mesh_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type mesh_data(mesh_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_print_mesh(mesh_data));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_compute_vertex_normals
 List scimesh_compute_vertex_normals(List mesh_data);
 RcppExport SEXP _scimesh_scimesh_compute_vertex_normals(SEXP mesh_dataSEXP) {
@@ -458,6 +502,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_image_rotate_90", (DL_FUNC) &_scimesh_scimesh_image_rotate_90, 2},
     {"_scimesh_scimesh_image_scale", (DL_FUNC) &_scimesh_scimesh_image_scale, 3},
     {"_scimesh_scimesh_image_crop_to_content", (DL_FUNC) &_scimesh_scimesh_image_crop_to_content, 3},
+    {"_scimesh_scimesh_print_image", (DL_FUNC) &_scimesh_scimesh_print_image, 1},
+    {"_scimesh_scimesh_print_camera", (DL_FUNC) &_scimesh_scimesh_print_camera, 1},
+    {"_scimesh_scimesh_print_options", (DL_FUNC) &_scimesh_scimesh_print_options, 1},
+    {"_scimesh_scimesh_print_mesh", (DL_FUNC) &_scimesh_scimesh_print_mesh, 1},
     {"_scimesh_scimesh_compute_vertex_normals", (DL_FUNC) &_scimesh_scimesh_compute_vertex_normals, 1},
     {NULL, NULL, 0}
 };

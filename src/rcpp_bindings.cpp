@@ -1,8 +1,10 @@
 #include <Rcpp.h>
+#include <sstream>
 #include "core/renderer.h"
 #include "core/transforms.h"
 #include "core/normals.h"
 #include "core/primitives.h"
+#include "core/to_string.h"
 #include "core/stl_io.h"
 #include "core/obj_io.h"
 #include "core/ply_io.h"
@@ -312,10 +314,12 @@ List image_to_r_list(const scimesh::Image &img) {
     if (!img.pixels.empty()) {
         std::memcpy(pixels.begin(), img.pixels.data(), npixels);
     }
-    return List::create(
+    List out = List::create(
         Named("width") = img.width,
         Named("height") = img.height,
         Named("pixels") = pixels);
+    out.attr("class") = "scimesh_image";
+    return out;
 }
 
 scimesh::Image r_list_to_image(List r_img) {
@@ -393,6 +397,7 @@ List mesh_to_r_list(const scimesh::Mesh &mesh) {
         out["uv"] = uvs_mat;
     }
 
+    out.attr("class") = "scimesh_mesh";
     return out;
 }
 
@@ -450,7 +455,7 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
         static_cast<float>(margin),
         proj);
 
-    return List::create(
+    List out = List::create(
         Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),
         Named("center") = NumericVector::create(
             cam.center.x, cam.center.y, cam.center.z),
@@ -458,6 +463,8 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
         Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
             ? "orthographic" : "perspective"),
         Named("fov") = cam.fov_degrees);
+    out.attr("class") = "scimesh_camera";
+    return out;
 }
 
 // ---- Mesh transforms -------------------------------------------------------
@@ -808,6 +815,50 @@ List scimesh_image_crop_to_content(List image, CharacterVector direction,
                       static_cast<float>(background[3]));
     img.crop_to_content(ccd, bg);
     return image_to_r_list(img);
+}
+
+// ---- Print / to-string -------------------------------------------------------
+// [[Rcpp::export]]
+std::string scimesh_print_image(List image) {
+    scimesh::Image img = r_list_to_image(image);
+    std::ostringstream os;
+    os << img;
+    return os.str();
+}
+
+// [[Rcpp::export]]
+std::string scimesh_print_camera(List camera_data) {
+    scimesh::Vec3 eye = vec3_from_r(camera_data["eye"]);
+    scimesh::Vec3 center = vec3_from_r(camera_data["center"]);
+    scimesh::Vec3 up = vec3_from_r(camera_data["up"]);
+    scimesh::Camera cam;
+    cam.eye = eye;
+    cam.center = center;
+    cam.up = up;
+    cam.fov_degrees = static_cast<float>(as<double>(camera_data["fov"]));
+    std::string proj_str = as<std::string>(camera_data["projection"]);
+    cam.projection = (proj_str == "orthographic")
+        ? scimesh::ProjectionType::ORTHOGRAPHIC
+        : scimesh::ProjectionType::PERSPECTIVE;
+    std::ostringstream os;
+    os << cam;
+    return os.str();
+}
+
+// [[Rcpp::export]]
+std::string scimesh_print_options(List options_data) {
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+    std::ostringstream os;
+    os << opts;
+    return os.str();
+}
+
+// [[Rcpp::export]]
+std::string scimesh_print_mesh(List mesh_data) {
+    scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
+    std::ostringstream os;
+    os << mesh;
+    return os.str();
 }
 
 // ---- Normals -----------------------------------------------------------------

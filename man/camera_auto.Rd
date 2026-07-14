@@ -25,9 +25,13 @@ example, \code{c(0, 0, -1)} looks along the negative Z axis.}
 \item{fov}{Field of view in degrees.}
 
 \item{margin}{Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).}
+
+\item{projection}{Projection type: \code{"perspective"} (default) or
+\code{"orthographic"}. When orthographic, the camera distance is
+computed to tightly frame the mesh regardless of FOV.}
 }
 \value{
-A camera list.
+A camera list, with S3 class \code{"scimesh_camera"}.
 }
 \description{
 Computes a camera position that frames the entire mesh in view.

@@ -21,13 +21,13 @@ camera <- function(eye, center, up = c(0, 1, 0),
                    projection = c("perspective", "orthographic"),
                    fov = 45) {
     projection <- match.arg(projection)
-    list(
+    structure(list(
         eye = as.numeric(eye),
         center = as.numeric(center),
         up = as.numeric(up),
         projection = projection,
         fov = as.numeric(fov)
-    )
+    ), class = "scimesh_camera")
 }
 
 #' Auto-frame a camera to fit a mesh or vertex set
@@ -43,7 +43,10 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #' @param up The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
 #' @param fov Field of view in degrees.
 #' @param margin Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).
-#' @return A camera list.
+#' @param projection Projection type: \code{"perspective"} (default) or
+#'   \code{"orthographic"}. When orthographic, the camera distance is
+#'   computed to tightly frame the mesh regardless of FOV.
+#' @return A camera list, with S3 class \code{"scimesh_camera"}.
 #'
 #' @examples
 #' verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,

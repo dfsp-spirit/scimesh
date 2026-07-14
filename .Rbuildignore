@@ -7,6 +7,7 @@
 ^dev_tools$
 ^test_data$
 ^README\.md$
+^README_DEVELOPMENT\.md$
 ^\.cache$
 ^build$
 ^build-.*
@@ -35,4 +36,5 @@
 ^scimesh_subject1_sulc_t4_vertical.png
 ^scimesh_subject1_sulc_t9.png
 ^scimesh_transparency_lh.png
+^scimesh_dragon.png
 

@@ -207,7 +207,7 @@ render_options <- function(width = 800L, height = 600L,
                            ssao_intensity = 0.8,
                            aa_samples = 1L) {
     shading <- match.arg(shading)
-    list(
+    structure(list(
         width = as.integer(width),
         height = as.integer(height),
         shading = shading,
@@ -232,7 +232,7 @@ render_options <- function(width = 800L, height = 600L,
         ssao_radius = as.numeric(ssao_radius),
         ssao_intensity = as.numeric(ssao_intensity),
         aa_samples = as.integer(aa_samples)
-    )
+    ), class = "scimesh_options")
 }
 
 #' Render raw triangles without index buffer

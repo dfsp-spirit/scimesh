@@ -1,5 +1,7 @@
 #include "catch_amalgamated.hpp"
 #include "image.h"
+#include "to_string.h"
+#include <sstream>
 
 using namespace scimesh;
 
@@ -336,4 +338,34 @@ TEST_CASE("Image crop_to_content no margin is no-op", "[image]") {
     img.crop_to_content(CropContentDirection::LEFT, Color(0, 1, 0, 1));
     REQUIRE(img.width == 2);
     REQUIRE(img.height == 2);
+}
+
+TEST_CASE("to_string Image operator<<", "[to_string]") {
+    Image img(100, 50);
+    std::ostringstream os;
+    os << img;
+    std::string s = os.str();
+    REQUIRE(s.find("Image") != std::string::npos);
+    REQUIRE(s.find("100x50") != std::string::npos);
+}
+
+TEST_CASE("to_string Camera operator<<", "[to_string]") {
+    Camera cam;
+    std::ostringstream os;
+    os << cam;
+    std::string s = os.str();
+    REQUIRE(s.find("Camera") != std::string::npos);
+    REQUIRE(s.find("persp") != std::string::npos);
+}
+
+TEST_CASE("to_string RenderOptions operator<<", "[to_string]") {
+    RenderOptions opts;
+    opts.ssao_enabled = true;
+    opts.aa_samples = 4;
+    std::ostringstream os;
+    os << opts;
+    std::string s = os.str();
+    REQUIRE(s.find("RenderOpts") != std::string::npos);
+    REQUIRE(s.find("ssao") != std::string::npos);
+    REQUIRE(s.find("aa=4") != std::string::npos);
 }
