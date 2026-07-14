@@ -176,7 +176,7 @@ Thanks heaps to the authors of these great software packages that scimesh is bui
 - `src/third_party/stl_reader.h`: [sreiter/stl_reader](https://github.com/sreiter/stl_reader) — STL file reader.
 - `src/third_party/stb_image.h`, `src/third_party/stb_image_write.h`: [nothings/stb](https://github.com/nothings/stb) — image loading/saving.
 
-Note: This section is to give credit only. Users do not need to worry about installing these, they come packaged (vendored) with scimesh already.
+Note: This section is to give credit only. Users do **not** need to worry about installing these, they come vendored with scimesh already.
 
 
 ## Developer Information
