@@ -246,90 +246,229 @@ Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
 Mesh generate_cuboid(const Vec3 &center, const Vec3 &half,
                      const Color &color) {
     Mesh m;
+
+    // 6 faces * 4 vertices = 24 distinct vertices
+    m.vertices.reserve(24);
+    m.normals.reserve(24);
+    m.colors.assign(24, color);
+    m.triangles.reserve(12);
+
     float x = half.x, y = half.y, z = half.z;
+
+    // The 8 unique spatial positions (kept exactly as you had them)
     Vec3 v[8] = {
-        center + Vec3(-x, -y, -z), center + Vec3( x, -y, -z),
-        center + Vec3( x,  y, -z), center + Vec3(-x,  y, -z),
-        center + Vec3(-x, -y,  z), center + Vec3( x, -y,  z),
-        center + Vec3( x,  y,  z), center + Vec3(-x,  y,  z),
+        center + Vec3(-x, -y, -z), // 0: Bottom-Left-Back
+        center + Vec3( x, -y, -z), // 1: Bottom-Right-Back
+        center + Vec3( x,  y, -z), // 2: Top-Right-Back
+        center + Vec3(-x,  y, -z), // 3: Top-Left-Back
+        center + Vec3(-x, -y,  z), // 4: Bottom-Left-Front
+        center + Vec3( x, -y,  z), // 5: Bottom-Right-Front
+        center + Vec3( x,  y,  z), // 6: Top-Right-Front
+        center + Vec3(-x,  y,  z), // 7: Top-Left-Front
     };
-    for (int i = 0; i < 8; i++) {
-        m.vertices.push_back(v[i]);
-        m.colors.push_back(color);
+
+    // Define the 6 faces using the 8 positions, plus the perfect normal for that face
+    struct Face {
+        int v0, v1, v2, v3;
+        Vec3 normal;
+    };
+
+    Face faces[6] = {
+        {4, 5, 6, 7, Vec3( 0,  0,  1)}, // Front
+        {1, 0, 3, 2, Vec3( 0,  0, -1)}, // Back
+        {0, 1, 5, 4, Vec3( 0, -1,  0)}, // Bottom
+        {7, 6, 2, 3, Vec3( 0,  1,  0)}, // Top
+        {1, 2, 6, 5, Vec3( 1,  0,  0)}, // Right
+        {0, 4, 7, 3, Vec3(-1,  0,  0)}  // Left
+    };
+
+    uint32_t index = 0;
+    for (int i = 0; i < 6; i++) {
+        // Push the 4 distinct vertices for this face
+        m.vertices.push_back(v[faces[i].v0]);
+        m.vertices.push_back(v[faces[i].v1]);
+        m.vertices.push_back(v[faces[i].v2]);
+        m.vertices.push_back(v[faces[i].v3]);
+
+        // Push the perfectly flat normal 4 times
+        for (int j = 0; j < 4; j++) {
+            m.normals.push_back(faces[i].normal);
+        }
+
+        // Create the two triangles for this quad using our new unrolled indices
+        m.triangles.push_back({index, index + 1, index + 2});
+        m.triangles.push_back({index, index + 2, index + 3});
+
+        index += 4;
     }
-    uint32_t f[12][3] = {
-        {4,5,6}, {4,6,7},  // front  (+z), normal = +z
-        {0,3,2}, {0,2,1},  // back   (-z), normal = -z
-        {0,1,5}, {0,5,4},  // bottom (-y), normal = -y
-        {7,6,2}, {7,2,3},  // top    (+y), normal = +y
-        {1,2,6}, {1,6,5},  // right  (+x), normal = +x
-        {0,4,7}, {0,7,3},  // left   (-x), normal = -x
-    };
-    for (int i = 0; i < 12; i++)
-        m.triangles.push_back({f[i][0], f[i][1], f[i][2]});
+
     return m;
 }
 
+
 Mesh generate_pyramid(const Vec3 &base_center, const Vec3 &apex,
-                      float hw, const Color &color) {
+                           float hw, const Color &color) {
     Mesh m;
-    m.vertices = {
-        base_center + Vec3(-hw, 0, -hw), base_center + Vec3( hw, 0, -hw),
-        base_center + Vec3( hw, 0,  hw), base_center + Vec3(-hw, 0,  hw),
-        apex,
-    };
-    for (int i = 0; i < 5; i++) m.colors.push_back(color);
-    m.triangles = {
-        {0,1,4}, {1,2,4}, {2,3,4}, {3,0,4},
-        {0,2,3}, {0,1,2},
+
+    // 4 sides (3 verts each) + 1 square base (4 verts) = 16 distinct vertices
+    m.vertices.reserve(16);
+    m.normals.reserve(16);
+    m.colors.assign(16, color);
+    m.triangles.reserve(6);
+
+    // Define the base corner positions
+    Vec3 p0 = base_center + Vec3(-hw, 0, -hw); // Back-Left
+    Vec3 p1 = base_center + Vec3( hw, 0, -hw); // Back-Right
+    Vec3 p2 = base_center + Vec3( hw, 0,  hw); // Front-Right
+    Vec3 p3 = base_center + Vec3(-hw, 0,  hw); // Front-Left
+
+    // 1. GENERATE THE 4 SIDE FACES (Unrolled for sharp edges)
+    std::vector<std::array<Vec3, 3>> side_faces = {
+        {p1, p0, apex}, // Back side
+        {p2, p1, apex}, // Right side
+        {p3, p2, apex}, // Front side
+        {p0, p3, apex}  // Left side
     };
 
-    Vec3 centroid = base_center + (apex - base_center) * 0.25f;
-    m.normals.resize(5);
-    for (int i = 0; i < 5; i++)
-        m.normals[i] = glm::normalize(m.vertices[i] - centroid);
+    uint32_t index = 0;
+    for (const auto& face : side_faces) {
+        Vec3 A = face[0], B = face[1], C = face[2];
+
+        // Calculate exact perpendicular normal for this side
+        Vec3 normal = glm::normalize(glm::cross(B - A, C - A));
+
+        // Push 3 dedicated vertices for this face
+        m.vertices.push_back(A);
+        m.vertices.push_back(B);
+        m.vertices.push_back(C);
+
+        m.normals.push_back(normal);
+        m.normals.push_back(normal);
+        m.normals.push_back(normal);
+
+        m.triangles.push_back({index, index + 1, index + 2});
+        index += 3;
+    }
+
+    // 2. GENERATE THE BASE QUAD (4 shared vertices, identical straight-down normal)
+    Vec3 base_normal = Vec3(0.0f, -1.0f, 0.0f);
+
+    m.vertices.push_back(p0); // index 12
+    m.vertices.push_back(p1); // index 13
+    m.vertices.push_back(p2); // index 14
+    m.vertices.push_back(p3); // index 15
+
+    for (int i = 0; i < 4; i++) {
+        m.normals.push_back(base_normal);
+    }
+
+    // Two CCW triangles forming the square base (viewed from below)
+    m.triangles.push_back({index,     index + 2, index + 3}); // {p0, p2, p3}
+    m.triangles.push_back({index,     index + 1, index + 2}); // {p0, p1, p2}
 
     return m;
 }
 
 Mesh generate_tetrahedron(const Vec3 &p0, const Vec3 &p1,
-                          const Vec3 &p2, const Vec3 &p3,
-                          const Color &color) {
+                               const Vec3 &p2, const Vec3 &p3,
+                               const Color &color) {
     Mesh m;
-    m.vertices = {p0, p1, p2, p3};
-    for (int i = 0; i < 4; i++) m.colors.push_back(color);
-    m.triangles = {{0,1,2}, {0,2,3}, {0,3,1}, {1,3,2}};
+
+    // 4 faces * 3 vertices per face = 12 distinct vertices
+    m.vertices.reserve(12);
+    m.normals.reserve(12);
+    m.colors.assign(12, color);
+    m.triangles.reserve(4);
+
+    Vec3 centroid = (p0 + p1 + p2 + p3) * 0.25f;
+
+    std::vector<std::array<Vec3, 3>> faces = {
+        {p0, p1, p2}, {p0, p2, p3}, {p0, p3, p1}, {p1, p3, p2}
+    };
+
+    uint32_t index = 0;
+    for (const auto& face : faces) {
+        Vec3 A = face[0], B = face[1], C = face[2];
+        Vec3 normal = glm::normalize(glm::cross(B - A, C - A));
+
+        // Flip normal and vertex order if facing inward
+        if (glm::dot(normal, A - centroid) < 0.0f) {
+            normal = -normal;
+            std::swap(B, C);
+        }
+
+        // Push 3 distinct vertices for this specific face
+        m.vertices.push_back(A);
+        m.vertices.push_back(B);
+        m.vertices.push_back(C);
+
+        // All 3 vertices share the exact same perpendicular face normal
+        m.normals.push_back(normal);
+        m.normals.push_back(normal);
+        m.normals.push_back(normal);
+
+        m.triangles.push_back({index, index + 1, index + 2});
+        index += 3;
+    }
+
     return m;
 }
+
 
 Mesh generate_torus(const Vec3 &center, float R, float r,
                     int seg_major, int seg_minor, const Color &color) {
     Mesh m;
+
+    // We can pre-allocate memory for slight performance gains
+    int total_vertices = seg_major * seg_minor;
+    m.vertices.reserve(total_vertices);
+    m.normals.reserve(total_vertices);
+    m.colors.reserve(total_vertices);
+    m.triangles.reserve(total_vertices * 2);
+
+    // 1. Generate Vertices, Colors, and Normals
     for (int i = 0; i < seg_major; i++) {
         float phi = glm::two_pi<float>() * float(i) / float(seg_major);
         float cp = std::cos(phi), sp = std::sin(phi);
+
+        // Calculate the center of the current tube ring (minor center)
+        Vec3 minor_center = center + Vec3(R * cp, 0.0f, R * sp);
+
         for (int j = 0; j < seg_minor; j++) {
             float theta = glm::two_pi<float>() * float(j) / float(seg_minor);
             float ct = std::cos(theta), st = std::sin(theta);
+
             float px = (R + r * ct) * cp;
             float py = r * st;
             float pz = (R + r * ct) * sp;
-            m.vertices.push_back(center + Vec3(px, py, pz));
+
+            Vec3 pos = center + Vec3(px, py, pz);
+            m.vertices.push_back(pos);
             m.colors.push_back(color);
+
+            // The normal is simply the direction from the tube's center to the vertex
+            m.normals.push_back(glm::normalize(pos - minor_center));
         }
     }
+
+    // 2. Generate Triangles (with fixed, outward-facing winding order)
     for (int i = 0; i < seg_major; i++) {
         int ni = (i + 1) % seg_major;
+
         for (int j = 0; j < seg_minor; j++) {
             int nj = (j + 1) % seg_minor;
-            uint32_t a = i * seg_minor + j;
-            uint32_t b = ni * seg_minor + j;
-            uint32_t c = ni * seg_minor + nj;
-            uint32_t d = i * seg_minor + nj;
-            m.triangles.push_back({a, b, c});
-            m.triangles.push_back({a, c, d});
+
+            uint32_t a = i * seg_minor + j;      // Current ring, current slice
+            uint32_t b = ni * seg_minor + j;     // Next ring, current slice
+            uint32_t c = ni * seg_minor + nj;    // Next ring, next slice
+            uint32_t d = i * seg_minor + nj;     // Current ring, next slice
+
+            // FIXED: Flipped winding order so the torus renders from the outside
+            m.triangles.push_back({a, d, c});
+            m.triangles.push_back({a, c, b});
         }
     }
+
     return m;
 }
 

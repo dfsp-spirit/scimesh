@@ -73,7 +73,7 @@ static void render_mesh_front_back(const char *name, Mesh &mesh,
                                    const Vec3 &front_dir,
                                    const Vec3 &up = Vec3(0, 1, 0),
                                    float fov = 45, float margin = 1.15,
-                                   int w = 400, int h = 300) {
+                                   int w = 800, int h = 600) {
 
     ensure_normals(mesh);
 
