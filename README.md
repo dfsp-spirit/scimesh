@@ -145,7 +145,7 @@ write_png(img, "sphere.png")
 * **Tests:** Some of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially examples that illustrate how to use the functions.
 
 
-## Examples
+### Direct Links to Example Program Source Code
 
 | Example | Language | Description |
 |---------|----------|-------------|
