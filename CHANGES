@@ -2,6 +2,14 @@ scimesh Changes
 ===============
 
 
+
+Version 0.2.4 -- String representations and cam fix
+----------------------------------------------------
+- NEW: add convenience to string function for classes, R and c++
+- FIX: fix camera auto mode when using ortho projection (less whitespace around scene now)
+- DEV: move all third party code from src/core/ to src/third_party/
+
+
 Version 0.2.3 -- Convenience Image Ops
 ---------------------------------------
 - NEW: add some basic convenience image ops to Image class
