@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
     Image img = renderer.render_scene(scene, cam, opts);
 
     img.crop_to_content(CropContentDirection::ALL, opts.background_color);
-    img.grow(20, 20, 20, 20, opts.background_color);
+    img.grow(20, 20, 100, 100, opts.background_color);
 
     // ---- Write output ----
     std::string out_ppm = "whole_brain_sulc.ppm";
