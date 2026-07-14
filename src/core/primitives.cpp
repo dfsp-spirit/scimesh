@@ -578,21 +578,37 @@ Mesh generate_plane(const Vec3 &center, const Vec3 &normal,
     if (std::abs(n.x) < 0.9f) u = glm::normalize(glm::cross(n, Vec3(1,0,0)));
     else u = glm::normalize(glm::cross(n, Vec3(0,1,0)));
     v = glm::cross(n, u);
-    m.vertices = {
-        center - u * hx - v * hy,
-        center + u * hx - v * hy,
-        center + u * hx + v * hy,
-        center - u * hx + v * hy,
-    };
-    for (int i = 0; i < 4; i++) m.colors.push_back(color);
-    m.triangles = {{0,1,2}, {0,2,3}};
 
-    std::vector<Vec3> norms;
-    compute_vertex_normals(m, norms);
-    m.normals = norms;
+    // Calculate the 4 corner positions
+    Vec3 p0 = center - u * hx - v * hy; // Bottom-Left
+    Vec3 p1 = center + u * hx - v * hy; // Bottom-Right
+    Vec3 p2 = center + u * hx + v * hy; // Top-Right
+    Vec3 p3 = center - u * hx + v * hy; // Top-Left
 
-    m.triangles.push_back({0,2,1});
-    m.triangles.push_back({0,3,2});
+    m.vertices.reserve(8);
+    m.normals.reserve(8);
+    m.colors.reserve(8);
+    m.triangles.reserve(4);
+
+    // --- 1. FRONT FACE (Normal = +n) ---
+    m.vertices.insert(m.vertices.end(), {p0, p1, p2, p3});
+    for (int i = 0; i < 4; i++) {
+        m.normals.push_back(n);
+        m.colors.push_back(color);
+    }
+    // Standard CCW winding for the front
+    m.triangles.push_back({0, 1, 2});
+    m.triangles.push_back({0, 2, 3});
+
+    // --- 2. BACK FACE (Normal = -n) ---
+    m.vertices.insert(m.vertices.end(), {p0, p1, p2, p3});
+    for (int i = 0; i < 4; i++) {
+        m.normals.push_back(-n);
+        m.colors.push_back(color);
+    }
+    // Reversed CCW winding so the triangles face outward from the back
+    m.triangles.push_back({4, 6, 5});
+    m.triangles.push_back({4, 7, 6});
 
     return m;
 }
