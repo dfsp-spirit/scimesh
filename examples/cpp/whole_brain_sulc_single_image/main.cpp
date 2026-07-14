@@ -44,6 +44,7 @@ using scimesh::RenderOptions;
 using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
+using scimesh::CropContentDirection;
 using scimesh::convert_fs_mesh;
 
 int main(int argc, char **argv) {
@@ -185,6 +186,9 @@ int main(int argc, char **argv) {
     // ---- Render ----
     Renderer renderer;
     Image img = renderer.render_scene(scene, cam, opts);
+
+    img.crop_to_content(CropContentDirection::ALL, opts.background_color);
+    img.grow(20, 20, 20, 20, opts.background_color);
 
     // ---- Write output ----
     std::string out_ppm = "whole_brain_sulc.ppm";
