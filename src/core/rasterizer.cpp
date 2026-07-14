@@ -198,7 +198,7 @@ void Rasterizer::apply_ssao(Image &output) {
         {-0.309f, -0.951f}, { 0.588f,  0.809f}, {-0.588f,  0.809f}, {-1.000f, -0.000f},
     };
 
-    float inv_radius = 1.0f / std::max(1.0f, ssao_radius);
+    const float depth_threshold = 0.02f;
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
@@ -217,7 +217,7 @@ void Rasterizer::apply_ssao(Image &output) {
                 float sample_depth = z_buffer[sy * width + sx];
                 float diff = sample_depth - center_depth;
                 if (diff < 0.0f) {
-                    float falloff = 1.0f + diff * inv_radius * 2.0f;
+                    float falloff = 1.0f + diff / depth_threshold;
                     if (falloff > 0.0f) {
                         occluded++;
                     }
