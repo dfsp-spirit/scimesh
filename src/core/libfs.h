@@ -2723,7 +2723,7 @@ namespace fs
       int num_verts = _freadt<int32_t>(is);
       int num_faces = _freadt<int32_t>(is);
 #ifdef LIBFS_DBG_INFO
-      std::cout << LIBFS_APPTAG << "Read surface file with " << num_verts << " vertices, " << num_faces << " faces.\n";
+      //std::cout << LIBFS_APPTAG << "Read surface file with " << num_verts << " vertices, " << num_faces << " faces.\n";
 #endif
       std::vector<float> vdata;
       for (int i = 0; i < (num_verts * 3); i++)
