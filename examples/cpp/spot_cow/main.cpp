@@ -120,29 +120,43 @@ int main() {
         return 1;
     }
 
+    Vec3 cow_min, cow_max;
+    mesh.compute_bounding_box(cow_min, cow_max);
+    Vec3 cow_extent = cow_max - cow_min;
+    float plane_half_x = cow_extent.x * 0.9f;
+    float plane_half_z = cow_extent.z * 0.6f;
+    Vec3 plane_center((cow_min.x + cow_max.x) * 0.5f, cow_min.y, (cow_min.z + cow_max.z) * 0.5f);
+
+    Mesh plane = generate_plane(plane_center, Vec3(0.0f, 1.0f, 0.0f),
+                                plane_half_x, plane_half_z, Color(0.1f, 0.7f, 0.2f));
+
+    Scene scene;
+    scene.meshes.push_back(std::move(mesh));
+    scene.meshes.push_back(std::move(plane));
+
     Vec3 eye_dir = glm::normalize(Vec3(1.0f, 0.4f, -1.2f));
-    Camera cam = scimesh::camera_fit_mesh(mesh, eye_dir,
+    Camera cam = scimesh::camera_fit_scene(scene, eye_dir,
         Vec3(0.0f, 1.0f, 0.0f), 40.0f, 1.05f);
 
     scimesh::Light key_light;
     key_light.position = Vec3(0.5f, 1.0f, 1.0f);
     key_light.color    = Color(1.00f, 0.97f, 0.90f);
-    key_light.intensity = 1.5f;
+    key_light.intensity = 3.0f;
 
     scimesh::Light fill_light;
     fill_light.position = Vec3(-1.0f, 0.2f, 0.5f);
     fill_light.color    = Color(0.4f, 0.5f, 0.8f);
-    fill_light.intensity = 0.5f;
+    fill_light.intensity = 1.0f;
 
     scimesh::Light rim_light;
     rim_light.position = Vec3(0.0f, -0.3f, -1.0f);
     rim_light.color    = Color(0.5f, 0.5f, 0.5f);
-    rim_light.intensity = 0.4f;
+    rim_light.intensity = 0.8f;
 
     RenderOptions opts;
     opts.width  = 1200;
     opts.height = 900;
-    opts.background_color = Color(0.10f, 0.10f, 0.14f);
+    opts.background_color = Color(0.70f, 0.70f, 0.9f);
     opts.shading = ShadingMode::SMOOTH;
     opts.backface_culling = true;
     opts.ambient = 0.3f;
@@ -155,7 +169,7 @@ int main() {
     opts.ssao_intensity = 0.5f;
 
     Renderer renderer;
-    Image img = renderer.render_mesh(mesh, cam, opts);
+    Image img = renderer.render_scene(scene, cam, opts);
 
     img.write_ppm("spot_cow.ppm");
     img.write_bmp("spot_cow.bmp");

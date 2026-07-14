@@ -79,7 +79,7 @@ int main() {
     opts.height = 1020;
     opts.shading = ShadingMode::SMOOTH;
     opts.backface_culling = true;
-    opts.background_color = Color(0.92f, 0.93f, 0.95f, 1.0f);
+    opts.background_color = Color(1.0f, 1.0f, 1.0f, 0.0f);
     opts.ambient = 0.22f;
     opts.lights = {key_light, fill_light, rim_light};
     opts.specular_color = Color(0.25f, 0.25f, 0.25f);
