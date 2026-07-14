@@ -117,6 +117,10 @@ scimesh_image_scale <- function(image, new_width, new_height) {
     .Call(`_scimesh_scimesh_image_scale`, image, new_width, new_height)
 }
 
+scimesh_image_crop_to_content <- function(image, direction, background) {
+    .Call(`_scimesh_scimesh_image_crop_to_content`, image, direction, background)
+}
+
 scimesh_compute_vertex_normals <- function(mesh_data) {
     .Call(`_scimesh_scimesh_compute_vertex_normals`, mesh_data)
 }

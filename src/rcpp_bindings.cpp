@@ -778,6 +778,32 @@ List scimesh_image_scale(List image, int new_width, int new_height) {
     return image_to_r_list(img);
 }
 
+// [[Rcpp::export]]
+List scimesh_image_crop_to_content(List image, CharacterVector direction,
+                                    NumericVector background) {
+    std::string dir = as<std::string>(direction);
+    scimesh::CropContentDirection ccd;
+    if (dir == "left")        ccd = scimesh::CropContentDirection::LEFT;
+    else if (dir == "right")  ccd = scimesh::CropContentDirection::RIGHT;
+    else if (dir == "horizontal") ccd = scimesh::CropContentDirection::HORIZONTAL;
+    else if (dir == "top")    ccd = scimesh::CropContentDirection::TOP;
+    else if (dir == "bottom") ccd = scimesh::CropContentDirection::BOTTOM;
+    else if (dir == "vertical") ccd = scimesh::CropContentDirection::VERTICAL;
+    else if (dir == "all")    ccd = scimesh::CropContentDirection::ALL;
+    else Rcpp::stop("direction must be 'left', 'right', 'horizontal', 'top', 'bottom', 'vertical', or 'all'");
+
+    if (background.size() != 4) {
+        Rcpp::stop("background must be a numeric vector of length 4 (RGBA)");
+    }
+    scimesh::Image img = r_list_to_image(image);
+    scimesh::Color bg(static_cast<float>(background[0]),
+                      static_cast<float>(background[1]),
+                      static_cast<float>(background[2]),
+                      static_cast<float>(background[3]));
+    img.crop_to_content(ccd, bg);
+    return image_to_r_list(img);
+}
+
 // ---- Normals -----------------------------------------------------------------
 // [[Rcpp::export]]
 List scimesh_compute_vertex_normals(List mesh_data) {

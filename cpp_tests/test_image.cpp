@@ -275,3 +275,65 @@ TEST_CASE("Image scale to zero clears image", "[image]") {
     REQUIRE(img.height == 0);
     REQUIRE(img.pixels.empty());
 }
+
+TEST_CASE("Image crop_to_content LEFT with margin", "[image]") {
+    Image img(4, 2);
+    img.clear_float(0, 1, 0, 1);
+    img.set_pixel(2, 0, 255, 0, 0, 255);
+    img.set_pixel(3, 1, 255, 0, 0, 255);
+    img.crop_to_content(CropContentDirection::LEFT, Color(0, 1, 0, 1));
+    REQUIRE(img.width == 2);
+    REQUIRE(img.height == 2);
+    check_pixel(img, 0, 0, 255, 0, 0, 255);
+}
+
+TEST_CASE("Image crop_to_content HORIZONTAL crops both sides", "[image]") {
+    Image img(5, 1);
+    img.clear_float(0, 0, 1, 1);
+    img.set_pixel(1, 0, 255, 0, 0, 255);
+    img.set_pixel(3, 0, 255, 0, 0, 255);
+    img.crop_to_content(CropContentDirection::HORIZONTAL, Color(0, 0, 1, 1));
+    REQUIRE(img.width == 3);
+    check_pixel(img, 0, 0, 255, 0, 0, 255);
+    check_pixel(img, 2, 0, 255, 0, 0, 255);
+}
+
+TEST_CASE("Image crop_to_content VERTICAL crops top and bottom", "[image]") {
+    Image img(1, 5);
+    img.clear_float(1, 1, 0, 1);
+    img.set_pixel(0, 1, 255, 0, 0, 255);
+    img.set_pixel(0, 3, 255, 0, 0, 255);
+    img.crop_to_content(CropContentDirection::VERTICAL, Color(1, 1, 0, 1));
+    REQUIRE(img.height == 3);
+    check_pixel(img, 0, 0, 255, 0, 0, 255);
+    check_pixel(img, 0, 2, 255, 0, 0, 255);
+}
+
+TEST_CASE("Image crop_to_content ALL crops all sides", "[image]") {
+    Image img(5, 5);
+    img.clear_float(0, 0, 0, 1);
+    img.set_pixel(1, 1, 255, 0, 0, 255);
+    img.set_pixel(3, 3, 255, 0, 0, 255);
+    img.crop_to_content(CropContentDirection::ALL, Color(0, 0, 0, 1));
+    REQUIRE(img.width == 3);
+    REQUIRE(img.height == 3);
+}
+
+TEST_CASE("Image crop_to_content fully background clears image", "[image]") {
+    Image img(3, 3);
+    img.clear_float(1, 0, 0, 1);
+    img.crop_to_content(CropContentDirection::ALL, Color(1, 0, 0, 1));
+    REQUIRE(img.width == 0);
+    REQUIRE(img.height == 0);
+    REQUIRE(img.pixels.empty());
+}
+
+TEST_CASE("Image crop_to_content no margin is no-op", "[image]") {
+    Image img(2, 2);
+    img.clear_float(0, 1, 0, 1);
+    img.set_pixel(0, 0, 255, 0, 0, 255);
+    img.set_pixel(1, 1, 255, 0, 0, 255);
+    img.crop_to_content(CropContentDirection::LEFT, Color(0, 1, 0, 1));
+    REQUIRE(img.width == 2);
+    REQUIRE(img.height == 2);
+}

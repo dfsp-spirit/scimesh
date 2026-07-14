@@ -401,6 +401,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_image_crop_to_content
+List scimesh_image_crop_to_content(List image, CharacterVector direction, NumericVector background);
+RcppExport SEXP _scimesh_scimesh_image_crop_to_content(SEXP imageSEXP, SEXP directionSEXP, SEXP backgroundSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type direction(directionSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type background(backgroundSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_crop_to_content(image, direction, background));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_compute_vertex_normals
 List scimesh_compute_vertex_normals(List mesh_data);
 RcppExport SEXP _scimesh_scimesh_compute_vertex_normals(SEXP mesh_dataSEXP) {
@@ -443,6 +456,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_image_grow", (DL_FUNC) &_scimesh_scimesh_image_grow, 6},
     {"_scimesh_scimesh_image_rotate_90", (DL_FUNC) &_scimesh_scimesh_image_rotate_90, 2},
     {"_scimesh_scimesh_image_scale", (DL_FUNC) &_scimesh_scimesh_image_scale, 3},
+    {"_scimesh_scimesh_image_crop_to_content", (DL_FUNC) &_scimesh_scimesh_image_crop_to_content, 3},
     {"_scimesh_scimesh_compute_vertex_normals", (DL_FUNC) &_scimesh_scimesh_compute_vertex_normals, 1},
     {NULL, NULL, 0}
 };

@@ -151,3 +151,35 @@ image_rotate_90 <- function(image, clockwise = TRUE) {
 image_scale <- function(image, new_width, new_height) {
     scimesh_image_scale(image, as.integer(new_width), as.integer(new_height))
 }
+
+#' Crop an image to its content bounding box
+#'
+#' Removes background-coloured margin from the specified edges of the
+#' image. The first non-background pixel found on each edge defines the
+#' crop boundary.
+#'
+#' @param image An image list.
+#' @param direction One of \code{"left"}, \code{"right"},
+#'   \code{"horizontal"} (both left and right), \code{"top"},
+#'   \code{"bottom"}, \code{"vertical"} (both top and bottom), or
+#'   \code{"all"} (all four sides).
+#' @param background Numeric vector of length 4 with RGBA values in
+#'   \code{[0, 1]} defining the background colour to crop away.
+#' @return A new image list with cropped dimensions.
+#'
+#' @examples
+#' \dontrun{
+#' img <- render_mesh(cube$vertices, cube$triangles,
+#'                    options = render_options(background_color = c(0, 0, 0, 0)))
+#' img <- image_crop_to_content(img, "all", c(0, 0, 0, 0))
+#' }
+#'
+#' @export
+image_crop_to_content <- function(image, direction, background) {
+    direction <- match.arg(direction, c("left", "right", "horizontal",
+                                        "top", "bottom", "vertical", "all"))
+    if (!is.numeric(background) || length(background) != 4) {
+        stop("background must be a numeric vector of length 4 (RGBA)")
+    }
+    scimesh_image_crop_to_content(image, direction, background)
+}

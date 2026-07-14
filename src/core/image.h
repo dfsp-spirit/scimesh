@@ -9,6 +9,8 @@ namespace scimesh {
 
 enum class MergeDirection { LEFT, RIGHT, TOP, BOTTOM };
 
+enum class CropContentDirection { LEFT, RIGHT, HORIZONTAL, TOP, BOTTOM, VERTICAL, ALL };
+
 struct Image {
     int width = 0;
     int height = 0;
@@ -32,6 +34,7 @@ struct Image {
     void grow(int top, int bottom, int left, int right, const Color &background);
     void rotate_90(bool clockwise = true);
     void scale(int new_width, int new_height);
+    void crop_to_content(CropContentDirection direction, const Color &background);
 
     // Write to PPM (for C++ test debugging - trivial format, no dependencies)
     bool write_ppm(const std::string &filename) const;

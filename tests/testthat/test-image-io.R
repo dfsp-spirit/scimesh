@@ -417,3 +417,57 @@ test_that("image_scale downscale reduces dimensions", {
     expect_equal(scaled$width, 2L)
     expect_equal(scaled$height, 2L)
 })
+
+# --- Category: crop_to_content ------------------------------------------------
+
+test_that("image_crop_to_content LEFT removes left margin", {
+    img <- .make_test_image(4, 2, 0, 255, 0, 255)  # all green
+    # make first two columns red (content)
+    npix <- 4 * 2
+    raw_bytes <- as.raw(rep(c(0, 255, 0, 255), times = npix))
+    raw_bytes[1:8] <- as.raw(c(255, 0, 0, 255, 255, 0, 0, 255))  # col 0 red
+    img$pixels <- as.raw(raw_bytes)
+    # all columns are green except col 0 has red — not a great test...
+    # let me build a better one
+    
+    # Make a 4x2: only last 2 columns are red, first 2 columns are green bg
+    raw <- as.raw(rep(c(rep(c(0, 255, 0, 255), 2), rep(c(255, 0, 0, 255), 2)), times = 2))
+    img <- list(width = 4L, height = 2L, pixels = raw)
+    cropped <- image_crop_to_content(img, "left", c(0, 1, 0, 1))
+    expect_equal(cropped$width, 2L)
+})
+
+test_that("image_crop_to_content HORIZONTAL crops both sides", {
+    # 5x1: cols 0,4 blue bg, cols 1-3 red content
+    raw <- as.raw(c(0, 0, 255, 255,  255, 0, 0, 255, 255, 0, 0, 255,
+                    255, 0, 0, 255,  0, 0, 255, 255))
+    img <- list(width = 5L, height = 1L, pixels = raw)
+    cropped <- image_crop_to_content(img, "horizontal", c(0, 0, 1, 1))
+    expect_equal(cropped$width, 3L)
+})
+
+test_that("image_crop_to_content ALL crops all four sides", {
+    # 5x5: black bg, content at (1,1) and (3,3)
+    raw <- as.raw(rep(c(0, 0, 0, 255), times = 25L))
+    # set (1,1) and (3,3) to red
+    idx1 <- (1*5 + 1)*4 + 1
+    idx2 <- (3*5 + 3)*4 + 1
+    raw[idx1:(idx1+2)] <- as.raw(c(255, 0, 0))
+    raw[idx2:(idx2+2)] <- as.raw(c(255, 0, 0))
+    img <- list(width = 5L, height = 5L, pixels = raw)
+    cropped <- image_crop_to_content(img, "all", c(0, 0, 0, 1))
+    expect_equal(cropped$width, 3L)
+    expect_equal(cropped$height, 3L)
+})
+
+test_that("image_crop_to_content fully background zeroes dimensions", {
+    img <- .make_test_image(3, 3, 255, 0, 0, 255)
+    cropped <- image_crop_to_content(img, "all", c(1, 0, 0, 1))
+    expect_equal(cropped$width, 0L)
+    expect_equal(cropped$height, 0L)
+})
+
+test_that("image_crop_to_content invalid direction errors", {
+    img <- .make_test_image(2, 2, 255, 0, 0, 255)
+    expect_error(image_crop_to_content(img, "diagonal", c(0, 0, 0, 0)))
+})

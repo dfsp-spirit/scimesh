@@ -251,6 +251,84 @@ void Image::scale(int new_width, int new_height) {
     pixels = std::move(new_pixels);
 }
 
+void Image::crop_to_content(CropContentDirection direction, const Color &background) {
+    if (width <= 0 || height <= 0) return;
+
+    uint8_t br = static_cast<uint8_t>(std::clamp(background.r, 0.0f, 1.0f) * 255.0f);
+    uint8_t bg = static_cast<uint8_t>(std::clamp(background.g, 0.0f, 1.0f) * 255.0f);
+    uint8_t bb = static_cast<uint8_t>(std::clamp(background.b, 0.0f, 1.0f) * 255.0f);
+    uint8_t ba = static_cast<uint8_t>(std::clamp(background.a, 0.0f, 1.0f) * 255.0f);
+
+    auto is_bg = [&](int x, int y) {
+        int idx = (y * width + x) * 4;
+        return pixels[idx] == br && pixels[idx+1] == bg &&
+               pixels[idx+2] == bb && pixels[idx+3] == ba;
+    };
+
+    int crop_left = 0, crop_right = 0, crop_top = 0, crop_bottom = 0;
+
+    bool do_left   = (direction == CropContentDirection::LEFT ||
+                      direction == CropContentDirection::HORIZONTAL ||
+                      direction == CropContentDirection::ALL);
+    bool do_right  = (direction == CropContentDirection::RIGHT ||
+                      direction == CropContentDirection::HORIZONTAL ||
+                      direction == CropContentDirection::ALL);
+    bool do_top    = (direction == CropContentDirection::TOP ||
+                      direction == CropContentDirection::VERTICAL ||
+                      direction == CropContentDirection::ALL);
+    bool do_bottom = (direction == CropContentDirection::BOTTOM ||
+                      direction == CropContentDirection::VERTICAL ||
+                      direction == CropContentDirection::ALL);
+
+    if (do_left) {
+        for (int x = 0; x < width; ++x) {
+            bool all_bg = true;
+            for (int y = 0; y < height; ++y) {
+                if (!is_bg(x, y)) { all_bg = false; break; }
+            }
+            if (!all_bg) break;
+            crop_left = x + 1;
+        }
+    }
+
+    if (do_right) {
+        for (int x = width - 1; x >= crop_left; --x) {
+            bool all_bg = true;
+            for (int y = 0; y < height; ++y) {
+                if (!is_bg(x, y)) { all_bg = false; break; }
+            }
+            if (!all_bg) break;
+            crop_right = width - x;
+        }
+    }
+
+    if (do_top) {
+        for (int y = 0; y < height; ++y) {
+            bool all_bg = true;
+            for (int x = 0; x < width; ++x) {
+                if (!is_bg(x, y)) { all_bg = false; break; }
+            }
+            if (!all_bg) break;
+            crop_top = y + 1;
+        }
+    }
+
+    if (do_bottom) {
+        for (int y = height - 1; y >= crop_top; --y) {
+            bool all_bg = true;
+            for (int x = 0; x < width; ++x) {
+                if (!is_bg(x, y)) { all_bg = false; break; }
+            }
+            if (!all_bg) break;
+            crop_bottom = height - y;
+        }
+    }
+
+    int new_w = width - crop_left - crop_right;
+    int new_h = height - crop_top - crop_bottom;
+    crop(crop_left, crop_top, std::max(0, new_w), std::max(0, new_h));
+}
+
 Color Image::sample_bilinear(float u, float v) const {
     if (width < 1 || height < 1) return Color();
     u = std::max(0.0f, std::min(1.0f, u));
