@@ -9,8 +9,8 @@ scimesh_render_scene <- function(scene_data, camera_data, options_data) {
     .Call(`_scimesh_scimesh_render_scene`, scene_data, camera_data, options_data)
 }
 
-scimesh_camera_fit_mesh <- function(mesh_data, direction, up, fov_degrees = 45.0, margin = 1.1) {
-    .Call(`_scimesh_scimesh_camera_fit_mesh`, mesh_data, direction, up, fov_degrees, margin)
+scimesh_camera_fit_mesh <- function(mesh_data, direction, up, fov_degrees = 45.0, margin = 1.1, projection = "perspective") {
+    .Call(`_scimesh_scimesh_camera_fit_mesh`, mesh_data, direction, up, fov_degrees, margin, projection)
 }
 
 scimesh_transform_mesh <- function(mesh_data, matrix_4x4) {

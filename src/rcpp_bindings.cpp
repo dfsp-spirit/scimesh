@@ -434,15 +434,21 @@ List scimesh_render_scene(List scene_data, List camera_data, List options_data) 
 // [[Rcpp::export]]
 List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
                               NumericVector up, double fov_degrees = 45.0,
-                              double margin = 1.1) {
+                              double margin = 1.1,
+                              CharacterVector projection = "perspective") {
     scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
     scimesh::Vec3 dir = vec3_from_r(direction);
     scimesh::Vec3 up_vec = vec3_from_r(up);
 
+    std::string proj_str = as<std::string>(projection);
+    scimesh::ProjectionType proj = scimesh::ProjectionType::PERSPECTIVE;
+    if (proj_str == "orthographic") proj = scimesh::ProjectionType::ORTHOGRAPHIC;
+
     scimesh::Camera cam = scimesh::camera_fit_mesh(
         mesh, dir, up_vec,
         static_cast<float>(fov_degrees),
-        static_cast<float>(margin));
+        static_cast<float>(margin),
+        proj);
 
     return List::create(
         Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),

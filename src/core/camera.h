@@ -63,14 +63,38 @@ inline float perp_extent_radius(const Vec3 &bmin, const Vec3 &bmax,
     return max_dist * sin_half;
 }
 
+// Maximum perpendicular extent of the AABB from the view ray through center.
+// Used for orthographic projection framing (no FOV dependence).
+inline float max_ortho_extent(const Vec3 &bmin, const Vec3 &bmax,
+                               const Vec3 &center, const Vec3 &dir) {
+    Vec3 corners[8] = {
+        Vec3(bmin.x, bmin.y, bmin.z), Vec3(bmax.x, bmin.y, bmin.z),
+        Vec3(bmin.x, bmax.y, bmin.z), Vec3(bmax.x, bmax.y, bmin.z),
+        Vec3(bmin.x, bmin.y, bmax.z), Vec3(bmax.x, bmin.y, bmax.z),
+        Vec3(bmin.x, bmax.y, bmax.z), Vec3(bmax.x, bmax.y, bmax.z),
+    };
+    float max_perp = 0.0f;
+    for (int i = 0; i < 8; i++) {
+        Vec3 delta = corners[i] - center;
+        float along = glm::dot(delta, dir);
+        float perp = std::sqrt(std::max(0.0f, glm::dot(delta, delta) - along * along));
+        if (perp > max_perp) max_perp = perp;
+    }
+    if (max_perp < 1e-6f) max_perp = 1.0f;
+    return max_perp;
+}
+
 Camera camera_look_at(const Vec3 &center, float radius,
                       const Vec3 &direction, const Vec3 &up,
-                      float fov_degrees, float margin = 1.1f);
+                      float fov_degrees, float margin = 1.1f,
+                      ProjectionType projection = ProjectionType::PERSPECTIVE);
 
 Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
-                        const Vec3 &up, float fov_degrees, float margin = 1.1f);
+                        const Vec3 &up, float fov_degrees, float margin = 1.1f,
+                        ProjectionType projection = ProjectionType::PERSPECTIVE);
 
 Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
-                       const Vec3 &up, float fov_degrees, float margin = 1.1f);
+                       const Vec3 &up, float fov_degrees, float margin = 1.1f,
+                       ProjectionType projection = ProjectionType::PERSPECTIVE);
 
 } // namespace scimesh

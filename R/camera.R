@@ -56,7 +56,9 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #'
 #' @export
 camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
-                        fov = 45, margin = 1.1) {
+                        fov = 45, margin = 1.1,
+                        projection = c("perspective", "orthographic")) {
+    projection <- match.arg(projection)
     if (is.list(mesh) && !is.null(mesh$vertices)) {
         mesh_data <- mesh
     } else if (is.matrix(mesh) && ncol(mesh) == 3L) {
@@ -83,5 +85,5 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
         )
     }
 
-    scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin)
+    scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
 }

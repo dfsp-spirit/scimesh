@@ -9,7 +9,8 @@ camera_auto(
   direction = c(0, 0, -1),
   up = c(0, 1, 0),
   fov = 45,
-  margin = 1.1
+  margin = 1.1,
+  projection = c("perspective", "orthographic")
 )
 }
 \arguments{

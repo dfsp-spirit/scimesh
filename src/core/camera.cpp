@@ -24,37 +24,56 @@ Mat4 Camera::get_projection_matrix(float aspect_ratio, float near_plane, float f
 
 Camera camera_look_at(const Vec3 &center, float radius,
                       const Vec3 &direction, const Vec3 &up,
-                      float fov_degrees, float margin) {
+                      float fov_degrees, float margin,
+                      ProjectionType projection) {
     Camera cam;
     cam.center = center;
     cam.up = glm::normalize(up);
     cam.fov_degrees = fov_degrees;
+    cam.projection = projection;
     float fov_rad = glm::radians(fov_degrees);
-    float dist = radius / std::sin(fov_rad * 0.5f) * margin;
+    float dist;
+    if (projection == ProjectionType::ORTHOGRAPHIC) {
+        dist = radius * margin;
+    } else {
+        dist = radius / std::sin(fov_rad * 0.5f) * margin;
+    }
     cam.eye = center + glm::normalize(direction) * dist;
     return cam;
 }
 
 Camera camera_fit_scene(const Scene &scene, const Vec3 &direction,
-                        const Vec3 &up, float fov_degrees, float margin) {
+                        const Vec3 &up, float fov_degrees, float margin,
+                        ProjectionType projection) {
     Vec3 bmin, bmax;
     scene.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
     Vec3 dir = glm::normalize(direction);
-    float radius = perp_extent_radius(bmin, bmax, center, dir,
-                                       glm::radians(fov_degrees));
-    return camera_look_at(center, radius, direction, up, fov_degrees, margin);
+    if (projection == ProjectionType::ORTHOGRAPHIC) {
+        float extent = max_ortho_extent(bmin, bmax, center, dir);
+        return camera_look_at(center, extent, direction, up, fov_degrees, margin, projection);
+    } else {
+        float radius = perp_extent_radius(bmin, bmax, center, dir,
+                                           glm::radians(fov_degrees));
+        return camera_look_at(center, radius, direction, up, fov_degrees, margin, projection);
+    }
 }
 
 Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
-                       const Vec3 &up, float fov_degrees, float margin) {
+                       const Vec3 &up, float fov_degrees, float margin,
+                       ProjectionType projection) {
     Vec3 bmin, bmax;
     mesh.compute_bounding_box(bmin, bmax);
     Vec3 center = (bmin + bmax) * 0.5f;
     Vec3 dir = glm::normalize(direction);
-    float radius = perp_extent_radius(bmin, bmax, center, dir,
-                                       glm::radians(fov_degrees));
-    return camera_look_at(center, radius, direction, up, fov_degrees, margin);
+    if (projection == ProjectionType::ORTHOGRAPHIC) {
+        float extent = max_ortho_extent(bmin, bmax, center, dir);
+        return camera_look_at(center, extent, direction, up, fov_degrees, margin, projection);
+    } else {
+        float radius = perp_extent_radius(bmin, bmax, center, dir,
+                                           glm::radians(fov_degrees));
+        return camera_look_at(center, radius, direction, up, fov_degrees, margin, projection);
+    }
 }
 
 } // namespace scimesh

@@ -207,3 +207,42 @@ TEST_CASE("camera_fit_mesh auto-frames a cluster of spheres proportionally to ma
     REQUIRE(std::abs(bbox_13.center_x() - img_center) < size / 20);
     REQUIRE(std::abs(bbox_13.center_y() - img_center) < size / 20);
 }
+
+TEST_CASE("camera_fit_mesh orthographic uses perp extent not FOV distance", "[camera]") {
+    Mesh sphere = generate_sphere(Vec3(0, 0, 0), 1.0f, 16, Color(1, 0, 0));
+    Vec3 direction = glm::normalize(Vec3(0, 0, -1));
+
+    Camera persp = camera_fit_mesh(sphere, direction, Vec3(0, 1, 0), 45.0f, 1.0f,
+                                    ProjectionType::PERSPECTIVE);
+    Camera ortho = camera_fit_mesh(sphere, direction, Vec3(0, 1, 0), 45.0f, 1.0f,
+                                    ProjectionType::ORTHOGRAPHIC);
+
+    REQUIRE(persp.projection == ProjectionType::PERSPECTIVE);
+    REQUIRE(ortho.projection == ProjectionType::ORTHOGRAPHIC);
+
+    float persp_dist = glm::length(persp.eye - persp.center);
+    float ortho_dist = glm::length(ortho.eye - ortho.center);
+    REQUIRE(ortho_dist < persp_dist);
+
+    // Unit sphere bbox is [-1,1]³, perp extent from (0,0,-1) axis ≈ sqrt(2)
+    REQUIRE(ortho_dist == Approx(1.414f).margin(0.1f));
+}
+
+TEST_CASE("camera_fit_scene orthographic frames mesh correctly", "[camera]") {
+    std::vector<Vec3> centers = {Vec3(-3, 0, 0), Vec3(3, 0, 0)};
+    std::vector<float> radii = {1.0f, 1.0f};
+    std::vector<Color> colors = {Color(1, 0, 0), Color(0, 0, 1)};
+    Mesh cluster = generate_multi_spheres(centers, radii, colors, 12);
+
+    Scene scene;
+    scene.meshes.push_back(cluster);
+
+    Vec3 direction = glm::normalize(Vec3(0, 0, -1));
+    Camera ortho = camera_fit_scene(scene, direction, Vec3(0, 1, 0), 45.0f, 1.0f,
+                                     ProjectionType::ORTHOGRAPHIC);
+
+    REQUIRE(ortho.projection == ProjectionType::ORTHOGRAPHIC);
+    float dist = glm::length(ortho.eye - ortho.center);
+    // Bbox [-4,4]×[-1,1]×[-1,1], perp extent ≈ sqrt(4²+1²) ≈ 4.123
+    REQUIRE(dist == Approx(4.123f).margin(0.2f));
+}
