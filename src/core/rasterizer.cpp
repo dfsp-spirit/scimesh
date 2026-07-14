@@ -186,10 +186,20 @@ void Rasterizer::rasterize_point(float screen_x, float screen_y, float depth,
     }
 }
 
-void Rasterizer::apply_ssao(Image &output) {
+
+// You'll need to pass your camera's near and far clipping planes (e.g., 0.1f and 100.0f)
+void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
     if (!ssao_enabled || width < 2 || height < 2) return;
 
-    int radius_i = std::max(1, static_cast<int>(ssao_radius));
+    // --- TUNABLE PARAMETERS (Now in linear world-units, e.g., meters) ---
+    // How far a sample must jut out to cast a shadow (fixes ground plane acne)
+    const float depth_bias = 0.05f;
+
+    // Max distance before we assume it's a different object (fixes skybox/cow halo)
+    const float max_occlusion_distance = 1.5f;
+
+    // Multiplier to convert world-radius to screen pixels
+    const float radius_scale = 10.0f;
 
     // Fixed normalized sample directions (8 samples on a spiral)
     const int ns = 8;
@@ -198,35 +208,66 @@ void Rasterizer::apply_ssao(Image &output) {
         {-0.309f, -0.951f}, { 0.588f,  0.809f}, {-0.588f,  0.809f}, {-1.000f, -0.000f},
     };
 
-    const float depth_threshold = 0.02f;
+    // Precalculate linearization constants outside the loop to save CPU cycles
+    const float depth_C = 2.0f * z_near * z_far;
+    const float depth_D = z_far + z_near;
+    const float depth_E = z_far - z_near;
+
+    // Fast inline lambda for depth linearization
+    auto linearize = [&](float raw_z) {
+        float z_ndc = 2.0f * raw_z - 1.0f;
+        return depth_C / (depth_D - z_ndc * depth_E);
+    };
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             int idx = y * width + x;
-            float center_depth = z_buffer[idx];
+            float center_depth_raw = z_buffer[idx];
 
-            if (center_depth >= 1.0f) continue;
+            // Skip background pixels
+            if (center_depth_raw >= 1.0f) continue;
 
-            int occluded = 0;
+            // Convert center depth to actual world units
+            float center_depth = linearize(center_depth_raw);
+
+            // Scale the sampling radius based on distance (closer = bigger radius)
+            int screen_radius = static_cast<int>((ssao_radius * radius_scale) / center_depth);
+            screen_radius = std::max(1, std::min(screen_radius, 100)); // Clamp to sane bounds
+
+            float occlusion = 0.0f;
             for (int s = 0; s < ns; ++s) {
-                int sx = x + static_cast<int>(dirs[s][0] * radius_i);
-                int sy = y + static_cast<int>(dirs[s][1] * radius_i);
+                int sx = x + static_cast<int>(dirs[s][0] * screen_radius);
+                int sy = y + static_cast<int>(dirs[s][1] * screen_radius);
+
+                // Bounds check
                 if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
                     continue;
                 }
-                float sample_depth = z_buffer[sy * width + sx];
-                float diff = sample_depth - center_depth;
-                if (diff < 0.0f) {
-                    float falloff = 1.0f + diff / depth_threshold;
-                    if (falloff > 0.0f) {
-                        occluded++;
+
+                float sample_depth_raw = z_buffer[sy * width + sx];
+                float sample_depth = linearize(sample_depth_raw);
+
+                // Delta: Positive means the sample is CLOSER to the camera than the center
+                float depth_delta = center_depth - sample_depth;
+
+                // 1. Bias Check: Is it actually jutting out, or is it just a tilted flat plane?
+                if (depth_delta > depth_bias) {
+
+                    // 2. Range Check: Smooth falloff to prevent halos across large gaps
+                    float range_falloff = 1.0f - (depth_delta / max_occlusion_distance);
+
+                    // Only add occlusion if it's within the max distance
+                    if (range_falloff > 0.0f) {
+                        occlusion += range_falloff;
                     }
                 }
             }
 
-            float ao = 1.0f - ssao_intensity * static_cast<float>(occluded) / ns;
+            // Calculate final AO and apply intensity
+            float ao = 1.0f - (ssao_intensity * (occlusion / static_cast<float>(ns)));
             ao = std::max(0.0f, std::min(1.0f, ao));
 
+            // Apply to color buffer
             if (ao < 1.0f) {
                 uint8_t r, g, b, a;
                 output.get_pixel(x, y, r, g, b, a);
@@ -238,5 +279,4 @@ void Rasterizer::apply_ssao(Image &output) {
         }
     }
 }
-
 } // namespace scimesh

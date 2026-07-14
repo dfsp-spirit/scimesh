@@ -46,7 +46,7 @@ struct Rasterizer {
                          const Vec3 &normal, const Vec3 &light_direction,
                          Image &output);
 
-    void apply_ssao(Image &output);
+    void apply_ssao(Image &output, float z_near, float z_far);
 
     Image *active_texture = nullptr;
 

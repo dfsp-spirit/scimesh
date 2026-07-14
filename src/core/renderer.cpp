@@ -130,7 +130,7 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     }
 
     if (rasterizer.ssao_enabled) {
-        rasterizer.apply_ssao(output);
+        rasterizer.apply_ssao(output, options.near_plane, options.far_plane);
     }
 
     return output.downsample_box(aa);
@@ -378,7 +378,7 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     }
 
     if (rasterizer.ssao_enabled) {
-        rasterizer.apply_ssao(output);
+        rasterizer.apply_ssao(output, options.near_plane, options.far_plane);
     }
 
     if (!deferred.empty()) {
