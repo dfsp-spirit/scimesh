@@ -53,6 +53,7 @@ run_one() {
     fi
 }
 
+run_one all_primitives                    all_primitives
 run_one spot_cow                          spot_cow
 run_one transparency                      transparency_demo
 run_one protein_data_bank_pdb_file        protein_demo        ../1CRN.pdb
