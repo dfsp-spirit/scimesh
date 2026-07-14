@@ -1,6 +1,12 @@
 scimesh Changes
 ===============
 
+
+Current WIP
+------------
+- NEW: add some basic convenience image ops to Image class
+
+
 Version 0.2.2 -- Better SSOA and primitives
 -------------------------------------------
 - NEW: improve SSOA quality dramatically by adding depth buffer
