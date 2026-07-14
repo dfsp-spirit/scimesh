@@ -205,12 +205,13 @@ void Rasterizer::apply_ssao(Image &output) {
             int idx = y * width + x;
             float center_depth = z_buffer[idx];
 
+            if (center_depth >= 1.0f) continue;
+
             int occluded = 0;
             for (int s = 0; s < ns; ++s) {
                 int sx = x + static_cast<int>(dirs[s][0] * radius_i);
                 int sy = y + static_cast<int>(dirs[s][1] * radius_i);
                 if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
-                    occluded++;
                     continue;
                 }
                 float sample_depth = z_buffer[sy * width + sx];
