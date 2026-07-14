@@ -140,10 +140,10 @@ write_png(img, "sphere.png")
 - **C++ examples**: [`examples/cpp/`](examples/cpp/) — standalone
   programs covering textured OBJ, transparency, protein visualization,
   and whole-brain rendering.
-- R live help: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
-* R live demo: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
-* Sme of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially a list of examples that illustrate how to use the functions.
-*
+- **R live help**: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
+* **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
+* **Tests:** Some of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially examples that illustrate how to use the functions.
+
 
 ## Examples
 
