@@ -30,6 +30,7 @@ using scimesh::Camera;
 using scimesh::RenderOptions;
 using scimesh::ShadingMode;
 using scimesh::Renderer;
+using scimesh::CropContentDirection;
 using scimesh::Image;
 
 int main() {
@@ -98,6 +99,9 @@ int main() {
     Image img = renderer.render_mesh(mesh, cam, opts);
     auto t1 = std::chrono::high_resolution_clock::now();
     double elapsed = std::chrono::duration<double>(t1 - t0).count();
+
+    img.crop_to_content(CropContentDirection::ALL, opts.background_color);
+    img.grow(20, 20, 200, 200, opts.background_color);
 
     const char *out_file = "dragon.png";
     img.write_png(out_file);
