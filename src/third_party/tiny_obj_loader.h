@@ -82,16 +82,6 @@ namespace tinyobj {
 #error "tinyobjloader requires C++11 or later. Compile with -std=c++11 or higher."
 #endif
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#if __has_warning("-Wzero-as-null-pointer-constant")
-#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#endif
-
-#pragma clang diagnostic ignored "-Wpadded"
-
-#endif
-
 // https://en.wikipedia.org/wiki/Wavefront_.obj_file says ...
 //
 //  -blendu on | off                       # set horizontal texture blending
@@ -1240,18 +1230,11 @@ OptResult LoadObjOptTyped(const char *filename,
 // Assume earcut.hpp is included outside of tiny_obj_loader.h
 #else
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Weverything"
-#endif
-
 #include <array>
 
 #include "mapbox/earcut.hpp"
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+
 
 #endif
 
@@ -5575,23 +5558,10 @@ fastfloat_really_inline bool rounds_to_nearest() noexcept {
 // enabled, as rounding conventions may not apply.
 #ifdef FASTFLOAT_VISUAL_STUDIO
 #pragma warning(push)
-//  todo: is there a VS warning?
-//  see
-//  https://stackoverflow.com/questions/46079446/is-there-a-warning-for-floating-point-equality-checking-in-visual-studio-2013
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
   return (fmini + 1.0f == 1.0f - fmini);
 #ifdef FASTFLOAT_VISUAL_STUDIO
 #pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
 #endif
 }
 
@@ -13857,9 +13827,6 @@ OptResult LoadObjOptTyped(const char *filename,
   return result;
 }
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 }  // namespace tinyobj
 
 #endif
