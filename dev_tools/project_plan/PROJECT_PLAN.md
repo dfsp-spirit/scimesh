@@ -474,11 +474,18 @@ scimesh/
 │       ├── image.h           # RGBA Image abstraction
 │       ├── image.cpp         # Implementation
 │       ├── math_utils.h      # Vector/Matrix utilities (uses GLM)
-│       └── glm/              # GLM header-only library (vendored)
-│           ├── vec3.hpp
-│           ├── vec4.hpp
-│           ├── mat4x4.hpp
-│           └── gtc/matrix_transform.hpp
+│   ├── third_party/          # Vendored third-party dependencies
+│   │   ├── glm/              # GLM header-only library (vendored)
+│   │   │   ├── vec3.hpp
+│   │   │   ├── vec4.hpp
+│   │   │   ├── mat4x4.hpp
+│   │   │   └── gtc/matrix_transform.hpp
+│   │   ├── stb_image.h
+│   │   ├── stb_image_write.h
+│   │   ├── tiny_obj_loader.h
+│   │   ├── tinyply.{h,cpp}
+│   │   ├── stl_reader.h
+│   │   └── libfs.h
 │
 ├── tests/                    # Standard R package tests
 │   ├── testthat.R
@@ -489,7 +496,6 @@ scimesh/
     ├── CMakeLists.txt        # Build profile for independent C++ compiling
     ├── main_test.cpp         # Test runner (Catch2 / doctest)
     ├── test_rasterizer.cpp   # Unit tests for the core/ algorithms
-    └── stb_image_write.h     # For writing test images to disk
 ```
 
 ### Dual-Track Development Workflow

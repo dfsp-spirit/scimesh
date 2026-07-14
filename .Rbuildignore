@@ -16,7 +16,7 @@
 ^Makefile$
 ^install_manifest\.txt
 ^compile_commands\.json
-^src/core/tinyply\.cpp$
+^src/third_party/tinyply\.cpp$
 ^src/core/.*\.o$
 ^src/.*\.o$
 ^src/.*\.so$

@@ -40,7 +40,7 @@ The C++ renderer core lives in `src/core/`:
 | `clipping.h/cpp` | Triangle clipping against planes |
 | `rasterizer.h/cpp` | Scanline rasterizer with z-buffer |
 | `math_utils.h` | Inline math helpers |
-| `glm/` | Vendored GLM math library (headers only) |
+| `third_party/glm/` | Vendored GLM math library (headers only) |
 
 To use scimesh in your own project, compile the `.cpp` files from
 `src/core/` alongside your code and add the include paths.
@@ -97,7 +97,7 @@ int main() {
 
 ```sh
 mkdir -p build && cd build
-g++ -std=c++17 -O2 -I../../src/core -I../../src/core/glm \
+g++ -std=c++17 -O2 -I../../src/core -I../../src/third_party -I../../src/third_party/glm \
     ../main.cpp ../../src/core/renderer.cpp ../../src/core/camera.cpp \
     ../../src/core/image.cpp ../../src/core/primitives.cpp \
     ../../src/core/rasterizer.cpp ../../src/core/normals.cpp \

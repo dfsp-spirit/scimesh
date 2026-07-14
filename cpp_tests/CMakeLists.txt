@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include paths: core renderer headers and vendored GLM
 include_directories(
     ${CMAKE_SOURCE_DIR}/../src/core
-    ${CMAKE_SOURCE_DIR}/../src/core/glm
+    ${CMAKE_SOURCE_DIR}/../src/third_party
+    ${CMAKE_SOURCE_DIR}/../src/third_party/glm
     ${CMAKE_SOURCE_DIR}
 )
 
@@ -22,7 +23,7 @@ set(CORE_SOURCES
     ${CMAKE_SOURCE_DIR}/../src/core/clipping.cpp
     ${CMAKE_SOURCE_DIR}/../src/core/rasterizer.cpp
     ${CMAKE_SOURCE_DIR}/../src/core/renderer.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/tinyply.cpp
+    ${CMAKE_SOURCE_DIR}/../src/third_party/tinyply.cpp
     ${CMAKE_SOURCE_DIR}/../src/core/primitives.cpp
 )
 

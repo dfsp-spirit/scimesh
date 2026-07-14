@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/../../../src/core
-    ${CMAKE_SOURCE_DIR}/../../../src/core/glm
+    ${CMAKE_SOURCE_DIR}/../../../src/third_party
+    ${CMAKE_SOURCE_DIR}/../../../src/third_party/glm
 )
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
