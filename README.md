@@ -169,7 +169,6 @@ write_png(img, "sphere.png")
 Thanks heaps to the authors of these great software packages that scimesh is built upon -- and of course, to the authors of the dependencies of these packages.
 
 - `cpp_tests/catch_amalgamated.{h,cpp}`: [catchorg/Catch2](https://github.com/catchorg/Catch2/tree/devel/extras) — C++ test framework.
-- `cpp_tests/catch_amalgamated.{h,cpp}`: [catchorg/Catch2](https://github.com/catchorg/Catch2/tree/devel/extras) — C++ test framework.
 - `src/third_party/glm/`: [g-truc/glm](https://github.com/g-truc/glm) — header-only C++ math library.
 - `src/third_party/tinyply.{h,cpp}`: [ddiakopoulos/tinyply](https://github.com/ddiakopoulos/tinyply) — PLY file reader.
 - `src/third_party/tiny_obj_loader.h`: [tinyobjloader/tinyobjloader](https://github.com/tinyobjloader/tinyobjloader) — Wavefront OBJ loader.
