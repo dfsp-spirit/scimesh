@@ -10,10 +10,11 @@
 namespace scimesh {
 
 Rasterizer::Rasterizer(int w, int h)
-    : width(w), height(h), z_buffer(w * h, 1.0f) {}
+    : width(w), height(h), z_buffer(w * h, 1.0f), normal_buffer(w * h, Vec3(0.0f)) {}
 
 void Rasterizer::clear(float clear_depth) {
     std::fill(z_buffer.begin(), z_buffer.end(), clear_depth);
+    std::fill(normal_buffer.begin(), normal_buffer.end(), Vec3(0.0f));
 }
 
 void Rasterizer::shade_and_write(int x, int y, float depth,
@@ -58,6 +59,7 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
             a = static_cast<uint8_t>(a + da * inv_a);
         } else {
             z_buffer[idx] = depth;
+            normal_buffer[idx] = normal;
         }
 
         output.set_pixel(x, y, r, g, b, a);
@@ -131,7 +133,11 @@ void Rasterizer::rasterize_triangle(
                     static_cast<uint8_t>(std::clamp(wireframe_color.g, 0.0f, 1.0f) * 255.0f),
                     static_cast<uint8_t>(std::clamp(wireframe_color.b, 0.0f, 1.0f) * 255.0f),
                     static_cast<uint8_t>(std::clamp(wireframe_color.a, 0.0f, 1.0f) * 255.0f));
-                if (!blend_mode) z_buffer[pidx] = depth;
+                if (!blend_mode) {
+                    z_buffer[pidx] = depth;
+                    Vec3 wf_normal = w0 * normal0 + w1 * normal1 + w2 * normal2;
+                    normal_buffer[pidx] = wf_normal;
+                }
                 continue;
             }
 
@@ -230,6 +236,11 @@ void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
             // Convert center depth to actual world units
             float center_depth = linearize(center_depth_raw);
 
+            Vec3 center_normal = normal_buffer[idx];
+            if (center_normal.x == 0.0f && center_normal.y == 0.0f && center_normal.z == 0.0f) continue;
+
+            center_normal = glm::normalize(center_normal);
+
             // Scale the sampling radius based on distance (closer = bigger radius)
             int screen_radius = static_cast<int>((ssao_radius * radius_scale) / center_depth);
             screen_radius = std::max(1, std::min(screen_radius, 100)); // Clamp to sane bounds
@@ -258,7 +269,17 @@ void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
 
                     // Only add occlusion if it's within the max distance
                     if (range_falloff > 0.0f) {
-                        occlusion += range_falloff;
+                        // 3. Hemisphere check: only count occlusion from above the surface
+                        float depth_ndc_delta = center_depth_raw - sample_depth_raw;
+                        Vec3 offset_dir(
+                            dirs[s][0] * screen_radius,
+                            -dirs[s][1] * screen_radius,
+                            -depth_ndc_delta * (width + height) * 0.1f);
+                        offset_dir = glm::normalize(offset_dir);
+                        float hem = glm::dot(center_normal, offset_dir);
+                        if (hem > 0.0f) {
+                            occlusion += range_falloff * hem;
+                        }
                     }
                 }
             }

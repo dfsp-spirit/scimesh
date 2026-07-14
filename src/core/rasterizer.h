@@ -10,6 +10,7 @@ struct Rasterizer {
     int width = 0;
     int height = 0;
     std::vector<float> z_buffer;
+    std::vector<Vec3> normal_buffer;
     bool blend_mode = false;
     Color specular_color = Color(0.0f, 0.0f, 0.0f, 0.0f);
     float shininess = 0.0f;
