@@ -6,16 +6,16 @@ Authors@R: c(
     person("Tim", "Schaefer", email = "ts+code@rcmd.org",
            role = c("aut", "cre"))
     )
-Description: A fast, GPU-free 3D software rasterizer written in modern C++17 with
+Description: A fast, GPU-free 3D software renderer written in modern C++17 with
     native R bindings. Renders triangle meshes to publication-quality images
-    entirely on the CPU, requiring no OpenGL, GPU, or display server.
+    entirely on the CPU, requiring no display server or graphics hardware.
     Features multi-light Blinn-Phong shading, screen-space ambient occlusion,
-    anti-aliasing, depth cueing, transparency, wireframe rendering, texture
-    mapping, and procedural geometry generation. Supports STL, OBJ, and PLY
-    mesh formats with PNG, PPM, and BMP output. Works on HPC clusters,
-    headless servers, containers, and CI pipelines, making it suitable for
-    scientific visualization across neuroimaging, molecular structures, and
-    general 3D graphics.
+    anti-aliasing, depth fog, transparency, wireframe rendering, texture
+    mapping, and procedural geometry generation. Supports standard mesh
+    file formats with PNG and PPM output. Works on high-performance
+    computing clusters, headless servers, containers, and continuous
+    integration pipelines, making it suitable for scientific visualization
+    across neuro-imaging, molecular structures, and general 3D graphics.
 License: MIT + file LICENSE
 URL: https://github.com/dfsp-spirit/scimesh
 BugReports: https://github.com/dfsp-spirit/scimesh/issues
