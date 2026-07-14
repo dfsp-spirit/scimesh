@@ -103,81 +103,179 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments,
     return m;
 }
 
+
 Mesh generate_cylinder(const Vec3 &start, const Vec3 &end, float radius,
                        int segments, const Color &color) {
     segments = std::max(3, segments);
     Mesh m;
 
     Vec3 dir = glm::normalize(end - start);
+    Vec3 uu, vv;
+    make_basis(dir, uu, vv);
 
-    std::vector<Vec3> ring0 = make_ring(start, radius, dir, segments);
-    std::vector<Vec3> ring1 = make_ring(end, radius, dir, segments);
+    // Pre-calculate the radial vectors and positions for the rings
+    std::vector<Vec3> radials(segments);
+    std::vector<Vec3> bottom_ring(segments);
+    std::vector<Vec3> top_ring(segments);
 
-    uint32_t start_c = static_cast<uint32_t>(ring0.size()) * 2;
-    m.vertices.insert(m.vertices.end(), ring0.begin(), ring0.end());
-    m.vertices.insert(m.vertices.end(), ring1.begin(), ring1.end());
+    float step = glm::two_pi<float>() / static_cast<float>(segments);
+    for (int i = 0; i < segments; ++i) {
+        float a = step * static_cast<float>(i);
+        radials[i] = std::cos(a) * uu + std::sin(a) * vv;
+        bottom_ring[i] = start + radius * radials[i];
+        top_ring[i] = end + radius * radials[i];
+    }
+
+    // --- 1. THE BODY (Smooth shading radially) ---
+    for (int i = 0; i < segments; ++i) {
+        m.vertices.push_back(bottom_ring[i]);
+        m.normals.push_back(radials[i]);
+        m.colors.push_back(color);
+    }
+    for (int i = 0; i < segments; ++i) {
+        m.vertices.push_back(top_ring[i]);
+        m.normals.push_back(radials[i]);
+        m.colors.push_back(color);
+    }
+
+    for (int i = 0; i < segments; ++i) {
+        uint32_t a = i;
+        uint32_t b = (i + 1) % segments;
+        uint32_t c = segments + (i + 1) % segments;
+        uint32_t d = segments + i;
+
+        // FIXED: Swapped from {a, c, b} to {a, b, c} for CCW outward facing
+        m.triangles.push_back({a, b, c});
+        m.triangles.push_back({a, c, d});
+    }
+
+    // --- 2. BOTTOM CAP (Flat shading, normal = -dir) ---
+    uint32_t bottom_cap_offset = static_cast<uint32_t>(m.vertices.size());
+
+    // Add the bottom center vertex
     m.vertices.push_back(start);
+    m.normals.push_back(-dir);
+    m.colors.push_back(color);
+
+    // Add dedicated edge vertices for the bottom cap
+    for (int i = 0; i < segments; ++i) {
+        m.vertices.push_back(bottom_ring[i]);
+        m.normals.push_back(-dir); // Shared flat normal
+        m.colors.push_back(color);
+    }
+
+    for (int i = 0; i < segments; ++i) {
+        uint32_t center_idx = bottom_cap_offset;
+        uint32_t edge_idx = bottom_cap_offset + 1 + i;
+        uint32_t next_edge_idx = bottom_cap_offset + 1 + ((i + 1) % segments);
+
+        // Reversed CCW winding to face outward from the bottom
+        m.triangles.push_back({center_idx, next_edge_idx, edge_idx});
+    }
+
+    // --- 3. TOP CAP (Flat shading, normal = +dir) ---
+    uint32_t top_cap_offset = static_cast<uint32_t>(m.vertices.size());
+
+    // Add the top center vertex
     m.vertices.push_back(end);
+    m.normals.push_back(dir);
+    m.colors.push_back(color);
 
-    m.colors.resize(m.vertices.size(), color);
-
-    for (int j = 0; j < segments; ++j) {
-        uint32_t a = j;
-        uint32_t b = (j + 1) % segments;
-        uint32_t c = segments + (j + 1) % segments;
-        uint32_t d = segments + j;
-
-        m.triangles.push_back({a, c, b});
-        m.triangles.push_back({a, d, c});
+    // Add dedicated edge vertices for the top cap
+    for (int i = 0; i < segments; ++i) {
+        m.vertices.push_back(top_ring[i]);
+        m.normals.push_back(dir); // Shared flat normal
+        m.colors.push_back(color);
     }
 
-    uint32_t start_center = start_c;
-    uint32_t end_center = start_c + 1;
-    uint32_t n_segs = static_cast<uint32_t>(segments);
-    for (uint32_t j = 0; j < n_segs; ++j) {
-        uint32_t j_next = (j + 1) % n_segs;
-        m.triangles.push_back({start_center, j, j_next});
-    }
-    for (uint32_t j = 0; j < n_segs; ++j) {
-        uint32_t j_next = (j + 1) % n_segs;
-        m.triangles.push_back({end_center, n_segs + j_next, n_segs + j});
+    for (int i = 0; i < segments; ++i) {
+        uint32_t center_idx = top_cap_offset;
+        uint32_t edge_idx = top_cap_offset + 1 + i;
+        uint32_t next_edge_idx = top_cap_offset + 1 + ((i + 1) % segments);
+
+        // Standard CCW winding to face outward from the top
+        m.triangles.push_back({center_idx, edge_idx, next_edge_idx});
     }
 
-    compute_vertex_normals(m, m.normals);
     return m;
 }
+
 
 Mesh generate_cone(const Vec3 &base, const Vec3 &tip, float radius,
                    int segments, const Color &color) {
     segments = std::max(3, segments);
     Mesh m;
 
-    Vec3 dir = glm::normalize(tip - base);
-    std::vector<Vec3> ring = make_ring(base, radius, dir, segments);
+    Vec3 dir_vec = tip - base;
+    float height = glm::length(dir_vec);
 
-    uint32_t tip_idx = static_cast<uint32_t>(ring.size());
-    uint32_t base_center = tip_idx + 1;
+    // Prevent division by zero if base and tip are identical
+    Vec3 dir = (height > 1e-8f) ? (dir_vec / height) : Vec3(0, 1, 0);
 
-    m.vertices = ring;
-    m.vertices.push_back(tip);
+    Vec3 uu, vv;
+    make_basis(dir, uu, vv);
+
+    float step = glm::two_pi<float>() / static_cast<float>(segments);
+
+    // --- 1. THE BODY (Smooth shading radially, duplicated tip) ---
+    uint32_t body_offset = 0;
+    for (int i = 0; i < segments; ++i) {
+        float a = step * static_cast<float>(i);
+        Vec3 radial = std::cos(a) * uu + std::sin(a) * vv;
+
+        // Calculate the mathematically perfect sloped normal for the cone surface
+        Vec3 slope_normal = glm::normalize(radial * height + dir * radius);
+
+        // Base ring vertex
+        m.vertices.push_back(base + radius * radial);
+        m.normals.push_back(slope_normal);
+        m.colors.push_back(color);
+
+        // Tip vertex (Duplicated for this specific slice to maintain the sloped normal)
+        m.vertices.push_back(tip);
+        m.normals.push_back(slope_normal);
+        m.colors.push_back(color);
+    }
+
+    for (int i = 0; i < segments; ++i) {
+        uint32_t base_idx = body_offset + i * 2;
+        uint32_t tip_idx = body_offset + i * 2 + 1;
+        uint32_t next_base_idx = body_offset + ((i + 1) % segments) * 2;
+
+        // Outward facing CCW
+        m.triangles.push_back({base_idx, next_base_idx, tip_idx});
+    }
+
+    // --- 2. BOTTOM CAP (Flat shading, normal = -dir) ---
+    uint32_t cap_offset = static_cast<uint32_t>(m.vertices.size());
+
+    // Add the bottom center vertex
     m.vertices.push_back(base);
+    m.normals.push_back(-dir);
+    m.colors.push_back(color);
 
-    m.colors.resize(m.vertices.size(), color);
+    // Add dedicated edge vertices for the bottom cap
+    for (int i = 0; i < segments; ++i) {
+        float a = step * static_cast<float>(i);
+        Vec3 radial = std::cos(a) * uu + std::sin(a) * vv;
 
-    uint32_t n_segs = static_cast<uint32_t>(segments);
-    for (uint32_t j = 0; j < n_segs; ++j) {
-        uint32_t j_next = (j + 1) % n_segs;
-        m.triangles.push_back({j, tip_idx, j_next});
+        m.vertices.push_back(base + radius * radial);
+        m.normals.push_back(-dir); // Shared flat normal pointing down
+        m.colors.push_back(color);
     }
 
-    for (uint32_t j = 0; j < n_segs; ++j) {
-        uint32_t j_next = (j + 1) % n_segs;
-        m.triangles.push_back({base_center, j, j_next});
+    for (int i = 0; i < segments; ++i) {
+        uint32_t center_idx = cap_offset;
+        uint32_t edge_idx = cap_offset + 1 + i;
+        uint32_t next_edge_idx = cap_offset + 1 + ((i + 1) % segments);
+
+        // Reversed CCW winding to face outward from the bottom
+        m.triangles.push_back({center_idx, next_edge_idx, edge_idx});
     }
 
-    compute_vertex_normals(m, m.normals);
     return m;
 }
+
 
 Mesh generate_arrow(const Vec3 &from, const Vec3 &to, float shaft_radius,
                     float head_radius, float head_length, int segments,
