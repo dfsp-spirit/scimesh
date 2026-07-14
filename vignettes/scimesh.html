@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Tim Schaefer" />
+
+<meta name="date" content="2026-07-14" />
+
+<title>Getting Started with scimesh</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with scimesh</h1>
+<h4 class="author">Tim Schaefer</h4>
+<h4 class="date">2026-07-14</h4>
+
+
+
+<div id="what-is-scimesh" class="section level2">
+<h2>What is scimesh?</h2>
+<p><strong>scimesh</strong> is a headless, GPU-free software renderer
+for 3D meshes. It works anywhere R works — no X11, no OpenGL, no GPU
+required. It is designed as a drop-in replacement for the rendering part
+of <a href="https://github.com/dfsp-spirit/fsbrain">fsbrain</a> when
+rgl/OpenGL is unavailable (e.g. on macOS with broken XQuartz, or on HPC
+clusters).</p>
+<p>All rendering is done in modern C++ and returns in-memory RGBA images
+that can be saved to PNG or composited into publication figures.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Install from GitHub</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;dfsp-spirit/scimesh&quot;</span>)</span></code></pre></div>
+<p>For FreeSurfer neuroimaging data, also install:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;dfsp-spirit/freesurferformats&quot;</span>)</span></code></pre></div>
+</div>
+<div id="quick-start-render-a-cube" class="section level2">
+<h2>Quick Start: Render a Cube</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(scimesh)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>sphere <span class="ot">&lt;-</span> <span class="fu">generate_sphere</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="at">radius =</span> <span class="fl">1.2</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                          <span class="at">segments =</span> <span class="dv">32</span>, <span class="at">color =</span> <span class="fu">c</span>(<span class="fl">0.9</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">1.0</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>cam <span class="ot">&lt;-</span> <span class="fu">camera_auto</span>(sphere, <span class="at">direction =</span> <span class="fu">c</span>(<span class="fl">1.2</span>, <span class="fl">0.8</span>, <span class="dv">1</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Flat-shaded sphere</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(sphere<span class="sc">$</span>vertices, sphere<span class="sc">$</span>triangles,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    <span class="at">colors =</span> sphere<span class="sc">$</span>colors, <span class="at">camera =</span> cam,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    <span class="at">options =</span> <span class="fu">render_options</span>(</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>        <span class="at">lights =</span> <span class="fu">list</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>            <span class="fu">list</span>(<span class="at">position =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.8</span>), <span class="at">intensity =</span> <span class="fl">1.5</span>),</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>            <span class="fu">list</span>(<span class="at">position =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">0.2</span>, <span class="fl">0.6</span>), <span class="at">intensity =</span> <span class="fl">0.5</span>))))</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="fu">write_png</span>(img, <span class="st">&quot;sphere.png&quot;</span>)</span></code></pre></div>
+<p>For neuroimaging visualisation (FreeSurfer data, anatomical views,
+cortex masking), see the <strong>neuromesh</strong> package which builds
+on scimesh:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;dfsp-spirit/neuromesh&quot;</span>)</span></code></pre></div>
+</div>
+<div id="anatomical-views" class="section level2">
+<h2>Anatomical Views</h2>
+<p>Standard neuroimaging camera views (lateral, medial, dorsal, ventral,
+anterior, posterior) and the <code>vis.subject.morph.native()</code>
+one-shot visualisation function are provided by the
+<strong>neuromesh</strong> package. See its vignette for examples.</p>
+</div>
+<div id="colour-bars" class="section level2">
+<h2>Colour Bars</h2>
+<p>Horizontal or vertical colour bars are produced in pure R (no X11)
+and can be composed alongside rendered images:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>cbar <span class="ot">&lt;-</span> <span class="fu">colorbar_horizontal</span>(viridis_colormap,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>    <span class="at">n_colors =</span> <span class="dv">256</span>, <span class="at">width =</span> <span class="dv">600</span>, <span class="at">height =</span> <span class="dv">80</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    <span class="at">ticks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="at">tick_labels =</span> <span class="fu">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;mid&quot;</span>, <span class="st">&quot;max&quot;</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Value&quot;</span>)</span></code></pre></div>
+</div>
+<div id="anti-aliasing" class="section level2">
+<h2>Anti-Aliasing</h2>
+<p>scimesh supports ordered-grid supersampling (SSAA). Pass
+<code>aa_samples = 2L</code> for 2×2 SSAA (renders internally at double
+resolution, downsamples by box averaging):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">render_options</span>(<span class="at">aa_samples =</span> <span class="dv">2</span><span class="dt">L</span>)</span></code></pre></div>
+<p>Values of 1 (off), 2, or 4 are supported. Higher values give smoother
+edges but use proportionally more memory and time.</p>
+</div>
+<div id="semi-transparent-overlays" class="section level2">
+<h2>Semi-Transparent Overlays</h2>
+<p>scimesh supports proper alpha blending with depth-sorted
+back-to-front rendering. This is useful for visualising nested surfaces
+(white matter, pial) or for glass-brain effects.</p>
+<p><strong>R example:</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(scimesh)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>white <span class="ot">&lt;-</span> freesurferformats<span class="sc">::</span><span class="fu">read.fs.surface</span>(<span class="st">&quot;sub-01/surf/lh.white&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>pial  <span class="ot">&lt;-</span> freesurferformats<span class="sc">::</span><span class="fu">read.fs.surface</span>(<span class="st">&quot;sub-01/surf/lh.pial&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>nv <span class="ot">&lt;-</span> <span class="fu">nrow</span>(white<span class="sc">$</span>vertices)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>white_mesh <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">vertices  =</span> white<span class="sc">$</span>vertices,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">triangles =</span> white<span class="sc">$</span>faces,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>    <span class="at">colors    =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.7</span>, <span class="fl">0.7</span>, <span class="fl">1.0</span>), nv, <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>pial_mesh <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>    <span class="at">vertices  =</span> pial<span class="sc">$</span>vertices,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>    <span class="at">triangles =</span> pial<span class="sc">$</span>faces,</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>    <span class="at">colors    =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.9</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">0.35</span>), nv, <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>cam <span class="ot">&lt;-</span> <span class="fu">camera_auto</span>(pial_mesh, <span class="at">direction =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.2</span>))</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_scene</span>(<span class="fu">list</span>(white_mesh, pial_mesh), cam,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>    <span class="fu">render_options</span>(<span class="at">width =</span> <span class="dv">1200</span>, <span class="at">height =</span> <span class="dv">900</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>        <span class="at">backface_culling =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>        <span class="at">specular_color =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="dv">1</span>),</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>        <span class="at">shininess =</span> <span class="dv">64</span>))</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="fu">write_png</span>(img, <span class="st">&quot;transparency_lh.png&quot;</span>)</span></code></pre></div>
+<p><strong>C++ example:</strong> See
+<code>examples/cpp/transparency/</code> in the repository.</p>
+</div>
+<div id="wireframe-mode" class="section level2">
+<h2>Wireframe Mode</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">render_options</span>(<span class="at">wireframe =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>    <span class="at">wireframe_color =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))  <span class="co"># black edges</span></span></code></pre></div>
+<p>Edges are computed via barycentric distance testing inside the
+triangle rasterizer — no separate line primitives needed. Edge thickness
+adapts to triangle size so small triangles don’t disappear.</p>
+</div>
+<div id="specular-highlights" class="section level2">
+<h2>Specular Highlights</h2>
+<p>Add a glossy sheen to surfaces:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">render_options</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>    <span class="at">specular_color =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="dv">1</span>),  <span class="co"># white highlight</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>    <span class="at">shininess =</span> <span class="dv">64</span>)                          <span class="co"># tight spot</span></span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th><code>shininess</code> value</th>
+<th>Look</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8–16</td>
+<td>Soft plastic</td>
+</tr>
+<tr class="even">
+<td>32–64</td>
+<td>Shiny surface</td>
+</tr>
+<tr class="odd">
+<td>128</td>
+<td>Glass-like tight spot</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="projection-type" class="section level2">
+<h2>Projection Type</h2>
+<p>Perspective (default) or orthographic (parallel projection, matching
+rgl’s <code>view3d(fov = 0)</code> convention):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">render_options</span>(<span class="at">projection =</span> <span class="st">&quot;orthographic&quot;</span>)</span></code></pre></div>
+</div>
+<div id="using-diverging-colormaps" class="section level2">
+<h2>Using Diverging Colormaps</h2>
+<p>For signed data (Z-scores, cluster maps), use the built-in
+blue–white–red diverging colormap:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>my_cmap <span class="ot">&lt;-</span> diverging_colormap</span></code></pre></div>
+<p>Or bring your own colormap function:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>my_cmap <span class="ot">&lt;-</span> <span class="cf">function</span>(n) grDevices<span class="sc">::</span><span class="fu">hcl.colors</span>(n, <span class="at">palette =</span> <span class="st">&quot;Blue-Red 3&quot;</span>)</span></code></pre></div>
+</div>
+<div id="compositing-multiple-images" class="section level2">
+<h2>Compositing Multiple Images</h2>
+<p><code>compose_layout()</code> arranges rendered images in a grid with
+optional per-row/per-column cropping to eliminate wasted whitespace:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>img1 <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(...)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>img2 <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(...)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">compose_layout</span>(<span class="fu">list</span>(img1, img2), <span class="at">nrow =</span> <span class="dv">1</span><span class="dt">L</span>, <span class="at">crop =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="fu">write_png</span>(result, <span class="st">&quot;side_by_side.png&quot;</span>)</span></code></pre></div>
+</div>
+<div id="interoperability-with-other-packages" class="section level2">
+<h2>Interoperability with Other Packages</h2>
+<div id="rgl-tmesh3d" class="section level3">
+<h3>rgl / tmesh3d</h3>
+<p>Convert an rgl <code>tmesh3d</code> object (or any list with
+<code>vb</code> and <code>it</code> components) to scimesh format
+<strong>without requiring the rgl package</strong>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>tmesh <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>    <span class="at">vb =</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    <span class="at">it =</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="dt">L</span>, <span class="dv">1</span><span class="dt">L</span>), <span class="fu">c</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="dv">3</span><span class="dt">L</span>), <span class="fu">c</span>(<span class="dv">3</span><span class="dt">L</span>, <span class="dv">4</span><span class="dt">L</span>)))</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">mesh_from_rgl</span>(tmesh)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>img  <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(mesh<span class="sc">$</span>vertices, mesh<span class="sc">$</span>triangles)</span></code></pre></div>
+</div>
+<div id="freesurferformats" class="section level3">
+<h3>freesurferformats</h3>
+<p>The <strong>neuromesh</strong> package provides FreeSurfer-aware
+loading, cortex masking, anatomical views, and colour bar integration on
+top of scimesh. For lower-level access, use the
+<code>freesurferformats</code> package directly:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>surf  <span class="ot">&lt;-</span> freesurferformats<span class="sc">::</span><span class="fu">read.fs.surface</span>(<span class="st">&quot;lh.white&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>sulc  <span class="ot">&lt;-</span> freesurferformats<span class="sc">::</span><span class="fu">read.fs.morph</span>(<span class="st">&quot;lh.sulc&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>label <span class="ot">&lt;-</span> freesurferformats<span class="sc">::</span><span class="fu">read.fs.label</span>(<span class="st">&quot;lh.cortex.label&quot;</span>)</span></code></pre></div>
+</div>
+<div id="c-via-libfs" class="section level3">
+<h3>C++ via libfs</h3>
+<p>scimesh bundles <a href="https://github.com/dfsp-spirit/libfs">libfs</a> — a header-only
+C++ library for FreeSurfer file I/O. C++ examples in the repository
+demonstrate reading surfaces, curv data, labels, and MGH volumes using
+<code>fs::read_surf()</code>, <code>fs::read_curv_data()</code>,
+etc.</p>
+</div>
+<div id="python-future" class="section level3">
+<h3>Python (future)</h3>
+<p>All core rendering functions are in C++ (<code>Mesh</code>,
+<code>Scene</code>, <code>Camera</code>, <code>RenderOptions</code>,
+<code>Renderer</code>). A Python binding (e.g., via pybind11) would be
+straightforward as the C++ API is already designed for language-agnostic
+use.</p>
+</div>
+</div>
+<div id="procedural-geometry" class="section level2">
+<h2>Procedural Geometry</h2>
+<p>scimesh provides C++ and R functions for generating primitive
+geometry:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>cube    <span class="ot">&lt;-</span> <span class="fu">generate_cuboid</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>pyramid <span class="ot">&lt;-</span> <span class="fu">generate_pyramid</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>), <span class="dv">1</span>, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>tetra   <span class="ot">&lt;-</span> <span class="fu">generate_tetrahedron</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">0</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>            <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">1</span>), <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="sc">-</span><span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>torus   <span class="ot">&lt;-</span> <span class="fu">generate_torus</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fl">1.5</span>, <span class="fl">0.4</span>, <span class="dv">32</span>, <span class="dv">16</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>plane   <span class="ot">&lt;-</span> <span class="fu">generate_plane</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">2</span>, <span class="dv">1</span>)</span></code></pre></div>
+</div>
+<div id="mesh-transforms" class="section level2">
+<h2>Mesh Transforms</h2>
+<p>Translate, scale, rotate, or apply arbitrary 4×4 matrices to meshes
+(all in C++ — no vertex data copied to R):</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">translate_mesh</span>(mesh, <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">scale_mesh</span>(mesh, <span class="fl">2.0</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">rotate_mesh</span>(mesh, pi <span class="sc">/</span> <span class="dv">4</span>, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">transform_mesh</span>(mesh, my_4x4_matrix)</span></code></pre></div>
+</div>
+<div id="mesh-io" class="section level2">
+<h2>Mesh I/O</h2>
+<p>scimesh can read and write standard 3D mesh file formats. All readers
+return a mesh descriptor list with <code>vertices</code>,
+<code>triangles</code>, and optionally <code>normals</code>,
+<code>uv</code>, or <code>colors</code>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Read a Wavefront OBJ file (with optional UVs and normals)</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">read_obj</span>(<span class="st">&quot;model.obj&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co"># Read a Stanford PLY file (with optional vertex colors)</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">read_ply</span>(<span class="st">&quot;model.ply&quot;</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co"># Read an STL file (binary or ASCII)</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">read_stl</span>(<span class="st">&quot;model.stl&quot;</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co"># Write a mesh to STL</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="fu">write_stl</span>(mesh, <span class="st">&quot;output.stl&quot;</span>)               <span class="co"># binary (default)</span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="fu">write_stl</span>(mesh, <span class="st">&quot;output.stl&quot;</span>, <span class="at">format =</span> <span class="st">&quot;ascii&quot;</span>)</span></code></pre></div>
+<p>The OBJ reader supports multi-shape files and texture coordinates.
+The PLY reader supports per-vertex RGB colors. STL writes preserve
+vertex normals when available.</p>
+</div>
+<div id="face-colors" class="section level2">
+<h2>Face Colors</h2>
+<p>Per-face coloring lets you assign a single color to every vertex of a
+triangle. This is useful for parcellation overlays or material
+assignment:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">generate_cuboid</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co"># 12 triangles, each gets a color</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">nrow =</span> <span class="dv">12</span>, <span class="at">ncol =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(mesh<span class="sc">$</span>vertices, mesh<span class="sc">$</span>triangles, <span class="at">face_colors =</span> fc)</span></code></pre></div>
+<p>When <code>face_colors</code> is provided, it takes precedence over
+vertex <code>colors</code>.</p>
+</div>
+<div id="texture-mapping" class="section level2">
+<h2>Texture Mapping</h2>
+<p>Load a texture image and assign UV coordinates to render textured
+meshes:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># Requires the &#39;png&#39; package</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">library</span>(png)</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>tex <span class="ot">&lt;-</span> <span class="fu">readPNG</span>(<span class="st">&quot;texture.png&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co"># UV coordinates (Nx2, values 0-1) must match vertex order</span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">read_obj</span>(<span class="st">&quot;textured.obj&quot;</span>)  <span class="co"># OBJ reader extracts UVs</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_mesh</span>(mesh<span class="sc">$</span>vertices, mesh<span class="sc">$</span>triangles,</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>    <span class="at">uv =</span> mesh<span class="sc">$</span>uv, <span class="at">texture =</span> tex)</span></code></pre></div>
+<p>Bilinear texture sampling is used for smooth results.</p>
+</div>
+<div id="lower-level-rendering" class="section level2">
+<h2>Lower-Level Rendering</h2>
+<p>Beyond <code>render_mesh()</code> and <code>render_scene()</code>,
+scimesh provides lower-level functions for special use cases:</p>
+<div id="raw-triangles-no-index-buffer" class="section level3">
+<h3>Raw Triangles (no index buffer)</h3>
+<p>Render geometry where positions and colors are flat arrays with 3
+vertices per triangle — useful for dynamically generated geometry:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>positions <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">0</span>,</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>                      <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="fl">0.5</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>                   <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">ncol =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>cam <span class="ot">&lt;-</span> <span class="fu">camera_auto</span>(positions)</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_triangles</span>(positions, colors, cam)</span></code></pre></div>
+</div>
+<div id="points" class="section level3">
+<h3>Points</h3>
+<p>Render point cloud data with depth-tested circular markers:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">300</span>), <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">nrow =</span> <span class="fu">nrow</span>(pts), <span class="at">ncol =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_points</span>(pts, cols, <span class="at">radius =</span> <span class="dv">4</span>)</span></code></pre></div>
+</div>
+<div id="lines-as-cylinders" class="section level3">
+<h3>Lines (as Cylinders)</h3>
+<p>Render line segments as thin cylinders:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>from <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>to   <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>, <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">ncol =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_lines</span>(from, to, <span class="at">radii =</span> <span class="fl">0.05</span>, <span class="at">colors =</span> cols, cam)</span></code></pre></div>
+</div>
+</div>
+<div id="camera-utilities" class="section level2">
+<h2>Camera Utilities</h2>
+<div id="auto-framing" class="section level3">
+<h3>Auto-Framing</h3>
+<p><code>camera_auto()</code> computes a camera that fits any mesh or
+vertex set:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>verts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">900</span>), <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>cam <span class="ot">&lt;-</span> <span class="fu">camera_auto</span>(verts, <span class="at">direction =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">fov =</span> <span class="dv">45</span>)</span></code></pre></div>
+<p>It accepts either an Nx3 matrix or a mesh descriptor list.</p>
+</div>
+<div id="manual-camera" class="section level3">
+<h3>Manual Camera</h3>
+<p>For full control, use <code>camera()</code>:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>cam <span class="ot">&lt;-</span> <span class="fu">camera</span>(<span class="at">eye =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">10</span>), <span class="at">center =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>              <span class="at">up =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), <span class="at">fov =</span> <span class="dv">30</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="mesh-utilities" class="section level2">
+<h2>Mesh Utilities</h2>
+<div id="bounding-box" class="section level3">
+<h3>Bounding Box</h3>
+<p>Compute or visualise the axis-aligned bounding box:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>mesh <span class="ot">&lt;-</span> <span class="fu">generate_torus</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="fl">1.5</span>, <span class="fl">0.4</span>, <span class="dv">32</span>, <span class="dv">16</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> <span class="fu">mesh_bbox</span>(mesh)</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>bbox<span class="sc">$</span>min  <span class="co"># c(xmin, ymin, zmin)</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>bbox<span class="sc">$</span>max  <span class="co"># c(xmax, ymax, zmax)</span></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="co"># Generate a wireframe bounding box mesh for rendering</span></span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>bbox_mesh <span class="ot">&lt;-</span> <span class="fu">generate_bbox</span>(mesh, <span class="at">color =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">radius =</span> <span class="fl">0.02</span>)</span></code></pre></div>
+</div>
+<div id="axis-arrows" class="section level3">
+<h3>Axis Arrows</h3>
+<p>Generate coloured XYZ axis arrows (red X, green Y, blue Z):</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>axes_mesh <span class="ot">&lt;-</span> <span class="fu">generate_axes</span>(<span class="at">center =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="at">size =</span> <span class="dv">2</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co"># Render together with your mesh:</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>img <span class="ot">&lt;-</span> <span class="fu">render_scene</span>(<span class="fu">list</span>(mesh, axes_mesh), cam)</span></code></pre></div>
+</div>
+</div>
+<div id="image-stacking" class="section level2">
+<h2>Image Stacking</h2>
+<p>Quick helpers for combining images:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># Vertical stack (one below another)</span></span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">stack_horizontal</span>(img1, img2, img3)</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co"># Vertical stack</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">stack_vertical</span>(img1, img2)</span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co"># With a colorbar</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">stack_horizontal</span>(img1, img2,</span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>    <span class="at">colorbar =</span> <span class="fu">colorbar_horizontal</span>(viridis_colormap))</span></code></pre></div>
+</div>
+<div id="running-the-r-examples" class="section level2">
+<h2>Running the R Examples</h2>
+<p>The repository includes runnable R example scripts in
+<code>examples/R/</code>:</p>
+<table>
+<colgroup>
+<col width="39%" />
+<col width="60%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Example</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>spot_cow/run.R</code></td>
+<td>Textured OBJ mesh with multi-light setup and SSAO</td>
+</tr>
+<tr class="even">
+<td><code>transparency/run.R</code></td>
+<td>Semi-transparent pial overlay on white matter</td>
+</tr>
+<tr class="odd">
+<td><code>dragon/run.R</code></td>
+<td>Stanford Dragon with specular highlights and 4x AA</td>
+</tr>
+<tr class="even">
+<td><code>whole_brain_sulc_single_image/run.R</code></td>
+<td>Whole-brain sulcal depth with cortex masking</td>
+</tr>
+</tbody>
+</table>
+<p>Run all examples at once:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="bu">cd</span> examples/R</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="fu">bash</span> run_all_R.sh</span></code></pre></div>
+<p>For C++ examples, see <code>examples/cpp/</code> and <a href="https://github.com/dfsp-spirit/scimesh/blob/main/docs/CPP_GETTING_STARTED.md"><code>docs/CPP_GETTING_STARTED.md</code></a>.</p>
+</div>
+<div id="faq" class="section level2">
+<h2>FAQ</h2>
+<p><strong>Why is there no interactive 3D window?</strong> scimesh is a
+headless (off-screen) renderer. It produces static images. For
+interactive rotation or real-time animation you still need
+rgl/OpenGL.</p>
+<p><strong>How fast is it?</strong> A typical cortical surface (~300k
+triangles) at 1200×900 with 2× SSAA renders in 1–3 seconds on a modern
+CPU.</p>
+<p><strong>What about volume data?</strong> scimesh renders 3D surface
+meshes. Volume slice visualisation (e.g.,
+<code>volvis.lb.with.surface()</code> in fsbrain) is done entirely in
+R/magick without 3D rendering — it works independently of the renderer
+backend.</p>
+<p><strong>Can I use it from Python?</strong> Not yet — but the C++ core
+is language-agnostic. A pybind11 wrapper would be straightforward.</p>
+<p><strong>My images look pixelated/jagged — how do I fix this?</strong>
+Enable anti-aliasing: <code>render_options(aa_samples = 2L)</code>.</p>
+<p><strong>How do I get a transparent background?</strong></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">render_options</span>(<span class="at">background_color =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
