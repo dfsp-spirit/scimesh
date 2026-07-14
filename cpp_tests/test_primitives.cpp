@@ -229,9 +229,9 @@ TEST_CASE("generate_cuboid produces correct vertex and face counts", "[primitive
     Mesh c = generate_cuboid(Vec3(1, 2, 3), Vec3(0.5f, 1.0f, 1.5f),
                              Color(0.2f, 0.6f, 1.0f, 1.0f));
 
-    REQUIRE(c.vertices.size() == 8);
+    REQUIRE(c.vertices.size() == 24);
     REQUIRE(c.triangles.size() == 12);
-    REQUIRE(c.colors.size() == 8);
+    REQUIRE(c.colors.size() == 24);
     REQUIRE(c.is_valid());
     REQUIRE_FALSE(c.empty());
 }
@@ -279,9 +279,9 @@ TEST_CASE("generate_pyramid has correct structure", "[primitives]") {
     Mesh p = generate_pyramid(Vec3(0, 0, 0), Vec3(0, 2, 0), 1.5f,
                               Color(1, 0, 0));
 
-    REQUIRE(p.vertices.size() == 5);
+    REQUIRE(p.vertices.size() == 16);
     REQUIRE(p.triangles.size() == 6);
-    REQUIRE(p.colors.size() == 5);
+    REQUIRE(p.colors.size() == 16);
     REQUIRE(p.is_valid());
     REQUIRE_FALSE(p.empty());
 }
@@ -308,9 +308,9 @@ TEST_CASE("generate_tetrahedron has correct structure", "[primitives]") {
     Vec3 p0(0, 0, 0), p1(2, 0, 0), p2(1, 0, 2), p3(1, 2, 1);
     Mesh t = generate_tetrahedron(p0, p1, p2, p3, Color(1, 1, 1));
 
-    REQUIRE(t.vertices.size() == 4);
+    REQUIRE(t.vertices.size() == 12);
     REQUIRE(t.triangles.size() == 4);
-    REQUIRE(t.colors.size() == 4);
+    REQUIRE(t.colors.size() == 12);
     REQUIRE(t.is_valid());
     REQUIRE_FALSE(t.empty());
 }
