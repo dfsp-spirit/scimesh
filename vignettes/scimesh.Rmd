@@ -464,9 +464,10 @@ For more complex trajectories, replace `camera_orbit()` with your own
 function — it only needs to set `camera$eye` and `camera$up`.
 
 The resulting PNG frames can be assembled into a video with ffmpeg
-or into an animated GIF with your tool of choice.  For a complete
-C++ example that renders 48 full-brain frames, see
-`examples/cpp/brain_video/` in the repository.
+or into an animated GIF with your tool of choice.  See
+`examples/R/video_frames_orbit/` for a runnable R example, and
+`examples/cpp/brain_video/` for a C++ version that renders 48
+full-brain frames.
 
 ## Mesh Utilities
 

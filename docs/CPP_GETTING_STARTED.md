@@ -470,6 +470,22 @@ cam.projection = ProjectionType::ORTHOGRAPHIC;
 cam.fov_degrees = 40.0f;  // orthographic extent
 ```
 
+### Orbit paths
+
+`camera_orbit()` rotates a camera's eye and up around its center:
+
+```cpp
+Camera cam = camera_fit_mesh(mesh, view_dir, up, 45.0f);
+for (int i = 0; i < 48; i++) {
+    Camera orbit_cam = camera_orbit(cam, Vec3(0, 0, 1), 360.0f / 48 * i);
+    Image img = renderer.render_mesh(mesh, orbit_cam, opts);
+    // write frame...
+}
+```
+
+This is useful for turntable video sequences.  See `examples/cpp/brain_video/`
+for a complete example.
+
 ## Anti-Aliasing
 
 Set `aa_samples` to 2 or 4 for supersampled anti-aliasing:
@@ -492,6 +508,7 @@ The `examples/cpp/` directory contains complete, runnable programs:
 | `whole_brain_sulc_single_image/` | Whole-brain sulcal depth rendering |
 | `whole_brain_sulc_single_image_fsaverage/` | Same on fsaverage template |
 | `whole_brain_annot_single_image/` | Cortical parcellation coloring |
+| `brain_video/` | Turntable animation — 48 orbit frames via camera_orbit() |
 
 Each example has its own `CMakeLists.txt`.  To build and run:
 

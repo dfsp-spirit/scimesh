@@ -53,6 +53,9 @@ fi
 if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_single_image" ]]; then
     run_one examples/R/whole_brain_sulc_single_image/run.R whole_brain_sulc_single_image
 fi
+if [[ -z "$FILTER" || "$FILTER" == "video_frames_orbit" ]]; then
+    run_one examples/R/video_frames_orbit/run.R            video_frames_orbit
+fi
 
 echo ""
 echo "============================================"
@@ -69,7 +72,7 @@ done
 
 if [[ -n "$FILTER" && ${#PASSED[@]} -eq 0 && ${#FAILED[@]} -eq 0 ]]; then
     echo "  WARNING: no example matched filter '$FILTER'"
-    echo "  Available: transparency primitives spot_cow dragon whole_brain_sulc_single_image"
+    echo "  Available: transparency primitives spot_cow dragon whole_brain_sulc_single_image video_frames_orbit"
     exit 2
 fi
 
