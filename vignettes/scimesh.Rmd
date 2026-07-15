@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 It works anywhere R works — no X11, no OpenGL, no GPU required.  It is
 designed as a drop-in replacement for the rendering part of
 [fsbrain](https://github.com/dfsp-spirit/fsbrain) when rgl/OpenGL is
-unavailable (e.g. on macOS with broken XQuartz, or on HPC clusters).
+unavailable (e.g. on macOS without XQuartz, or on HPC clusters).
 
 All rendering is done in modern C++ and returns in-memory RGBA images
 that can be saved to PNG or composited into publication figures.
@@ -65,12 +65,6 @@ masking), see the **neuromesh** package which builds on scimesh:
 remotes::install_github("dfsp-spirit/neuromesh")
 ```
 
-## Anatomical Views
-
-Standard neuroimaging camera views (lateral, medial, dorsal, ventral,
-anterior, posterior) and the `vis.subject.morph.native()` one-shot
-visualisation function are provided by the **neuromesh** package.
-See its vignette for examples.
 
 ## Colour Bars
 
@@ -102,7 +96,7 @@ edges but use proportionally more memory and time.
 
 scimesh supports proper alpha blending with depth-sorted back-to-front
 rendering.  This is useful for visualising nested surfaces (white matter,
-pial) or for glass-brain effects.
+pial surface in neuroimaging), or for glass-brain effects.
 
 **R example:**
 ```{r, eval=FALSE}
@@ -228,20 +222,6 @@ rgl's `view3d(fov = 0)` convention):
 render_options(projection = "orthographic")
 ```
 
-## Using Diverging Colormaps
-
-For signed data (Z-scores, cluster maps), use the built-in
-blue–white–red diverging colormap:
-
-```r
-my_cmap <- diverging_colormap
-```
-
-Or bring your own colormap function:
-```r
-my_cmap <- function(n) grDevices::hcl.colors(n, palette = "Blue-Red 3")
-```
-
 ## Compositing Multiple Images
 
 `compose_layout()` arranges rendered images in a grid with optional
@@ -269,31 +249,6 @@ mesh <- mesh_from_rgl(tmesh)
 img  <- render_mesh(mesh$vertices, mesh$triangles)
 ```
 
-### freesurferformats
-
-The **neuromesh** package provides FreeSurfer-aware loading, cortex
-masking, anatomical views, and colour bar integration on top of scimesh.
-For lower-level access, use the `freesurferformats` package directly:
-
-```r
-surf  <- freesurferformats::read.fs.surface("lh.white")
-sulc  <- freesurferformats::read.fs.morph("lh.sulc")
-label <- freesurferformats::read.fs.label("lh.cortex.label")
-```
-
-### C++ via libfs
-
-scimesh bundles [libfs](https://github.com/dfsp-spirit/libfs) — a
-header-only C++ library for FreeSurfer file I/O.  C++ examples in
-the repository demonstrate reading surfaces, curv data, labels, and
-MGH volumes using `fs::read_surf()`, `fs::read_curv_data()`, etc.
-
-### Python (future)
-
-All core rendering functions are in C++ (`Mesh`, `Scene`, `Camera`,
-`RenderOptions`, `Renderer`).  A Python binding (e.g., via pybind11)
-would be straightforward as the C++ API is already designed for
-language-agnostic use.
 
 ## Procedural Geometry
 
@@ -310,8 +265,7 @@ plane   <- generate_plane(c(0, 0, 0), c(0, 1, 0), 2, 1)
 
 ## Mesh Transforms
 
-Translate, scale, rotate, or apply arbitrary 4×4 matrices to meshes
-(all in C++ — no vertex data copied to R):
+Translate, scale, rotate, or apply arbitrary 4×4 matrices to meshes:
 
 ```r
 mesh <- translate_mesh(mesh, c(5, 0, 0))
@@ -534,25 +488,24 @@ For C++ examples, see `examples/cpp/` and
 
 ## FAQ
 
-**Why is there no interactive 3D window?**
-scimesh is a headless (off-screen) renderer.  It produces static images.
-For interactive rotation or real-time animation you still need rgl/OpenGL.
-
 **How fast is it?**
 A typical cortical surface (~300k triangles) at 1200×900 with 2× SSAA
-renders in 1–3 seconds on a modern CPU.
+renders in 1–3 seconds on a modern CPU. Smaller meshes in lower resolution can render in 200 ms or less, depending on the CPU and number of lights.
 
-**What about volume data?**
+**Why is there no interactive 3D window in which I can rotate the mesh?**
+scimesh is a headless (off-screen) renderer, also known as a software rasterizer.  It produces images in roughly seconds, on just the CPU.
+For interactive rotation or real-time animation, you need to render at least 30 images *per second*. This
+is only achievable with a hardware renderer, i.e., a graphics card and the full software stack required to make use of it.
+If you have a graphics card, the typical solution in R is to use rgl/OpenGL for interactive visualization.
+
+**What about volume data, like 3D MRI scans in neuroimaging?**
 scimesh renders 3D surface meshes.  Volume slice visualisation
 (e.g., `volvis.lb.with.surface()` in fsbrain) is done entirely in R/magick
-without 3D rendering — it works independently of the renderer backend.
-
-**Can I use it from Python?**
-Not yet — but the C++ core is language-agnostic.  A pybind11 wrapper
-would be straightforward.
+without 3D rendering — it works independently of the renderer backend. Technically its just a 2D image,
+no renderer needed. This means you can use the functions in fsbrain for volume visualisation even if you do not have rgl/OpenGL, and are using scimesh for surface (mesh) rendering.
 
 **My images look pixelated/jagged — how do I fix this?**
-Enable anti-aliasing: `render_options(aa_samples = 2L)`.
+Render in higher resolution and enable anti-aliasing: `render_options(aa_samples = 2L)`.
 
 **How do I get a transparent background?**
 ```r
