@@ -90,3 +90,27 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
 
     scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
 }
+
+#' @rdname camera
+#' @export
+camera_orbit <- function(camera, axis = c(0, 0, 1), angle_degrees) {
+    axis <- as.numeric(axis) / sqrt(sum(axis^2))
+    angle <- angle_degrees * pi / 180
+
+    rotate <- function(v) {
+        cos_a <- cos(angle)
+        sin_a <- sin(angle)
+        dot <- sum(v * axis)
+        cross <- c(
+            v[2] * axis[3] - v[3] * axis[2],
+            v[3] * axis[1] - v[1] * axis[3],
+            v[1] * axis[2] - v[2] * axis[1]
+        )
+        v * cos_a + cross * sin_a + axis * dot * (1 - cos_a)
+    }
+
+    cam <- camera
+    cam$eye <- cam$center + rotate(cam$eye - cam$center)
+    cam$up  <- rotate(cam$up)
+    cam
+}
