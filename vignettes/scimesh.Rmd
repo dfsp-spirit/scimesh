@@ -80,6 +80,21 @@ cbar <- colorbar_horizontal(viridis_colormap,
     title = "Value")
 ```
 
+
+## Compositing Multiple Images
+
+`compose_layout()` arranges rendered images in a grid with optional
+per-row/per-column cropping to eliminate wasted whitespace:
+
+```r
+img1 <- render_mesh(...)
+img2 <- render_mesh(...)
+result <- compose_layout(list(img1, img2), nrow = 1L, crop = TRUE)
+write_png(result, "side_by_side.png")
+```
+
+
+
 ## Anti-Aliasing
 
 scimesh supports ordered-grid supersampling (SSAA).  Pass `aa_samples = 2L`
@@ -223,17 +238,6 @@ rgl's `view3d(fov = 0)` convention):
 render_options(projection = "orthographic")
 ```
 
-## Compositing Multiple Images
-
-`compose_layout()` arranges rendered images in a grid with optional
-per-row/per-column cropping to eliminate wasted whitespace:
-
-```r
-img1 <- render_mesh(...)
-img2 <- render_mesh(...)
-result <- compose_layout(list(img1, img2), nrow = 1L, crop = TRUE)
-write_png(result, "side_by_side.png")
-```
 
 ## Interoperability with Other Packages
 
