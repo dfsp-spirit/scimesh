@@ -1,7 +1,7 @@
 Package: scimesh
 Type: Package
 Title: Headless 3D Mesh Rendering Engine
-Version: 0.2.5
+Version: 0.2.6
 Authors@R: c(
     person("Tim", "Schaefer", email = "ts+code@rcmd.org",
            role = c("aut", "cre"))

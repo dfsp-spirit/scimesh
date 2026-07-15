@@ -2,9 +2,14 @@ scimesh Changes
 ===============
 
 
+Version 0.2.6 -- Add contrast render option
+--------------------------------------------
+- NEW: add contrast to render options and Image class, see vignette.
+
+
 Version 0.2.5 -- Fix CRAN checks
 ---------------------------------
-- Waste an evening and mess with third party vendored source to satisfy R CMD check --as-cran
+- NEW: Waste an evening and mess with third party vendored source to satisfy R CMD check --as-cran
 
 
 Version 0.2.4 -- String representations and cam fix
