@@ -14,14 +14,25 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 FILTER="${1:-}"
 
+declare -a EXAMPLES=(
+    all_primitives:all_primitives
+    spot_cow:spot_cow
+    transparency:transparency_demo
+    protein_data_bank_pdb_file:protein_demo
+    whole_brain_annot:whole_brain_annot
+    whole_brain_sulc:whole_brain_sulc
+    whole_brain_sulc_fsaverage:whole_brain_sulc_fsaverage
+    bunny:bunny
+    dragon:dragon
+    brain_video:brain_video
+)
+
 PASSED=()
 FAILED=()
 
 run_one() {
     local dir="$1"
     local exe="$2"
-    shift 2
-    local args=("$@")
 
     echo ""
     echo "============================================"
@@ -46,8 +57,8 @@ run_one() {
         return 1
     fi
 
-    echo "[run] $exe ${args[*]}"
-    if "./$exe" "${args[@]}"; then
+    echo "[run] $exe"
+    if "./$exe"; then
         echo "  PASS"
         PASSED+=("$dir")
     else
@@ -56,36 +67,12 @@ run_one() {
     fi
 }
 
-if [[ -z "$FILTER" || "$FILTER" == "all_primitives" ]]; then
-    run_one all_primitives                    all_primitives
-fi
-if [[ -z "$FILTER" || "$FILTER" == "spot_cow" ]]; then
-    run_one spot_cow                          spot_cow
-fi
-if [[ -z "$FILTER" || "$FILTER" == "transparency" ]]; then
-    run_one transparency                      transparency_demo
-fi
-if [[ -z "$FILTER" || "$FILTER" == "protein_data_bank_pdb_file" ]]; then
-    run_one protein_data_bank_pdb_file        protein_demo
-fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_annot" ]]; then
-    run_one whole_brain_annot    whole_brain_annot
-fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc" ]]; then
-    run_one whole_brain_sulc     whole_brain_sulc
-fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_fsaverage" ]]; then
-    run_one whole_brain_sulc_fsaverage whole_brain_sulc_fsaverage
-fi
-if [[ -z "$FILTER" || "$FILTER" == "bunny" ]]; then
-    run_one bunny                             bunny
-fi
-if [[ -z "$FILTER" || "$FILTER" == "dragon" ]]; then
-    run_one dragon                            dragon
-fi
-if [[ -z "$FILTER" || "$FILTER" == "brain_video" ]]; then
-    run_one brain_video                       brain_video
-fi
+for entry in "${EXAMPLES[@]}"; do
+    dir="${entry%%:*}"
+    exe="${entry##*:}"
+    [[ -z "$FILTER" || "$FILTER" == "$dir" ]] || continue
+    run_one "$dir" "$exe"
+done
 
 echo ""
 echo "============================================"
@@ -102,7 +89,7 @@ done
 
 if [[ -n "$FILTER" && ${#PASSED[@]} -eq 0 && ${#FAILED[@]} -eq 0 ]]; then
     echo "  WARNING: no example matched filter '$FILTER'"
-    echo "  Available: all_primitives spot_cow transparency protein_data_bank_pdb_file whole_brain_annot whole_brain_sulc whole_brain_sulc_fsaverage bunny dragon brain_video"
+    echo "  Available: ${EXAMPLES[*]%%:*}"
     exit 2
 fi
 

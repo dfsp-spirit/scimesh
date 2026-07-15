@@ -21,7 +21,14 @@
 
 library(scimesh)
 
-sjd <- "test_data/freesurfer/subjects_dir"
+test_data_dir <- Sys.getenv("SCIMESH_TEST_DATA_DIR",
+    unset = file.path(
+        dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])),
+        "..", "..", "test_data"
+    )
+)
+
+sjd <- file.path(test_data_dir, "freesurfer/subjects_dir")
 sj  <- "subject1"
 
 cat(sprintf("Subjects dir : %s\n", sjd))

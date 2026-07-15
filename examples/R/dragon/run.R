@@ -16,7 +16,14 @@
 
 library(scimesh)
 
-ply_path <- "test_data/stanford_3d_scanning_repo/dragon/dragon_vrip.ply"
+test_data_dir <- Sys.getenv("SCIMESH_TEST_DATA_DIR",
+    unset = file.path(
+        dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])),
+        "..", "..", "test_data"
+    )
+)
+
+ply_path <- file.path(test_data_dir, "stanford_3d_scanning_repo/dragon/dragon_vrip.ply")
 
 cat("Loading", ply_path, "...\n")
 mesh <- read_ply(ply_path)

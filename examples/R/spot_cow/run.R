@@ -16,8 +16,15 @@
 
 library(scimesh)
 
-obj_path <- "test_data/keenan_crane/spot/spot_triangulated.obj"
-tex_path <- "test_data/keenan_crane/spot/spot_texture.png"
+test_data_dir <- Sys.getenv("SCIMESH_TEST_DATA_DIR",
+    unset = file.path(
+        dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])),
+        "..", "..", "test_data"
+    )
+)
+
+obj_path <- file.path(test_data_dir, "keenan_crane/spot/spot_triangulated.obj")
+tex_path <- file.path(test_data_dir, "keenan_crane/spot/spot_texture.png")
 
 cat("Loading mesh...\n")
 mesh <- read_obj(obj_path)

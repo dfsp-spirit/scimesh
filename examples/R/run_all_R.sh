@@ -3,8 +3,8 @@
 # run_all_R.sh — Run all scimesh R example scripts
 #
 # Usage:
-#   ./examples/R/run_all_R.sh                    # run all
-#   ./examples/R/run_all_R.sh spot_cow           # run only spot_cow
+#   ./examples/R/run_all_R.sh                # run all
+#   ./examples/R/run_all_R.sh spot_cow       # run only spot_cow
 #
 # Prints a summary at the end showing how many examples passed / failed.
 
@@ -13,49 +13,45 @@ set -o pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-cd "$REPO_ROOT"
+export SCIMESH_TEST_DATA_DIR="$REPO_ROOT/test_data"
 
 FILTER="${1:-}"
+
+declare -a EXAMPLES=(
+    transparency
+    primitives
+    spot_cow
+    dragon
+    whole_brain_sulc
+    video_frames_orbit
+)
 
 PASSED=()
 FAILED=()
 
 run_one() {
-    local script="$1"
-    local label="$2"
+    local dir="$1"
 
     echo ""
     echo "============================================"
-    echo "  Running: $label"
+    echo "  Running: $dir"
     echo "============================================"
 
-    if Rscript "$script"; then
+    cd "$SCRIPT_DIR/$dir"
+
+    if Rscript "$SCRIPT_DIR/$dir/run.R"; then
         echo "  PASS"
-        PASSED+=("$label")
+        PASSED+=("$dir")
     else
         echo "  FAIL: exited with non-zero status"
-        FAILED+=("$label")
+        FAILED+=("$dir")
     fi
 }
 
-if [[ -z "$FILTER" || "$FILTER" == "transparency" ]]; then
-    run_one examples/R/transparency/run.R                transparency
-fi
-if [[ -z "$FILTER" || "$FILTER" == "primitives" ]]; then
-    run_one examples/R/primitives/run.R                primitives
-fi
-if [[ -z "$FILTER" || "$FILTER" == "spot_cow" ]]; then
-    run_one examples/R/spot_cow/run.R                    spot_cow
-fi
-if [[ -z "$FILTER" || "$FILTER" == "dragon" ]]; then
-    run_one examples/R/dragon/run.R                      dragon
-fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc" ]]; then
-    run_one examples/R/whole_brain_sulc/run.R whole_brain_sulc
-fi
-if [[ -z "$FILTER" || "$FILTER" == "video_frames_orbit" ]]; then
-    run_one examples/R/video_frames_orbit/run.R            video_frames_orbit
-fi
+for dir in "${EXAMPLES[@]}"; do
+    [[ -z "$FILTER" || "$FILTER" == "$dir" ]] || continue
+    run_one "$dir"
+done
 
 echo ""
 echo "============================================"
@@ -72,7 +68,7 @@ done
 
 if [[ -n "$FILTER" && ${#PASSED[@]} -eq 0 && ${#FAILED[@]} -eq 0 ]]; then
     echo "  WARNING: no example matched filter '$FILTER'"
-    echo "  Available: transparency primitives spot_cow dragon whole_brain_sulc video_frames_orbit"
+    echo "  Available: ${EXAMPLES[*]}"
     exit 2
 fi
 

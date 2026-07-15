@@ -13,6 +13,13 @@
 
 library(scimesh)
 
+test_data_dir <- Sys.getenv("SCIMESH_TEST_DATA_DIR",
+    unset = file.path(
+        dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])),
+        "..", "..", "test_data"
+    )
+)
+
 opts_shaded <- render_options(
     width = 300L, height = 300L, shading = "flat",
     background_color = c(0.92, 0.93, 0.95, 1),

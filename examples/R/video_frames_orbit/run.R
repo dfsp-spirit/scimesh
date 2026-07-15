@@ -17,6 +17,13 @@
 
 library(scimesh)
 
+test_data_dir <- Sys.getenv("SCIMESH_TEST_DATA_DIR",
+    unset = file.path(
+        dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])),
+        "..", "..", "test_data"
+    )
+)
+
 mesh <- generate_torus(c(0, 0, 0), major_radius = 1.2, minor_radius = 0.4,
                        major_segments = 48, minor_segments = 24,
                        color = c(0.7, 0.5, 0.3, 1.0))
