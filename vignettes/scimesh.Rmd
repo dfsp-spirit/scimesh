@@ -19,13 +19,14 @@ knitr::opts_chunk$set(
 ## What is scimesh?
 
 **scimesh** is a headless, GPU-free software renderer for 3D meshes.
-It works anywhere R works — no X11, no OpenGL, no GPU required.  It is
-designed as a drop-in replacement for the rendering part of
-[fsbrain](https://github.com/dfsp-spirit/fsbrain) when rgl/OpenGL is
-unavailable (e.g. on macOS without XQuartz, or on HPC clusters).
+It works anywhere R works — no X11, no OpenGL, no GPU required.
+
+As such, it can replace be used for scientific mesh visualization when rgl/OpenGL is
+unavailable (e.g. on macOS without XQuartz, or on HPC clusters, in CI containers, etc.).
 
 All rendering is done in modern C++ and returns in-memory RGBA images
-that can be saved to PNG or composited into publication figures.
+that can be saved to PNG or composited into high-quality figures for publications or presentations.
+
 
 ## Installation
 
