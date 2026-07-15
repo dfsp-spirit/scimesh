@@ -505,9 +505,9 @@ The `examples/cpp/` directory contains complete, runnable programs:
 | `spot_cow/` | Textured OBJ mesh with multi-light setup and SSAO |
 | `transparency/` | Semi-transparent overlays with FreeSurfer surfaces |
 | `protein_data_bank_pdb_file/` | Protein visualization from PDB files |
-| `whole_brain_sulc_single_image/` | Whole-brain sulcal depth rendering |
-| `whole_brain_sulc_single_image_fsaverage/` | Same on fsaverage template |
-| `whole_brain_annot_single_image/` | Cortical parcellation coloring |
+| `whole_brain_sulc/` | Whole-brain sulcal depth rendering |
+| `whole_brain_sulc_fsaverage/` | Same on fsaverage template |
+| `whole_brain_annot/` | Cortical parcellation coloring |
 | `brain_video/` | Turntable animation — 48 orbit frames via camera_orbit() |
 
 Each example has its own `CMakeLists.txt`.  To build and run:

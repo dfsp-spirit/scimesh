@@ -10,7 +10,7 @@
 /// the `unknown` region color).
 ///
 /// To compile (from the project root):
-///   cd examples/cpp/whole_brain_annot_single_image && mkdir -p build && cd build
+///   cd examples/cpp/whole_brain_annot && mkdir -p build && cd build
 ///   cmake .. && make
 ///
 /// Then run:
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     for (const auto &f : {lh_surf, rh_surf, lh_annot, rh_annot}) {
         if (!fs::util::file_exists(f)) {
             std::cerr << "ERROR: File not found: " << f << "\n";
-            std::cerr << "Run from the examples/cpp/whole_brain_annot_single_image"
+            std::cerr << "Run from the examples/cpp/whole_brain_annot"
                          " directory, or pass paths as arguments.\n";
             return 1;
         }

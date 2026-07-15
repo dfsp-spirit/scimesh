@@ -68,14 +68,14 @@ fi
 if [[ -z "$FILTER" || "$FILTER" == "protein_data_bank_pdb_file" ]]; then
     run_one protein_data_bank_pdb_file        protein_demo
 fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_annot_single_image" ]]; then
-    run_one whole_brain_annot_single_image    whole_brain_annot
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_annot" ]]; then
+    run_one whole_brain_annot    whole_brain_annot
 fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_single_image" ]]; then
-    run_one whole_brain_sulc_single_image     whole_brain_sulc
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc" ]]; then
+    run_one whole_brain_sulc     whole_brain_sulc
 fi
-if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_single_image_fsaverage" ]]; then
-    run_one whole_brain_sulc_single_image_fsaverage whole_brain_sulc_fsaverage
+if [[ -z "$FILTER" || "$FILTER" == "whole_brain_sulc_fsaverage" ]]; then
+    run_one whole_brain_sulc_fsaverage whole_brain_sulc_fsaverage
 fi
 if [[ -z "$FILTER" || "$FILTER" == "bunny" ]]; then
     run_one bunny                             bunny
@@ -102,7 +102,7 @@ done
 
 if [[ -n "$FILTER" && ${#PASSED[@]} -eq 0 && ${#FAILED[@]} -eq 0 ]]; then
     echo "  WARNING: no example matched filter '$FILTER'"
-    echo "  Available: all_primitives spot_cow transparency protein_data_bank_pdb_file whole_brain_annot_single_image whole_brain_sulc_single_image whole_brain_sulc_single_image_fsaverage bunny dragon"
+    echo "  Available: all_primitives spot_cow transparency protein_data_bank_pdb_file whole_brain_annot whole_brain_sulc whole_brain_sulc_fsaverage bunny dragon brain_video"
     exit 2
 fi
 

@@ -520,7 +520,7 @@ The repository includes runnable R example scripts in `examples/R/`:
 | `spot_cow/run.R` | Textured OBJ mesh with multi-light setup and SSAO |
 | `transparency/run.R` | Semi-transparent pial overlay on white matter |
 | `dragon/run.R` | Stanford Dragon with specular highlights and 4x AA |
-| `whole_brain_sulc_single_image/run.R` | Whole-brain sulcal depth with cortex masking |
+| `whole_brain_sulc/run.R` | Whole-brain sulcal depth with cortex masking |
 
 Run all examples at once:
 

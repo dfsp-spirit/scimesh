@@ -12,7 +12,7 @@
 # cortex masking, and headless rendering with scimesh.
 #
 # Usage:
-#   Rscript examples/R/whole_brain_sulc_single_image/run.R
+#   Rscript examples/R/whole_brain_sulc/run.R
 #
 # Output PNG file is written to the current directory:
 #   scimesh_whole_brain_sulc.png
