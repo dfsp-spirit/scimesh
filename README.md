@@ -5,6 +5,7 @@ scimesh is a fast 3D mesh renderer that produces publication-quality images enti
 We provide both a C++ library and an R package.  No OpenGL, no X11, no GPU drivers required.  Works anywhere a C++17 compiler **or** R runs: HPC clusters, headless servers, macOS without XQuartz, containers, and CI pipelines.
 
 <!-- badges: start -->
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21374840.svg)](https://doi.org/10.5281/zenodo.21374840)
   [![R-CMD-check](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml)
   [![tests_cpp](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_cpp.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
   [![tests_R](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_R.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
