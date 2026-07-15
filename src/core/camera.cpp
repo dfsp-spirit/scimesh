@@ -76,4 +76,15 @@ Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
     }
 }
 
+Camera camera_orbit(const Camera &camera, const Vec3 &axis, float angle_degrees) {
+    Camera result = camera;
+    float angle_rad = glm::radians(angle_degrees);
+    Mat4 rotation = glm::rotate(Mat4(1.0f), angle_rad, axis);
+    Vec4 rotated_dir = rotation * Vec4(camera.eye - camera.center, 0.0f);
+    result.eye = camera.center + Vec3(rotated_dir);
+    Vec4 rotated_up = rotation * Vec4(camera.up, 0.0f);
+    result.up = glm::normalize(Vec3(rotated_up));
+    return result;
+}
+
 } // namespace scimesh

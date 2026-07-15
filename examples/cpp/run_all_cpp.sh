@@ -83,6 +83,9 @@ fi
 if [[ -z "$FILTER" || "$FILTER" == "dragon" ]]; then
     run_one dragon                            dragon
 fi
+if [[ -z "$FILTER" || "$FILTER" == "brain_video" ]]; then
+    run_one brain_video                       brain_video
+fi
 
 echo ""
 echo "============================================"

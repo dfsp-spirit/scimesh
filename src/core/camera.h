@@ -97,4 +97,6 @@ Camera camera_fit_mesh(const Mesh &mesh, const Vec3 &direction,
                        const Vec3 &up, float fov_degrees, float margin = 1.1f,
                        ProjectionType projection = ProjectionType::PERSPECTIVE);
 
+Camera camera_orbit(const Camera &camera, const Vec3 &axis, float angle_degrees);
+
 } // namespace scimesh
