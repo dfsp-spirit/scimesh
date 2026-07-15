@@ -90,6 +90,7 @@ int main() {
     opts.ssao_enabled = true;
     opts.ssao_radius = 12.0f;
     opts.ssao_intensity = 0.5f;
+    opts.contrast = 1.2f;
 
     std::cout << "Rendering at " << opts.width << "x" << opts.height
               << " with " << opts.aa_samples << "x AA ...\n";

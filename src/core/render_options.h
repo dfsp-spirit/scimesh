@@ -27,7 +27,7 @@ struct RenderOptions {
 
     std::vector<Light> lights;
     float ambient = 0.3f;
-    float gamma = 2.2f;
+    float contrast = 1.0f;
     std::vector<ClipPlane> clip_planes;
 
     bool fog_enabled = false;

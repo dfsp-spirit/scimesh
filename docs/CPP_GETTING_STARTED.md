@@ -192,7 +192,7 @@ opts.background_color = Color(0, 0, 0, 0); // transparent
 
 // Lighting
 opts.ambient = 0.2f;
-opts.gamma = 2.2f;
+opts.contrast = 1.1f;
 opts.lights = {key_light, fill_light, rim_light};
 opts.specular_color = Color(0.4f, 0.4f, 0.4f);
 opts.shininess = 64.0f;
@@ -248,7 +248,7 @@ img.clear(r, g, b, a);
 Color c = img.sample_bilinear(u, v);
 
 // Post-processing
-img.apply_gamma(2.2f);  // sRGB contrast
+img.apply_contrast(1.1f);  // S-curve contrast stretch
 
 // Downsample (e.g., for anti-aliasing)
 Image small = img.downsample_box(2);
@@ -405,26 +405,27 @@ opts.shininess = 64.0f;
 When no lights are specified, a single headlight at `(0, 0, 1)` is
 used.
 
-### Gamma
+### Contrast
 
-`opts.gamma` (default 2.2, sRGB-like contrast matching OpenGL / rgl)
-applies gamma encoding after shading via `value^(1/gamma)`.
-Set to 1.0 to disable.
+`opts.contrast` (default 1.0, no change) applies an S-curve contrast
+stretch after shading via `(value - 0.5) * contrast + 0.5`.
+Values > 1.0 push darks toward black and lights toward white.
+Typical values: 1.1--1.3 for subtle contrast, up to 1.5 for dramatic.
 
 ### Ambient
 
 `opts.ambient` (default 0.3) controls how much light reaches surfaces
-facing away from the light source.  Lower values produce deeper shadows
-and higher contrast.  Typical values are 0.1–0.3.
+facing away from the light source.  Lower values produce deeper shadows.
+Typical values are 0.1--0.3.
 
 ### Post-Processing
 
-`Image::apply_gamma()` applies the same gamma encoding to an already
+`Image::apply_contrast()` applies the same S-curve to an already
 rendered image:
 
 ```cpp
 Image img = renderer.render_mesh(mesh, cam, opts);
-img.apply_gamma(2.2f);  // sRGB-like contrast
+img.apply_contrast(1.1f);  // S-curve contrast stretch
 img.write_png("output.png");
 ```
 

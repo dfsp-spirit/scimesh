@@ -35,7 +35,7 @@ struct Image {
     void rotate_90(bool clockwise = true);
     void scale(int new_width, int new_height);
     void crop_to_content(CropContentDirection direction, const Color &background);
-    void apply_gamma(float gamma);
+    void apply_contrast(float contrast);
 
     // Write to PPM (for C++ test debugging - trivial format, no dependencies)
     bool write_ppm(const std::string &filename) const;

@@ -252,9 +252,9 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         opts.ambient = as<float>(opt_desc["ambient"]);
     }
 
-    if (opt_desc.containsElementNamed("gamma") &&
-        !Rf_isNull(opt_desc["gamma"])) {
-        opts.gamma = as<float>(opt_desc["gamma"]);
+    if (opt_desc.containsElementNamed("contrast") &&
+        !Rf_isNull(opt_desc["contrast"])) {
+        opts.contrast = as<float>(opt_desc["contrast"]);
     }
 
     if (opt_desc.containsElementNamed("fog_enabled") &&
@@ -823,9 +823,9 @@ List scimesh_image_crop_to_content(List image, CharacterVector direction,
 }
 
 // [[Rcpp::export]]
-List scimesh_image_apply_gamma(List image, double gamma) {
+List scimesh_image_apply_contrast(List image, double contrast) {
     scimesh::Image img = r_list_to_image(image);
-    img.apply_gamma(static_cast<float>(gamma));
+    img.apply_contrast(static_cast<float>(contrast));
     return image_to_r_list(img);
 }
 

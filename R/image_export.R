@@ -51,27 +51,28 @@ write_png <- function(image, filename) {
     invisible(scimesh_write_png(image, filename))
 }
 
-#' Apply gamma correction to an image
+#' Apply contrast adjustment to an image
 #'
-#' Applies gamma encoding to the RGB channels of a rendered image.
-#' Formula: \code{value^(1/gamma)}.  Default 1.0 = no change.
-#' Values > 1.0 (e.g. 2.2) brighten midtones, matching the sRGB
-#' transfer function used by GPU renderers.
+#' Applies a contrast stretch (S-curve) to the RGB channels of a
+#' rendered image.  Formula: \code{(value - 0.5) * contrast + 0.5},
+#' clamped to \code{[0, 1]}.  The default 1.0 means no change.
+#' Values > 1.0 produce darker darks and lighter highlights.
 #'
 #' @param image An image list returned by \code{render_mesh()} or
 #'   \code{render_scene()}.
-#' @param gamma Gamma value.  Default 2.2 for sRGB-like contrast.
-#' @return A new image list with gamma-corrected pixel data.
+#' @param contrast Contrast multiplier.  Default 1.0 (no change).
+#'   Typical values: 1.1--1.2 for subtle S-curve, 1.5 for strong.
+#' @return A new image list with contrast-adjusted pixel data.
 #'
 #' @examples
 #' \dontrun{
 #' img <- render_mesh(cube$vertices, cube$triangles)
-#' img <- image_apply_gamma(img, gamma = 2.2)
+#' img <- image_apply_contrast(img, contrast = 1.1)
 #' }
 #'
 #' @export
-image_apply_gamma <- function(image, gamma = 2.2) {
-    scimesh_image_apply_gamma(image, as.numeric(gamma))
+image_apply_contrast <- function(image, contrast = 1.0) {
+    scimesh_image_apply_contrast(image, as.numeric(contrast))
 }
 
 #' Crop an image to a rectangular region

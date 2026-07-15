@@ -19,7 +19,7 @@ render_options(
   shininess = 0,
   lights = NULL,
   ambient = 0.3,
-  gamma = 2.2,
+  contrast = 1,
   fog_enabled = FALSE,
   fog_start = 0,
   fog_end = 1,
@@ -76,10 +76,10 @@ plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).}
 
 \item{ambient}{Ambient light contribution (0-1).  Default 0.3.}
 
-\item{gamma}{Gamma correction applied after shading, before uint8_t
-conversion.  Default 2.2 (sRGB-like contrast matching GPU renderers
-such as rgl / OpenGL).  Set to 1.0 for no correction.
-Formula: \code{value^(1/gamma)}.}
+\item{contrast}{Contrast adjustment applied after shading, before
+uint8_t conversion.  Default 1.0 (no change).  Values > 1.0 produce
+darker darks and lighter highlights (S-curve).  Formula:
+\code{(value - 0.5) * contrast + 0.5}, clamped to \code{[0, 1]}.}
 
 \item{fog_enabled}{Enable depth cueing (fog).  Default \code{FALSE}.}
 

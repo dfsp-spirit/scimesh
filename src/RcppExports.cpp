@@ -415,15 +415,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// scimesh_image_apply_gamma
-List scimesh_image_apply_gamma(List image, double gamma);
-RcppExport SEXP _scimesh_scimesh_image_apply_gamma(SEXP imageSEXP, SEXP gammaSEXP) {
+// scimesh_image_apply_contrast
+List scimesh_image_apply_contrast(List image, double contrast);
+RcppExport SEXP _scimesh_scimesh_image_apply_contrast(SEXP imageSEXP, SEXP contrastSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type image(imageSEXP);
-    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
-    rcpp_result_gen = Rcpp::wrap(scimesh_image_apply_gamma(image, gamma));
+    Rcpp::traits::input_parameter< double >::type contrast(contrastSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_image_apply_contrast(image, contrast));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -514,7 +514,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_image_rotate_90", (DL_FUNC) &_scimesh_scimesh_image_rotate_90, 2},
     {"_scimesh_scimesh_image_scale", (DL_FUNC) &_scimesh_scimesh_image_scale, 3},
     {"_scimesh_scimesh_image_crop_to_content", (DL_FUNC) &_scimesh_scimesh_image_crop_to_content, 3},
-    {"_scimesh_scimesh_image_apply_gamma", (DL_FUNC) &_scimesh_scimesh_image_apply_gamma, 2},
+    {"_scimesh_scimesh_image_apply_contrast", (DL_FUNC) &_scimesh_scimesh_image_apply_contrast, 2},
     {"_scimesh_scimesh_print_image", (DL_FUNC) &_scimesh_scimesh_print_image, 1},
     {"_scimesh_scimesh_print_camera", (DL_FUNC) &_scimesh_scimesh_print_camera, 1},
     {"_scimesh_scimesh_print_options", (DL_FUNC) &_scimesh_scimesh_print_options, 1},

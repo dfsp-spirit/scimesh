@@ -34,11 +34,13 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
                                        specular_color, shininess);
         }
 
-        if (gamma != 1.0f) {
-            float inv_gamma = 1.0f / gamma;
-            shaded.r = std::pow(std::clamp(shaded.r, 0.0f, 1.0f), inv_gamma);
-            shaded.g = std::pow(std::clamp(shaded.g, 0.0f, 1.0f), inv_gamma);
-            shaded.b = std::pow(std::clamp(shaded.b, 0.0f, 1.0f), inv_gamma);
+        if (contrast != 1.0f) {
+            auto apply_contrast = [&](float v) {
+                return std::clamp((v - 0.5f) * contrast + 0.5f, 0.0f, 1.0f);
+            };
+            shaded.r = apply_contrast(shaded.r);
+            shaded.g = apply_contrast(shaded.g);
+            shaded.b = apply_contrast(shaded.b);
         }
 
         uint8_t r = static_cast<uint8_t>(std::clamp(shaded.r, 0.0f, 1.0f) * 255.0f);
