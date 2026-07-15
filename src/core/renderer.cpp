@@ -149,6 +149,7 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     rasterizer.shininess = options.shininess;
     rasterizer.lights = options.lights;
     rasterizer.ambient = options.ambient;
+    rasterizer.gamma = options.gamma;
     rasterizer.fog_enabled = options.fog_enabled;
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;

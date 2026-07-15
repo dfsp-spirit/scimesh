@@ -51,6 +51,29 @@ write_png <- function(image, filename) {
     invisible(scimesh_write_png(image, filename))
 }
 
+#' Apply gamma correction to an image
+#'
+#' Applies gamma encoding to the RGB channels of a rendered image.
+#' Formula: \code{value^(1/gamma)}.  Default 1.0 = no change.
+#' Values > 1.0 (e.g. 2.2) brighten midtones, matching the sRGB
+#' transfer function used by GPU renderers.
+#'
+#' @param image An image list returned by \code{render_mesh()} or
+#'   \code{render_scene()}.
+#' @param gamma Gamma value.  Default 2.2 for sRGB-like contrast.
+#' @return A new image list with gamma-corrected pixel data.
+#'
+#' @examples
+#' \dontrun{
+#' img <- render_mesh(cube$vertices, cube$triangles)
+#' img <- image_apply_gamma(img, gamma = 2.2)
+#' }
+#'
+#' @export
+image_apply_gamma <- function(image, gamma = 2.2) {
+    scimesh_image_apply_gamma(image, as.numeric(gamma))
+}
+
 #' Crop an image to a rectangular region
 #'
 #' @param image An image list returned by \code{render_mesh()} or similar.

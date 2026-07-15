@@ -19,6 +19,7 @@ render_options(
   shininess = 0,
   lights = NULL,
   ambient = 0.3,
+  gamma = 2.2,
   fog_enabled = FALSE,
   fog_start = 0,
   fog_end = 1,
@@ -74,6 +75,11 @@ plastic), 64 (shiny), 128 (glass).  Default \code{0} (off).}
 \code{c(0, 0, 1)} is used (the original behaviour).}
 
 \item{ambient}{Ambient light contribution (0-1).  Default 0.3.}
+
+\item{gamma}{Gamma correction applied after shading, before uint8_t
+conversion.  Default 2.2 (sRGB-like contrast matching GPU renderers
+such as rgl / OpenGL).  Set to 1.0 for no correction.
+Formula: \code{value^(1/gamma)}.}
 
 \item{fog_enabled}{Enable depth cueing (fog).  Default \code{FALSE}.}
 

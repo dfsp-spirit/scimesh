@@ -357,6 +357,20 @@ Color Image::sample_bilinear(float u, float v) const {
         c00.a * (1-sx)*(1-sy) + c10.a * sx*(1-sy) + c01.a * (1-sx)*sy + c11.a * sx*sy);
 }
 
+void Image::apply_gamma(float gamma) {
+    if (gamma == 1.0f) return;
+    float inv_gamma = 1.0f / gamma;
+    for (int i = 0; i < width * height; ++i) {
+        int idx = i * 4;
+        float r = pixels[idx] / 255.0f;
+        float g = pixels[idx + 1] / 255.0f;
+        float b = pixels[idx + 2] / 255.0f;
+        pixels[idx] = static_cast<uint8_t>(std::clamp(std::pow(r, inv_gamma), 0.0f, 1.0f) * 255.0f);
+        pixels[idx + 1] = static_cast<uint8_t>(std::clamp(std::pow(g, inv_gamma), 0.0f, 1.0f) * 255.0f);
+        pixels[idx + 2] = static_cast<uint8_t>(std::clamp(std::pow(b, inv_gamma), 0.0f, 1.0f) * 255.0f);
+    }
+}
+
 bool Image::write_ppm(const std::string &filename) const {
     std::ofstream f(filename, std::ios::binary);
     if (!f)

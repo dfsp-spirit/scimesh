@@ -16,6 +16,7 @@ struct Rasterizer {
     float shininess = 0.0f;
     std::vector<Light> lights;
     float ambient = 0.3f;
+    float gamma = 2.2f;
 
     bool fog_enabled = false;
     float fog_start = 0.0f;

@@ -191,7 +191,8 @@ opts.backface_culling = true;
 opts.background_color = Color(0, 0, 0, 0); // transparent
 
 // Lighting
-opts.ambient = 0.3f;
+opts.ambient = 0.2f;
+opts.gamma = 2.2f;
 opts.lights = {key_light, fill_light, rim_light};
 opts.specular_color = Color(0.4f, 0.4f, 0.4f);
 opts.shininess = 64.0f;
@@ -245,6 +246,9 @@ img.clear(r, g, b, a);
 
 // Bilinear texture sampling
 Color c = img.sample_bilinear(u, v);
+
+// Post-processing
+img.apply_gamma(2.2f);  // sRGB contrast
 
 // Downsample (e.g., for anti-aliasing)
 Image small = img.downsample_box(2);
@@ -376,6 +380,7 @@ transform_mesh(mesh, M);
 
 ## Lighting
 
+Scimesh works in display-referred (sRGB) colour space for simplicity.
 Lights are defined as structs with position, color, and intensity:
 
 ```cpp
@@ -391,13 +396,37 @@ fill_light.intensity = 0.5f;
 
 RenderOptions opts;
 opts.lights = {key_light, fill_light};
-opts.ambient = 0.3f;
+opts.ambient = 0.2f;
+opts.gamma = 2.2f;
 opts.specular_color = Color(0.4f, 0.4f, 0.4f);
 opts.shininess = 64.0f;
 ```
 
 When no lights are specified, a single headlight at `(0, 0, 1)` is
 used.
+
+### Gamma
+
+`opts.gamma` (default 2.2, sRGB-like contrast matching OpenGL / rgl)
+applies gamma encoding after shading via `value^(1/gamma)`.
+Set to 1.0 to disable.
+
+### Ambient
+
+`opts.ambient` (default 0.3) controls how much light reaches surfaces
+facing away from the light source.  Lower values produce deeper shadows
+and higher contrast.  Typical values are 0.1–0.3.
+
+### Post-Processing
+
+`Image::apply_gamma()` applies the same gamma encoding to an already
+rendered image:
+
+```cpp
+Image img = renderer.render_mesh(mesh, cam, opts);
+img.apply_gamma(2.2f);  // sRGB-like contrast
+img.write_png("output.png");
+```
 
 ## Semi-Transparent Meshes
 

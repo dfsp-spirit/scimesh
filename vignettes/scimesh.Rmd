@@ -161,6 +161,65 @@ render_options(
 | 32–64 | Shiny surface |
 | 128 | Glass-like tight spot |
 
+## Lighting and Gamma
+
+Scimesh works in display-referred (sRGB) colour space for simplicity.
+This means your lighting values directly correspond to what you see on
+screen, but GPU renderers like rgl additionally apply an sRGB transfer
+function (gamma ~2.2) when writing to the framebuffer, producing higher
+perceived contrast.
+
+### Gamma Correction
+
+Pass `gamma = 2.2` to `render_options()` to apply sRGB-like gamma
+encoding during rendering.  This brightens midtones and increases
+perceived contrast, matching the output of GPU renderers:
+
+```r
+render_options(gamma = 2.2)
+```
+
+The default is 2.2 (sRGB-like contrast, matching rgl / OpenGL).
+Set to 1.0 for no correction.  The formula applied is
+\code{value^(1/gamma)}.
+
+You can also apply gamma as post-processing to an existing image:
+
+```r
+img <- render_mesh(mesh$vertices, mesh$triangles)
+img <- image_apply_gamma(img, gamma = 2.2)
+write_png(img, "output.png")
+```
+
+### Ambient Lighting
+
+The `ambient` parameter (default 0.3) controls how much light reaches
+surfaces that face away from the light source.  Lower values produce
+deeper shadows and more contrast:
+
+```r
+render_options(ambient = 0.15)  # deeper shadows
+```
+
+### Multi-Light Setups
+
+Explicit lights give you full control over direction, colour, and
+intensity:
+
+```r
+render_options(
+    ambient = 0.2,
+    gamma = 2.2,
+    lights = list(
+        list(position = c(0.5, 1.0, 0.8), color = c(1, 0.97, 0.9, 1),
+             intensity = 1.5),
+        list(position = c(-0.5, 0.2, 0.6), color = c(0.4, 0.5, 0.8, 1),
+             intensity = 0.5)))
+```
+
+See also the `specular_color` and `shininess` options (above) for
+adding glossy highlights.
+
 ## Projection Type
 
 Perspective (default) or orthographic (parallel projection, matching

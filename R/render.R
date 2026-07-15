@@ -142,6 +142,10 @@ render_scene <- function(meshes, camera, options = render_options()) {
 #'   \code{TRUE}).  When empty or \code{NULL}, a single headlight at
 #'   \code{c(0, 0, 1)} is used (the original behaviour).
 #' @param ambient Ambient light contribution (0-1).  Default 0.3.
+#' @param gamma Gamma correction applied after shading, before uint8_t
+#'   conversion.  Default 2.2 (sRGB-like contrast matching GPU renderers
+#'   such as rgl / OpenGL).  Set to 1.0 for no correction.
+#'   Formula: \code{value^(1/gamma)}.
 #' @param fog_enabled Enable depth cueing (fog).  Default \code{FALSE}.
 #' @param fog_start Z-depth where fog begins (0 = near plane, 1 = far
 #'   plane).  Default 0.
@@ -195,8 +199,9 @@ render_options <- function(width = 800L, height = 600L,
                            specular_color = c(0, 0, 0, 0),
                            shininess = 0,
                            lights = NULL,
-                           ambient = 0.3,
-                           fog_enabled = FALSE,
+                            ambient = 0.3,
+                            gamma = 2.2,
+                            fog_enabled = FALSE,
                            fog_start = 0,
                            fog_end = 1,
                            fog_color = c(0, 0, 0, 0),
@@ -222,6 +227,7 @@ render_options <- function(width = 800L, height = 600L,
         shininess = as.numeric(shininess),
         lights = lights,
         ambient = as.numeric(ambient),
+        gamma = as.numeric(gamma),
         fog_enabled = isTRUE(fog_enabled),
         fog_start = as.numeric(fog_start),
         fog_end = as.numeric(fog_end),

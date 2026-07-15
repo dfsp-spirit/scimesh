@@ -121,6 +121,10 @@ scimesh_image_crop_to_content <- function(image, direction, background) {
     .Call(`_scimesh_scimesh_image_crop_to_content`, image, direction, background)
 }
 
+scimesh_image_apply_gamma <- function(image, gamma) {
+    .Call(`_scimesh_scimesh_image_apply_gamma`, image, gamma)
+}
+
 scimesh_print_image <- function(image) {
     .Call(`_scimesh_scimesh_print_image`, image)
 }
