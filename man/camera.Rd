@@ -2,7 +2,6 @@
 % Please edit documentation in R/camera.R
 \name{camera}
 \alias{camera}
-\alias{camera_orbit}
 \title{Create a camera specification}
 \usage{
 camera(
@@ -12,8 +11,6 @@ camera(
   projection = c("perspective", "orthographic"),
   fov = 45
 )
-
-camera_orbit(camera, axis = c(0, 0, 1), angle_degrees)
 }
 \arguments{
 \item{eye}{Numeric vector of length 3: camera position.}

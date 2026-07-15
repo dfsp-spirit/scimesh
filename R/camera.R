@@ -91,7 +91,22 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
     scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
 }
 
-#' @rdname camera
+#' Orbit a camera around an axis
+#'
+#' Rotates a camera's eye position and up vector around its center
+#' by a given angle about a rotation axis.  Useful for generating
+#' turntable-style frame sequences.
+#'
+#' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
+#' @param axis Rotation axis as a length-3 vector. Default \code{c(0, 0, 1)} (Z axis).
+#' @param angle_degrees Rotation angle in degrees.
+#' @return A camera list with S3 class \code{"scimesh_camera"}.
+#'
+#' @examples
+#' mesh <- generate_torus(c(0, 0, 0))
+#' cam <- camera_auto(mesh, direction = c(1, 1, 1))
+#' cam2 <- camera_orbit(cam, axis = c(0, 0, 1), angle_degrees = 90)
+#'
 #' @export
 camera_orbit <- function(camera, axis = c(0, 0, 1), angle_degrees) {
     axis <- as.numeric(axis) / sqrt(sum(axis^2))
