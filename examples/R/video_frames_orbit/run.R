@@ -17,8 +17,8 @@
 
 library(scimesh)
 
-mesh <- generate_torus(c(0, 0, 0), R = 1.2, r = 0.4,
-                       n_segments = 48, n_rings = 24,
+mesh <- generate_torus(c(0, 0, 0), major_radius = 1.2, minor_radius = 0.4,
+                       major_segments = 48, minor_segments = 24,
                        color = c(0.7, 0.5, 0.3, 1.0))
 
 cam <- camera_auto(mesh, direction = c(1, 1, 1), fov = 45)
