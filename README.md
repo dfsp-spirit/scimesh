@@ -165,9 +165,9 @@ write_png(img, "sphere.png")
 | [`examples/cpp/whole_brain_annot_single_image/`](examples/cpp/whole_brain_annot_single_image/) | C++ | Cortical parcellation visualization |
 
 
-## Vendored Dependencies
+## Acknowledgements
 
-Thanks heaps to the authors of these great software packages that scimesh is built upon -- and of course, to the authors of the dependencies of these packages.
+Thanks heaps to the authors of these great software packages that scimesh is built upon:
 
 - `cpp_tests/catch_amalgamated.{h,cpp}`: [catchorg/Catch2](https://github.com/catchorg/Catch2/tree/devel/extras) — C++ test framework.
 - `src/third_party/glm/`: [g-truc/glm](https://github.com/g-truc/glm) — header-only C++ math library.
@@ -177,7 +177,9 @@ Thanks heaps to the authors of these great software packages that scimesh is bui
 - `src/third_party/stl_reader.h`: [sreiter/stl_reader](https://github.com/sreiter/stl_reader) — STL file reader.
 - `src/third_party/stb_image.h`, `src/third_party/stb_image_write.h`: [nothings/stb](https://github.com/nothings/stb) — image loading/saving.
 
-Note: This section is to give credit only. Users do **not** need to worry about installing these, they come vendored with scimesh already.
+And of course, thanks to the authors of the dependencies of these packages, and their dependencies...
+
+*Note: This section is to give credit only. Users do **not** need to worry about installing these dependencies, they come vendored with scimesh already.*
 
 
 ## Developer Information
