@@ -93,7 +93,114 @@ int main() {
 }
 ```
 
+### Loading a PLY Mesh
+
+Instead of generating geometry, you can load a mesh from a PLY file:
+
+```cpp
+#include "renderer.h"
+#include "camera.h"
+#include "render_options.h"
+#include "ply_io.h"
+#include "image.h"
+
+using namespace scimesh;
+
+int main() {
+    Mesh mesh = ply_io::read("bunny.ply");
+
+    Vec3 view_dir = glm::normalize(Vec3(1.0f, 1.0f, 1.0f));
+    Camera cam = camera_fit_mesh(mesh, view_dir, Vec3(0, 1, 0), 45.0f, 1.1f);
+
+    RenderOptions opts;
+    opts.width  = 800;
+    opts.height = 600;
+    opts.background_color = Color(0.98f, 0.98f, 0.98f, 1);
+    opts.shading = ShadingMode::SMOOTH;
+
+    Renderer renderer;
+    Image img = renderer.render_mesh(mesh, cam, opts);
+
+    img.write_ppm("bunny.ppm");
+
+    return 0;
+}
+```
+
+Compile with `ply_io.cpp` added to the source list (see Building below).
+
 ### Building
+
+#### Cmake (Recommended)
+
+Create a `CMakeLists.txt` in your project directory:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(my_app CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/../src/core
+)
+include_directories(SYSTEM
+    ${CMAKE_SOURCE_DIR}/../src/third_party
+    ${CMAKE_SOURCE_DIR}/../src/third_party/glm
+)
+
+set(CORE_SOURCES
+    ${CMAKE_SOURCE_DIR}/../src/core/image.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/camera.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/normals.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/clipping.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/rasterizer.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/renderer.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/primitives.cpp
+    ${CMAKE_SOURCE_DIR}/../src/core/transforms.cpp
+    # add ply_io.cpp if loading PLY files:
+    # ${CMAKE_SOURCE_DIR}/../src/core/ply_io.cpp
+)
+
+add_executable(my_app
+    main.cpp
+    ${CORE_SOURCES}
+)
+
+target_compile_features(my_app PRIVATE cxx_std_17)
+```
+
+Build and run:
+
+```sh
+mkdir -p build && cd build
+cmake ..
+make
+./my_app
+```
+
+#### Manually
+
+If you prefer to build manually, copy the scimesh `src/` directory so that
+it sits next to your project.  Assuming your code is in a directory called
+`my_project/`, the layout should look like this:
+
+```
+parent_directory/
+├── my_project/           ← your application
+│   ├── main.cpp          ← your source code
+│   └── build/            ← you run commands from here
+└── src/                  ← scimesh repo src/ copied here
+    ├── core/
+    │   ├── renderer.cpp
+    │   ├── camera.cpp
+    │   └── ...
+    └── third_party/
+        └── glm/
+```
+
+From inside `build/`, scimesh sources are reachable at `../../src/`.  Build with:
 
 ```sh
 mkdir -p build && cd build
@@ -105,9 +212,7 @@ g++ -std=c++17 -O2 -I../../src/core -I../../src/third_party -I../../src/third_pa
     -o my_app
 ./my_app
 ```
-
-Or use CMake — see any example in `examples/cpp/` for a complete
-`CMakeLists.txt`.
+Of course you can, and most likely shoud, rename the directory `/src/core/` into something like `third_party/scimesh/`. But this example matches what examples programs.
 
 ## Core Concepts
 
