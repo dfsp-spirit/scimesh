@@ -415,7 +415,7 @@ Typical values: 1.1--1.3 for subtle contrast, up to 1.5 for dramatic.
 ### Ambient
 
 `opts.ambient` (default 0.3) controls how much light reaches surfaces
-facing away from the light source.  Lower values produce deeper shadows.
+facing away from the light source. Lower values produce deeper shadows.
 Typical values are 0.1--0.3.
 
 ### Post-Processing
@@ -540,13 +540,14 @@ Run all examples at once:
   disappear when rotating, try `opts.backface_culling = false` or
   `opts.invert_normals = true`.
 
-**Open surfaces (brain meshes):**
-- Brain surfaces are open (not watertight).  Set
+**Open surfaces:**
+- For surface that are open (not watertight), set
   `opts.backface_culling = false` so both sides are visible.
 
 **Transparency not working:**
 - Make sure the mesh has `has_transparency = true` and vertex colors
   with alpha < 1.  Transparent meshes are rendered back-to-front.
+- Note that you can also set the background color for the rendered image to transparent.
 
 **Performance:**
 - A 300k triangle mesh at 1200x900 with 2x AA renders in ~1-3 seconds.
