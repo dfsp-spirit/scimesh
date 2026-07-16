@@ -1,6 +1,6 @@
 Package: scimesh
 Type: Package
-Title: Headless 3D Mesh Rendering Engine
+Title: Headless Publication-Quality 3D Mesh Rendering Engine
 Version: 0.2.6
 Authors@R: c(
     person("Tim", "Schaefer", email = "ts+code@rcmd.org",
@@ -27,6 +27,7 @@ Suggests:
     testthat (>= 3.0.0),
     png,
     freesurferformats,
+    viridisLite,
     knitr,
     rmarkdown
 VignetteBuilder: knitr

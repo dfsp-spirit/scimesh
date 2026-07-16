@@ -24,6 +24,7 @@ declare -a EXAMPLES=(
     dragon
     whole_brain_sulc
     video_frames_orbit
+    colormaps
 )
 
 PASSED=()
