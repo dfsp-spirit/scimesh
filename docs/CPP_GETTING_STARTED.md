@@ -131,100 +131,34 @@ Compile with `ply_io.cpp` added to the source list (see Building below).
 
 ### Building
 
-#### Cmake (Recommended)
+#### CMake (Recommended)
 
-Create a `CMakeLists.txt` in your project directory:
-
-```cmake
-cmake_minimum_required(VERSION 3.10)
-project(my_app CXX)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include_directories(
-    ${CMAKE_SOURCE_DIR}/../src/core
-)
-include_directories(SYSTEM
-    ${CMAKE_SOURCE_DIR}/../src/third_party
-    ${CMAKE_SOURCE_DIR}/../src/third_party/glm
-)
-
-set(CORE_SOURCES
-    ${CMAKE_SOURCE_DIR}/../src/core/image.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/camera.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/normals.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/clipping.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/rasterizer.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/renderer.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/primitives.cpp
-    ${CMAKE_SOURCE_DIR}/../src/core/transforms.cpp
-    # add ply_io.cpp if loading PLY files:
-    # ${CMAKE_SOURCE_DIR}/../src/core/ply_io.cpp
-)
-
-add_executable(my_app
-    main.cpp
-    ${CORE_SOURCES}
-)
-
-target_compile_features(my_app PRIVATE cxx_std_17)
-```
-
-Build and run:
-
-```sh
-mkdir -p build && cd build
-cmake ..
-make
-./my_app
-```
-
-A complete, real-world example that builds one of our demo apps: [`examples/cpp/all_primitives/CMakeLists.txt`](../examples/cpp/all_primitives/CMakeLists.txt).
+Add scimesh `src/core/` to your include path, list its `.cpp` files in your
+sources, and require C++17.  See a complete example:
+[`examples/cpp/all_primitives/CMakeLists.txt`](../examples/cpp/all_primitives/CMakeLists.txt).
 
 #### Manually
 
-If you prefer to build manually, copy the scimesh `src/` directory so that
-it sits next to your project.  Assuming your code is in a directory called
+Copy scimesh `src/` so it sits next to your project.  Assuming your code is in
 `my_project/`, the layout should look like this:
 
 ```
 parent_directory/
 ├── my_project/           ← your application
-│   ├── main.cpp          ← your source code
-│   └── build/            ← you run commands from here
+│   ├── main.cpp
+│   └── build/
 └── src/                  ← scimesh repo src/ copied here
     ├── core/
-    │   ├── renderer.cpp
-    │   ├── camera.cpp
-    │   └── ...
     └── third_party/
-        └── glm/
 ```
 
-From inside `build/`, scimesh sources are reachable at `../../src/`.  Build with:
+From inside `build/`, scimesh sources are reachable at `../../src/`.
+Compile the `.cpp` files from `../../src/core/` alongside `../main.cpp`
+with `-std=c++17`.
 
-```sh
-mkdir -p build && cd build
-g++ -std=c++17 -O2 -I../../src/core -I../../src/third_party -I../../src/third_party/glm \
-    ../main.cpp ../../src/core/renderer.cpp ../../src/core/camera.cpp \
-    ../../src/core/image.cpp ../../src/core/primitives.cpp \
-    ../../src/core/rasterizer.cpp ../../src/core/normals.cpp \
-    ../../src/core/clipping.cpp ../../src/core/transforms.cpp \
-    -o my_app
-./my_app
-```
+> **Note:** If your code calls `write_png()`, add `-DSCIMESH_STB_WRITE_IMPL`.
 
-> **Note:** If your code calls `write_png()` you must also add
-> `-DSCIMESH_STB_WRITE_IMPL` to the compile flags — this enables the
-> stb_image_write PNG backend embedded in `image.cpp`.  Without it you
-> will get an `undefined reference to stbi_write_png` linker error.
-
-Of course you can, and most likely should, rename the directory `src/core/` into
-something like `third_party/scimesh/`.  But this example matches what the
-example programs in this repo do.
-
-A runnable script that follows this exact pattern to build one of our demo apps:
+A runnable script that manually compiles on of our demos using `g++`:
 [`examples/cpp/all_primitives/build_manually.sh`](../examples/cpp/all_primitives/build_manually.sh).
 
 ## Core Concepts
