@@ -35,7 +35,7 @@ BUILD_DIR="$SCRIPT_DIR/build_manual"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-g++ -std=c++17 -O2 \
+g++ -std=c++17 -O2 -DSCIMESH_STB_WRITE_IMPL \
     -I../../../../src/core \
     -I../../../../src/third_party \
     -I../../../../src/third_party/glm \

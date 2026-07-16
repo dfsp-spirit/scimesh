@@ -214,6 +214,12 @@ g++ -std=c++17 -O2 -I../../src/core -I../../src/third_party -I../../src/third_pa
     -o my_app
 ./my_app
 ```
+
+> **Note:** If your code calls `write_png()` you must also add
+> `-DSCIMESH_STB_WRITE_IMPL` to the compile flags — this enables the
+> stb_image_write PNG backend embedded in `image.cpp`.  Without it you
+> will get an `undefined reference to stbi_write_png` linker error.
+
 Of course you can, and most likely should, rename the directory `src/core/` into
 something like `third_party/scimesh/`.  But this example matches what the
 example programs in this repo do.
