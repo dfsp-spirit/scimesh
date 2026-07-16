@@ -180,6 +180,8 @@ make
 ./my_app
 ```
 
+A complete, real-world example that builds one of our demo apps: [`examples/cpp/all_primitives/CMakeLists.txt`](../examples/cpp/all_primitives/CMakeLists.txt).
+
 #### Manually
 
 If you prefer to build manually, copy the scimesh `src/` directory so that
@@ -212,7 +214,12 @@ g++ -std=c++17 -O2 -I../../src/core -I../../src/third_party -I../../src/third_pa
     -o my_app
 ./my_app
 ```
-Of course you can, and most likely shoud, rename the directory `/src/core/` into something like `third_party/scimesh/`. But this example matches what examples programs.
+Of course you can, and most likely should, rename the directory `src/core/` into
+something like `third_party/scimesh/`.  But this example matches what the
+example programs in this repo do.
+
+A runnable script that follows this exact pattern to build one of our demo apps:
+[`examples/cpp/all_primitives/build_manually.sh`](../examples/cpp/all_primitives/build_manually.sh).
 
 ## Core Concepts
 
