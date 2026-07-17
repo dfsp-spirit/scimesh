@@ -1,9 +1,18 @@
 #' Render a 3D mesh to an image
 #'
 #' Renders a single mesh using the scimesh software renderer.
+#' The mesh can be specified either as separate
+#' \code{vertices}/\code{triangles} matrices, as a scimesh mesh
+#' descriptor list, or as an rgl \code{tmesh3d}-style list (with
+#' \code{vb}/\code{it} components).  rgl meshes are transparently
+#' converted via \code{\link{mesh_from_rgl}()}.
 #'
-#' @param vertices Nx3 numeric matrix of vertex positions.
+#' @param vertices Either an Nx3 numeric matrix of vertex positions,
+#'   or a scimesh mesh descriptor list (with \code{vertices} and
+#'   \code{triangles} components), or an rgl-style list (with
+#'   \code{vb} and \code{it} components).
 #' @param triangles Mx3 integer matrix of triangle indices (1-based).
+#'   Ignored when \code{vertices} is a list.
 #' @param colors Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
 #'   Use \code{face_colors} (Mx4) for per-triangle colours instead.
 #' @param face_colors Optional Mx4 numeric matrix of per-face RGBA colors,
@@ -26,16 +35,44 @@
 #' img <- render_mesh(verts, tris, colors = cols)
 #' \dontrun{write_png(img, "triangle.png")}
 #'
+#' # Render directly from an rgl mesh (vb/it format) — no manual conversion needed
+#' \dontrun{
+#' rgl_mesh <- rgl::tetrahedron3d()
+#' img <- render_mesh(rgl_mesh)
+#' write_png(img, "rgl_tetra.png")
+#' }
+#'
 #' @export
-render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
-                        normals = NULL, uv = NULL, texture = NULL,
-                        camera = camera_auto(vertices),
+render_mesh <- function(vertices, triangles = NULL, colors = NULL,
+                        face_colors = NULL, normals = NULL, uv = NULL,
+                        texture = NULL,
+                        camera = NULL,
                         options = render_options()) {
+    # Transparently accept rgl or scimesh mesh descriptors
+    if (is.list(vertices) && !is.matrix(vertices)) {
+        converted <- as_scimesh_mesh(vertices)
+        if (!is.null(converted$colors) && is.null(colors)) {
+            colors <- converted$colors
+        }
+        if (!is.null(converted$face_colors) && is.null(face_colors)) {
+            face_colors <- converted$face_colors
+        }
+        if (!is.null(converted$normals) && is.null(normals)) {
+            normals <- converted$normals
+        }
+        vertices  <- converted$vertices
+        triangles <- converted$triangles
+    }
+
     if (!is.matrix(vertices) || ncol(vertices) != 3L) {
         stop("vertices must be an Nx3 numeric matrix")
     }
     if (!is.matrix(triangles) || ncol(triangles) != 3L) {
         stop("triangles must be an Mx3 integer matrix")
+    }
+
+    if (is.null(camera)) {
+        camera <- camera_auto(vertices)
     }
 
     mesh <- list(
@@ -76,12 +113,16 @@ render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
 #' Render multiple meshes to an image
 #'
 #' Renders a list of meshes as a single scene using the scimesh
-#' software renderer.
+#' software renderer.  Each element can be a scimesh mesh descriptor
+#' or an rgl-style mesh (with \code{vb}/\code{it}); rgl meshes are
+#' transparently converted.
 #'
 #' @param meshes A list of mesh descriptors. Each element is a list
 #'   with components \code{vertices} (Nx3 matrix), \code{triangles}
 #'   (Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
 #'   \code{normals}, and \code{default_color}.
+#'   Elements may also be rgl-style lists (with \code{vb} and \code{it}),
+#'   which are converted automatically.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #' @param options A render options list from \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
@@ -96,10 +137,20 @@ render_mesh <- function(vertices, triangles, colors = NULL, face_colors = NULL,
 #'     render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
 #' \dontrun{write_png(img, "two_cubes.png")}
 #'
+#' # Mix scimesh and rgl meshes transparently
+#' \dontrun{
+#' scimesh_cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
+#' rgl_sphere  <- rgl::tetrahedron3d()
+#' img <- render_scene(list(scimesh_cube, rgl_sphere), cam)
+#' }
+#'
 #' @export
 render_scene <- function(meshes, camera, options = render_options()) {
     if (!is.list(meshes)) {
         stop("meshes must be a list of mesh descriptors")
+    }
+    for (i in seq_along(meshes)) {
+        meshes[[i]] <- as_scimesh_mesh(meshes[[i]])
     }
     for (i in seq_along(meshes)) {
         m <- meshes[[i]]

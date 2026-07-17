@@ -249,6 +249,116 @@ mesh_from_rgl <- function(tmesh) {
     list(vertices = verts, triangles = tris)
 }
 
+# ---- internal helpers for transparent rgl interop --------------------------
+
+#' Convert rgl or scimesh mesh to canonical scimesh format
+#'
+#' Internal helper that transparently accepts either an rgl-style mesh
+#' (list with \code{vb}/\code{it}) or a scimesh mesh descriptor
+#' (list with \code{vertices}/\code{triangles}) and returns the
+#' canonical scimesh format.
+#'
+#' @param x A mesh-like object (rgl tmesh3d or scimesh mesh descriptor).
+#' @return A scimesh mesh descriptor list with \code{vertices} and
+#'   \code{triangles}.
+#' @keywords internal
+as_scimesh_mesh <- function(x) {
+    if (!is.list(x)) {
+        stop("Expected a mesh descriptor list, got ", class(x)[1])
+    }
+    # Already in scimesh format?
+    if (!is.null(x$vertices) && !is.null(x$triangles)) {
+        return(x)
+    }
+    # rgl tmesh3d format?
+    if (!is.null(x$vb) && !is.null(x$it)) {
+        return(mesh_from_rgl(x))
+    }
+    stop("Cannot interpret as mesh: expected 'vertices'/'triangles' ",
+         "(scimesh format) or 'vb'/'it' (rgl format)")
+}
+
+#' Convert a scimesh mesh to rgl tmesh3d format
+#'
+#' Builds an rgl-compatible triangular mesh from a scimesh mesh
+#' descriptor so that the result can be used with
+#' \code{rgl::shade3d()} or other rgl functions.
+#'
+#' @param mesh A scimesh mesh descriptor list with \code{vertices}
+#'   (Nx3 matrix) and \code{triangles} (Mx3 integer matrix,
+#'   1-based).
+#' @param color Optional per-vertex colour, either a single length-4
+#'   RGBA vector (applied to all vertices) or an Nx4 matrix.
+#' @param face_color Optional per-face colour (Mx4 matrix).
+#' @return A list with components \code{vb} (4xN homogeneous
+#'   coordinates), \code{it} (3xM 1-based index matrix), and
+#'   optionally \code{normals} and \code{mat} (material), suitable
+#'   for use with rgl's \code{tmesh3d()} and \code{shade3d()}.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' rgl_mesh <- mesh_to_rgl(mesh)
+#' if (requireNamespace("rgl", quietly = TRUE)) {
+#'   rgl::shade3d(rgl::tmesh3d(
+#'       vertices = rgl_mesh$vb,
+#'       indices  = rgl_mesh$it), col = "steelblue")
+#' }
+#'
+#' @export
+mesh_to_rgl <- function(mesh, color = NULL, face_color = NULL) {
+    if (!is.list(mesh) || is.null(mesh$vertices) || is.null(mesh$triangles)) {
+        stop("mesh must be a scimesh mesh descriptor with 'vertices' and 'triangles'")
+    }
+    verts <- mesh$vertices
+    tris  <- mesh$triangles
+    if (!is.matrix(verts) || ncol(verts) != 3L) {
+        stop("mesh$vertices must be an Nx3 numeric matrix")
+    }
+    if (!is.matrix(tris) || ncol(tris) != 3L) {
+        stop("mesh$triangles must be an Mx3 integer matrix")
+    }
+
+    # Build rgl-format vb: 4xN homogeneous, column-major
+    nv <- nrow(verts)
+    vb <- rbind(t(verts), rep(1, nv))
+
+    # Build rgl-format it: 3xM, 1-based, column-major
+    it <- t(tris)
+    storage.mode(it) <- "integer"
+
+    result <- list(vb = vb, it = it)
+
+    # Optional normals
+    if (!is.null(mesh$normals)) {
+        result$normals <- t(mesh$normals)
+    }
+
+    # Optional material (colours)
+    mat <- list()
+    if (!is.null(face_color)) {
+        if (is.vector(face_color) && length(face_color) == 4L) {
+            mat$color <- matrix(face_color, nrow = 4, ncol = ncol(it))
+        } else if (is.matrix(face_color)) {
+            mat$color <- t(face_color)
+        }
+    } else if (!is.null(color)) {
+        if (is.vector(color) && length(color) == 4L) {
+            mat$color <- matrix(color, nrow = 4, ncol = nv)
+        } else if (is.matrix(color)) {
+            mat$color <- t(color)
+        }
+    } else if (!is.null(mesh$colors)) {
+        mat$color <- t(mesh$colors)
+    } else if (!is.null(mesh$face_colors)) {
+        mat$color <- t(mesh$face_colors)
+    }
+    if (length(mat) > 0L) {
+        result$mat <- mat
+    }
+
+    result
+}
+
 #' Generate a cuboid mesh
 #'
 #' Creates an axis-aligned cuboid (box) centred at \code{center}
