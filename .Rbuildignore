@@ -9,7 +9,6 @@
 ^README\.md$
 ^README_DEVELOPMENT\.md$
 ^\.cache$
-^build$
 ^build-.*
 ^CMakeFiles$
 ^CMakeCache\.txt
