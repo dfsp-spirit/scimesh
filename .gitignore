@@ -68,7 +68,7 @@ vcpkg_installed/
 Testing/
 .cache/
 /doc/
-/Meta/
+Meta
 
 cpp_tests/*.png
 cpp_tests/*.ppm
@@ -78,3 +78,4 @@ examples/**/*.png
 examples/**/*.mp4
 
 dev_tools/rgl_interoperability/**/*.png
+/Meta/

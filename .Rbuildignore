@@ -29,10 +29,9 @@
 ^examples$
 ^scimesh_.*\.tar\.gz$
 ^web$
+^Meta$
 ^.*\.png$
 ^.*\.bmp$
 ^.*\.ppm$
 ^reference_images$
-
-
 ^LICENSE\.md$

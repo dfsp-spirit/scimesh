@@ -1,12 +1,10 @@
 ---
 title: "Getting Started with scimesh"
-author: "Tim Schaefer"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting Started with scimesh}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\usepackage[utf8]{inputenc}
 ---
 
 ```{r, include = FALSE}
