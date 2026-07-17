@@ -10,7 +10,9 @@ render_scene(meshes, camera, options = render_options())
 \item{meshes}{A list of mesh descriptors. Each element is a list
 with components \code{vertices} (Nx3 matrix), \code{triangles}
 (Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
-\code{normals}, and \code{default_color}.}
+\code{normals}, and \code{default_color}.
+Elements may also be rgl-style lists (with \code{vb} and \code{it}),
+which are converted automatically.}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
 
@@ -22,7 +24,9 @@ A list with components \code{width}, \code{height}, and
 }
 \description{
 Renders a list of meshes as a single scene using the scimesh
-software renderer.
+software renderer.  Each element can be a scimesh mesh descriptor
+or an rgl-style mesh (with \code{vb}/\code{it}); rgl meshes are
+transparently converted.
 }
 \examples{
 # Render two cubes side by side
@@ -32,5 +36,12 @@ cam <- camera_auto(list(cube1, cube2), direction = c(1, 1, 1))
 img <- render_scene(list(cube1, cube2), cam,
     render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
 \dontrun{write_png(img, "two_cubes.png")}
+
+# Render multiple meshes together
+scimesh_cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
+tet <- generate_tetrahedron(c(1, 0, 0), 0.6, c(0, 1, 0, 1))
+cam <- camera_auto(list(scimesh_cube, tet), direction = c(1, 1, 1))
+img <- render_scene(list(scimesh_cube, tet), cam,
+    render_options(width = 400, height = 300, background_color = c(1, 1, 1, 1)))
 
 }

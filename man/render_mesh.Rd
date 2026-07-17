@@ -6,20 +6,24 @@
 \usage{
 render_mesh(
   vertices,
-  triangles,
+  triangles = NULL,
   colors = NULL,
   face_colors = NULL,
   normals = NULL,
   uv = NULL,
   texture = NULL,
-  camera = camera_auto(vertices),
+  camera = NULL,
   options = render_options()
 )
 }
 \arguments{
-\item{vertices}{Nx3 numeric matrix of vertex positions.}
+\item{vertices}{Either an Nx3 numeric matrix of vertex positions,
+or a scimesh mesh descriptor list (with \code{vertices} and
+\code{triangles} components), or an rgl-style list (with
+\code{vb} and \code{it} components).}
 
-\item{triangles}{Mx3 integer matrix of triangle indices (1-based).}
+\item{triangles}{Mx3 integer matrix of triangle indices (1-based).
+Ignored when \code{vertices} is a list.}
 
 \item{colors}{Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
 Use \code{face_colors} (Mx4) for per-triangle colours instead.}
@@ -45,6 +49,11 @@ A list with components \code{width}, \code{height}, and
 }
 \description{
 Renders a single mesh using the scimesh software renderer.
+The mesh can be specified either as separate
+\code{vertices}/\code{triangles} matrices, as a scimesh mesh
+descriptor list, or as an rgl \code{tmesh3d}-style list (with
+\code{vb}/\code{it} components).  rgl meshes are transparently
+converted via \code{\link{mesh_from_rgl}()}.
 }
 \examples{
 # Render a simple colored triangle
@@ -53,5 +62,9 @@ tris  <- matrix(1L, nrow = 1, ncol = 3)
 cols  <- matrix(c(1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1), ncol = 4, byrow = TRUE)
 img <- render_mesh(verts, tris, colors = cols)
 \dontrun{write_png(img, "triangle.png")}
+
+# Render from a mesh descriptor list (scimesh format)
+mesh_desc <- list(vertices = verts, triangles = tris, colors = cols)
+img <- render_mesh(mesh_desc)
 
 }

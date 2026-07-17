@@ -298,11 +298,7 @@ as_scimesh_mesh <- function(x) {
 #' @examples
 #' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' rgl_mesh <- mesh_to_rgl(mesh)
-#' if (requireNamespace("rgl", quietly = TRUE)) {
-#'   rgl::shade3d(rgl::tmesh3d(
-#'       vertices = rgl_mesh$vb,
-#'       indices  = rgl_mesh$it), col = "steelblue")
-#' }
+#' str(rgl_mesh)
 #'
 #' @export
 mesh_to_rgl <- function(mesh, color = NULL, face_color = NULL) {
