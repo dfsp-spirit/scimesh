@@ -1,13 +1,14 @@
 scimesh Changes
 ===============
 
-Current WIP
-------------
+Version 0.2.7 -- Small improvements
+--------------------------------------
 - NEW: check meshes for validity via is_valid() in rendering pipeline to avoid crashes later
 - NEW: R interoperability improvements: add more convenient auto-conversion from rgl meshes to scimesh mesh format, including auto-convert in render function (accepts both formats now). add manual helper for the inverse way. Explained in vignette.
 - DEP: suggest viridisLite for R in DESCRIPTION
 - DOC: Restructure and dramatically improve the R vignette
 - NEW: add camera_orbit helper function for video generation, add example in docs
+- FIX: fix building vignette index for CRAN
 
 
 Version 0.2.6 -- Add contrast render option
