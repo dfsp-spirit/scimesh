@@ -136,9 +136,9 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'
 #' # Render multiple meshes together
 #' scimesh_cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
-#' tet <- generate_tetrahedron(c(1, 0, 0), 0.6, c(0, 1, 0, 1))
-#' cam <- camera_auto(list(scimesh_cube, tet), direction = c(1, 1, 1))
-#' img <- render_scene(list(scimesh_cube, tet), cam,
+#' sphere <- generate_sphere(c(1, 0, 0), radius = 0.5, color = c(0, 1, 0, 1))
+#' cam <- camera_auto(list(scimesh_cube, sphere), direction = c(1, 1, 1))
+#' img <- render_scene(list(scimesh_cube, sphere), cam,
 #'     render_options(width = 400, height = 300, background_color = c(1, 1, 1, 1)))
 #'
 #' @export
