@@ -10,6 +10,7 @@ camera_auto(
   up = c(0, 1, 0),
   fov = 45,
   margin = 1.1,
+  rgl_compat = FALSE,
   projection = c("perspective", "orthographic")
 )
 }
@@ -18,13 +19,19 @@ camera_auto(
 mesh descriptor list with a \code{vertices} component.}
 
 \item{direction}{The view direction as a length-3 vector. For
-example, \code{c(0, 0, -1)} looks along the negative Z axis.}
+example, \code{c(0, 0, -1)} looks along the negative Z axis.
+Ignored when \code{rgl_compat = TRUE}.}
 
-\item{up}{The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.}
+\item{up}{The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
+Ignored when \code{rgl_compat = TRUE}.}
 
-\item{fov}{Field of view in degrees.}
+\item{fov}{Field of view in degrees. Default 45° (30° when
+\code{rgl_compat = TRUE}).}
 
 \item{margin}{Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).}
+
+\item{rgl_compat}{Logical. If \code{TRUE}, use rgl's camera defaults
+and bounding-sphere distance formula. Default \code{FALSE}.}
 
 \item{projection}{Projection type: \code{"perspective"} (default) or
 \code{"orthographic"}. When orthographic, the camera distance is
@@ -38,6 +45,13 @@ Computes a camera position that frames the entire mesh in view.
 The camera looks along the given direction, positioned at a distance
 that ensures the mesh fits within the field of view.
 }
+\details{
+When \code{rgl_compat = TRUE}, the camera mimics rgl's default
+auto-framing behaviour: a 30° FOV, 15° elevation, and the distance
+is computed from the \emph{bounding sphere} of the mesh (the
+half-diagonal of the axis-aligned bounding box), reproducing the
+formula \code{distance = sphere_radius / sin(FOV/2)} used by rgl.
+}
 \examples{
 verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
                    -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
@@ -46,5 +60,6 @@ tris <- matrix(c(0L,3L,2L, 0L,2L,1L, 4L,5L,6L, 4L,6L,7L,
                   0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
 mesh <- list(vertices = verts, triangles = tris)
 cam <- camera_auto(mesh, direction = c(1, 1, 1))
+cam_rgl <- camera_auto(mesh, rgl_compat = TRUE)
 
 }

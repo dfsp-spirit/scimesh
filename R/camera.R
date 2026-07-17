@@ -36,13 +36,24 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #' The camera looks along the given direction, positioned at a distance
 #' that ensures the mesh fits within the field of view.
 #'
+#' When \code{rgl_compat = TRUE}, the camera mimics rgl's default
+#' auto-framing behaviour: a 30° FOV, 15° elevation, and the distance
+#' is computed from the \emph{bounding sphere} of the mesh (the
+#' half-diagonal of the axis-aligned bounding box), reproducing the
+#' formula \code{distance = sphere_radius / sin(FOV/2)} used by rgl.
+#'
 #' @param mesh Either an Nx3 numeric matrix of vertex positions, or a
 #'   mesh descriptor list with a \code{vertices} component.
 #' @param direction The view direction as a length-3 vector. For
 #'   example, \code{c(0, 0, -1)} looks along the negative Z axis.
+#'   Ignored when \code{rgl_compat = TRUE}.
 #' @param up The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
-#' @param fov Field of view in degrees.
+#'   Ignored when \code{rgl_compat = TRUE}.
+#' @param fov Field of view in degrees. Default 45° (30° when
+#'   \code{rgl_compat = TRUE}).
 #' @param margin Extra margin factor (1.0 = tight fit, 1.1 = 10\% margin).
+#' @param rgl_compat Logical. If \code{TRUE}, use rgl's camera defaults
+#'   and bounding-sphere distance formula. Default \code{FALSE}.
 #' @param projection Projection type: \code{"perspective"} (default) or
 #'   \code{"orthographic"}. When orthographic, the camera distance is
 #'   computed to tightly frame the mesh regardless of FOV.
@@ -56,12 +67,18 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #'                   0L,4L,7L, 0L,7L,3L, 1L,2L,6L, 1L,6L,5L), ncol = 3, byrow = TRUE)
 #' mesh <- list(vertices = verts, triangles = tris)
 #' cam <- camera_auto(mesh, direction = c(1, 1, 1))
+#' cam_rgl <- camera_auto(mesh, rgl_compat = TRUE)
 #'
 #' @export
 camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
                         fov = 45, margin = 1.1,
+                        rgl_compat = FALSE,
                         projection = c("perspective", "orthographic")) {
     projection <- match.arg(projection)
+    # Transparently accept rgl-style meshes (vb/it format)
+    if (is.list(mesh) && !is.null(mesh$vb) && !is.null(mesh$it)) {
+        mesh <- mesh_from_rgl(mesh)
+    }
     if (is.list(mesh) && !is.null(mesh$vertices)) {
         mesh_data <- mesh
     } else if (is.matrix(mesh) && ncol(mesh) == 3L) {
@@ -88,7 +105,45 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
         )
     }
 
-    scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
+    if (isTRUE(rgl_compat)) {
+        # --- rgl-compatible auto-framing ----------------------------------------
+        # rgl defaults: FOV = 30°, phi = 15° elevation, theta = 0°
+        # Distance = bounding_sphere_radius / sin(FOV / 2)
+        #
+        # The bounding sphere is the sphere that encloses the AABB, with
+        # radius = half the length of the AABB diagonal.
+        rgl_fov <- 30
+
+        verts <- mesh_data$vertices
+        vmin <- apply(verts, 2, min)
+        vmax <- apply(verts, 2, max)
+        half_diag <- (vmax - vmin) / 2
+        sphere_radius <- sqrt(sum(half_diag^2))
+
+        fov_half_rad <- (rgl_fov / 2) * pi / 180
+        distance <- sphere_radius / sin(fov_half_rad)
+
+        # rgl default orientation: theta = 0 (no azimuthal rotation),
+        # phi = 15° elevation above the horizontal plane.
+        # This is equivalent to looking along -Z tilted upward by phi.
+        phi_rad <- 15 * pi / 180
+
+        # Compute center: centroid of the bounding box
+        center <- (vmin + vmax) / 2
+
+        # Direction tilted up by phi from -Z axis
+        direction <- c(0, sin(phi_rad), -cos(phi_rad))
+
+        # Up vector: rotated with the direction
+        up <- c(0, cos(phi_rad), sin(phi_rad))
+
+        eye <- center + direction * distance
+
+        camera(eye = eye, center = center, up = up,
+               projection = projection, fov = rgl_fov)
+    } else {
+        scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
+    }
 }
 
 #' Orbit a camera around an axis
