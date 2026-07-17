@@ -9,10 +9,19 @@ To build and check the R package, you will need these:
 sudo apt install build-essential qpdf tidy pandoc libuv1-dev libharfbuzz-dev libfribidi-dev
 ```
 
-You must also install all R packages which are `suggested` by scimesh, see the [package DESCRIPTION](./DESCRIPTION). Also make sure you have the basics, in R:
+You must also install all R packages which are `suggested` by scimesh, see the [package DESCRIPTION](./DESCRIPTION).
+
+Also make sure you have the basics, in R:
 
 ```R
 install.packages(c("devtools", "knitr", "remotes"))
+```
+
+And finally, install tinytex for vignette building:
+
+```R
+install.packages("tinytex")
+tinytex::install_tinytex()
 ```
 
 ### Running the C++ unit tests
