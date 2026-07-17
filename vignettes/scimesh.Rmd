@@ -662,6 +662,23 @@ if (requireNamespace("rgl", quietly = TRUE)) {
 The returned list has `vb` (4×N homogeneous coordinates), `it` (3×M
 index matrix), and optionally `normals` and `mat` (material/colors).
 
+#### Rvcg, Morpho, fsbrain, and other packages
+
+The rgl `mesh3d`/`tmesh3d` format is the lingua franca for 3D meshes in R.
+Packages like [Rvcg](https://cran.r-project.org/package=Rvcg) (mesh processing
+via VCGLIB), [Morpho](https://cran.r-project.org/package=Morpho) (geometric
+morphometrics), and [fsbrain](https://cran.r-project.org/package=fsbrain)
+(neuroimaging) all produce and consume rgl-format meshes.  Since scimesh
+transparently accepts rgl meshes, you can process a mesh with any of these
+packages and render it with scimesh **without any conversion step**:
+
+```r
+if (requireNamespace("Rvcg", quietly = TRUE)) {
+    mesh <- Rvcg::vcgSphere()          # returns rgl-format mesh
+    img  <- render_mesh(mesh)          # scimesh renders it directly
+}
+```
+
 
 ## Examples
 
