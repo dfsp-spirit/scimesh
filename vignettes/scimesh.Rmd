@@ -605,16 +605,62 @@ result <- stack_horizontal(img1, img2,
 
 ### rgl / tmesh3d
 
-Convert an rgl `tmesh3d` object (or any list with `vb` and `it`
-components) to scimesh format **without requiring the rgl package**:
+scimesh and [rgl](https://cran.r-project.org/package=rgl) mesh formats can
+be converted in both directions, and scimesh render functions accept rgl
+meshes **transparently** — no manual conversion needed.
+
+#### Rendering an rgl mesh directly
+
+Pass an rgl `tmesh3d` object (or any list with `vb` and `it` components)
+directly to `render_mesh()` or include it in a scene list for
+`render_scene()` — the conversion happens automatically:
+
+```r
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl_mesh <- rgl::tetrahedron3d()
+    img <- render_mesh(rgl_mesh)          # transparent conversion
+}
+```
+
+This also works when mixing scimesh and rgl meshes in a scene:
+
+```r
+cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
+img <- render_scene(list(cube, rgl_mesh), cam)   # mixed formats
+```
+
+#### rgl → scimesh (explicit)
+
+If you prefer explicit conversion, use `mesh_from_rgl()`.  This also works
+**without the rgl package** installed — any list with `vb` and `it`
+components is accepted:
 
 ```r
 tmesh <- list(
     vb = rbind(c(-1, -1, 1, 1), c(-1, 1, 1, -1), c(0, 0, 0, 0), c(1, 1, 1, 1)),
     it = rbind(c(1L, 1L), c(2L, 3L), c(3L, 4L)))
 mesh <- mesh_from_rgl(tmesh)
-img  <- render_mesh(mesh$vertices, mesh$triangles)
+img  <- render_mesh(mesh)
 ```
+
+#### scimesh → rgl (inverse)
+
+Convert a scimesh mesh back to rgl's `tmesh3d` format with
+`mesh_to_rgl()`.  Vertex colors are forwarded automatically if present
+in the mesh:
+
+```r
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), color = c(1, 0, 0, 1))
+rgl_mesh <- mesh_to_rgl(mesh)
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl::shade3d(rgl::tmesh3d(
+        vertices = rgl_mesh$vb,
+        indices  = rgl_mesh$it), col = "red")
+}
+```
+
+The returned list has `vb` (4×N homogeneous coordinates), `it` (3×M
+index matrix), and optionally `normals` and `mat` (material/colors).
 
 
 ## Examples
