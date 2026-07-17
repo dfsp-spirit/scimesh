@@ -235,6 +235,37 @@ or into an animated GIF with your tool of choice.  See
 `examples/cpp/brain_video/` for a C++ version that renders 48
 full-brain frames.
 
+#### rgl-Compatible Default View
+
+`camera_auto()` accepts an `rgl_compat` parameter.  When `TRUE`,
+it mimics rgl's default view parameters:
+
+| Parameter       | scimesh default | `rgl_compat = TRUE` |
+|-----------------|-----------------|---------------------|
+| FOV             | 45°             | 30°                 |
+| Elevation       | 0° (front-on)  | 15° above horizon   |
+| Distance basis  | bounding box    | bounding sphere     |
+
+The distance formula follows rgl's implementation exactly:
+`distance = sphere_radius / sin(FOV / 2)`, where `sphere_radius`
+is half the length of the axis-aligned bounding box diagonal.
+
+```r
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+
+# scimesh default: straight front view
+img_default <- render_mesh(mesh)
+
+# rgl-compatible view: elevated, matching rgl's default look
+cam <- camera_auto(mesh, rgl_compat = TRUE)
+img_rgl   <- render_mesh(mesh, camera = cam)
+```
+
+This is especially useful when comparing outputs between scimesh and
+rgl, or when you prefer rgl's slightly elevated default perspective.
+
+
+
 ### Projection Type
 
 Perspective (default) or orthographic (parallel projection, matching
@@ -661,6 +692,27 @@ if (requireNamespace("rgl", quietly = TRUE)) {
 
 The returned list has `vb` (4×N homogeneous coordinates), `it` (3×M
 index matrix), and optionally `normals` and `mat` (material/colors).
+
+#### Matching rgl's Default View
+
+When rendering an rgl mesh with scimesh, you may want the output
+to visually match what you'd see in an rgl window.  Pass
+`rgl_compat = TRUE` to `camera_auto()` to get rgl's default
+30° FOV, 15° elevation, and bounding-sphere distance:
+
+```r
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl_mesh <- rgl::cube3d()             # rgl primitive
+    cam <- camera_auto(rgl_mesh, rgl_compat = TRUE)
+    img <- render_mesh(rgl_mesh, camera = cam)
+    write_png(img, "cube_rgl_view.png")
+}
+```
+
+The `rgl_compat` camera uses the same algorithm rgl uses internally:
+it computes the bounding sphere (half-diagonal of the AABB) and places
+the eye at `distance = sphere_radius / sin(FOV / 2)` along a direction
+tilted 15° above the −Z axis.
 
 #### Rvcg, Morpho, fsbrain, and other packages
 
