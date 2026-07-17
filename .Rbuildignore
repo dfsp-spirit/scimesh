@@ -25,7 +25,6 @@
 .*\.Rproj$
 ^\.license\.stub$
 ^doc$
-^Meta$
 ^docs$
 ^examples$
 ^scimesh_.*\.tar\.gz$
