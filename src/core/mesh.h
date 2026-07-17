@@ -25,17 +25,32 @@ struct Mesh {
     bool has_texture() const { return texture.width > 0; }
 
     bool is_valid() const {
+        // Geometry must exist
+        if (vertices.empty()) return false;
+        if (triangles.empty()) return false;
+
+        // Triangle indices must be in-bounds
+        const auto nv = vertices.size();
         for (const auto &tri : triangles) {
-            if (tri.v0 >= vertices.size() || tri.v1 >= vertices.size() ||
-                tri.v2 >= vertices.size())
+            if (tri.v0 >= nv || tri.v1 >= nv || tri.v2 >= nv)
                 return false;
         }
+
+        // No degenerate geometry
         for (const auto &v : vertices) {
             if (std::isnan(v.x) || std::isnan(v.y) || std::isnan(v.z))
                 return false;
             if (std::isinf(v.x) || std::isinf(v.y) || std::isinf(v.z))
                 return false;
         }
+
+        // Optional arrays: if present, must match vertex or face count
+        if (!colors.empty() && colors.size() != nv) return false;
+        if (!face_colors.empty() && face_colors.size() != triangles.size())
+            return false;
+        if (!normals.empty() && normals.size() != nv) return false;
+        if (!uvs.empty() && uvs.size() != nv) return false;
+
         return true;
     }
 

@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include <stdexcept>
+#include <string>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -140,6 +142,16 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                                const Camera &camera,
                                const RenderOptions &options,
                                Image &output) {
+    // Validate all non-empty meshes before rendering
+    for (size_t i = 0; i < meshes.size(); ++i) {
+        const auto *mp = meshes[i];
+        if (mp->empty()) continue;          // empty is harmless
+        if (!mp->is_valid()) {
+            throw std::invalid_argument(
+                "Mesh " + std::to_string(i) + " failed validation: "
+                "check indices, vertex data, and array sizes");
+        }
+    }
     output.clear_float(options.background_color.r, options.background_color.g,
                        options.background_color.b, options.background_color.a);
 

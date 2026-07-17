@@ -50,6 +50,40 @@ TEST_CASE("Mesh is_valid returns false for NaN coordinates", "[mesh]") {
     REQUIRE_FALSE(mesh.is_valid());
 }
 
+TEST_CASE("Mesh is_valid returns false for mismatched color count", "[mesh]") {
+    Mesh mesh = make_unit_cube();
+    mesh.colors.resize(5); // 5 colors for 8 vertices — mismatch
+    REQUIRE_FALSE(mesh.is_valid());
+}
+
+TEST_CASE("Mesh is_valid returns false for mismatched normal count", "[mesh]") {
+    Mesh mesh = make_unit_cube();
+    mesh.normals.resize(3); // 3 normals for 8 vertices — mismatch
+    REQUIRE_FALSE(mesh.is_valid());
+}
+
+TEST_CASE("Mesh is_valid returns false for mismatched face_color count", "[mesh]") {
+    Mesh mesh = make_unit_cube();
+    mesh.face_colors.resize(5); // 5 face colors for 12 triangles — mismatch
+    REQUIRE_FALSE(mesh.is_valid());
+}
+
+TEST_CASE("Mesh is_valid returns false for mismatched uv count", "[mesh]") {
+    Mesh mesh = make_unit_cube();
+    mesh.uvs.resize(7); // 7 UVs for 8 vertices — mismatch
+    REQUIRE_FALSE(mesh.is_valid());
+}
+
+TEST_CASE("Mesh is_valid returns true with correctly-sized optional arrays",
+          "[mesh]") {
+    Mesh mesh = make_unit_cube();
+    mesh.colors.resize(8);
+    mesh.normals.resize(8);
+    mesh.uvs.resize(8);
+    mesh.face_colors.resize(12); // one per triangle
+    REQUIRE(mesh.is_valid());
+}
+
 TEST_CASE("Mesh empty returns true for no vertices", "[mesh]") {
     Mesh mesh;
     REQUIRE(mesh.empty());
