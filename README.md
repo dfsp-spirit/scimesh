@@ -1,6 +1,6 @@
 # scimesh
 
-scimesh is a fast 3D mesh renderer that produces publication-quality images entirely on the CPU.
+Scimesh is a high-performance 3D renderer built for scientific visualization, delivering publication-quality imagery entirely on the CPU.
 
 We provide both a C++ library and an R package.  No OpenGL, no X11, no GPU drivers required.  Works anywhere a C++17 compiler **or** R runs: HPC clusters, headless servers, macOS without XQuartz, containers, and CI pipelines.
 
