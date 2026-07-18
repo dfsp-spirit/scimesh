@@ -2,7 +2,9 @@
 
 Scimesh is a high-performance 3D renderer built for scientific visualization, delivering publication-quality imagery entirely on the CPU.
 
-We provide both a C++ library and an R package.  No OpenGL, no X11, no GPU drivers required.  Works anywhere a C++17 compiler **or** R runs: HPC clusters, headless servers, macOS without XQuartz, containers, and CI pipelines.
+
+Scientific compute environments are often constrained by the absence of graphical interfaces, specialized hardware, or complex driver stacks. Scimesh eliminates these bottlenecks by providing a zero-dependency, headless rendering pipeline—no OpenGL, no X11, and no GPU drivers required. Whether you are running complex visualization scripts on HPC clusters, inside isolated containers, or even on a modern macOS laptop where missing support for X11 makes traditional tools like rgl a challenge, Scimesh works reliably wherever your C++17 or R code runs.
+
 
 <!-- badges: start -->
   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21374840.svg)](https://doi.org/10.5281/zenodo.21374840)
