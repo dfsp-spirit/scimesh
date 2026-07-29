@@ -3,8 +3,22 @@ Type: Package
 Title: Headless Publication-Quality 3D Mesh Rendering Engine
 Version: 0.2.7
 Authors@R: c(
-    person("Tim", "Schaefer", email = "ts+code@rcmd.org",
-           role = c("aut", "cre"))
+    person("Tim", "Sch\u00e4fer", email = "ts+code@rcmd.org",
+           role = c("aut", "cre")),
+    person("Martin", "Ho\u0159e\u0148ovsk\u00fd", role = "ctb",
+           comment = "Author of Catch2 (cpp_tests/catch_amalgamated.{h,cpp})"),
+    person("Christophe", "Riccio", role = "ctb",
+           comment = "Author of GLM - OpenGL Mathematics (src/third_party/glm/)"),
+    person("Dimitri", "Diakopoulos", role = "ctb",
+           comment = "Author of tinyply (src/third_party/tinyply.{h,cpp})"),
+    person("Syoyo", "Fujita", role = "ctb",
+           comment = "Author of tinyobjloader (src/third_party/tiny_obj_loader.h)"),
+    person("Tim", "Sch\u00e4fer", role = "ctb",
+           comment = "Author of libfs (src/third_party/libfs.h)"),
+    person("Sebastian", "Reiter", role = "ctb",
+           comment = "Author of stl_reader (src/third_party/stl_reader.h)"),
+    person("Sean", "Barrett", role = "ctb",
+           comment = "Author of stb libraries (src/third_party/stb_image*.h)")
     )
 Description: A fast, GPU-free 3D software renderer written in modern C++17 with
     native R bindings. Renders triangle meshes to publication-quality images
