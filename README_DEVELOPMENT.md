@@ -48,6 +48,33 @@ Or via R CMD check:
 R CMD build . && R CMD check scimesh_*.tar.gz
 ```
 
+### Generating C++ API documentation
+
+The C++ API documentation is generated with [Doxygen](https://www.doxygen.nl/).
+The configuration is in `Doxyfile` at the repository root.
+
+**Prerequisites:** Install Doxygen (and optionally Graphviz for diagrams):
+
+```shell
+sudo apt install doxygen graphviz
+```
+
+**Generate locally:**
+
+```shell
+# From the repository root:
+doxygen Doxyfile
+```
+
+This produces HTML output in `docs/cpp_api/html/`. Open `docs/cpp_api/html/index.html`
+in a browser to view the docs.
+
+The published API documentation is available at:
+`https://dfsp-spirit.github.io/scimesh/`
+
+It is built and deployed automatically via GitHub Actions (`.github/workflows/docs.yml`)
+on every push to `main`.
+
 
 ### Making a release
 

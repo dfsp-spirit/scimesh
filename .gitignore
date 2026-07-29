@@ -28,6 +28,9 @@
 *.mod
 *.smod
 
+# Generated Doxygen C++ API docs
+docs/cpp_api/
+
 # Compiled Static libraries
 *.lai
 *.la
