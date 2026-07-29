@@ -131,13 +131,33 @@ Compile with `ply_io.cpp` added to the source list (see Building below).
 
 ### Building
 
-#### CMake (Recommended)
+#### CMake with FetchContent (Recommended)
 
-Add scimesh `src/core/` to your include path, list its `.cpp` files in your
-sources, and require C++17.  See a complete example:
-[`examples/cpp/all_primitives/CMakeLists.txt`](../examples/cpp/all_primitives/CMakeLists.txt).
+The easiest way to use scimesh in your own CMake project is via
+`FetchContent`.  Add the following to your `CMakeLists.txt`:
 
-#### Manually
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+    scimesh
+    GIT_REPOSITORY https://github.com/dfsp-spirit/scimesh.git
+    GIT_TAG        main          # or a release tag, e.g. v0.2.8
+)
+FetchContent_MakeAvailable(scimesh)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE scimesh)
+```
+
+That's it — CMake will clone scimesh, build it as a static library, and
+make all headers and compiled code available to your target.  No manual
+source listing, include paths, or preprocessor defines needed.
+
+For the in-repo examples, see any
+[`examples/cpp/*/CMakeLists.txt`](../examples/cpp/all_primitives/CMakeLists.txt)
+which use `add_subdirectory()` for the same effect.
+
+#### Manually (without CMake)
 
 Copy scimesh `src/` so it sits next to your project.  Assuming your code is in
 `my_project/`, the layout should look like this:
@@ -158,7 +178,7 @@ with `-std=c++17`.
 
 > **Note:** If your code calls `write_png()`, add `-DSCIMESH_STB_WRITE_IMPL`.
 
-A runnable script that manually compiles on of our demos using `g++`:
+A runnable script that manually compiles one of our demos using `g++`:
 [`examples/cpp/all_primitives/build_manually.sh`](../examples/cpp/all_primitives/build_manually.sh).
 
 ## Core Concepts

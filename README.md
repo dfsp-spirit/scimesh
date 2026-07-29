@@ -93,12 +93,32 @@ remotes::install_github("dfsp-spirit/scimesh")
 remotes::install_github("dfsp-spirit/freesurferformats")
 ```
 
-### C++ (header + source)
+### C++
 
-The C++ core lives in `src/core/`.  To use scimesh in a C++ project,
-add the source files and include paths to your build system.  See
-[`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md) for
-details.
+#### Via CMake FetchContent (recommended)
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+    scimesh
+    GIT_REPOSITORY https://github.com/dfsp-spirit/scimesh.git
+    GIT_TAG        main          # or a release tag, e.g. v0.2.8
+)
+FetchContent_MakeAvailable(scimesh)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE scimesh)
+```
+
+That's it — no manual source listing, include paths, or preprocessor
+defines needed.
+
+#### Manually (header + source)
+
+The C++ core lives in `src/core/`.  To use scimesh in a C++ project
+without CMake, add the source files and include paths to your build
+system.  See [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
+for details.
 
 ## Quick Start
 

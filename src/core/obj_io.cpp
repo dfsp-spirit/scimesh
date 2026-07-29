@@ -2,8 +2,8 @@
 #include "tiny_obj_loader.h"
 #include "obj_io.h"
 #include "types.h"
-#include <Rcpp.h>
 
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 
@@ -27,7 +27,7 @@ Mesh read_obj(const std::string &path) {
                                true, false);
 
     if (!warn.empty()) {
-        Rcpp::warning("OBJ warning: " + warn);
+        std::cerr << "OBJ warning: " << warn << std::endl;
     }
     if (!err.empty()) {
         throw std::runtime_error("Failed to load OBJ file '" + path + "': " + err);
