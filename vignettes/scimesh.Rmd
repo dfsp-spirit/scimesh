@@ -782,8 +782,8 @@ visualisation even if you do not have rgl/OpenGL, and are using
 scimesh for surface (mesh) rendering.
 
 **My images look pixelated / jagged --- how do I fix this?**
-Render at higher resolution and enable anti-aliasing:
-`render_options(aa_samples = 2L)`.
+Render at higher resolution, e.g. `(render_options(width = 2560, height = 1440))`, and enable anti-aliasing:
+`render_options(aa_samples = 2L)`, or even higher like `4L`.
 
 **How do I get a transparent background?**
 This is the default (`background_color = c(0, 0, 0, 0)`). See the
