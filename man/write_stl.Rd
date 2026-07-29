@@ -13,6 +13,9 @@ write_stl(mesh, path, format = c("binary", "ascii"))
 
 \item{format}{\code{"binary"} (default) or \code{"ascii"}.}
 }
+\value{
+invisible NULL, called for side effects of writing the file.
+}
 \description{
 Writes a scimesh mesh descriptor to an ASCII or binary STL file.
 }

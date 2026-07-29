@@ -45,6 +45,7 @@ image_to_array <- function(image) {
 #' img <- render_mesh(mesh$vertices, mesh$triangles)
 #' write_png(img, "cuboid.png")
 #' }
+#' @return No return value; called for side effects.
 #'
 #' @export
 write_png <- function(image, filename) {

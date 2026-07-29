@@ -12,6 +12,9 @@ write_png(image, filename)
 
 \item{filename}{Output PNG file path.}
 }
+\value{
+No return value; called for side effects.
+}
 \description{
 Writes the output of \code{render_mesh()} or \code{render_scene()}
 to a PNG file using the built-in C++ PNG writer (stb_image_write).
@@ -23,5 +26,4 @@ mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(mesh$vertices, mesh$triangles)
 write_png(img, "cuboid.png")
 }
-
 }

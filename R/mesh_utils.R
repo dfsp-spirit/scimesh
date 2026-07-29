@@ -601,6 +601,7 @@ read_stl <- function(path) {
 #' write_stl(mesh, "output.stl")
 #' }
 #'
+#' @return invisible NULL, called for side effects of writing the file.
 #' @export
 write_stl <- function(mesh, path, format = c("binary", "ascii")) {
     format <- match.arg(format)
