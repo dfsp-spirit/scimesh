@@ -1,6 +1,12 @@
 scimesh Changes
 ===============
 
+
+Current WIP
+-----------
+- Update libfs to v0.4.1
+
+
 Version 0.2.8 -- Changes for CRAN submission only
 --------------------------------------------------
 - Add dependency authors as package contributors
