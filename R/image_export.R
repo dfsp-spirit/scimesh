@@ -109,7 +109,7 @@ image_crop <- function(image, x, y, w, h) {
 #'
 #' @examples
 #' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
-#' sphere <- generate_sphere(c(0, 0, 0), 1.0, subdivisions = 3)
+#' sphere <- generate_sphere(c(0, 0, 0), radius = 0.5)
 #' left  <- render_mesh(sphere$vertices, sphere$triangles)
 #' right <- render_mesh(cube$vertices, cube$triangles)
 #' merged <- image_merge(left, right, "right")
