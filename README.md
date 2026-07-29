@@ -135,13 +135,13 @@ write_png(img, "sphere.png")
 
 - **R vignette**: `vignettes/scimesh.Rmd` — comprehensive guide to the
   R package with examples for all major features.
-- **C++ getting started**: [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
-  — gentle introduction to the C++ renderer.
 - **R examples**: [`examples/R/`](examples/R/) — runnable scripts
   demonstrating textured rendering, transparency, and neuroimaging
   visualization.
 - **R live help**: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
 - **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
+- **C++ getting started**: [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
+  — gentle introduction to the C++ renderer.
 - **C++ examples**: [`examples/cpp/`](examples/cpp/) — standalone
   programs covering textured OBJ, transparency, protein visualization,
   and whole-brain rendering.
