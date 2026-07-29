@@ -42,12 +42,6 @@ or package.
 remotes::install_github("dfsp-spirit/scimesh")
 ```
 
-For neuroimaging applications using FreeSurfer data, also install:
-
-```r
-remotes::install_github("dfsp-spirit/freesurferformats")
-```
-
 For the full viridis colormap family (magma, inferno, cividis, etc.), you may
 optionally install `viridisLite`:
 
@@ -75,7 +69,9 @@ img <- render_mesh(sphere$vertices, sphere$triangles,
             list(position = c(0.5, 1.0, 0.8), intensity = 1.5),
             list(position = c(-0.5, 0.2, 0.6), intensity = 0.5))))
 
-write_png(img, "sphere.png")
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
+printf("Rendered sphere written to: %s\n", tmp_file)
 ```
 
 
@@ -182,7 +178,9 @@ You can also apply contrast as post-processing to an existing image:
 ```r
 img <- render_mesh(mesh$vertices, mesh$triangles)
 img <- image_apply_contrast(img, contrast = 1.1)
-write_png(img, "output.png")
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
+printf("Contrast-adjusted image written to: %s\n", tmp_file)
 ```
 
 ### Camera
@@ -220,8 +218,16 @@ for (i in seq_len(8)) {
     cam_i <- camera_orbit(cam, angle_degrees = 360 / 8 * (i - 1))
     img   <- render_mesh(mesh$vertices, mesh$triangles, camera = cam_i,
                          options = render_options(width = 600, height = 400))
-    write_png(img, sprintf("frame_%04d.png", i - 1))
+
+    # Construct the file path inside tempdir()
+    file_name <- sprintf("frame_%04d.png", i - 1)
+    file_path <- file.path(tempdir(), file_name)
+
+    # Write the image to the temporary directory
+    write_png(img, file_path)
 }
+
+message("Frames saved in: ", tempdir())
 ```
 
 For more complex trajectories, replace `camera_orbit()` with your own
@@ -364,7 +370,9 @@ img <- render_scene(list(white_mesh, pial_mesh), cam,
         backface_culling = FALSE,
         specular_color = c(0.4, 0.4, 0.4, 1),
         shininess = 64))
-write_png(img, "transparency_lh.png")
+temp_file <- tempfile(fileext = ".png")
+write_png(img, temp_file)
+printf("Transparent render written to: %s\n", temp_file)
 ```
 
 **C++ example:** See `examples/cpp/transparency/` in the repository.
@@ -418,7 +426,7 @@ scimesh can read and write standard 3D mesh file formats.  All readers
 return a mesh descriptor list with `vertices`, `triangles`, and
 optionally `normals`, `uv`, or `colors`.
 
-```r
+```{r, eval=FALSE}
 # Read a Wavefront OBJ file (with optional UVs and normals)
 mesh <- read_obj("model.obj")
 
@@ -429,8 +437,11 @@ mesh <- read_ply("model.ply")
 mesh <- read_stl("model.stl")
 
 # Write a mesh to STL
-write_stl(mesh, "output.stl")               # binary (default)
-write_stl(mesh, "output.stl", format = "ascii")
+tmp_file1 <- tempfile(fileext = ".stl")
+tmp_file2 <- tempfile(fileext = ".stl")
+
+write_stl(mesh, tmp_file1)               # binary (default)
+write_stl(mesh, tmp_file2, format = "ascii")
 ```
 
 The OBJ reader supports multi-shape files and texture coordinates.
@@ -442,6 +453,7 @@ vertex normals when available.
 Translate, scale, rotate, or apply arbitrary 4x4 matrices to meshes:
 
 ```r
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(1, 0, 0, 1))
 mesh <- translate_mesh(mesh, c(5, 0, 0))
 mesh <- scale_mesh(mesh, 2.0)
 mesh <- rotate_mesh(mesh, pi / 4, c(0, 0, 1))
@@ -610,7 +622,9 @@ per-row/per-column cropping to eliminate wasted whitespace:
 img1 <- render_mesh(...)
 img2 <- render_mesh(...)
 result <- compose_layout(list(img1, img2), nrow = 1L, crop = TRUE)
-write_png(result, "side_by_side.png")
+tmp_file <- tempfile(fileext = ".png")
+write_png(result, tmp_file)
+printf("Composed image written to: %s\n", tmp_file)
 ```
 
 ### Image Stacking
