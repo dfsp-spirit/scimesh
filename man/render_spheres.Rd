@@ -44,6 +44,7 @@ centers <- matrix(c(0, 2, 4, 0, 0, 0, 0, 0, 0), ncol = 3)
 img <- render_spheres(centers, radii = 0.5,
                       colors = c(1, 0, 0, 1),
                       camera = camera_auto(centers))
-\dontrun{ write_png(img, "spheres.png") }
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
 
 }

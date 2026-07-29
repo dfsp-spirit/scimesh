@@ -112,7 +112,8 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
 #' img <- render_spheres(centers, radii = 0.5,
 #'                       colors = c(1, 0, 0, 1),
 #'                       camera = camera_auto(centers))
-#' \dontrun{ write_png(img, "spheres.png") }
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
 #'
 #' @export
 render_spheres <- function(centers, radii, colors, camera,
@@ -157,7 +158,8 @@ render_spheres <- function(centers, radii, colors, camera,
 #' img <- render_lines(from, to, radii = 0.05,
 #'                     colors = c(0, 0, 1, 1),
 #'                     camera = camera_auto(rbind(from, to)))
-#' \dontrun{ write_png(img, "lines.png") }
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
 #'
 #' @export
 render_lines <- function(from, to, radii = 0.1, colors, camera,
@@ -202,7 +204,8 @@ render_lines <- function(from, to, radii = 0.1, colors, camera,
 #'  ncol = 3)
 #' colors = matrix(c(0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1), ncol = 4)
 #' img <- render_points(pts, colors = colors, radius = 5)
-#' \dontrun{ write_png(img, "points.png") }
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
 #'
 #' @export
 render_points <- function(positions, colors, radius = 3,
@@ -596,10 +599,9 @@ read_stl <- function(path) {
 #' @param format \code{"binary"} (default) or \code{"ascii"}.
 #'
 #' @examples
-#' \dontrun{
 #' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
-#' write_stl(mesh, "output.stl")
-#' }
+#' tmp_file <- tempfile(fileext = ".stl")
+#' write_stl(mesh, tmp_file, format = "binary")
 #'
 #' @return invisible NULL, called for side effects of writing the file.
 #' @export

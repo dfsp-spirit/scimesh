@@ -44,6 +44,7 @@ to   <- matrix(c(3, 0, 0, 0, 3, 0), ncol = 3, byrow = TRUE)
 img <- render_lines(from, to, radii = 0.05,
                     colors = c(0, 0, 1, 1),
                     camera = camera_auto(rbind(from, to)))
-\dontrun{ write_png(img, "lines.png") }
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
 
 }

@@ -20,9 +20,8 @@ invisible NULL, called for side effects of writing the file.
 Writes a scimesh mesh descriptor to an ASCII or binary STL file.
 }
 \examples{
-\dontrun{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
-write_stl(mesh, "output.stl")
-}
+tmp_file <- tempfile(fileext = ".stl")
+write_stl(mesh, tmp_file, format = "binary")
 
 }
