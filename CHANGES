@@ -1,6 +1,12 @@
 scimesh Changes
 ===============
 
+Version 0.2.8 -- Changes for CRAN submission only
+--------------------------------------------------
+- Add dependency authors as package contributors
+- Various documentation / example changes
+
+
 Version 0.2.7 -- Small improvements
 --------------------------------------
 - NEW: check meshes for validity via is_valid() in rendering pipeline to avoid crashes later
