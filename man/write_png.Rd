@@ -21,9 +21,9 @@ to a PNG file using the built-in C++ PNG writer (stb_image_write).
 No additional R packages are required.
 }
 \examples{
-\dontrun{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(mesh$vertices, mesh$triangles)
-write_png(img, "cuboid.png")
-}
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
+
 }

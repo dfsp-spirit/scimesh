@@ -44,6 +44,7 @@ mesh2 <- generate_cuboid(c( 2, 0, 0), c(0.5, 1, 1), c(0, 0, 1, 1))
 img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
 img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
 result <- stack_horizontal(img1, img2)
-\dontrun{write_png(result, "stacked_h.png")}
+tmp_file <- tempfile(fileext = ".png")
+write_png(result, tmp_file)
 
 }

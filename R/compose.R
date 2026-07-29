@@ -165,13 +165,13 @@
 #'   suitable for \code{write_png()} or \code{image_to_array()}.
 #'
 #' @examples
-#' # Compose two renders side by side
 #' mesh1 <- generate_cuboid(c(-1.5, 0, 0), c(0.5, 0.5, 0.5), c(1, 0, 0, 1))
 #' mesh2 <- generate_cuboid(c( 1.5, 0, 0), c(0.5, 0.5, 0.5), c(0, 0, 1, 1))
 #' img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
 #' img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
 #' result <- compose_layout(list(img1, img2), nrow = 1L)
-#' \dontrun{write_png(result, "composed.png")}
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(result, tmp_file)
 #'
 #' @export
 compose_layout <- function(images, nrow = NULL, ncol = NULL,
@@ -333,7 +333,8 @@ compose_layout <- function(images, nrow = NULL, ncol = NULL,
 #' img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
 #' img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
 #' result <- stack_vertical(img1, img2)
-#' \dontrun{write_png(result, "stacked_v.png")}
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(result, tmp_file)
 #'
 #' @export
 stack_vertical <- function(..., colorbar = NULL,
@@ -379,7 +380,8 @@ stack_vertical <- function(..., colorbar = NULL,
 #' img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
 #' img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
 #' result <- stack_horizontal(img1, img2)
-#' \dontrun{write_png(result, "stacked_h.png")}
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(result, tmp_file)
 #'
 #' @export
 stack_horizontal <- function(..., colorbar = NULL,

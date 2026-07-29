@@ -57,12 +57,12 @@ Arranges rendered images (from \code{render_mesh()} or
 a colorbar. All composition is done with pure R array operations.
 }
 \examples{
-# Compose two renders side by side
 mesh1 <- generate_cuboid(c(-1.5, 0, 0), c(0.5, 0.5, 0.5), c(1, 0, 0, 1))
 mesh2 <- generate_cuboid(c( 1.5, 0, 0), c(0.5, 0.5, 0.5), c(0, 0, 1, 1))
 img1 <- render_mesh(mesh1$vertices, mesh1$triangles)
 img2 <- render_mesh(mesh2$vertices, mesh2$triangles)
 result <- compose_layout(list(img1, img2), nrow = 1L)
-\dontrun{write_png(result, "composed.png")}
+tmp_file <- tempfile(fileext = ".png")
+write_png(result, tmp_file)
 
 }

@@ -24,9 +24,8 @@ A new image list with the cropped dimensions.
 Crop an image to a rectangular region
 }
 \examples{
-\dontrun{
+cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(cube$vertices, cube$triangles)
 img <- image_crop(img, 100, 50, 400, 300)
-}
 
 }

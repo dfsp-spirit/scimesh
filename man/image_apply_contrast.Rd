@@ -23,9 +23,9 @@ clamped to \code{[0, 1]}.  The default 1.0 means no change.
 Values > 1.0 produce darker darks and lighter highlights.
 }
 \examples{
-\dontrun{
+cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(cube$vertices, cube$triangles)
 img <- image_apply_contrast(img, contrast = 1.1)
-}
+
 
 }

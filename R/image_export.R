@@ -40,11 +40,11 @@ image_to_array <- function(image) {
 #' @param filename Output PNG file path.
 #'
 #' @examples
-#' \dontrun{
 #' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' img <- render_mesh(mesh$vertices, mesh$triangles)
-#' write_png(img, "cuboid.png")
-#' }
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
+#'
 #' @return No return value; called for side effects.
 #'
 #' @export
@@ -66,10 +66,10 @@ write_png <- function(image, filename) {
 #' @return A new image list with contrast-adjusted pixel data.
 #'
 #' @examples
-#' \dontrun{
+#' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' img <- render_mesh(cube$vertices, cube$triangles)
 #' img <- image_apply_contrast(img, contrast = 1.1)
-#' }
+#'
 #'
 #' @export
 image_apply_contrast <- function(image, contrast = 1.0) {
@@ -86,10 +86,9 @@ image_apply_contrast <- function(image, contrast = 1.0) {
 #' @return A new image list with the cropped dimensions.
 #'
 #' @examples
-#' \dontrun{
+#' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' img <- render_mesh(cube$vertices, cube$triangles)
 #' img <- image_crop(img, 100, 50, 400, 300)
-#' }
 #'
 #' @export
 image_crop <- function(image, x, y, w, h) {
@@ -109,11 +108,11 @@ image_crop <- function(image, x, y, w, h) {
 #' @return A new image list with the merged dimensions.
 #'
 #' @examples
-#' \dontrun{
+#' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' sphere <- generate_sphere(c(0, 0, 0), 1.0, subdivisions = 3)
 #' left  <- render_mesh(sphere$vertices, sphere$triangles)
 #' right <- render_mesh(cube$vertices, cube$triangles)
 #' merged <- image_merge(left, right, "right")
-#' }
 #'
 #' @export
 image_merge <- function(image, other, direction) {
@@ -136,10 +135,9 @@ image_merge <- function(image, other, direction) {
 #' @return A new image list with the expanded dimensions.
 #'
 #' @examples
-#' \dontrun{
+#' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' img <- render_mesh(cube$vertices, cube$triangles)
 #' img <- image_grow(img, 10, 10, 20, 20, c(1, 1, 1, 1))
-#' }
 #'
 #' @export
 image_grow <- function(image, top, bottom, left, right, background) {
@@ -193,11 +191,11 @@ image_scale <- function(image, new_width, new_height) {
 #' @return A new image list with cropped dimensions.
 #'
 #' @examples
-#' \dontrun{
+#' cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 #' img <- render_mesh(cube$vertices, cube$triangles,
 #'                    options = render_options(background_color = c(0, 0, 0, 0)))
 #' img <- image_crop_to_content(img, "all", c(0, 0, 0, 0))
-#' }
+#'
 #'
 #' @export
 image_crop_to_content <- function(image, direction, background) {

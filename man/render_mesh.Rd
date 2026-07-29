@@ -61,7 +61,8 @@ verts <- matrix(c(0, 0, 0,  1, 0, 0,  0.5, 1, 0), ncol = 3, byrow = TRUE)
 tris  <- matrix(1L, nrow = 1, ncol = 3)
 cols  <- matrix(c(1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1), ncol = 4, byrow = TRUE)
 img <- render_mesh(verts, tris, colors = cols)
-\dontrun{write_png(img, "triangle.png")}
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
 
 # Render from a mesh descriptor list (scimesh format)
 mesh_desc <- list(vertices = verts, triangles = tris, colors = cols)

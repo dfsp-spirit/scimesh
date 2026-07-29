@@ -33,6 +33,5 @@ positions <- matrix(c(0, 0, 0, 1, 0, 0, 0.5, 1, 0), ncol = 3, byrow = TRUE)
 colors <- matrix(c(1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1), ncol = 4, byrow = TRUE)
 cam <- camera_auto(positions)
 img <- render_triangles(positions, colors, cam)
-\dontrun{write_png(img, "raw_triangle.png")}
 
 }

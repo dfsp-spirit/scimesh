@@ -33,7 +33,8 @@
 #' tris  <- matrix(1L, nrow = 1, ncol = 3)
 #' cols  <- matrix(c(1, 0, 0, 1,  0, 1, 0, 1,  0, 0, 1, 1), ncol = 4, byrow = TRUE)
 #' img <- render_mesh(verts, tris, colors = cols)
-#' \dontrun{write_png(img, "triangle.png")}
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
 #'
 #' # Render from a mesh descriptor list (scimesh format)
 #' mesh_desc <- list(vertices = verts, triangles = tris, colors = cols)
@@ -132,7 +133,8 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #' cam <- camera_auto(list(cube1, cube2), direction = c(1, 1, 1))
 #' img <- render_scene(list(cube1, cube2), cam,
 #'     render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
-#' \dontrun{write_png(img, "two_cubes.png")}
+#' tmp_file <- tempfile(fileext = ".png")
+#' write_png(img, tmp_file)
 #'
 #' # Render multiple meshes together
 #' scimesh_cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
@@ -311,7 +313,6 @@ render_options <- function(width = 800L, height = 600L,
 #' colors <- matrix(c(1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1), ncol = 4, byrow = TRUE)
 #' cam <- camera_auto(positions)
 #' img <- render_triangles(positions, colors, cam)
-#' \dontrun{write_png(img, "raw_triangle.png")}
 #'
 #' @export
 render_triangles <- function(positions, colors, camera,

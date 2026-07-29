@@ -35,7 +35,8 @@ cube2 <- generate_cuboid(c( 1.5, 0, 0), c(0.8, 0.8, 0.8), c(0, 0, 1, 1))
 cam <- camera_auto(list(cube1, cube2), direction = c(1, 1, 1))
 img <- render_scene(list(cube1, cube2), cam,
     render_options(width = 800, height = 600, background_color = c(1, 1, 1, 1)))
-\dontrun{write_png(img, "two_cubes.png")}
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
 
 # Render multiple meshes together
 scimesh_cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))

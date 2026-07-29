@@ -26,10 +26,10 @@ image. The first non-background pixel found on each edge defines the
 crop boundary.
 }
 \examples{
-\dontrun{
+cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(cube$vertices, cube$triangles,
                    options = render_options(background_color = c(0, 0, 0, 0)))
 img <- image_crop_to_content(img, "all", c(0, 0, 0, 0))
-}
+
 
 }

@@ -28,9 +28,8 @@ Expands the canvas by adding pixel rows/columns filled with a
 background colour.
 }
 \examples{
-\dontrun{
+cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
 img <- render_mesh(cube$vertices, cube$triangles)
 img <- image_grow(img, 10, 10, 20, 20, c(1, 1, 1, 1))
-}
 
 }
