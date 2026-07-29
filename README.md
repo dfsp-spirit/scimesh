@@ -140,12 +140,13 @@ write_png(img, "sphere.png")
 - **R examples**: [`examples/R/`](examples/R/) — runnable scripts
   demonstrating textured rendering, transparency, and neuroimaging
   visualization.
+- **R live help**: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
+- **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
 - **C++ examples**: [`examples/cpp/`](examples/cpp/) — standalone
   programs covering textured OBJ, transparency, protein visualization,
   and whole-brain rendering.
-- **R live help**: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
-* **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
-* **Tests:** Some of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially examples that illustrate how to use the functions.
+- **C++ API Documentation**: [dfsp-spirit.github.io/scimesh/](https://dfsp-spirit.github.io/scimesh/)
+- **Tests:** Some of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially examples that illustrate how to use the functions.
 
 
 ### Direct Links to Example Program Source Code
