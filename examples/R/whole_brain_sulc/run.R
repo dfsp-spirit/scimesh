@@ -3,13 +3,13 @@
 # scimesh Example — Whole-brain sulcal depth rendering
 # ----------------------------------------------------
 # Loads both brain hemisphere white-matter surfaces from FreeSurfer
-# files, maps sulcal depth to vertex colours via the viridis colormap,
+# files, maps sulcal depth to vertex colours via apply_colormap(),
 # masks out non-cortex (medial wall) vertices, and renders the
 # whole-brain scene to a PNG image.
 #
-# This demonstrates the full low-level pipeline: FreeSurfer mesh
-# loading via freesurferformats, per-vertex data colouring with
-# cortex masking, and headless rendering with scimesh.
+# This demonstrates the high-level colormap API: apply_colormap()
+# handles multi-dataset mapping, pooled range, winsorizing, and NaN
+# colours in a single call.
 #
 # Usage:
 #   Rscript examples/R/whole_brain_sulc/run.R
@@ -34,8 +34,8 @@ sj  <- "subject1"
 cat(sprintf("Subjects dir : %s\n", sjd))
 cat(sprintf("Subject      : %s\n\n", sj))
 
-# ---- helper: build a mesh descriptor for one hemisphere ----
-build_hemi_mesh <- function(sjd, sj, hemi) {
+# ---- helper: load mesh geometry and sulc data for one hemisphere ----
+build_hemi_data <- function(sjd, sj, hemi) {
     surf_file  <- file.path(sjd, sj, "surf",  paste0(hemi, ".white"))
     sulc_file  <- file.path(sjd, sj, "surf",  paste0(hemi, ".sulc"))
     label_file <- file.path(sjd, sj, "label", paste0(hemi, ".cortex.label"))
@@ -58,70 +58,55 @@ build_hemi_mesh <- function(sjd, sj, hemi) {
         stop(sprintf("  ERROR: sulc count (%d) != vertex count (%d)",
                      length(sulc), nv))
     }
-    finite_sulc <- sulc[!is.na(sulc)]
-    cat(sprintf("  Sulc range: %.3f to %.3f\n",
-                min(finite_sulc), max(finite_sulc)))
 
     cat(sprintf("  Label: %s\n", label_file))
     cortex_verts <- freesurferformats::read.fs.label(label_file)
-    n_labeled <- length(cortex_verts)
     in_cortex <- rep(FALSE, nv)
     in_cortex[cortex_verts] <- TRUE
     n_cortex <- sum(in_cortex)
     n_medial <- nv - n_cortex
-    cat(sprintf("  Cortex label: %d labeled vertices, %d in cortex, %d medial wall.\n",
-                n_labeled, n_cortex, n_medial))
+    cat(sprintf("  Cortex label: %d in cortex, %d medial wall.\n",
+                n_cortex, n_medial))
 
+    # Mask medial wall → NA
     sulc[!in_cortex] <- NA_real_
-
-    cat("  Mapping sulc -> viridis colors...\n")
-
-    finite_vals <- sulc[!is.na(sulc)]
-    lo <- min(finite_vals)
-    hi <- max(finite_vals)
-    rng <- hi - lo
-    if (rng == 0) rng <- 1
-
-    palette <- viridis_colormap(256L)
-
-    colors <- character(nv)
-    for (i in seq_len(nv)) {
-        if (is.na(sulc[i])) {
-            colors[i] <- "#FFFFFFFF"
-        } else {
-            t <- (sulc[i] - lo) / rng
-            t <- min(max(t, 0), 1)
-            idx <- as.integer(t * 255L) + 1L
-            if (idx < 1L) idx <- 1L
-            if (idx > 256L) idx <- 256L
-            colors[i] <- palette[idx]
-        }
-    }
-
-    clean <- sub("^#", "", colors)
-    r <- as.integer(paste0("0x", substr(clean, 1L, 2L))) / 255
-    g <- as.integer(paste0("0x", substr(clean, 3L, 4L))) / 255
-    b <- as.integer(paste0("0x", substr(clean, 5L, 6L))) / 255
-
-    if (all(nchar(clean) >= 8L)) {
-        a <- as.integer(paste0("0x", substr(clean, 7L, 8L))) / 255
-    } else {
-        a <- rep(1.0, nv)
-    }
 
     list(
         vertices  = surf$vertices,
         triangles = surf$faces,
-        colors    = cbind(r, g, b, a)
+        sulc      = sulc
     )
 }
 
-lh_mesh <- build_hemi_mesh(sjd, sj, "lh")
+# ---- Phase 1: Load both hemispheres (geometry + data) ----
+lh <- build_hemi_data(sjd, sj, "lh")
 cat("  Done with lh.\n\n")
 
-rh_mesh <- build_hemi_mesh(sjd, sj, "rh")
+rh <- build_hemi_data(sjd, sj, "rh")
 cat("  Done with rh.\n\n")
 
+# ---- Phase 2: Apply colormap with pooled range + winsorizing ----
+cat("=== Applying colormap ===\n")
+
+colors <- apply_colormap(
+    list(lh$sulc, rh$sulc),
+    colormap = viridis_colormap(256L),
+    limits = "global",
+    nan_color = c(1, 1, 1, 1),        # white for medial wall
+    winsor_percentiles = c(0.02, 0.98) # clip outliers
+)
+
+cat(sprintf("  Pooled data range: %.3f to %.3f\n",
+            attr(colors, "pooled_data_min"),
+            attr(colors, "pooled_data_max")))
+
+# Assign colours to mesh descriptors
+lh_mesh <- list(vertices = lh$vertices, triangles = lh$triangles,
+                colors = colors[[1]])
+rh_mesh <- list(vertices = rh$vertices, triangles = rh$triangles,
+                colors = colors[[2]])
+
+# ---- Phase 3: Render ----
 cat("=== Computing camera ===\n")
 cam <- camera_auto(list(lh_mesh, rh_mesh),
     direction = c(-1.0, 0.3, 0.4),

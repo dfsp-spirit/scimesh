@@ -145,3 +145,11 @@ scimesh_compute_vertex_normals <- function(mesh_data) {
     .Call(`_scimesh_scimesh_compute_vertex_normals`, mesh_data)
 }
 
+scimesh_apply_colormap_single <- function(data, colormap_lut, limits = NULL, nan_color = as.numeric( c(0.5, 0.5, 0.5, 1.0)), winsor_pct = NULL) {
+    .Call(`_scimesh_scimesh_apply_colormap_single`, data, colormap_lut, limits, nan_color, winsor_pct)
+}
+
+scimesh_apply_colormap_multi <- function(data_list, colormap_lut, global_range = FALSE, limits = NULL, nan_color = as.numeric( c(0.5, 0.5, 0.5, 1.0)), winsor_pct = NULL) {
+    .Call(`_scimesh_scimesh_apply_colormap_multi`, data_list, colormap_lut, global_range, limits, nan_color, winsor_pct)
+}
+

@@ -8,6 +8,7 @@ OBJECTS = rcpp_bindings.o \
     RcppExports.o \
     core/image.o \
     core/camera.o \
+    core/colormap.o \
     core/normals.o \
     core/clipping.o \
     core/rasterizer.o \

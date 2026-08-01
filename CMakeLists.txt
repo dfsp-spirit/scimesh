@@ -22,6 +22,7 @@ project(scimesh VERSION 0.2.8 LANGUAGES CXX)
 add_library(scimesh STATIC
     src/core/image.cpp
     src/core/camera.cpp
+    src/core/colormap.cpp
     src/core/normals.cpp
     src/core/clipping.cpp
     src/core/rasterizer.cpp

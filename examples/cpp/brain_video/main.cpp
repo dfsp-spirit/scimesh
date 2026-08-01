@@ -22,6 +22,7 @@
 #include "render_options.h"
 #include "image.h"
 #include "fs_mesh_converter.h"
+#include "colormap.h"
 
 #include <string>
 #include <iostream>
@@ -32,7 +33,6 @@
 
 using scimesh::Vec3;
 using scimesh::Color;
-using scimesh::Triangle;
 using scimesh::Mesh;
 using scimesh::Scene;
 using scimesh::Camera;
@@ -41,6 +41,8 @@ using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
 using scimesh::convert_fs_mesh;
+using scimesh::apply_colormap;
+using scimesh::ColorMap;
 
 int main(int argc, char **argv) {
     std::string subjects_dir = "../../../../test_data/freesurfer/subjects_dir";
@@ -74,6 +76,8 @@ int main(int argc, char **argv) {
     }
 
     Scene scene;
+    Mesh lh_mesh, rh_mesh;
+    std::vector<float> lh_sulc_data, rh_sulc_data;
 
     for (int hemi = 0; hemi < 2; hemi++) {
         const char *hemi_tag = (hemi == 0) ? "lh" : "rh";
@@ -98,10 +102,29 @@ int main(int argc, char **argv) {
             }
         }
 
-        std::vector<uint8_t> rgb_colors = fs::util::viridis(sulc);
-        Mesh sc_mesh = convert_fs_mesh(fs_surface, sulc, rgb_colors);
-        scene.meshes.push_back(std::move(sc_mesh));
+        Mesh sc_mesh = convert_fs_mesh(fs_surface);
+
+        if (hemi == 0) {
+            lh_mesh = std::move(sc_mesh);
+            lh_sulc_data = std::move(sulc);
+        } else {
+            rh_mesh = std::move(sc_mesh);
+            rh_sulc_data = std::move(sulc);
+        }
     }
+
+    // Apply colormap with pooled range + winsorizing
+    const auto& viridis_cmap = ColorMap::viridis();
+    auto result = apply_colormap({lh_sulc_data, rh_sulc_data},
+                                 viridis_cmap,
+                                 NAN, NAN,
+                                 Color(1.0f, 1.0f, 1.0f, 1.0f),
+                                 2.0f, 98.0f, true);
+    lh_mesh.colors = std::move(result.per_dataset[0].colors);
+    rh_mesh.colors = std::move(result.per_dataset[1].colors);
+
+    scene.meshes.push_back(std::move(lh_mesh));
+    scene.meshes.push_back(std::move(rh_mesh));
 
     Vec3 view_dir = glm::normalize(Vec3(-1.0f, 0.3f, 0.4f));
     Vec3 up(0.0f, 0.0f, 1.0f);

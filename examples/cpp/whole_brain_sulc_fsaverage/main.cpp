@@ -4,7 +4,8 @@
 /// scene to an image using the scimesh software renderer.
 ///
 /// This demonstrates the full pipeline: FreeSurfer mesh loading via
-/// libfs, MGH morphometry data reading with cortex masking, and
+/// libfs, MGH morphometry data reading with cortex masking, colormap
+/// application with winsorizing via scimesh::apply_colormap(), and
 /// headless rendering with scimesh — all on the standard fsaverage
 /// template.
 ///
@@ -28,16 +29,15 @@
 #include "render_options.h"
 #include "image.h"
 #include "fs_mesh_converter.h"
+#include "colormap.h"
 
 #include <string>
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <algorithm>
 
 using scimesh::Vec3;
 using scimesh::Color;
-using scimesh::Triangle;
 using scimesh::Mesh;
 using scimesh::Scene;
 using scimesh::Camera;
@@ -46,6 +46,8 @@ using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
 using scimesh::convert_fs_mesh;
+using scimesh::apply_colormap;
+using scimesh::ColorMap;
 
 int main(int argc, char **argv) {
     // ---- Default paths ----
@@ -94,6 +96,8 @@ int main(int argc, char **argv) {
     }
 
     Scene scene;
+    Mesh lh_mesh, rh_mesh;
+    std::vector<float> lh_sulc_data, rh_sulc_data;
 
     // ---- Process each hemisphere ----
     for (int hemi = 0; hemi < 2; hemi++) {
@@ -114,8 +118,6 @@ int main(int argc, char **argv) {
                   << " faces.\n";
 
         // b) Read sulcal depth data from MGH file.
-        //    MGH is a 4D volume format, but for surface-mapped data
-        //    the file contains a flat 1D float array (one frame).
         std::cout << "  Sulc data (MGH): " << sulc_file << "\n";
         fs::Mgh mgh;
         fs::read_mgh(&mgh, sulc_file);
@@ -129,54 +131,64 @@ int main(int argc, char **argv) {
                       << ") != vertex count (" << nv << ")\n";
             return 1;
         }
-        {
-            float mn = NAN, mx = NAN;
-            bool have = false;
-            for (auto v : sulc) {
-                if (std::isnan(v)) continue;
-                if (!have) { mn = mx = v; have = true; }
-                else { if (v < mn) mn = v; if (v > mx) mx = v; }
-            }
-            std::cout << "  Sulc range: " << mn << " to " << mx << "\n";
-        }
         std::cout << "  MGH header: dtype=" << mgh.header.dtype
                   << " dims=" << mgh.header.dim1length
                   << "x" << mgh.header.dim2length
                   << "x" << mgh.header.dim3length
                   << "x" << mgh.header.dim4length << "\n";
 
-        // c) Read fsaverage cortex label for masking.
+        // c) Read fsaverage cortex label and mask medial wall to NaN.
         std::cout << "  Label: " << label_file << "\n";
         fs::Label cortex_label;
         fs::read_label(&cortex_label, label_file);
-        size_t n_labeled = cortex_label.num_entries();
         std::vector<bool> in_cortex = cortex_label.vert_in_label(nv);
         size_t n_cortex = 0, n_medial = 0;
         for (size_t i = 0; i < nv; i++) {
-            if (in_cortex[i]) n_cortex++; else n_medial++;
-        }
-        std::cout << "  Cortex label: " << n_labeled
-                  << " labeled vertices, "
-                  << n_cortex << " in cortex, "
-                  << n_medial << " medial wall.\n";
-
-        // d) Mask non-cortex: set sulc to NaN for medial wall vertices.
-        for (size_t i = 0; i < nv; i++) {
-            if (!in_cortex[i]) {
-                sulc[i] = NAN;
+            if (in_cortex[i]) {
+                n_cortex++;
+            } else {
+                sulc[i] = NAN;   // medial wall → NaN
+                n_medial++;
             }
         }
+        std::cout << "  Cortex: " << n_cortex << " in cortex, "
+                  << n_medial << " medial wall (→ NaN).\n";
 
-        // e) Map sulcal depth to RGB colors (viridis, NaN -> white).
-        std::cout << "  Mapping sulc -> viridis colors...\n";
-        std::vector<uint8_t> rgb_colors = fs::util::viridis(sulc);
+        // d) Convert mesh geometry (no colors yet).
+        Mesh sc_mesh = convert_fs_mesh(fs_surface);
 
-        // f) Convert to scimesh::Mesh.
-        Mesh sc_mesh = convert_fs_mesh(fs_surface, sulc, rgb_colors);
-        scene.meshes.push_back(std::move(sc_mesh));
-
+        if (hemi == 0) {
+            lh_mesh = std::move(sc_mesh);
+            lh_sulc_data = std::move(sulc);
+        } else {
+            rh_mesh = std::move(sc_mesh);
+            rh_sulc_data = std::move(sulc);
+        }
         std::cout << "  Done with " << hemi_tag << ".\n\n";
     }
+
+    // ---- Phase 2: Apply colormap to both hemispheres with pooled range ----
+    std::cout << "=== Applying colormap ===\n";
+
+    const auto& viridis_cmap = ColorMap::viridis();
+
+    auto result = apply_colormap({lh_sulc_data, rh_sulc_data},
+                                 viridis_cmap,
+                                 NAN, NAN,
+                                 Color(1.0f, 1.0f, 1.0f, 1.0f), // white NaN
+                                 2.0f, 98.0f,                    // winsorize
+                                 true);                           // global range
+
+    std::cout << "  Pooled data range: "
+              << result.pooled_data_min << " to "
+              << result.pooled_data_max << "\n";
+
+    lh_mesh.colors = std::move(result.per_dataset[0].colors);
+    rh_mesh.colors = std::move(result.per_dataset[1].colors);
+
+    // ---- Phase 3: Build scene and render ----
+    scene.meshes.push_back(std::move(lh_mesh));
+    scene.meshes.push_back(std::move(rh_mesh));
 
     // ---- Camera: auto-frame the whole scene ----
     Vec3 view_dir(-1.0f, 0.3f, 0.4f);

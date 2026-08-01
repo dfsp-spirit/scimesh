@@ -482,6 +482,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_apply_colormap_single
+List scimesh_apply_colormap_single(NumericVector data, NumericMatrix colormap_lut, Nullable<NumericVector> limits, NumericVector nan_color, Nullable<NumericVector> winsor_pct);
+RcppExport SEXP _scimesh_scimesh_apply_colormap_single(SEXP dataSEXP, SEXP colormap_lutSEXP, SEXP limitsSEXP, SEXP nan_colorSEXP, SEXP winsor_pctSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colormap_lut(colormap_lutSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type limits(limitsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nan_color(nan_colorSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type winsor_pct(winsor_pctSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_apply_colormap_single(data, colormap_lut, limits, nan_color, winsor_pct));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_apply_colormap_multi
+List scimesh_apply_colormap_multi(List data_list, NumericMatrix colormap_lut, bool global_range, Nullable<NumericVector> limits, NumericVector nan_color, Nullable<NumericVector> winsor_pct);
+RcppExport SEXP _scimesh_scimesh_apply_colormap_multi(SEXP data_listSEXP, SEXP colormap_lutSEXP, SEXP global_rangeSEXP, SEXP limitsSEXP, SEXP nan_colorSEXP, SEXP winsor_pctSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type data_list(data_listSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colormap_lut(colormap_lutSEXP);
+    Rcpp::traits::input_parameter< bool >::type global_range(global_rangeSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type limits(limitsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type nan_color(nan_colorSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type winsor_pct(winsor_pctSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_apply_colormap_multi(data_list, colormap_lut, global_range, limits, nan_color, winsor_pct));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
@@ -520,6 +551,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_print_options", (DL_FUNC) &_scimesh_scimesh_print_options, 1},
     {"_scimesh_scimesh_print_mesh", (DL_FUNC) &_scimesh_scimesh_print_mesh, 1},
     {"_scimesh_scimesh_compute_vertex_normals", (DL_FUNC) &_scimesh_scimesh_compute_vertex_normals, 1},
+    {"_scimesh_scimesh_apply_colormap_single", (DL_FUNC) &_scimesh_scimesh_apply_colormap_single, 5},
+    {"_scimesh_scimesh_apply_colormap_multi", (DL_FUNC) &_scimesh_scimesh_apply_colormap_multi, 6},
     {NULL, NULL, 0}
 };
 

@@ -4,6 +4,7 @@
 #include "core/transforms.h"
 #include "core/normals.h"
 #include "core/primitives.h"
+#include "core/colormap.h"
 #include "core/to_string.h"
 #include "core/stl_io.h"
 #include "core/obj_io.h"
@@ -881,4 +882,190 @@ List scimesh_compute_vertex_normals(List mesh_data) {
     scimesh::compute_vertex_normals(mesh, normals);
     mesh.normals = normals;
     return mesh_to_r_list(mesh);
+}
+
+// ---- Colormap ----------------------------------------------------------------
+
+namespace {
+
+// Convert R numeric vector to scimesh::Color
+scimesh::Color colormap_color_from_r(const NumericVector &v) {
+    return scimesh::Color(
+        static_cast<float>(v.size() > 0 ? v[0] : 0.5),
+        static_cast<float>(v.size() > 1 ? v[1] : 0.5),
+        static_cast<float>(v.size() > 2 ? v[2] : 0.5),
+        static_cast<float>(v.size() > 3 ? v[3] : 1.0));
+}
+
+// Convert an ApplyColormapResult to an R list with attributes
+List colormap_result_to_r(const scimesh::ApplyColormapResult &r) {
+    int n = static_cast<int>(r.colors.size());
+    NumericMatrix cols(n, 4);
+    for (int i = 0; i < n; i++) {
+        cols(i, 0) = r.colors[i].r;
+        cols(i, 1) = r.colors[i].g;
+        cols(i, 2) = r.colors[i].b;
+        cols(i, 3) = r.colors[i].a;
+    }
+
+    List out = List::create(Named("colors") = cols);
+    out.attr("data_min")   = r.data_min;
+    out.attr("data_max")   = r.data_max;
+    out.attr("raw_min")    = r.raw_min;
+    out.attr("raw_max")    = r.raw_max;
+    out.attr("winsor_lo")  = r.winsor_lo;
+    out.attr("winsor_hi")  = r.winsor_hi;
+    out.attr("nan_count")  = static_cast<int>(r.nan_count);
+    return out;
+}
+
+} // anonymous namespace
+
+// [[Rcpp::export]]
+List scimesh_apply_colormap_single(NumericVector data,
+                                    NumericMatrix colormap_lut,
+                                    Nullable<NumericVector> limits = R_NilValue,
+                                    NumericVector nan_color = NumericVector::create(0.5, 0.5, 0.5, 1.0),
+                                    Nullable<NumericVector> winsor_pct = R_NilValue) {
+    // Build ColorMap from R matrix (N×3 or N×4)
+    scimesh::ColorMap cmap;
+    int nl = colormap_lut.nrow();
+    int ncol_lut = colormap_lut.ncol();
+    cmap.colors.reserve(nl);
+    for (int i = 0; i < nl; i++) {
+        cmap.colors.emplace_back(
+            static_cast<float>(colormap_lut(i, 0)),
+            static_cast<float>(ncol_lut > 1 ? colormap_lut(i, 1) : 0.0f),
+            static_cast<float>(ncol_lut > 2 ? colormap_lut(i, 2) : 0.0f),
+            static_cast<float>(ncol_lut > 3 ? colormap_lut(i, 3) : 1.0f));
+    }
+
+    // Convert data
+    int nd = data.size();
+    std::vector<float> cdata(nd);
+    for (int i = 0; i < nd; i++) {
+        cdata[i] = static_cast<float>(data[i]);
+    }
+
+    // Parse limits
+    float vmin = NAN, vmax = NAN;
+    if (limits.isNotNull()) {
+        NumericVector lim(limits);
+        if (lim.size() >= 2) {
+            vmin = static_cast<float>(lim[0]);
+            vmax = static_cast<float>(lim[1]);
+        }
+    }
+
+    // Parse nan_color
+    scimesh::Color nc = colormap_color_from_r(nan_color);
+
+    // Parse winsor percentiles
+    float lo_pct = 0.0f, hi_pct = 100.0f;
+    if (winsor_pct.isNotNull()) {
+        NumericVector wp(winsor_pct);
+        if (wp.size() >= 1) lo_pct = static_cast<float>(wp[0]);
+        if (wp.size() >= 2) hi_pct = static_cast<float>(wp[1]);
+    }
+
+    auto result = scimesh::apply_colormap(cdata, cmap, vmin, vmax, nc,
+                                          lo_pct, hi_pct);
+    return colormap_result_to_r(result);
+}
+
+// [[Rcpp::export]]
+List scimesh_apply_colormap_multi(List data_list,
+                                   NumericMatrix colormap_lut,
+                                   bool global_range = false,
+                                   Nullable<NumericVector> limits = R_NilValue,
+                                   NumericVector nan_color = NumericVector::create(0.5, 0.5, 0.5, 1.0),
+                                   Nullable<NumericVector> winsor_pct = R_NilValue) {
+    // Build ColorMap
+    scimesh::ColorMap cmap;
+    int nl = colormap_lut.nrow();
+    int ncol_lut = colormap_lut.ncol();
+    cmap.colors.reserve(nl);
+    for (int i = 0; i < nl; i++) {
+        cmap.colors.emplace_back(
+            static_cast<float>(colormap_lut(i, 0)),
+            static_cast<float>(ncol_lut > 1 ? colormap_lut(i, 1) : 0.0f),
+            static_cast<float>(ncol_lut > 2 ? colormap_lut(i, 2) : 0.0f),
+            static_cast<float>(ncol_lut > 3 ? colormap_lut(i, 3) : 1.0f));
+    }
+
+    // Convert data list
+    int nds = data_list.size();
+    std::vector<std::vector<float>> datasets(nds);
+    for (int d = 0; d < nds; d++) {
+        NumericVector rv = data_list[d];
+        int n = rv.size();
+        datasets[d].resize(n);
+        for (int i = 0; i < n; i++) {
+            datasets[d][i] = static_cast<float>(rv[i]);
+        }
+    }
+
+    // Parse limits
+    float vmin = NAN, vmax = NAN;
+    if (limits.isNotNull()) {
+        NumericVector lim(limits);
+        if (lim.size() >= 2) {
+            vmin = static_cast<float>(lim[0]);
+            vmax = static_cast<float>(lim[1]);
+        }
+    }
+
+    scimesh::Color nc = colormap_color_from_r(nan_color);
+
+    float lo_pct = 0.0f, hi_pct = 100.0f;
+    if (winsor_pct.isNotNull()) {
+        NumericVector wp(winsor_pct);
+        if (wp.size() >= 1) lo_pct = static_cast<float>(wp[0]);
+        if (wp.size() >= 2) hi_pct = static_cast<float>(wp[1]);
+    }
+
+    auto result = scimesh::apply_colormap(datasets, cmap, vmin, vmax, nc,
+                                          lo_pct, hi_pct, global_range);
+
+    // Build return list
+    List out_list(static_cast<int>(result.per_dataset.size()));
+    for (size_t d = 0; d < result.per_dataset.size(); d++) {
+        int n = static_cast<int>(result.per_dataset[d].colors.size());
+        NumericMatrix cols(n, 4);
+        for (int i = 0; i < n; i++) {
+            cols(i, 0) = result.per_dataset[d].colors[i].r;
+            cols(i, 1) = result.per_dataset[d].colors[i].g;
+            cols(i, 2) = result.per_dataset[d].colors[i].b;
+            cols(i, 3) = result.per_dataset[d].colors[i].a;
+        }
+        out_list[static_cast<int>(d)] = cols;
+    }
+
+    // Attach pooled metadata as attributes on the list
+    out_list.attr("pooled_data_min")  = result.pooled_data_min;
+    out_list.attr("pooled_data_max")  = result.pooled_data_max;
+    out_list.attr("pooled_raw_min")   = result.pooled_raw_min;
+    out_list.attr("pooled_raw_max")   = result.pooled_raw_max;
+    out_list.attr("pooled_winsor_lo") = result.pooled_winsor_lo;
+    out_list.attr("pooled_winsor_hi") = result.pooled_winsor_hi;
+    out_list.attr("total_nan_count")  = static_cast<int>(result.total_nan_count);
+
+    // Attach per-dataset metadata
+    NumericVector per_data_min(static_cast<int>(result.per_dataset.size()));
+    NumericVector per_data_max(static_cast<int>(result.per_dataset.size()));
+    NumericVector per_winsor_lo(static_cast<int>(result.per_dataset.size()));
+    NumericVector per_winsor_hi(static_cast<int>(result.per_dataset.size()));
+    NumericVector per_nan_count(static_cast<int>(result.per_dataset.size()));
+    for (size_t d = 0; d < result.per_dataset.size(); d++) {
+        per_data_min[static_cast<int>(d)]  = result.per_dataset[d].data_min;
+        per_data_max[static_cast<int>(d)]  = result.per_dataset[d].data_max;
+        per_winsor_lo[static_cast<int>(d)] = result.per_dataset[d].winsor_lo;
+        per_winsor_hi[static_cast<int>(d)] = result.per_dataset[d].winsor_hi;
+        per_nan_count[static_cast<int>(d)] = static_cast<int>(result.per_dataset[d].nan_count);
+    }
+    out_list.attr("data_ranges")     = List::create(per_data_min, per_data_max);
+    out_list.attr("winsor_cutoffs")  = List::create(per_winsor_lo, per_winsor_hi);
+    out_list.attr("nan_counts")      = per_nan_count;
+
+    return out_list;
 }

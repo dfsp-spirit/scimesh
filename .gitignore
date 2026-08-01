@@ -82,3 +82,8 @@ examples/**/*.mp4
 
 dev_tools/rgl_interoperability/**/*.png
 /Meta/
+
+test_*.ppm
+test_*.bmp
+scimesh.Rcheck/
+examples/cpp/all_primitives/build_manual/

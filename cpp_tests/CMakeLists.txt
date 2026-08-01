@@ -25,6 +25,7 @@ add_executable(scimesh_tests
     test_visual_validation.cpp
     test_brain_mesh.cpp
     test_primitives.cpp
+    test_colormap.cpp
 )
 
 target_link_libraries(scimesh_tests PRIVATE scimesh)
