@@ -57,15 +57,16 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
 - Automatic camera framing (`camera_fit_mesh`, `camera_fit_scene`)
 - Per-vertex and per-face coloring (vertex colors, face colors)
 - Texture mapping with bilinear sampling
-- Mesh transform utilities: translate, scale, rotate, arbitrary 4x4 matrices
+- Basic mesh transform utilities: translate, scale, rotate, arbitrary 4x4 matrices
+- Basic image composition: cropping, stacking
 
 ### R Layer
 
 The R layer gives access to all C++ layer features, and adds on top:
 
 - Easy, high-level access from R
-- Image composition: grids, cropping, stacking
-- Colorbars (and using them during image composition)
+- More advanced image composition, like grids
+- Colorbars (combine with your main plot with image composition!)
 
 
 If you need colorbars in C++, have a look at [scibar](https://github.com/dfsp-spirit/scibar).
