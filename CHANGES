@@ -2,15 +2,19 @@ scimesh Changes
 ===============
 
 
-Current WIP
------------
-- Update libfs to v0.4.1
+Version 0.3.0
+---------------
+- BRK: move scimesh code from src/core/ to src/core/scimesh and all required downstream adjustments. avoids conflicts with other libraries in C++ layer
+- NEW: get proper versioning in place for C++ layer
+- SEC: Update libfs to v0.4.1
+- DOC: dramatically improve all doc strings, integrate CPP_GETTING_STARTED into API docs
+- NEW: add colorbar application functions (C++ and R)
 
 
 Version 0.2.8 -- Changes for CRAN submission only
 --------------------------------------------------
-- Add dependency authors as package contributors
-- Various documentation / example changes
+- NEW: Add dependency authors as package contributors
+- CHG: Various documentation / example changes
 
 
 Version 0.2.7 -- Small improvements
