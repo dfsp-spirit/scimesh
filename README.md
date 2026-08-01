@@ -11,6 +11,7 @@ Scientific compute environments are often constrained by the absence of graphica
   [![R-CMD-check](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml)
   [![tests_cpp](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_cpp.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
   [![tests_R](https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_R.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
+  [![docs](https://github.com/dfsp-spirit/scimesh/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/dfsp-spirit/scimesh/actions)
 <!-- badges: end -->
 
 ## Visualization Examples
