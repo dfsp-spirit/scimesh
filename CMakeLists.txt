@@ -17,7 +17,7 @@ project(scimesh VERSION 0.2.8 LANGUAGES CXX)
 #   FetchContent_MakeAvailable(scimesh)
 #
 #   add_executable(my_app main.cpp)
-#   target_link_libraries(my_app PRIVATE scimesh)
+#   target_link_libraries(my_app PRIVATE scimesh::scimesh)
 
 add_library(scimesh STATIC
     src/core/image.cpp
@@ -34,13 +34,17 @@ add_library(scimesh STATIC
     src/third_party/tinyply.cpp
 )
 
+# Alias target for modern CMake usage (scimesh::scimesh)
+add_library(scimesh::scimesh ALIAS scimesh)
+
 # ---- include paths ----------------------------------------------------------
 target_include_directories(scimesh PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/core>
+    $<INSTALL_INTERFACE:include>
 )
 target_include_directories(scimesh SYSTEM PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/glm
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/third_party>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/glm>
 )
 
 # ---- compile features & definitions -----------------------------------------
@@ -52,3 +56,18 @@ find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     target_link_libraries(scimesh PUBLIC OpenMP::OpenMP_CXX)
 endif()
+
+# ---- install rules ----------------------------------------------------------
+include(GNUInstallDirs)
+
+install(TARGETS scimesh
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(DIRECTORY src/core/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "*.hpp"
+    PATTERN "*.o" EXCLUDE
+)
