@@ -51,6 +51,17 @@ target_include_directories(scimesh SYSTEM PUBLIC
 target_compile_features(scimesh PUBLIC cxx_std_17)
 target_compile_definitions(scimesh PRIVATE SCIMESH_STB_WRITE_IMPL)
 
+# ---- generated version header -----------------------------------------------
+# Generates scimesh/version.h from the project version declared above.
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scimesh/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/scimesh/version.h
+    @ONLY
+)
+target_include_directories(scimesh PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
 # ---- optional OpenMP --------------------------------------------------------
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
@@ -69,5 +80,9 @@ install(DIRECTORY src/core/
     FILES_MATCHING
     PATTERN "*.h"
     PATTERN "*.hpp"
+    PATTERN "*.h.in" EXCLUDE
     PATTERN "*.o" EXCLUDE
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scimesh/version.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scimesh
 )

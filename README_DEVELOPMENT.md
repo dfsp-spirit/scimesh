@@ -79,8 +79,17 @@ on every push to `main`.
 ### Making a release
 
 
-* bump version in DESCRIPTION
+* bump version in all of these files:
+    * `DESCRIPTION` (R package version)
+    * `CMakeLists.txt` — the `project(scimesh VERSION ...)` line (C++ version, single source of truth)
+        * The C++ header `version.h` is **auto-generated** by CMake from this value — no need to edit it manually.
+    * `Doxyfile` — the `PROJECT_NUMBER` field (version shown in published C++ API docs)
 * make sure new additions have proper doc strings and tests, then build/refresh all docs. In R, run `devtools::document()` to re-generate docs.
+* **REQUIRED:** Re-run Doxygen so the published C++ API docs pick up the new version in `PROJECT_NUMBER`:
+    ```
+    doxygen Doxyfile
+    ```
+    Do not skip this step — the online API documentation at `https://dfsp-spirit.github.io/scimesh/` will show a stale or empty version otherwise.
 * run all tests and make sure they are green:
 
     C++ unit tests:
@@ -103,4 +112,5 @@ on every push to `main`.
 * run the even stricter `R CMD check scimesh_0.1.0.tar.gz --as-cran` and see what you can do to get as little notes and warnings as possible. Stuff in downstream code is not our problem though, but you may have to discuss that with CRAN team on submit, hf.
 * test package on [winbuilder](https://win-builder.r-project.org/upload.aspx)
 * [submit to CRAN](https://cran.r-project.org/submit.html) when green
+* when it's accepted at CRAN, tag it in git and publish release on github, with artefact attached
 
