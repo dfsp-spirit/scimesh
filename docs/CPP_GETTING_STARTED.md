@@ -1,4 +1,4 @@
-# Getting Started with scimesh C++
+\page cpp_getting_started Getting Started with scimesh C++
 
 A gentle introduction to using the scimesh C++ software renderer.  No
 OpenGL, GPU, or display server required — just a C++17 compiler.

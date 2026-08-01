@@ -165,6 +165,7 @@ write_png(img, "sphere.png")
 - **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
 - **C++ getting started**: [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
   — gentle introduction to the C++ renderer.
+  \subpage cpp_getting_started
 - **C++ examples**: [`examples/cpp/`](examples/cpp/) — standalone
   programs covering textured OBJ, transparency, protein visualization,
   and whole-brain rendering.
