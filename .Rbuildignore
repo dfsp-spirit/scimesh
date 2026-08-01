@@ -36,4 +36,5 @@
 ^LICENSE\.md$
 CMakeLists.txt
 Doxyfile
+AGENTS.md
 

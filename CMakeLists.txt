@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(scimesh VERSION 0.2.8 LANGUAGES CXX)
+project(scimesh VERSION 0.3.0 LANGUAGES CXX)
 
 # ---- scimesh static library ------------------------------------------------
 # This is the core C++ software renderer.  Link against this target to use
