@@ -27,7 +27,8 @@ Mesh read_obj(const std::string &path) {
                                true, false);
 
     if (!warn.empty()) {
-        std::cerr << "OBJ warning: " << warn << std::endl;
+        // OBJ loader warning suppressed to avoid R CMD check NOTE
+        // about compiled code writing to stderr.
     }
     if (!err.empty()) {
         throw std::runtime_error("Failed to load OBJ file '" + path + "': " + err);

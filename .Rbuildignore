@@ -34,3 +34,6 @@
 ^.*\.ppm$
 ^reference_images$
 ^LICENSE\.md$
+CMakeLists.txt
+Doxyfile
+

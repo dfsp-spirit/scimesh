@@ -141,8 +141,8 @@ apply_colormap <- function(
     if (is.character(hex_cols)) {
         # Strip leading '#' if present
         hex_clean <- gsub("^#", "", hex_cols)
-        if (any(nchar(hex_clean) != 6L)) {
-            stop("Hex colours must be 6-digit strings (e.g., '#FF0000' or 'FF0000')")
+        if (any(nchar(hex_clean) != 6L & nchar(hex_clean) != 8L)) {
+            stop("Hex colours must be 6- or 8-digit strings (e.g., '#FF0000' or '#FF0000FF')")
         }
         rgb_mat <- t(grDevices::col2rgb(paste0("#", hex_clean), alpha = FALSE)) / 255
         return(rgb_mat)
