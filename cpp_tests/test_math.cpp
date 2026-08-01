@@ -1,5 +1,5 @@
 #include "catch_amalgamated.hpp"
-#include "math_utils.h"
+#include <scimesh/math_utils.h>
 
 using namespace scimesh;
 using Catch::Approx;

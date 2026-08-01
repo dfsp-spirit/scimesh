@@ -1,7 +1,7 @@
 /// @file colormap.cpp
 /// @brief Implementation of the ColorMap and apply_colormap() functions.
 
-#include "colormap.h"
+#include <scimesh/colormap.h>
 #include <algorithm>
 #include <stdexcept>
 #include <limits>

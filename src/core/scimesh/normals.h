@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "mesh.h"
-#include "math_utils.h"
+#include <scimesh/mesh.h>
+#include <scimesh/math_utils.h>
 
 namespace scimesh {
 

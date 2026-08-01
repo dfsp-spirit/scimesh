@@ -1,4 +1,4 @@
-#include "camera.h"
+#include <scimesh/camera.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <cmath>

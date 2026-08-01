@@ -1,4 +1,4 @@
-#include "normals.h"
+#include <scimesh/normals.h>
 
 namespace scimesh {
 

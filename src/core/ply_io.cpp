@@ -1,7 +1,7 @@
 #define TINYPLY_IMPLEMENTATION
 #include "tinyply.h"
-#include "ply_io.h"
-#include "types.h"
+#include <scimesh/ply_io.h>
+#include <scimesh/types.h>
 
 #include <fstream>
 #include <stdexcept>

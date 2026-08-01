@@ -17,12 +17,12 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
-#include "primitives.h"
-#include "scene.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/primitives.h>
+#include <scimesh/scene.h>
 
 #include <string>
 #include <iostream>

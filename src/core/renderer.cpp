@@ -1,8 +1,8 @@
-#include "renderer.h"
-#include "math_utils.h"
-#include "normals.h"
-#include "clipping.h"
-#include "rasterizer.h"
+#include <scimesh/renderer.h>
+#include <scimesh/math_utils.h>
+#include <scimesh/normals.h>
+#include <scimesh/clipping.h>
+#include <scimesh/rasterizer.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>

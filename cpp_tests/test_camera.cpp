@@ -1,11 +1,11 @@
 #include "catch_amalgamated.hpp"
-#include "camera.h"
-#include "math_utils.h"
+#include <scimesh/camera.h>
+#include <scimesh/math_utils.h>
 #include "test_meshes.h"
-#include "renderer.h"
-#include "render_options.h"
-#include "image.h"
-#include "primitives.h"
+#include <scimesh/renderer.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/primitives.h>
 #include <glm/glm.hpp>
 
 using namespace scimesh;

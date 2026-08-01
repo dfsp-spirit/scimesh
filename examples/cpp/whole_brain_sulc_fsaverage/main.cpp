@@ -24,12 +24,12 @@
 #define LIBFS_DBG_INFO
 
 #include "libfs.h"
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
-#include "fs_mesh_converter.h"
-#include "colormap.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/fs_mesh_converter.h>
+#include <scimesh/colormap.h>
 
 #include <string>
 #include <iostream>

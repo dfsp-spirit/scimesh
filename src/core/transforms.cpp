@@ -1,5 +1,5 @@
-#include "transforms.h"
-#include "math_utils.h"
+#include <scimesh/transforms.h>
+#include <scimesh/math_utils.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace scimesh {

@@ -14,13 +14,13 @@
 ///   cylinder_front.png, cylinder_back.png,
 ///   ... etc. (9 primitives × 2 views = 18 PNGs)
 
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
-#include "normals.h"
-#include "primitives.h"
-#include "types.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/normals.h>
+#include <scimesh/primitives.h>
+#include <scimesh/types.h>
 
 #include <iostream>
 #include <chrono>

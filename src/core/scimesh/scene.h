@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "mesh.h"
+#include <scimesh/mesh.h>
 
 namespace scimesh {
 

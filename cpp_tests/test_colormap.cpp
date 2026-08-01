@@ -1,5 +1,5 @@
 #include "catch_amalgamated.hpp"
-#include "colormap.h"
+#include <scimesh/colormap.h>
 #include <cmath>
 
 using namespace scimesh;

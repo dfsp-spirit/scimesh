@@ -1,6 +1,6 @@
-#include "primitives.h"
-#include "normals.h"
-#include "math_utils.h"
+#include <scimesh/primitives.h>
+#include <scimesh/normals.h>
+#include <scimesh/math_utils.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <cmath>

@@ -18,7 +18,7 @@
 ///
 /// @par Quick start
 /// @code{.cpp}
-/// #include "colormap.h"
+/// #include <scimesh/colormap.h>
 ///
 /// // Build a colormap from scratch (linear blue→red gradient, 8 entries)
 /// ColorMap cmap;
@@ -44,7 +44,7 @@
 /// @par scibar interop (no coupling)
 /// @code{.cpp}
 /// #include <scibar.hpp>   // user includes scibar, not scimesh
-/// #include "colormap.h"
+/// #include <scimesh/colormap.h>
 ///
 /// auto scibar_cmap = scibar::util::viridis();        // std::vector<scibar::Color>
 /// auto scm_cmap = ColorMap::from_uint8_colors(scibar_cmap);  // duck-typed copy
@@ -53,7 +53,7 @@
 
 #pragma once
 
-#include "types.h"
+#include <scimesh/types.h>
 #include <vector>
 #include <cstdint>
 #include <cmath>

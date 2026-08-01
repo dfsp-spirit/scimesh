@@ -1,6 +1,6 @@
 #include "catch_amalgamated.hpp"
-#include "mesh.h"
-#include "scene.h"
+#include <scimesh/mesh.h>
+#include <scimesh/scene.h>
 
 using namespace scimesh;
 using Catch::Approx;

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "types.h"
+#include <scimesh/types.h>
 #include <vector>
 
 namespace scimesh {

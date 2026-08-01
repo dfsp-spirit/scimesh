@@ -1,7 +1,7 @@
 #include "catch_amalgamated.hpp"
-#include "rasterizer.h"
-#include "image.h"
-#include "math_utils.h"
+#include <scimesh/rasterizer.h>
+#include <scimesh/image.h>
+#include <scimesh/math_utils.h>
 
 using namespace scimesh;
 using Catch::Approx;

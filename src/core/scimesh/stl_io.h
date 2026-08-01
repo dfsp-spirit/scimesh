@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "mesh.h"
+#include <scimesh/mesh.h>
 #include "stl_reader.h"
 #include <fstream>
 #include <cstring>

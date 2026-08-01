@@ -1,14 +1,14 @@
 #include <Rcpp.h>
 #include <sstream>
-#include "core/renderer.h"
-#include "core/transforms.h"
-#include "core/normals.h"
-#include "core/primitives.h"
-#include "core/colormap.h"
-#include "core/to_string.h"
-#include "core/stl_io.h"
-#include "core/obj_io.h"
-#include "core/ply_io.h"
+#include <scimesh/renderer.h>
+#include <scimesh/transforms.h>
+#include <scimesh/normals.h>
+#include <scimesh/primitives.h>
+#include <scimesh/colormap.h>
+#include <scimesh/to_string.h>
+#include <scimesh/stl_io.h>
+#include <scimesh/obj_io.h>
+#include <scimesh/ply_io.h>
 
 using namespace Rcpp;
 

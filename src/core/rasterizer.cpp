@@ -1,5 +1,5 @@
-#include "rasterizer.h"
-#include "math_utils.h"
+#include <scimesh/rasterizer.h>
+#include <scimesh/math_utils.h>
 #include <algorithm>
 #include <cmath>
 

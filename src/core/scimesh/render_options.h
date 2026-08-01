@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "types.h"
-#include "camera.h"
+#include <scimesh/types.h>
+#include <scimesh/camera.h>
 
 namespace scimesh {
 

@@ -1,10 +1,10 @@
 #include "catch_amalgamated.hpp"
-#include "primitives.h"
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
-#include "math_utils.h"
+#include <scimesh/primitives.h>
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/math_utils.h>
 
 #include <filesystem>
 #include "stb_image_write.h"

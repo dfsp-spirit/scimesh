@@ -1,4 +1,4 @@
-#include "image.h"
+#include <scimesh/image.h>
 #include <fstream>
 #include <cstring>
 #include <algorithm>

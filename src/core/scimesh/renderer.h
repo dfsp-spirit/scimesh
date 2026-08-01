@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "mesh.h"
-#include "scene.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
+#include <scimesh/mesh.h>
+#include <scimesh/scene.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
 
 namespace scimesh {
 

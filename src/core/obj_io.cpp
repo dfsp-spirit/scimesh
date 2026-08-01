@@ -1,7 +1,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
-#include "obj_io.h"
-#include "types.h"
+#include <scimesh/obj_io.h>
+#include <scimesh/types.h>
 
 #include <iostream>
 #include <fstream>

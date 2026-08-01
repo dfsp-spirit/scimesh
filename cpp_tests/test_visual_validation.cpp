@@ -1,11 +1,11 @@
 #include "catch_amalgamated.hpp"
 #include "test_meshes.h"
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "mesh.h"
-#include "scene.h"
-#include "image.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/mesh.h>
+#include <scimesh/scene.h>
+#include <scimesh/image.h>
 #include <filesystem>
 #include <cmath>
 

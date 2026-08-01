@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "types.h"
+#include <scimesh/types.h>
 #include <vector>
 #include <cstdint>
 #include <string>

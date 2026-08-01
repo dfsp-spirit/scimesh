@@ -12,13 +12,13 @@
 ///
 /// Output: bunny.png (1980x1020)
 
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "image.h"
-#include "normals.h"
-#include "ply_io.h"
-#include "types.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/image.h>
+#include <scimesh/normals.h>
+#include <scimesh/ply_io.h>
+#include <scimesh/types.h>
 
 #include <iostream>
 #include <cmath>

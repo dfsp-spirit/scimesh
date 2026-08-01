@@ -1,6 +1,6 @@
 #include "catch_amalgamated.hpp"
-#include "image.h"
-#include "to_string.h"
+#include <scimesh/image.h>
+#include <scimesh/to_string.h>
 #include <sstream>
 
 using namespace scimesh;

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "types.h"
-#include "scene.h"
+#include <scimesh/types.h>
+#include <scimesh/scene.h>
 
 namespace scimesh {
 

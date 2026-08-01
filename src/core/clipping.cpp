@@ -1,4 +1,4 @@
-#include "clipping.h"
+#include <scimesh/clipping.h>
 #include <algorithm>
 
 namespace scimesh {

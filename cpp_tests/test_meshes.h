@@ -3,7 +3,7 @@
 // Shared test mesh generators for the scimesh C++ test suite.
 // Provides procedurally-generated meshes for unit and integration tests.
 
-#include "mesh.h"
+#include <scimesh/mesh.h>
 #include <cmath>
 
 namespace scimesh_test {

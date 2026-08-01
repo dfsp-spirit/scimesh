@@ -28,33 +28,34 @@ The C++ renderer core lives in `src/core/`:
 
 | File | Purpose |
 |------|---------|
-| `renderer.h/cpp` | Main `Renderer` class |
-| `mesh.h` | `Mesh` struct (vertices, triangles, colors, UVs, normals) |
-| `scene.h` | `Scene` struct (collection of meshes) |
-| `camera.h/cpp` | `Camera` struct and auto-framing helpers |
-| `render_options.h` | `RenderOptions` struct (resolution, shading, lights, AA, etc.) |
-| `image.h/cpp` | `Image` struct (RGBA pixel buffer, PPM/BMP output) |
-| `primitives.h/cpp` | Procedural geometry generators |
-| `transforms.h/cpp` | Mesh translation, scaling, rotation |
-| `normals.h/cpp` | Vertex normal computation |
-| `clipping.h/cpp` | Triangle clipping against planes |
-| `rasterizer.h/cpp` | Scanline rasterizer with z-buffer |
-| `math_utils.h` | Inline math helpers |
+| `scimesh/renderer.h` | Main `Renderer` class |
+| `scimesh/mesh.h` | `Mesh` struct (vertices, triangles, colors, UVs, normals) |
+| `scimesh/scene.h` | `Scene` struct (collection of meshes) |
+| `scimesh/camera.h` | `Camera` struct and auto-framing helpers |
+| `scimesh/render_options.h` | `RenderOptions` struct (resolution, shading, lights, AA, etc.) |
+| `scimesh/image.h` | `Image` struct (RGBA pixel buffer, PPM/BMP output) |
+| `scimesh/primitives.h` | Procedural geometry generators |
+| `scimesh/transforms.h` | Mesh translation, scaling, rotation |
+| `scimesh/normals.h` | Vertex normal computation |
+| `scimesh/clipping.h` | Triangle clipping against planes |
+| `scimesh/rasterizer.h` | Scanline rasterizer with z-buffer |
+| `scimesh/math_utils.h` | Inline math helpers |
 | `third_party/glm/` | Vendored GLM math library (headers only) |
 
 To use scimesh in your own project, compile the `.cpp` files from
-`src/core/` alongside your code and add the include paths.
+`src/core/` alongside your code.  Headers are under `src/core/scimesh/`
+and included as `#include <scimesh/header.h>`.
 
 ## Minimal Example
 
 The simplest program builds a colored cube and renders it:
 
 ```cpp
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "primitives.h"
-#include "image.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/primitives.h>
+#include <scimesh/image.h>
 
 using namespace scimesh;
 
@@ -98,11 +99,11 @@ int main() {
 Instead of generating geometry, you can load a mesh from a PLY file:
 
 ```cpp
-#include "renderer.h"
-#include "camera.h"
-#include "render_options.h"
-#include "ply_io.h"
-#include "image.h"
+#include <scimesh/renderer.h>
+#include <scimesh/camera.h>
+#include <scimesh/render_options.h>
+#include <scimesh/ply_io.h>
+#include <scimesh/image.h>
 
 using namespace scimesh;
 
@@ -333,7 +334,7 @@ scimesh can read and write several mesh formats:
 ### STL
 
 ```cpp
-#include "stl_io.h"
+#include <scimesh/stl_io.h>
 
 Mesh mesh = stl_io::read("model.stl");
 stl_io::write(mesh, "output.stl");         // binary
@@ -343,7 +344,7 @@ stl_io::write(mesh, "output.stl", true);   // ASCII
 ### Wavefront OBJ
 
 ```cpp
-#include "obj_io.h"
+#include <scimesh/obj_io.h>
 
 Mesh mesh = obj_io::read("model.obj");
 ```
@@ -354,7 +355,7 @@ For textured meshes, the texture image must be loaded separately.
 ### Stanford PLY
 
 ```cpp
-#include "ply_io.h"
+#include <scimesh/ply_io.h>
 
 Mesh mesh = ply_io::read("model.ply");
 ```
@@ -367,7 +368,7 @@ per-vertex colors.
 Generate primitives without external files:
 
 ```cpp
-#include "primitives.h"
+#include <scimesh/primitives.h>
 
 Mesh sphere = generate_sphere(
     Vec3(0, 0, 0),     // center
@@ -420,7 +421,7 @@ For rendering many instances at once (e.g., molecular atoms), use the
 merged variants that combine multiple primitives into a single mesh:
 
 ```cpp
-#include "primitives.h"
+#include <scimesh/primitives.h>
 
 std::vector<Vec3> centers = {Vec3(0,0,0), Vec3(2,0,0), Vec3(1,2,0)};
 std::vector<float> radii = {0.5f, 0.3f, 0.4f};
@@ -439,7 +440,7 @@ Mesh bonds = generate_multi_cylinders(starts, ends, radii, colors, 12);
 Transform vertices without modifying colors or normals:
 
 ```cpp
-#include "transforms.h"
+#include <scimesh/transforms.h>
 
 translate_mesh(mesh, Vec3(5, 0, 0));
 scale_mesh(mesh, 2.0f);

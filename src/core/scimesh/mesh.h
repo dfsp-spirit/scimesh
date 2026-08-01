@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "types.h"
-#include "image.h"
+#include <scimesh/types.h>
+#include <scimesh/image.h>
 #include <vector>
 #include <cmath>
 

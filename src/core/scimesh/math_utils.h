@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "types.h"
+#include <scimesh/types.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 
