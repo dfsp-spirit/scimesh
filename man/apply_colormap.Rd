@@ -14,53 +14,32 @@ apply_colormap(
 }
 \arguments{
 \item{data}{A numeric vector, or a list of numeric vectors for
-multi-dataset mapping (e.g., \code{list(lh_data, rh_data)}).}
+multi-dataset mapping (e.g., list(lh_data, rh_data)).}
 
-\item{colormap}{A colormap specification. Can be: (1) a function
-\code{f(n)} that returns \code{n} hex colour strings (e.g.,
-\code{viridis_colormap}), (2) a character vector of hex colour
-strings, or (3) an Nx3 or Nx4 numeric matrix of RGBA values in
-[0, 1]. Default is \code{viridis_colormap(256L)}.}
+\item{colormap}{A colormap specification: a function f(n) returning
+n hex colour strings (e.g., viridis_colormap), a character vector
+of hex colours, or an Nx3/Nx4 matrix of RGBA values in [0,1].
+Default is viridis_colormap(256L).}
 
-\item{limits}{Controls how the data value range is determined:
-\itemize{
-  \item \code{NULL} (default): auto-detect from finite values
-    (after winsorizing, if applicable).
-  \item \code{c(min, max)}: explicit fixed range shared by all
-    datasets.
-  \item \code{"global"}: pool all finite values across all datasets
-    to compute a single shared range.
-  \item \code{"each"}: each dataset gets its own independent range
-    (equivalent to \code{limits=NULL, global_range=FALSE}).
-}}
+\item{limits}{How the data value range is determined. NULL (default)
+auto-detects from finite values after winsorizing. c(min, max)
+sets an explicit fixed range. "global" pools all datasets for a
+shared range. "each" uses independent per-dataset ranges.}
 
-\item{nan_color}{Numeric vector of length 3 or 4 specifying the RGBA
-colour for \code{NaN} or \code{NA} values. Values are in [0, 1].
-Default is \code{c(0.5, 0.5, 0.5, 1.0)} (opaque mid-grey).}
+\item{nan_color}{RGBA colour for NaN/NA values as a length-3 (RGB)
+or length-4 (RGBA) numeric vector in [0,1]. Default mid-grey.}
 
-\item{winsor_percentiles}{A numeric vector \code{c(lower, upper)}
-specifying percentile cutoffs for outlier clipping. Values below the
-lower percentile are clamped to the lower cutoff; values above the
-upper percentile are clamped to the upper cutoff. Applied before
-computing the effective range. \code{NULL} (default) disables
-winsorizing. Example: \code{c(0.02, 0.98)} clips the lowest 2% and
-highest 2% of values.}
+\item{winsor_percentiles}{Optional c(lower, upper) percentiles for
+outlier clipping, e.g. c(0.02, 0.98). NULL disables winsorizing.}
 }
 \value{
-If \code{data} is a single numeric vector, returns an Nx4
-  numeric matrix of RGBA colours (one row per data value). If
-  \code{data} is a list, returns a list of Nx4 matrices.
+If data is a single vector: an Nx4 numeric matrix of RGBA
+  colours. If data is a list: a list of Nx4 matrices.
 
-  The returned object carries attributes with metadata:
-  \itemize{
-    \item For single-dataset results:
-      \code{data_min}, \code{data_max}, \code{raw_min}, \code{raw_max},
-      \code{winsor_lo}, \code{winsor_hi}, \code{nan_count}.
-    \item For multi-dataset results:
-      \code{pooled_data_min}, \code{pooled_data_max} (use for a shared
-      colourbar), \code{data_ranges} (per-dataset min/max),
-      \code{winsor_cutoffs}, \code{nan_counts}.
-  }
+  Attributes on the result provide metadata. Single-dataset:
+  data_min, data_max, raw_min, raw_max, winsor_lo, winsor_hi,
+  nan_count. Multi-dataset: pooled_data_min, pooled_data_max (use
+  for a colourbar), data_ranges, winsor_cutoffs, nan_counts.
 }
 \description{
 Maps numeric per-vertex (or per-element) data to RGBA colours using a
@@ -68,37 +47,19 @@ colormap. Handles multi-dataset data (e.g., two brain hemispheres),
 NaN values, and optional outlier clipping via winsorizing.
 }
 \examples{
-# Single dataset — no winsorizing
 data <- c(1.2, 3.4, NA, 2.1, 5.0, 2.8)
 colors <- apply_colormap(data)
-# attr(colors, "data_min")  → effective min
-# attr(colors, "data_max")  → effective max
 
-# Single dataset — with outlier clipping
-noisy <- c(rnorm(95, mean=50, sd=10), 200, -50)  # two outliers
+noisy <- c(rnorm(95, mean = 50, sd = 10), 200, -50)
 colors <- apply_colormap(noisy, winsor_percentiles = c(0.02, 0.98))
 
-# Two hemispheres — shared colour scale
-lh_data <- c(2.3, 2.1, NA, 3.4)   # left hemisphere
-rh_data <- c(2.5, 2.0, NA, 3.1)   # right hemisphere
-colors <- apply_colormap(
-    list(lh_data, rh_data),
+lh <- c(2.3, 2.1, NA, 3.4)
+rh <- c(2.5, 2.0, NA, 3.1)
+
+colors <- apply_colormap(list(lh, rh),
     colormap = viridis_colormap(256L),
     limits = "global",
     winsor_percentiles = c(0.02, 0.98),
-    nan_color = c(1, 1, 1, 1)  # white for missing (medial wall)
-)
-# colors[[1]] — RGBA for left hemisphere
-# colors[[2]] — RGBA for right hemisphere
-# attr(colors, "pooled_data_min/max") — use for colourbar
-
-# Use with render_mesh
-\dontrun{
-mesh_colors <- apply_colormap(thickness_data,
-                              winsor_percentiles = c(0.02, 0.98))
-render_mesh(vertices, triangles,
-            colors = mesh_colors,
-            camera = cam, options = opts)
-}
+    nan_color = c(1, 1, 1, 1))
 
 }
