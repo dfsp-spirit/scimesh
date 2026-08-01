@@ -67,6 +67,9 @@ The R layer gives access to all C++ layer features, and adds on top:
 - Colorbars (and using them during image composition)
 
 
+If you need colorbars in C++, have a look at [scibar](https://github.com/dfsp-spirit/scibar).
+
+
 ## What scimesh is not
 
 - Not a plotting framework — use ggplot2, lattice, or plotly for
