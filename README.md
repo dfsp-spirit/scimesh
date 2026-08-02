@@ -195,6 +195,7 @@ write_png(img, "sphere.png")
 | [`examples/cpp/whole_brain_sulc_fsaverage/`](examples/cpp/whole_brain_sulc_fsaverage/) | C++ | Same on fsaverage template |
 | [`examples/cpp/whole_brain_annot/`](examples/cpp/whole_brain_annot/) | C++ | Cortical parcellation visualization |
 | [`examples/cpp/brain_video/`](examples/cpp/brain_video/) | C++ | Turntable brain animation via camera_orbit() |
+| [`examples/cpp/full_CLI_renderer/`](examples/cpp/full_CLI_renderer/) | C++ | Self-contained CLI renderer with TOML config + CLI overrides |
 
 
 ## Acknowledgements
