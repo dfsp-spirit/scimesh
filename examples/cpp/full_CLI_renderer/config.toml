@@ -8,7 +8,8 @@ width    = 800
 height   = 600
 
 [mesh]
-file = ""                     # path to .obj/.ply/.stl file (required, or set via CLI)
+file = ""                     # path to .obj/.ply/.stl/.white file (required, or set via CLI)
+format = ""                   # force format: "obj", "ply", "stl", or "fs" (empty = auto-detect by extension)
 color = [0.7, 0.7, 0.7]      # default mesh color (R, G, B in [0, 1]) if mesh has no vertex colors
 compute_normals = true        # auto-compute vertex normals if the file doesn't include them
 

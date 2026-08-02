@@ -12,7 +12,7 @@
 //   scimesh_render -h                                      # full help
 //
 // Supported mesh formats: Wavefront OBJ (.obj), PLY (.ply), STL (.stl),
-// FreeSurfer surface (.surf)
+// FreeSurfer surface (auto: .white; use --mesh-format fs for .pial, .sphere, etc.)
 // Supported image formats: PNG (.png), PPM (.ppm), BMP (.bmp)
 //
 // Dependencies (vendored alongside this file):
@@ -63,6 +63,7 @@ struct AppConfig {
 
     // [mesh]
     std::string meshFile;
+    std::string meshFormat;   // empty = auto-detect; "obj", "ply", "stl", or "fs"
     float meshColorR = 0.7f;
     float meshColorG = 0.7f;
     float meshColorB = 0.7f;
@@ -133,7 +134,8 @@ static void printHelp(const char* prog) {
         "\n"
         "Options:\n"
         "  --config FILE       TOML config file (default: config.toml in cwd)\n"
-        "  --mesh FILE         Path to mesh file (.obj, .ply, .stl, .surf)\n"
+        "  --mesh FILE         Path to mesh file (.obj, .ply, .stl, .white)\n"
+        "  --mesh-format FMT    Force mesh format: obj, ply, stl, fs\n"
         "  --output FILE       Output filename without extension (default: render)\n"
         "  --format FMT        Output format: png, ppm, bmp (default: png)\n"
         "  --width N           Image width in pixels (default: 800)\n"
@@ -202,6 +204,7 @@ static AppConfig loadTOMLConfig(const std::string& path) {
         // [mesh]
         if (auto* ms = tbl["mesh"].as_table()) {
             cfg.meshFile       = (*ms)["file"].value_or("");
+            cfg.meshFormat     = (*ms)["format"].value_or("");
             cfg.computeNormals = (*ms)["compute_normals"].value_or(true);
             if (auto* col = (*ms)["color"].as_array()) {
                 if (col->size() >= 3) {
@@ -351,6 +354,8 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             configPath = nextStr();
         } else if (arg == "--mesh") {
             cfg.meshFile = nextStr();
+        } else if (arg == "--mesh-format") {
+            cfg.meshFormat = nextStr();
         } else if (arg == "--output") {
             cfg.filename = nextStr();
         } else if (arg == "--format") {
@@ -449,7 +454,26 @@ static std::string fileExtension(const std::string& path) {
 // Load mesh from file, auto-detecting format by extension
 // =========================================================================
 
-static Mesh loadMesh(const std::string& path) {
+static Mesh loadMesh(const std::string& path, const std::string& formatOverride) {
+    // If the user specified a format override, use it.
+    std::string fmt = lowerCase(formatOverride);
+    if (fmt == "obj") {
+        return scimesh::obj_io::read_obj(path);
+    } else if (fmt == "ply") {
+        return scimesh::ply_io::read_ply(path);
+    } else if (fmt == "stl") {
+        return scimesh::stl_io::read_stl(path);
+    } else if (fmt == "fs") {
+        fs::Mesh fs_mesh;
+        fs::read_surf(&fs_mesh, path);
+        return scimesh::convert_fs_mesh(fs_mesh);
+    } else if (!fmt.empty()) {
+        fprintf(stderr, "Error: unknown mesh format '%s'. Use obj, ply, stl, or fs.\n",
+                formatOverride.c_str());
+        exit(1);
+    }
+
+    // Auto-detect by file extension
     std::string ext = fileExtension(path);
     if (ext == ".obj") {
         return scimesh::obj_io::read_obj(path);
@@ -457,13 +481,14 @@ static Mesh loadMesh(const std::string& path) {
         return scimesh::ply_io::read_ply(path);
     } else if (ext == ".stl") {
         return scimesh::stl_io::read_stl(path);
-    } else if (ext == ".surf") {
+    } else if (ext == ".white") {
         fs::Mesh fs_mesh;
         fs::read_surf(&fs_mesh, path);
         return scimesh::convert_fs_mesh(fs_mesh);
     } else {
         fprintf(stderr, "Error: unsupported file extension '%s'\n", ext.c_str());
-        fprintf(stderr, "Supported formats: .obj, .ply, .stl, .surf\n");
+        fprintf(stderr, "Supported formats: .obj, .ply, .stl, .white\n");
+        fprintf(stderr, "Use --mesh-format fs for other FreeSurfer files (.pial, .sphere, etc.)\n");
         exit(1);
     }
 }
@@ -586,7 +611,7 @@ int main(int argc, char** argv) {
     std::cout << "Loading mesh: " << cfg.meshFile << std::endl;
     Mesh mesh;
     try {
-        mesh = loadMesh(cfg.meshFile);
+        mesh = loadMesh(cfg.meshFile, cfg.meshFormat);
     } catch (const std::exception& e) {
         fprintf(stderr, "Error loading mesh: %s\n", e.what());
         return 1;
