@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
     Camera base_cam = scimesh::camera_fit_scene(scene, view_dir, up, 45.0f, 1.1f);
 
     RenderOptions opts;
-    opts.width = 800;
-    opts.height = 600;
+    opts.width = 640;
+    opts.height = 480;
     opts.shading = ShadingMode::SMOOTH;
     opts.backface_culling = false;
     opts.background_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
