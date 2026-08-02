@@ -25,6 +25,7 @@ declare -a EXAMPLES=(
     bunny:bunny
     dragon:dragon
     brain_video:brain_video
+    'full_CLI_renderer:scimesh_render:--mesh ../../../../test_data/stanford_3d_scanning_repo/bunny/bun_zipper.ply --output full_cli_renderer_demo'
 )
 
 PASSED=()
@@ -33,6 +34,7 @@ FAILED=()
 run_one() {
     local dir="$1"
     local exe="$2"
+    local extra_args="$3"
 
     echo ""
     echo "============================================"
@@ -57,8 +59,8 @@ run_one() {
         return 1
     fi
 
-    echo "[run] $exe"
-    if "./$exe"; then
+    echo "[run] $exe $extra_args"
+    if "./$exe" $extra_args; then
         echo "  PASS"
         PASSED+=("$dir")
     else
@@ -69,9 +71,12 @@ run_one() {
 
 for entry in "${EXAMPLES[@]}"; do
     dir="${entry%%:*}"
-    exe="${entry##*:}"
+    rest="${entry#*:}"
+    exe="${rest%%:*}"
+    args="${rest#*:}"
+    [[ "$exe" == "$args" ]] && args=""
     [[ -z "$FILTER" || "$FILTER" == "$dir" ]] || continue
-    run_one "$dir" "$exe"
+    run_one "$dir" "$exe" "$args"
 done
 
 echo ""

@@ -1,0 +1,57 @@
+# scimesh CLI renderer — default configuration
+# All values can be overridden via command-line flags.
+
+[output]
+filename = "render"           # output filename (without extension)
+format   = "png"              # "png", "ppm", or "bmp"
+width    = 800
+height   = 600
+
+[mesh]
+file = ""                     # path to .obj/.ply/.stl file (required, or set via CLI)
+color = [0.7, 0.7, 0.7]      # default mesh color (R, G, B in [0, 1]) if mesh has no vertex colors
+compute_normals = true        # auto-compute vertex normals if the file doesn't include them
+
+[camera]
+projection = "perspective"    # "perspective" or "orthographic"
+fov        = 45.0             # field of view in degrees (perspective only)
+near       = 0.1              # near clipping plane
+far        = 0.0              # far clipping plane (0 = auto: 4× scene extent)
+margin     = 1.1              # extra margin around the scene (1.0 = tight fit)
+# Direction from camera to scene center (auto-normalized by camera_fit_scene).
+# The rendered view looks opposite this direction.
+view_dir   = [0.0, 0.0, 1.0]
+up         = [0.0, 1.0, 0.0]
+
+[shading]
+mode              = "smooth"  # "smooth" (Gouraud) or "flat" (faceted)
+backface_culling  = true
+invert_normals    = false
+
+[wireframe]
+enabled = false
+color   = [0.0, 0.0, 0.0]    # wireframe line color
+
+[antialiasing]
+samples = 1                   # supersampling: 1 (off), 2, 4, or 8
+
+[ssao]
+enabled   = false             # screen-space ambient occlusion
+radius    = 16.0              # sample radius in pixels
+intensity = 0.8               # darkening amount [0, 1]
+
+[background]
+color = [1.0, 1.0, 1.0]      # R, G, B in [0, 1]; alpha is always 1.0
+
+[lighting]
+ambient = 0.3                 # ambient light level [0, 1]
+
+[fog]
+enabled = false
+start   = 0.0                 # distance where fog begins
+end     = 0.0                 # distance where fog is fully opaque (0 = auto)
+color   = [0.5, 0.5, 0.5]   # fog color
+
+[post]
+crop_to_content = false       # trim transparent/background border after render
+grow_px         = 0           # add padding in pixels after cropping
