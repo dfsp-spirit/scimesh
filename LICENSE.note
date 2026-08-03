@@ -1,7 +1,7 @@
 # Third-Party Licenses
 
 This file lists all third-party code included in scimesh.
-The library itself is licensed under the [MIT License](../../LICENSE).
+The library itself is licensed under the MIT license.
 
 ---
 
