@@ -13,14 +13,14 @@ as part of the library.
 ### glm/
 
 - **Project:** [g-truc/glm](https://github.com/g-truc/glm)
-- **License:** Happy Bunny (MIT-like)
+- **License:** MIT or Happy Bunny (MIT-like)
 - **Usage:** Header-only C++ math library (vectors, matrices, geometric operations)
 
 ### tinyply.h / tinyply.cpp
 
 - **Project:** [ddiakopoulos/tinyply](https://github.com/ddiakopoulos/tinyply)
 - **Author:** Dimitri Diakopoulos
-- **License:** Public Domain
+- **License:** Public Domain or BSD 2-Clause
 - **Usage:** PLY mesh file reader
 
 ### tiny_obj_loader.h
@@ -48,12 +48,12 @@ as part of the library.
 
 - **Project:** [nothings/stb](https://github.com/nothings/stb)
 - **Author:** Sean Barrett
-- **License:** Public Domain / MIT
+- **License:** Public Domain or MIT
 - **Usage:** Image loading (PNG, JPEG, BMP, etc.)
 
 ### stb_image_write.h
 
 - **Project:** [nothings/stb](https://github.com/nothings/stb)
 - **Author:** Sean Barrett
-- **License:** Public Domain / MIT
+- **License:** Public Domain or MIT
 - **Usage:** Image writing (PNG, BMP output)
