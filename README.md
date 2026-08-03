@@ -212,6 +212,8 @@ Thanks heaps to the authors of these great software packages that scimesh is bui
 
 And of course, thanks to the authors of the dependencies of these packages, and their dependencies...
 
+Detailed information on the licenses for all these packages (all MIT-compatible) can be found in the file [THIRD_PARTY_LICENSES.md](./src/third_party/THIRD_PARTY_LICENSES.md).
+
 *Note: This section is to give credit only. Users do **not** need to worry about installing these dependencies, they come vendored with scimesh already.*
 
 
