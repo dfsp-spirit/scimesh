@@ -9,7 +9,7 @@ render_options(
   height = 600L,
   shading = c("smooth", "flat"),
   backface_culling = TRUE,
-  background_color = c(0, 0, 0, 0),
+  background_color = c(1, 1, 1, 1),
   default_color = c(0.7, 0.7, 0.7, 1),
   invert_normals = FALSE,
   wireframe = FALSE,
