@@ -149,6 +149,12 @@ constexpr Color DEFAULT_COLOR{0.7f, 0.7f, 0.7f, 1.0f};
 /// @see Color
 constexpr Color TRANSPARENT_BLACK{0.0f, 0.0f, 0.0f, 0.0f};
 
+/// @brief An opaque white color (1, 1, 1, 1).
+///
+/// Convenience constant for backgrounds.
+/// @see Color
+constexpr Color WHITE{1.0f, 1.0f, 1.0f, 1.0f};
+
 // ---------------------------------------------------------------------------
 //  Light
 // ---------------------------------------------------------------------------

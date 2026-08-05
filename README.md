@@ -140,6 +140,7 @@ cam <- camera_auto(sphere, direction = c(1.2, 0.8, 1))
 img_shaded <- render_mesh(sphere$vertices, sphere$triangles,
     colors = sphere$colors, camera = cam,
     options = render_options(
+        background_color = c(1, 1, 1, 1),
         lights = list(
             list(position = c(0.5, 1.0, 0.8), intensity = 1.5),
             list(position = c(-0.5, 0.2, 0.6), intensity = 0.5))))
@@ -149,6 +150,7 @@ img_wire <- render_mesh(sphere$vertices, sphere$triangles,
     colors = sphere$colors, camera = cam,
     options = render_options(wireframe = TRUE,
         wireframe_color = c(0, 0, 0, 1),
+        background_color = c(1, 1, 1, 1),
         backface_culling = FALSE))
 
 # Side-by-side

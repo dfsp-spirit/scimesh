@@ -111,11 +111,11 @@ struct RenderOptions {
     /// @name Colors
     /// @{
 
-    /// @brief Background color (default: transparent black).
+    /// @brief Background color (default: opaque white).
     ///
     /// Pixels not covered by any triangle get this color.
-    /// @see TRANSPARENT_BLACK
-    Color background_color = TRANSPARENT_BLACK;
+    /// @see WHITE
+    Color background_color = WHITE;
 
     /// @brief Default color for meshes without explicit vertex/face colors.
     ///
