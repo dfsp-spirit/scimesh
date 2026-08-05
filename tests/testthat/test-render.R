@@ -5,7 +5,7 @@ test_that("render_options returns valid defaults", {
     expect_equal(opts$height, 600L)
     expect_equal(opts$shading, "smooth")
     expect_true(opts$backface_culling)
-    expect_equal(opts$background_color, c(0, 0, 0, 0))
+    expect_equal(opts$background_color, c(1, 1, 1, 1))
     expect_equal(opts$default_color, c(0.7, 0.7, 0.7, 1))
     expect_false(opts$invert_normals)
     expect_false(opts$wireframe)
