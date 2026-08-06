@@ -17,3 +17,20 @@ OBJECTS = rcpp_bindings.o \
     core/transforms.o \
     core/obj_io.o \
     core/ply_io.o
+
+# Cross-platform stripping to keep package size under CRAN's 5MB limit
+# macOS uses BSD/Xcode strip (needs -x), Linux uses GNU strip (needs --strip-debug)
+ifeq ($(shell uname -s),Darwin)
+  STRIP_FLAGS = -x
+else
+  STRIP_FLAGS = --strip-debug
+endif
+
+# Override the default linking rule to include stripping
+%.so: %.o
+	$(SHLIB_LINK) -o $@ $^ $(SHLIB_LIBADD)
+	if [ -n "$(STRIP_STATIC_LIBS)" ]; then \
+		$(STRIP) $(STRIP_FLAGS) $@; \
+	else \
+		$(STRIP) $(STRIP_FLAGS) $@; \
+	fi
