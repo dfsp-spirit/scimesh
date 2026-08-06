@@ -5,7 +5,7 @@ scimesh Changes
 Version 0.3.1
 --------------
 - FIX: make R package compile again unter MacOS by avoiding strip --strip-debug in Makevars, the MacOS version of strip does not support --strip-debug.
-- NEW: add TGA output support for Image class (C++ and R)
+- NEW: add TGA image export (own uncompressed true-color writer, no dependencies) to the C++ layer and the R layer via new `write_tga()` function (32-bit RGBA default, optional 24-bit RGB)
 - improve all c++ doc strings for better API docs
 - DEP: update libfs to commit 2641453 which fixes version define typo
 - CHG: default to white instead of transparent background
@@ -20,7 +20,6 @@ Version 0.3.0
 - SEC: Update libfs to v0.4.1
 - DOC: dramatically improve all doc strings, integrate CPP_GETTING_STARTED into API docs
 - NEW: add colorbar application functions (C++ and R)
-- NEW: add TGA image export (own uncompressed true-color writer, no dependencies) to the C++ layer and the R layer via new `write_tga()` function (32-bit RGBA default, optional 24-bit RGB)
 
 
 Version 0.2.8 -- Changes for CRAN submission only
