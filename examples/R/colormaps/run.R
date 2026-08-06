@@ -61,7 +61,7 @@ img_viridis <- render_mesh(torus$vertices, torus$triangles,
 cbar_viridis <- colorbar_vertical(viridis_colormap,
     width = 60, height = opts$height, data_range = range(torus_data),
     ticks = pretty(range(torus_data), n = 5), title = "Viridis")
-out_viridis <- stack_horizontal(img_viridis, cbar_viridis)
+out_viridis <- stack_horizontal(img_viridis, colorbar = cbar_viridis)
 write_png(out_viridis, output_file_viridis)
 cat(sprintf("  -> %s (%dx%d)\n", output_file_viridis,
     out_viridis$width, out_viridis$height))
@@ -75,7 +75,7 @@ img_diverging <- render_mesh(torus$vertices, torus$triangles,
 cbar_diverging <- colorbar_vertical(diverging_colormap,
     width = 60, height = opts$height, data_range = range(torus_data),
     ticks = pretty(range(torus_data), n = 5), title = "Diverging")
-out_diverging <- stack_horizontal(img_diverging, cbar_diverging)
+out_diverging <- stack_horizontal(img_diverging, colorbar = cbar_diverging)
 write_png(out_diverging, output_file_diverging)
 cat(sprintf("  -> %s (%dx%d)\n", output_file_diverging,
     out_diverging$width, out_diverging$height))
@@ -91,7 +91,7 @@ cbar_custom <- colorbar_vertical(my_inferno,
     width = 60, height = opts$height, data_range = range(torus_data),
     ticks = pretty(range(torus_data), n = 5),
     title = expression(Inferno ~ "(base R)"))
-out_custom <- stack_horizontal(img_custom, cbar_custom)
+out_custom <- stack_horizontal(img_custom, colorbar = cbar_custom)
 write_png(out_custom, output_file_custom)
 cat(sprintf("  -> %s (%dx%d)\n", output_file_custom,
     out_custom$width, out_custom$height))
@@ -109,7 +109,7 @@ if (requireNamespace("viridisLite", quietly = TRUE)) {
         width = 60, height = opts$height, data_range = range(torus_data),
         ticks = pretty(range(torus_data), n = 5),
         title = "viridis\n(viridisLite)")
-    out_vr <- stack_horizontal(img_vr, cbar_vr)
+    out_vr <- stack_horizontal(img_vr, colorbar = cbar_vr)
     write_png(out_vr, output_file_viridis)
     cat(sprintf("  -> %s (%dx%d) [viridisLite version]\n",
         output_file_viridis, out_vr$width, out_vr$height))
@@ -122,7 +122,7 @@ if (requireNamespace("viridisLite", quietly = TRUE)) {
     cbar_magma <- colorbar_vertical(magma_cmap,
         width = 60, height = opts$height, data_range = range(torus_data),
         ticks = pretty(range(torus_data), n = 5), title = "Magma")
-    out_magma <- stack_horizontal(img_magma, cbar_magma)
+    out_magma <- stack_horizontal(img_magma, colorbar = cbar_magma)
     write_png(out_magma, "colormaps_magma.png")
     cat(sprintf("  -> colormaps_magma.png (%dx%d)\n",
         out_magma$width, out_magma$height))
@@ -135,7 +135,7 @@ if (requireNamespace("viridisLite", quietly = TRUE)) {
     cbar_inferno <- colorbar_vertical(inferno_cmap,
         width = 60, height = opts$height, data_range = range(torus_data),
         ticks = pretty(range(torus_data), n = 5), title = "Inferno")
-    out_inferno <- stack_horizontal(img_inferno, cbar_inferno)
+    out_inferno <- stack_horizontal(img_inferno, colorbar = cbar_inferno)
     write_png(out_inferno, "colormaps_inferno.png")
     cat("  -> colormaps_inferno.png\n")
 }
