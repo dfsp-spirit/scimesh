@@ -9,6 +9,7 @@ Version 0.3.0
 - SEC: Update libfs to v0.4.1
 - DOC: dramatically improve all doc strings, integrate CPP_GETTING_STARTED into API docs
 - NEW: add colorbar application functions (C++ and R)
+- NEW: add TGA image export (own uncompressed true-color writer, no dependencies) to the C++ layer and the R layer via new `write_tga()` function (32-bit RGBA default, optional 24-bit RGB)
 
 
 Version 0.2.8 -- Changes for CRAN submission only

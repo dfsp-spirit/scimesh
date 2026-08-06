@@ -2,6 +2,8 @@
 #include <scimesh/image.h>
 #include <scimesh/to_string.h>
 #include <sstream>
+#include <fstream>
+#include <cstdint>
 
 using namespace scimesh;
 
@@ -70,6 +72,148 @@ TEST_CASE("Image write_bmp creates valid file", "[image]") {
     img.set_pixel(0, 0, 255, 0, 0, 255);
     img.set_pixel(7, 7, 0, 255, 0, 255);
     REQUIRE(img.write_bmp("test_output.bmp"));
+}
+
+// ---- TGA test helpers ------------------------------------------------------
+
+struct TgaImageData {
+    int width = 0;
+    int height = 0;
+    int bpp = 0;
+    unsigned char descriptor = 0;
+    std::vector<uint8_t> pixels;  // RGBA, top-left origin
+};
+
+// Minimal TGA reader for tests — uncompressed true-color (type 2), 24/32-bit,
+// no color map, no image ID. Assumes top-left origin (0x20 descriptor bit).
+static bool read_tga(const std::string &path, TgaImageData &img) {
+    std::ifstream in(path, std::ios::binary);
+    if (!in) return false;
+
+    unsigned char hdr[18];
+    in.read(reinterpret_cast<char *>(hdr), 18);
+    if (!in) return false;
+    if (hdr[0] != 0) return false;                  // no image ID
+    if (hdr[1] != 0) return false;                  // no color map
+    if (hdr[2] != 2) return false;                  // uncompressed true-color
+
+    img.width  = hdr[12] | (hdr[13] << 8);
+    img.height = hdr[14] | (hdr[15] << 8);
+    img.bpp    = hdr[16];
+    img.descriptor = hdr[17];
+    if (img.bpp != 24 && img.bpp != 32) return false;
+    if ((img.descriptor & 0x20) == 0) return false; // tests assume top-left
+
+    const int bytes_per_pixel = img.bpp / 8;
+    img.pixels.assign(static_cast<size_t>(img.width) * img.height * 4, 0);
+
+    std::vector<uint8_t> row(static_cast<size_t>(img.width) * bytes_per_pixel);
+    for (int y = 0; y < img.height; ++y) {
+        in.read(reinterpret_cast<char *>(row.data()),
+                static_cast<std::streamsize>(row.size()));
+        if (!in) return false;
+        size_t o = 0;
+        for (int x = 0; x < img.width; ++x) {
+            uint8_t b = row[o++];
+            uint8_t g = row[o++];
+            uint8_t r = row[o++];
+            uint8_t a = (bytes_per_pixel == 4) ? row[o++] : 255;
+            size_t idx = (static_cast<size_t>(y) * img.width + x) * 4;
+            img.pixels[idx]     = r;
+            img.pixels[idx + 1] = g;
+            img.pixels[idx + 2] = b;
+            img.pixels[idx + 3] = a;
+        }
+    }
+    return true;
+}
+
+TEST_CASE("Image write_tga 32-bit roundtrip", "[image][tga]") {
+    Image img(3, 2);
+    img.set_pixel(0, 0, 255, 0, 0, 255);      // red
+    img.set_pixel(1, 0, 0, 255, 0, 255);      // green
+    img.set_pixel(2, 0, 0, 0, 255, 255);      // blue
+    img.set_pixel(0, 1, 255, 255, 255, 255);  // white
+    img.set_pixel(1, 1, 255, 0, 0, 128);      // red, alpha 128
+    img.set_pixel(2, 1, 0, 0, 0, 255);        // black
+
+    REQUIRE(img.write_tga("test_output.tga"));
+
+    // File size must be exactly 18-byte header + W*H*4.
+    std::ifstream in("test_output.tga", std::ios::binary | std::ios::ate);
+    REQUIRE(in.good());
+    REQUIRE(in.tellg() == 18 + 3 * 2 * 4);
+
+    TgaImageData tga;
+    REQUIRE(read_tga("test_output.tga", tga));
+    REQUIRE(tga.width == 3);
+    REQUIRE(tga.height == 2);
+    REQUIRE(tga.bpp == 32);
+    REQUIRE((tga.descriptor & 0x20) != 0);   // top-left origin
+    REQUIRE((tga.descriptor & 0x0F) == 8);   // 8 alpha bits
+
+    // Every pixel must round-trip exactly (RGBA) — proves the BGR swap.
+    for (int y = 0; y < 2; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            uint8_t r, g, b, a;
+            img.get_pixel(x, y, r, g, b, a);
+            size_t idx = (static_cast<size_t>(y) * 3 + x) * 4;
+            REQUIRE(tga.pixels[idx] == r);
+            REQUIRE(tga.pixels[idx + 1] == g);
+            REQUIRE(tga.pixels[idx + 2] == b);
+            REQUIRE(tga.pixels[idx + 3] == a);
+        }
+    }
+}
+
+TEST_CASE("Image write_tga 24-bit roundtrip", "[image][tga]") {
+    Image img(3, 2);
+    img.set_pixel(0, 0, 255, 0, 0, 255);
+    img.set_pixel(1, 0, 0, 255, 0, 255);
+    img.set_pixel(2, 0, 0, 0, 255, 255);
+    img.set_pixel(0, 1, 255, 255, 255, 255);
+    img.set_pixel(1, 1, 255, 0, 0, 128);      // alpha dropped in 24-bit
+    img.set_pixel(2, 1, 0, 0, 0, 255);
+
+    REQUIRE(img.write_tga("test_output_24.tga", true));
+
+    // File size must be exactly 18-byte header + W*H*3.
+    std::ifstream in("test_output_24.tga", std::ios::binary | std::ios::ate);
+    REQUIRE(in.good());
+    REQUIRE(in.tellg() == 18 + 3 * 2 * 3);
+
+    TgaImageData tga;
+    REQUIRE(read_tga("test_output_24.tga", tga));
+    REQUIRE(tga.width == 3);
+    REQUIRE(tga.height == 2);
+    REQUIRE(tga.bpp == 24);
+    REQUIRE((tga.descriptor & 0x20) != 0);   // top-left origin
+    REQUIRE((tga.descriptor & 0x0F) == 0);   // no alpha bits
+
+    // RGB preserved; alpha forced opaque (24-bit has no alpha channel).
+    for (int y = 0; y < 2; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            uint8_t r, g, b, a;
+            img.get_pixel(x, y, r, g, b, a);
+            size_t idx = (static_cast<size_t>(y) * 3 + x) * 4;
+            REQUIRE(tga.pixels[idx] == r);
+            REQUIRE(tga.pixels[idx + 1] == g);
+            REQUIRE(tga.pixels[idx + 2] == b);
+            REQUIRE(tga.pixels[idx + 3] == 255);
+        }
+    }
+}
+
+TEST_CASE("Image write_tga unwritable path returns false", "[image][tga]") {
+    Image img(2, 2);
+    img.clear(255, 255, 255, 255);
+    REQUIRE_FALSE(img.write_tga("/nonexistent_dir_xyz/out.tga"));
+}
+
+TEST_CASE("Image write_tga rejects empty image", "[image][tga]") {
+    Image img(0, 0);
+    REQUIRE_FALSE(img.write_tga("test_empty.tga"));
+    REQUIRE_FALSE(std::ifstream("test_empty.tga").good());
 }
 
 static Image make_2x2() {

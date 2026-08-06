@@ -449,6 +449,56 @@ bool Image::write_bmp(const std::string &filename) const {
     return f.good();
 }
 
+bool Image::write_tga(const std::string &filename, bool use24bit) const {
+    if (width <= 0 || height <= 0 || pixels.empty())
+        return false;
+
+    const int bytes_per_pixel = use24bit ? 3 : 4;
+
+    std::ofstream f(filename, std::ios::binary);
+    if (!f)
+        return false;
+
+    // 18-byte TGA 2.0 header. Fields not set explicitly below are zero:
+    //   [0] ID length (0)          [1] color map type (0 = none)
+    //   [2] image type (2 = uncompressed true-color)
+    //   [3..7]  color map spec (all 0)       [8..11] x/y origin (0)
+    //   [12..13] width (LE)        [14..15] height (LE)
+    //   [16] pixel depth           [17] image descriptor
+    uint8_t header[18] = {0};
+    header[2] = 2;                           // uncompressed true-color
+    header[12] = static_cast<uint8_t>(width & 0xFF);
+    header[13] = static_cast<uint8_t>((width >> 8) & 0xFF);
+    header[14] = static_cast<uint8_t>(height & 0xFF);
+    header[15] = static_cast<uint8_t>((height >> 8) & 0xFF);
+    header[16] = static_cast<uint8_t>(use24bit ? 24 : 32);
+    header[17] = 0x20;                       // top-left origin
+    if (!use24bit) header[17] |= 0x08;       // 8 attribute (alpha) bits
+
+    f.write(reinterpret_cast<const char *>(header), sizeof(header));
+    if (!f)
+        return false;
+
+    // Pixel data: TGA stores BGR(A) order, our buffer is RGBA. Swap R/B.
+    // The renderer stores row 0 as the top row, matching TGA top-left origin.
+    std::vector<uint8_t> row(static_cast<size_t>(width) * bytes_per_pixel);
+    for (int y = 0; y < height; ++y) {
+        size_t o = 0;
+        for (int x = 0; x < width; ++x) {
+            int idx = (y * width + x) * 4;
+            row[o++] = pixels[idx + 2];      // B
+            row[o++] = pixels[idx + 1];      // G
+            row[o++] = pixels[idx];          // R
+            if (!use24bit) row[o++] = pixels[idx + 3];  // A (32-bit only)
+        }
+        f.write(reinterpret_cast<const char *>(row.data()),
+                static_cast<std::streamsize>(row.size()));
+        if (!f)
+            return false;
+    }
+    return true;
+}
+
 bool Image::write_png(const std::string &filename) const {
     if (width <= 0 || height <= 0 || pixels.empty())
         return false;

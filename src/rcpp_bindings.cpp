@@ -743,6 +743,21 @@ bool scimesh_write_png(List image, CharacterVector filename) {
     return img.write_png(as<std::string>(filename));
 }
 
+// [[Rcpp::export]]
+bool scimesh_write_tga(List image, CharacterVector filename,
+                       bool use24bit = false) {
+    int width = as<int>(image["width"]);
+    int height = as<int>(image["height"]);
+    RawVector pixels = image["pixels"];
+
+    scimesh::Image img;
+    img.width = width;
+    img.height = height;
+    img.pixels.assign(pixels.begin(), pixels.end());
+
+    return img.write_tga(as<std::string>(filename), use24bit);
+}
+
 // ---- Image manipulation -------------------------------------------------------
 // [[Rcpp::export]]
 List scimesh_image_crop(List image, int x, int y, int w, int h) {

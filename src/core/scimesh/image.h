@@ -72,6 +72,7 @@ enum class CropContentDirection {
 /// img.write_png("output.png");   // PNG (recommended)
 /// img.write_ppm("output.ppm");   // PPM (simple text/binary format, for debugging)
 /// img.write_bmp("output.bmp");   // BMP (for debugging)
+/// img.write_tga("output.tga");   // TGA (uncompressed true-color, no dependencies)
 /// @endcode
 ///
 /// @see Mesh::texture, Renderer
@@ -293,6 +294,22 @@ struct Image {
     ///
     /// @see write_png(), write_ppm()
     bool write_bmp(const std::string &filename) const;
+
+    /// @brief Write the image as a TGA file (Truevision Targa).
+    ///
+    /// Writes an uncompressed true-color TGA file (image type 2) using
+    /// scimesh's own implementation (no external libraries).  The header
+    /// declares a top-left origin, matching the pixel layout produced by
+    /// the renderer.  Pixel data is stored BGR(A) per the TGA spec, so
+    /// red and blue channels are swapped on write.
+    ///
+    /// @param filename Output file path (should end with `.tga`).
+    /// @param use24bit If `true`, write 24-bit RGB (no alpha channel).
+    ///                 Default `false` writes 32-bit RGBA.
+    /// @return `true` on success.
+    ///
+    /// @see write_png(), write_bmp()
+    bool write_tga(const std::string &filename, bool use24bit = false) const;
 
     /// @brief Write the image as a PNG file.
     ///

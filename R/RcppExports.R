@@ -97,6 +97,10 @@ scimesh_write_png <- function(image, filename) {
     .Call(`_scimesh_scimesh_write_png`, image, filename)
 }
 
+scimesh_write_tga <- function(image, filename, use24bit = FALSE) {
+    .Call(`_scimesh_scimesh_write_tga`, image, filename, use24bit)
+}
+
 scimesh_image_crop <- function(image, x, y, w, h) {
     .Call(`_scimesh_scimesh_image_crop`, image, x, y, w, h)
 }

@@ -89,6 +89,7 @@ int main() {
     // 5. Save
     img.write_ppm("cube.ppm");
     img.write_bmp("cube.bmp");
+    img.write_tga("cube.tga");   // uncompressed true-color, no dependencies
 
     return 0;
 }
@@ -178,6 +179,9 @@ Compile the `.cpp` files from `../../src/core/` alongside `../main.cpp`
 with `-std=c++17`.
 
 > **Note:** If your code calls `write_png()`, add `-DSCIMESH_STB_WRITE_IMPL`.
+>
+> `write_tga()`, `write_bmp()` and `write_ppm()` need no extra defines — they
+> use scimesh's own writers.
 
 A runnable script that manually compiles one of our demos using `g++`:
 [`examples/cpp/all_primitives/build_manually.sh`](../examples/cpp/all_primitives/build_manually.sh).

@@ -429,7 +429,7 @@ test_that("image_crop_to_content LEFT removes left margin", {
     img$pixels <- as.raw(raw_bytes)
     # all columns are green except col 0 has red — not a great test...
     # let me build a better one
-    
+
     # Make a 4x2: only last 2 columns are red, first 2 columns are green bg
     raw <- as.raw(rep(c(rep(c(0, 255, 0, 255), 2), rep(c(255, 0, 0, 255), 2)), times = 2))
     img <- list(width = 4L, height = 2L, pixels = raw)
@@ -470,4 +470,107 @@ test_that("image_crop_to_content fully background zeroes dimensions", {
 test_that("image_crop_to_content invalid direction errors", {
     img <- .make_test_image(2, 2, 255, 0, 0, 255)
     expect_error(image_crop_to_content(img, "diagonal", c(0, 0, 0, 0)))
+})
+
+# --- Category 4: TGA export --------------------------------------------------
+
+# Minimal TGA reader for tests — uncompressed true-color (type 2), 24/32-bit,
+# no color map, no image ID. Assumes top-left origin (0x20 descriptor bit).
+# Note: TGA header fields are 0-indexed, R vectors are 1-indexed, so each
+# field index is +1.
+.read_tga <- function(path) {
+    con <- file(path, "rb")
+    on.exit(close(con))
+    hdr <- readBin(con, "raw", 18)
+    stopifnot(hdr[1L] == as.raw(0))   # no image ID
+    stopifnot(hdr[2L] == as.raw(0))   # no color map
+    stopifnot(hdr[3L] == as.raw(2))   # uncompressed true-color
+    w <- as.integer(hdr[14L]) * 256L + as.integer(hdr[13L])   # bytes 12/13
+    h <- as.integer(hdr[16L]) * 256L + as.integer(hdr[15L])   # bytes 14/15
+    bpp <- as.integer(hdr[17L])       # byte 16
+    descriptor <- as.integer(hdr[18L])  # byte 17
+    bppx <- bpp %/% 8L
+    stopifnot(bppx %in% c(3L, 4L))
+    stopifnot(bitwAnd(descriptor, 0x20) != 0)  # top-left origin
+
+    npix <- w * h
+    all_bytes <- readBin(con, "raw", npix * bppx)
+    # BGR(A) -> RGBA
+    m <- matrix(as.integer(all_bytes), ncol = bppx, byrow = TRUE)
+    r <- as.raw(m[, 3L]); g <- as.raw(m[, 2L]); b <- as.raw(m[, 1L])
+    a <- if (bppx == 4L) as.raw(m[, 4L]) else as.raw(rep(255L, npix))
+    list(width = w, height = h, bpp = bpp, descriptor = descriptor,
+         pixels = as.raw(as.vector(rbind(r, g, b, a))))
+}
+
+test_that("write_tga writes a file with a valid header", {
+    w <- 4L; h <- 4L
+    img <- .make_solid_image(w, h, c(1, 0, 0, 1))
+    fname <- file.path(tempdir(), "scimesh_test_tga_solid.tga")
+    ok <- write_tga(img, fname)
+    expect_true(ok)
+    expect_true(file.exists(fname))
+
+    tga <- .read_tga(fname)
+    expect_equal(tga$width, w)
+    expect_equal(tga$height, h)
+    expect_equal(tga$bpp, 32L)
+    expect_true(bitwAnd(tga$descriptor, 0x20) != 0)  # top-left origin
+    expect_equal(bitwAnd(tga$descriptor, 0x0F), 8L)  # 8 alpha bits
+
+    # Solid red everywhere
+    rgba <- matrix(as.integer(tga$pixels), ncol = 4L, byrow = TRUE)
+    expect_true(all(rgba[, 1L] == 255L))  # R
+    expect_true(all(rgba[, 2L] == 0L))    # G
+    expect_true(all(rgba[, 3L] == 0L))    # B
+    expect_true(all(rgba[, 4L] == 255L))  # A
+    unlink(fname)
+})
+
+test_that("write_tga round-trips RGBA with BGR swap", {
+    w <- 3L; h <- 2L
+    npix <- w * h
+    pixels <- raw(npix * 4L)
+    cols <- list(c(255, 0, 0, 255),   # red
+                 c(0, 255, 0, 255),   # green
+                 c(0, 0, 255, 255),   # blue
+                 c(255, 255, 255, 255),  # white
+                 c(255, 0, 0, 128),   # red, alpha 128
+                 c(0, 0, 0, 255))     # black
+    for (i in seq_len(npix)) {
+        off <- (i - 1L) * 4L
+        c_ <- cols[[i]]
+        pixels[off + 1L] <- as.raw(c_[1L])
+        pixels[off + 2L] <- as.raw(c_[2L])
+        pixels[off + 3L] <- as.raw(c_[3L])
+        pixels[off + 4L] <- as.raw(c_[4L])
+    }
+    img <- list(width = w, height = h, pixels = pixels)
+    fname <- file.path(tempdir(), "scimesh_test_tga_roundtrip.tga")
+    expect_true(write_tga(img, fname))
+
+    tga <- .read_tga(fname)
+    expect_equal(length(tga$pixels), npix * 4L)
+    expect_identical(tga$pixels, pixels)
+    unlink(fname)
+})
+
+test_that("write_tga 24-bit drops alpha", {
+    w <- 2L; h <- 2L
+    img <- .make_solid_image(w, h, c(0, 0.5, 1, 0.5))  # half alpha
+    fname <- file.path(tempdir(), "scimesh_test_tga_24.tga")
+    expect_true(write_tga(img, fname, use24bit = TRUE))
+
+    tga <- .read_tga(fname)
+    expect_equal(tga$bpp, 24L)
+    expect_equal(bitwAnd(tga$descriptor, 0x0F), 0L)  # no alpha bits
+    # Alpha forced to opaque (24-bit has no alpha channel)
+    alpha <- as.integer(tga$pixels[seq(4L, length(tga$pixels), by = 4L)])
+    expect_true(all(alpha == 255L))
+    unlink(fname)
+})
+
+test_that("write_tga to unwritable path returns FALSE", {
+    img <- .make_solid_image(2, 2, c(1, 0, 0, 1))
+    expect_false(write_tga(img, file.path(tempdir(), "no_such_dir_xyz", "out.tga")))
 })

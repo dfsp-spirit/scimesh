@@ -333,6 +333,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_write_tga
+bool scimesh_write_tga(List image, CharacterVector filename, bool use24bit);
+RcppExport SEXP _scimesh_scimesh_write_tga(SEXP imageSEXP, SEXP filenameSEXP, SEXP use24bitSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type image(imageSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type filename(filenameSEXP);
+    Rcpp::traits::input_parameter< bool >::type use24bit(use24bitSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_write_tga(image, filename, use24bit));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_image_crop
 List scimesh_image_crop(List image, int x, int y, int w, int h);
 RcppExport SEXP _scimesh_scimesh_image_crop(SEXP imageSEXP, SEXP xSEXP, SEXP ySEXP, SEXP wSEXP, SEXP hSEXP) {
@@ -539,6 +552,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
     {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
     {"_scimesh_scimesh_write_png", (DL_FUNC) &_scimesh_scimesh_write_png, 2},
+    {"_scimesh_scimesh_write_tga", (DL_FUNC) &_scimesh_scimesh_write_tga, 3},
     {"_scimesh_scimesh_image_crop", (DL_FUNC) &_scimesh_scimesh_image_crop, 5},
     {"_scimesh_scimesh_image_merge", (DL_FUNC) &_scimesh_scimesh_image_merge, 3},
     {"_scimesh_scimesh_image_grow", (DL_FUNC) &_scimesh_scimesh_image_grow, 6},

@@ -52,6 +52,31 @@ write_png <- function(image, filename) {
     invisible(scimesh_write_png(image, filename))
 }
 
+#' Write a rendered image to a TGA file
+#'
+#' Writes the output of \code{render_mesh()} or \code{render_scene()}
+#' to a TGA file using scimesh's own C++ TGA writer (no external
+#' dependencies).  TGA output is uncompressed true-color.
+#'
+#' @param image An image list returned by \code{render_mesh()} or
+#'   \code{render_scene()}.
+#' @param filename Output TGA file path.
+#' @param use24bit If \code{TRUE}, write 24-bit RGB (no alpha channel).
+#'   The default \code{FALSE} writes 32-bit RGBA.
+#'
+#' @examples
+#' mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+#' img <- render_mesh(mesh$vertices, mesh$triangles)
+#' tmp_file <- tempfile(fileext = ".tga")
+#' write_tga(img, tmp_file)
+#'
+#' @return No return value; called for side effects.
+#'
+#' @export
+write_tga <- function(image, filename, use24bit = FALSE) {
+    invisible(scimesh_write_tga(image, filename, use24bit))
+}
+
 #' Apply contrast adjustment to an image
 #'
 #' Applies a contrast stretch (S-curve) to the RGB channels of a
