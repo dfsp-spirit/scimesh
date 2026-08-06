@@ -2,6 +2,17 @@ scimesh Changes
 ===============
 
 
+Version 0.3.1
+--------------
+- FIX: make R package compile again unter MacOS by avoiding strip --strip-debug in Makevars, the MacOS version of strip does not support --strip-debug.
+- NEW: add TGA output support for Image class (C++ and R)
+- improve all c++ doc strings for better API docs
+- DEP: update libfs to commit 2641453 which fixes version define typo
+- CHG: default to white instead of transparent background
+- DOC: add cpp example that is a full command line program that renders meshes
+- DOC: add file in source tree that lists all third-party details with full licenses, see src/third_party/THIRD_PARTY_LICENSES.md (and a copy for R at LICENSE.note)
+
+
 Version 0.3.0
 ---------------
 - BRK: move scimesh code from src/core/ to src/core/scimesh and all required downstream adjustments. avoids conflicts with other libraries in C++ layer
