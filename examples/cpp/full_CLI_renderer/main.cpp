@@ -122,6 +122,7 @@ struct AppConfig {
     // [post]
     bool cropToContent = false;
     int  growPx = 0;
+    int  rotateDeg = 0;        // 0, 90, 180, or 270
 
     // [composite]
     bool compositeMode = false;
@@ -178,6 +179,7 @@ static void printHelp(const char* prog) {
         "  --fog-color R,G,B   Fog color [0-1] (default: 0.5,0.5,0.5)\n"
         "  --crop              Crop transparent/background border after render\n"
         "  --grow N            Add N pixels padding after cropping (default: 0)\n"
+        "  --rotate DEG        Rotate output 0/90/180/270 degrees CW (default: 0)\n"
         "  -h, --help          Show this help and exit\n"
         "\n"
         "Composite mode (image layout, no rendering):\n"
@@ -485,6 +487,8 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             cfg.cropToContent = true;
         } else if (arg == "--grow") {
             cfg.growPx = nextInt();
+        } else if (arg == "--rotate") {
+            cfg.rotateDeg = nextInt();
         } else if (arg == "--composite") {
             cfg.compositeMode = true;
         } else if (arg == "--cols") {
@@ -784,6 +788,16 @@ int main(int argc, char** argv) {
     Image img = renderer.render_scene(scene, cam, opts);
 
     // 10. Post-processing
+    if (cfg.rotateDeg != 0) {
+        int times = 0;
+        if (cfg.rotateDeg == 90)       times = 1;
+        else if (cfg.rotateDeg == 180) times = 2;
+        else if (cfg.rotateDeg == 270) times = 3;
+        else if (cfg.rotateDeg != 0) {
+            fprintf(stderr, "Warning: --rotate must be 0, 90, 180, or 270, ignored.\n");
+        }
+        for (int i = 0; i < times; ++i) img.rotate_90(true);
+    }
     if (cfg.cropToContent) {
         img.crop_to_content(CropContentDirection::ALL, opts.background_color);
     }
