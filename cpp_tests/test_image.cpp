@@ -513,3 +513,293 @@ TEST_CASE("to_string RenderOptions operator<<", "[to_string]") {
     REQUIRE(s.find("ssao") != std::string::npos);
     REQUIRE(s.find("aa=4") != std::string::npos);
 }
+
+// =========================================================================
+//  read_image
+// =========================================================================
+
+static Image make_solid(int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
+    Image img(w, h);
+    img.clear(r, g, b, a);
+    return img;
+}
+
+TEST_CASE("Image read_image roundtrip via PNG", "[image][read]") {
+    Image orig = make_solid(8, 6, 255, 128, 64, 255);
+    REQUIRE(orig.write_png("test_read_roundtrip.png"));
+
+    Image loaded = Image::read_image("test_read_roundtrip.png");
+    REQUIRE(loaded.width == 8);
+    REQUIRE(loaded.height == 6);
+    for (int y = 0; y < 6; ++y)
+        for (int x = 0; x < 8; ++x)
+            check_pixel(loaded, x, y, 255, 128, 64, 255);
+}
+
+TEST_CASE("Image read_image roundtrip via TGA", "[image][read]") {
+    Image orig(3, 2);
+    orig.set_pixel(0, 0, 255, 0, 0, 255);
+    orig.set_pixel(1, 0, 0, 255, 0, 255);
+    orig.set_pixel(2, 0, 0, 0, 255, 128);
+    REQUIRE(orig.write_tga("test_read_roundtrip.tga"));
+
+    Image loaded = Image::read_image("test_read_roundtrip.tga");
+    REQUIRE(loaded.width == 3);
+    REQUIRE(loaded.height == 2);
+    check_pixel(loaded, 0, 0, 255, 0, 0, 255);
+    check_pixel(loaded, 1, 0, 0, 255, 0, 255);
+    check_pixel(loaded, 2, 0, 0, 0, 255, 128);
+}
+
+TEST_CASE("Image read_image nonexistent file returns empty", "[image][read]") {
+    Image img = Image::read_image("/nonexistent_path_xyz/nope.png");
+    REQUIRE(img.width == 0);
+    REQUIRE(img.height == 0);
+    REQUIRE(img.pixels.empty());
+}
+
+// =========================================================================
+//  pad_to_size
+// =========================================================================
+
+TEST_CASE("Image pad_to_size centers smaller image", "[image][pad]") {
+    Image img = make_solid(2, 2, 255, 0, 0, 255);
+    img.pad_to_size(6, 4, Color(0, 1, 0, 1));
+    REQUIRE(img.width == 6);
+    REQUIRE(img.height == 4);
+    // center of padded image should contain original red
+    check_pixel(img, 2, 1, 255, 0, 0, 255);  // top-left of original
+    check_pixel(img, 3, 1, 255, 0, 0, 255);  // top-right of original
+    check_pixel(img, 2, 2, 255, 0, 0, 255);  // bottom-left of original
+    check_pixel(img, 3, 2, 255, 0, 0, 255);  // bottom-right of original
+    // border should be green
+    check_pixel(img, 0, 0, 0, 255, 0, 255);
+    check_pixel(img, 5, 0, 0, 255, 0, 255);
+    check_pixel(img, 0, 3, 0, 255, 0, 255);
+    check_pixel(img, 5, 3, 0, 255, 0, 255);
+}
+
+TEST_CASE("Image pad_to_size already at target is no-op", "[image][pad]") {
+    Image img = make_solid(4, 4, 255, 0, 0, 255);
+    img.pad_to_size(4, 4, Color(0, 1, 0, 1));
+    REQUIRE(img.width == 4);
+    REQUIRE(img.height == 4);
+    check_pixel(img, 2, 2, 255, 0, 0, 255);
+}
+
+TEST_CASE("Image pad_to_size already larger is no-op", "[image][pad]") {
+    Image img = make_solid(8, 8, 255, 0, 0, 255);
+    img.pad_to_size(4, 4, Color(0, 1, 0, 1));
+    REQUIRE(img.width == 8);
+    REQUIRE(img.height == 8);
+}
+
+TEST_CASE("Image pad_to_size asymmetric deficit distributes correctly", "[image][pad]") {
+    // 3→7: deficit of 4, pad_left=2, pad_right=2  (even split)
+    // 3→8: deficit of 5, pad_left=2, pad_right=3  (odd, right gets extra)
+    Image img = make_solid(3, 3, 255, 255, 255, 255);
+    img.pad_to_size(8, 7, Color(0, 0, 0, 255));
+    REQUIRE(img.width == 8);
+    REQUIRE(img.height == 7);
+    // white at expected center positions
+    check_pixel(img, 2, 2, 255, 255, 255, 255);
+    check_pixel(img, 4, 2, 255, 255, 255, 255);
+    check_pixel(img, 2, 4, 255, 255, 255, 255);
+    // black at left border
+    check_pixel(img, 1, 2, 0, 0, 0, 255);
+    // black at right border (extra pixel on right from odd deficit)
+    check_pixel(img, 5, 2, 0, 0, 0, 255);
+}
+
+// =========================================================================
+//  grid_arrange
+// =========================================================================
+
+static bool pixel_is(const Image &img, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+    uint8_t cr, cg, cb, ca;
+    img.get_pixel(x, y, cr, cg, cb, ca);
+    return cr == r && cg == g && cb == b;
+}
+
+TEST_CASE("grid_arrange 2x2 four colors preserves positions", "[image][grid]") {
+    auto red    = make_solid(5, 5, 255, 0, 0);
+    auto green  = make_solid(5, 5, 0, 255, 0);
+    auto blue   = make_solid(5, 5, 0, 0, 255);
+    auto yellow = make_solid(5, 5, 255, 255, 0);
+
+    Image result = grid_arrange({red, green, blue, yellow}, 2, 2);
+
+    REQUIRE(result.width == 10);
+    REQUIRE(result.height == 10);
+
+    // Top row (y=5..9): red (left), green (right)
+    REQUIRE(pixel_is(result, 2, 7, 255, 0, 0));
+    REQUIRE(pixel_is(result, 7, 7, 0, 255, 0));
+    // Bottom row (y=0..4): blue (left), yellow (right)
+    REQUIRE(pixel_is(result, 2, 2, 0, 0, 255));
+    REQUIRE(pixel_is(result, 7, 2, 255, 255, 0));
+}
+
+TEST_CASE("grid_arrange auto square layout for 3 images", "[image][grid]") {
+    auto red   = make_solid(3, 3, 255, 0, 0);
+    auto green = make_solid(3, 3, 0, 255, 0);
+    auto blue  = make_solid(3, 3, 0, 0, 255);
+
+    Image result = grid_arrange({red, green, blue}); // ncol=0, nrow=0 → 2×2
+
+    REQUIRE(result.width == 6);
+    REQUIRE(result.height == 6);
+    // red at (0,0), green at (1,0), blue at (0,1), background fill at (1,1)
+    REQUIRE(pixel_is(result, 1, 4, 255, 0, 0));
+    REQUIRE(pixel_is(result, 4, 4, 0, 255, 0));
+    REQUIRE(pixel_is(result, 1, 1, 0, 0, 255));
+    REQUIRE(pixel_is(result, 4, 1, 255, 255, 255));  // empty cell → bg
+}
+
+TEST_CASE("grid_arrange auto rows from cols", "[image][grid]") {
+    auto a = make_solid(2, 2, 255, 0, 0);
+    auto b = make_solid(2, 2, 0, 255, 0);
+    auto c = make_solid(2, 2, 0, 0, 255);
+
+    Image result = grid_arrange({a, b, c}, 2, 0); // ncol=2 → nrow=2
+
+    REQUIRE(result.width == 4);
+    REQUIRE(result.height == 4);
+}
+
+TEST_CASE("grid_arrange auto cols from rows", "[image][grid]") {
+    auto a = make_solid(2, 2, 255, 0, 0);
+    auto b = make_solid(2, 2, 0, 255, 0);
+    auto c = make_solid(2, 2, 0, 0, 255);
+
+    Image result = grid_arrange({a, b, c}, 0, 2); // nrow=2 → ncol=2
+
+    REQUIRE(result.width == 4);
+    REQUIRE(result.height == 4);
+}
+
+TEST_CASE("grid_arrange PAD preserves pixel size on mismatched images", "[image][grid]") {
+    auto big   = make_solid(6, 6, 255, 0, 0);
+    auto small = make_solid(2, 2, 0, 255, 0);
+
+    Image result = grid_arrange({big, small}, 2, 1, FitMode::PAD);
+
+    // cell size = max(6,2) × max(6,2) = 6×6
+    REQUIRE(result.width == 12);
+    REQUIRE(result.height == 6);
+
+    // small green should still be 2×2, centered in a 6×6 cell → at x=8,y=2
+    REQUIRE(pixel_is(result, 8, 2, 0, 255, 0));
+    REQUIRE(pixel_is(result, 9, 2, 0, 255, 0));
+    REQUIRE(pixel_is(result, 8, 3, 0, 255, 0));
+    // immediately outside small green → white padding (default bg)
+    REQUIRE(pixel_is(result, 7, 1, 255, 255, 255));
+}
+
+TEST_CASE("grid_arrange SCALE stretches to fill cell", "[image][grid]") {
+    auto big   = make_solid(6, 6, 255, 0, 0);
+    auto small = make_solid(2, 2, 0, 255, 0);
+
+    Image result = grid_arrange({big, small}, 2, 1, FitMode::SCALE);
+
+    REQUIRE(result.width == 12);
+    REQUIRE(result.height == 6);
+
+    // small green scaled to 6×6 → covers cell (6,0) to (11,5)
+    REQUIRE(pixel_is(result, 7, 3, 0, 255, 0));
+    // big red still 6×6
+    REQUIRE(pixel_is(result, 3, 3, 255, 0, 0));
+}
+
+TEST_CASE("grid_arrange single image returns copy", "[image][grid]") {
+    auto img = make_solid(5, 3, 128, 64, 32);
+    Image result = grid_arrange({img});
+    REQUIRE(result.width == 5);
+    REQUIRE(result.height == 3);
+    check_pixel(result, 2, 1, 128, 64, 32, 255);
+}
+
+TEST_CASE("grid_arrange empty input returns empty", "[image][grid]") {
+    Image result = grid_arrange({});
+    REQUIRE(result.width == 0);
+    REQUIRE(result.height == 0);
+}
+
+TEST_CASE("grid_arrange custom background fills empty cells", "[image][grid]") {
+    auto red = make_solid(2, 2, 255, 0, 0);
+
+    Image result = grid_arrange({red}, 2, 1, FitMode::PAD,
+                                Color(0.5f, 0.0f, 0.5f, 1.0f));
+
+    REQUIRE(result.width == 4);
+    REQUIRE(result.height == 2);
+    REQUIRE(pixel_is(result, 1, 1, 255, 0, 0));   // red cell
+    REQUIRE(pixel_is(result, 3, 1, 127, 0, 127)); // purple empty cell (0.5→127)
+}
+
+// =========================================================================
+//  stack_horizontal / stack_vertical
+// =========================================================================
+
+TEST_CASE("stack_horizontal three images side by side", "[image][stack]") {
+    auto red   = make_solid(3, 5, 255, 0, 0);
+    auto green = make_solid(4, 5, 0, 255, 0);
+    auto blue  = make_solid(3, 5, 0, 0, 255);
+
+    Image result = stack_horizontal({red, green, blue});
+
+    // cell width = max(3,4,3) = 4, so total = 12
+    REQUIRE(result.width == 12);
+    REQUIRE(result.height == 5);
+    REQUIRE(pixel_is(result, 1, 2, 255, 0, 0));  // left: red
+    REQUIRE(pixel_is(result, 6, 2, 0, 255, 0));  // center: green
+    REQUIRE(pixel_is(result, 10, 2, 0, 0, 255)); // right: blue
+}
+
+TEST_CASE("stack_horizontal mismatched heights pads vertically", "[image][stack]") {
+    auto tall  = make_solid(2, 8, 255, 0, 0);
+    auto short_ = make_solid(2, 4, 0, 255, 0);
+
+    Image result = stack_horizontal({tall, short_}, FitMode::PAD,
+                                    Color(0, 0, 0, 1));
+
+    REQUIRE(result.width == 4);
+    REQUIRE(result.height == 8);
+    // short image is centered vertically with black padding above/below
+    REQUIRE(pixel_is(result, 3, 1, 0, 0, 0));     // padding below short
+    REQUIRE(pixel_is(result, 3, 5, 0, 255, 0));   // short image content
+    REQUIRE(pixel_is(result, 3, 7, 0, 0, 0));     // padding above short
+}
+
+TEST_CASE("stack_vertical three images top to bottom", "[image][stack]") {
+    auto red   = make_solid(5, 3, 255, 0, 0);
+    auto green = make_solid(5, 4, 0, 255, 0);
+    auto blue  = make_solid(5, 3, 0, 0, 255);
+
+    Image result = stack_vertical({red, green, blue});
+
+    // cell height = max(3,4,3) = 4, so total = 12
+    REQUIRE(result.width == 5);
+    REQUIRE(result.height == 12);
+    // With grid_arrange fixed: top row first, bottom row last.
+    // y=8..11: red, y=4..7: green, y=0..3: blue
+    REQUIRE(pixel_is(result, 2, 10, 255, 0, 0));  // top: red
+    REQUIRE(pixel_is(result, 2, 5, 0, 255, 0));   // middle: green
+    REQUIRE(pixel_is(result, 2, 1, 0, 0, 255));   // bottom: blue
+}
+
+TEST_CASE("stack_vertical single image", "[image][stack]") {
+    auto img = make_solid(5, 7, 128, 64, 32);
+    Image result = stack_vertical({img});
+    REQUIRE(result.width == 5);
+    REQUIRE(result.height == 7);
+    check_pixel(result, 2, 3, 128, 64, 32, 255);
+}
+
+TEST_CASE("stack_horizontal single image", "[image][stack]") {
+    auto img = make_solid(7, 5, 64, 128, 192);
+    Image result = stack_horizontal({img});
+    REQUIRE(result.width == 7);
+    REQUIRE(result.height == 5);
+    check_pixel(result, 3, 2, 64, 128, 192, 255);
+}

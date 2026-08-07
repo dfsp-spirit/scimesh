@@ -412,4 +412,42 @@ Image grid_arrange(const std::vector<Image> &images,
                    FitMode fit_mode = FitMode::PAD,
                    const Color &background = Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+/// @brief Stack images horizontally in a single row.
+///
+/// Convenience wrapper around grid_arrange() for the common case of
+/// placing images side-by-side. Equivalent to
+/// `grid_arrange(images, images.size(), 1, ...)`.
+///
+/// @param images     The list of images to arrange left-to-right.
+/// @param fit_mode   How to handle size mismatches (PAD or SCALE).
+/// @param background Fill color for padding.
+/// @return A new Image containing the horizontal strip.
+///
+/// @see grid_arrange(), stack_vertical()
+inline Image stack_horizontal(const std::vector<Image> &images,
+                               FitMode fit_mode = FitMode::PAD,
+                               const Color &background = Color(1.0f, 1.0f, 1.0f, 1.0f)) {
+    return grid_arrange(images, static_cast<int>(images.size()), 1,
+                        fit_mode, background);
+}
+
+/// @brief Stack images vertically in a single column.
+///
+/// Convenience wrapper around grid_arrange() for the common case of
+/// placing images one above the other. Equivalent to
+/// `grid_arrange(images, 1, images.size(), ...)`.
+///
+/// @param images     The list of images to arrange top-to-bottom.
+/// @param fit_mode   How to handle size mismatches (PAD or SCALE).
+/// @param background Fill color for padding.
+/// @return A new Image containing the vertical strip.
+///
+/// @see grid_arrange(), stack_horizontal()
+inline Image stack_vertical(const std::vector<Image> &images,
+                             FitMode fit_mode = FitMode::PAD,
+                             const Color &background = Color(1.0f, 1.0f, 1.0f, 1.0f)) {
+    return grid_arrange(images, 1, static_cast<int>(images.size()),
+                        fit_mode, background);
+}
+
 } // namespace scimesh

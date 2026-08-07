@@ -607,10 +607,12 @@ Image grid_arrange(const std::vector<Image> &images,
         rows.push_back(std::move(row_img));
     }
 
-    // Assemble final image
+    // Assemble final image — grid row 0 is the conceptual top, image y=0
+    // is the bottom.  merge(TOP) places `other` below `this`, so stacking
+    // upwards from row 0 puts row 0 at the top of the final image.
     Image result = rows[0];
     for (int r = 1; r < nrow; ++r) {
-        result.merge(rows[r], MergeDirection::BOTTOM);
+        result.merge(rows[r], MergeDirection::TOP);
     }
     return result;
 }
