@@ -49,6 +49,8 @@ using scimesh::ShadingMode;
 using scimesh::Renderer;
 using scimesh::Image;
 using scimesh::CropContentDirection;
+using scimesh::FitMode;
+using scimesh::grid_arrange;
 
 // =========================================================================
 // Application config (merged from TOML + CLI)
@@ -120,6 +122,13 @@ struct AppConfig {
     // [post]
     bool cropToContent = false;
     int  growPx = 0;
+
+    // [composite]
+    bool compositeMode = false;
+    std::vector<std::string> compositeImages;
+    int  compositeCols = 0;   // 0 = auto
+    int  compositeRows = 0;   // 0 = auto
+    std::string fitMode = "pad";
 };
 
 // =========================================================================
@@ -170,14 +179,27 @@ static void printHelp(const char* prog) {
         "  --grow N            Add N pixels padding after cropping (default: 0)\n"
         "  -h, --help          Show this help and exit\n"
         "\n"
+        "Composite mode (image layout, no rendering):\n"
+        "  --composite         Enter composite mode; remaining non-flag arguments\n"
+        "                      are image files to arrange into a grid.\n"
+        "  --cols N            Grid columns (0 = auto, default: 0)\n"
+        "  --rows N            Grid rows (0 = auto, default: 0)\n"
+        "  --fit-mode MODE     Size handling: pad (default) or scale\n"
+        "\n"
         "Config file format is TOML; see config.toml for all defaults.\n"
         "CLI flags override config file values.\n"
         "\n"
         "Examples:\n"
         "  %s --mesh bunny.obj\n"
         "  %s --mesh sphere.ply --aa-samples 4 --ssao --output smooth_sphere\n"
-        "  %s --mesh model.ply --shading flat --wireframe --bg-color 0.9,0.95,1.0\n",
-        prog, prog, prog, prog);
+        "  %s --mesh model.ply --shading flat --wireframe --bg-color 0.9,0.95,1.0\n"
+        "  %s --composite view1.png view2.png --cols 2 --output grid.png\n"
+        "\n"
+        "Composite workflow (render multiple views + combine):\n"
+        "  %s --mesh brain.ply --view-dir 0,0,1 --output lat\n"
+        "  %s --mesh brain.ply --view-dir 0,1,0 --output med\n"
+        "  %s --composite lat.png med.png colorbar.png --cols 3 --output final\n",
+        prog, prog, prog, prog, prog, prog, prog, prog);
 }
 
 // =========================================================================
@@ -454,6 +476,16 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             cfg.cropToContent = true;
         } else if (arg == "--grow") {
             cfg.growPx = nextInt();
+        } else if (arg == "--composite") {
+            cfg.compositeMode = true;
+        } else if (arg == "--cols") {
+            cfg.compositeCols = nextInt();
+        } else if (arg == "--rows") {
+            cfg.compositeRows = nextInt();
+        } else if (arg == "--fit-mode") {
+            cfg.fitMode = nextStr();
+        } else if (cfg.compositeMode && !arg.empty() && arg[0] != '-') {
+            cfg.compositeImages.push_back(arg);
         } else {
             fprintf(stderr, "Unknown option: %s\n", arg.c_str());
             fprintf(stderr, "Try '%s --help' for usage.\n", argv[0]);
@@ -626,6 +658,48 @@ int main(int argc, char** argv) {
 
     // 3. Apply CLI overrides (single pass, --config is a no-op here)
     applyCLIArgs(argc, argv, cfg);
+
+    // 3b. Composite mode: load images, arrange, save, done.
+    if (cfg.compositeMode) {
+        if (cfg.compositeImages.empty()) {
+            fprintf(stderr, "Error: --composite requires at least one image file.\n");
+            fprintf(stderr, "Usage: %s --composite img1.png img2.png ... [--cols N] [--rows N] [--output name] [--format fmt] [--fit-mode pad|scale] [--bg-color R,G,B]\n", argv[0]);
+            return 1;
+        }
+
+        std::vector<Image> images;
+        for (const auto& path : cfg.compositeImages) {
+            Image img = Image::read_image(path);
+            if (img.width == 0) {
+                fprintf(stderr, "Error: failed to load image '%s'\n", path.c_str());
+                return 1;
+            }
+            std::cout << "Loaded " << path << " (" << img.width << "×" << img.height << ")\n";
+            images.push_back(std::move(img));
+        }
+
+        FitMode fm = (cfg.fitMode == "scale") ? FitMode::SCALE : FitMode::PAD;
+        Color bg(cfg.bgColorR, cfg.bgColorG, cfg.bgColorB, 1.0f);
+
+        std::cout << "Arranging " << images.size() << " image(s) into grid"
+                  << " (fit=" << cfg.fitMode << ")"
+                  << "..." << std::endl;
+
+        Image result = grid_arrange(images, cfg.compositeCols, cfg.compositeRows,
+                                    fm, bg);
+
+        std::cout << "Output: " << result.width << "×" << result.height << "\n";
+
+        bool ok = writeImage(result, cfg.filename, cfg.format);
+        if (ok) {
+            std::cout << "Wrote " << cfg.filename << "." << cfg.format << std::endl;
+        } else {
+            std::cerr << "Error writing output image.\n";
+            return 1;
+        }
+        std::cout << "Done.\n";
+        return 0;
+    }
 
     // 4. Require a mesh file
     if (cfg.meshFile.empty()) {

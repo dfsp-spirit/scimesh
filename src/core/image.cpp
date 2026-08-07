@@ -576,24 +576,61 @@ Image grid_arrange(const std::vector<Image> &images,
     }
     if (cell_w <= 0 || cell_h <= 0) return Image();
 
-    // Normalize all images to cell size
+    bool is_1d_horizontal = (nrow == 1);
+    bool is_1d_vertical   = (ncol == 1);
+
+    // Normalize images.  For 1D layouts (single row or single column),
+    // only the cross-axis dimension needs to match — the merge direction
+    // only cares about one dimension.  For 2D grids, both must match.
     std::vector<Image> cells;
     cells.reserve(n);
-    for (const auto &img : images) {
-        Image c = img;
-        if (fit_mode == FitMode::SCALE) {
-            c.scale(cell_w, cell_h);
-        } else {
-            c.pad_to_size(cell_w, cell_h, background);
-        }
-        cells.push_back(std::move(c));
-    }
 
-    // Fill remaining slots with background
-    Image blank(cell_w, cell_h);
-    blank.clear_float(background.r, background.g, background.b, background.a);
-    while (static_cast<int>(cells.size()) < ncol * nrow) {
-        cells.push_back(blank);
+    if (is_1d_horizontal) {
+        // Horizontal strip: normalize heights only, widths stay as-is.
+        for (const auto &img : images) {
+            Image c = img;
+            if (fit_mode == FitMode::SCALE) {
+                float ar = static_cast<float>(img.width) / img.height;
+                c.scale(static_cast<int>(cell_h * ar), cell_h);
+            } else {
+                c.pad_to_size(img.width, cell_h, background);
+            }
+            cells.push_back(std::move(c));
+        }
+        ncol = static_cast<int>(cells.size());
+        nrow = 1;
+    } else if (is_1d_vertical) {
+        // Vertical strip: normalize widths only, heights stay as-is.
+        for (const auto &img : images) {
+            Image c = img;
+            if (fit_mode == FitMode::SCALE) {
+                float ar = static_cast<float>(img.height) / img.width;
+                c.scale(cell_w, static_cast<int>(cell_w * ar));
+            } else {
+                c.pad_to_size(cell_w, img.height, background);
+            }
+            cells.push_back(std::move(c));
+        }
+        nrow = static_cast<int>(cells.size());
+        ncol = 1;
+    } else {
+        // 2D grid: normalize both dimensions.
+        for (const auto &img : images) {
+            Image c = img;
+            if (fit_mode == FitMode::SCALE) {
+                c.scale(cell_w, cell_h);
+            } else {
+                c.pad_to_size(cell_w, cell_h, background);
+            }
+            cells.push_back(std::move(c));
+        }
+
+        // Fill remaining slots with background
+        Image blank(cell_w, cell_h);
+        blank.clear_float(background.r, background.g, background.b, background.a);
+        while (static_cast<int>(cells.size()) < ncol * nrow) {
+            cells.push_back(blank);
+        }
     }
 
     // Assemble rows

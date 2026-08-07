@@ -684,16 +684,16 @@ TEST_CASE("grid_arrange PAD preserves pixel size on mismatched images", "[image]
 
     Image result = grid_arrange({big, small}, 2, 1, FitMode::PAD);
 
-    // cell size = max(6,2) × max(6,2) = 6×6
-    REQUIRE(result.width == 12);
+    // 1D horizontal: only heights normalized.  cell_h = max(6,2) = 6.
+    // small padded to 2×6, big stays 6×6.  Output: 8×6.
+    REQUIRE(result.width == 8);
     REQUIRE(result.height == 6);
 
-    // small green should still be 2×2, centered in a 6×6 cell → at x=8,y=2
-    REQUIRE(pixel_is(result, 8, 2, 0, 255, 0));
-    REQUIRE(pixel_is(result, 9, 2, 0, 255, 0));
-    REQUIRE(pixel_is(result, 8, 3, 0, 255, 0));
-    // immediately outside small green → white padding (default bg)
-    REQUIRE(pixel_is(result, 7, 1, 255, 255, 255));
+    // big red at x=0..5, small green at x=6..7 (centered vertically at y=2..3)
+    REQUIRE(pixel_is(result, 3, 3, 255, 0, 0));
+    REQUIRE(pixel_is(result, 6, 3, 0, 255, 0));
+    // white padding below small green
+    REQUIRE(pixel_is(result, 6, 0, 255, 255, 255));
 }
 
 TEST_CASE("grid_arrange SCALE stretches to fill cell", "[image][grid]") {
@@ -726,15 +726,18 @@ TEST_CASE("grid_arrange empty input returns empty", "[image][grid]") {
 }
 
 TEST_CASE("grid_arrange custom background fills empty cells", "[image][grid]") {
+    // 2×2 grid: empty cell gets custom background
     auto red = make_solid(2, 2, 255, 0, 0);
 
-    Image result = grid_arrange({red}, 2, 1, FitMode::PAD,
+    Image result = grid_arrange({red}, 2, 2, FitMode::PAD,
                                 Color(0.5f, 0.0f, 0.5f, 1.0f));
 
     REQUIRE(result.width == 4);
-    REQUIRE(result.height == 2);
-    REQUIRE(pixel_is(result, 1, 1, 255, 0, 0));   // red cell
-    REQUIRE(pixel_is(result, 3, 1, 127, 0, 127)); // purple empty cell (0.5→127)
+    REQUIRE(result.height == 4);
+    REQUIRE(pixel_is(result, 1, 3, 255, 0, 0));   // top-left: red
+    REQUIRE(pixel_is(result, 3, 3, 127, 0, 127)); // top-right: purple empty
+    REQUIRE(pixel_is(result, 1, 1, 127, 0, 127)); // bottom-left: purple empty
+    REQUIRE(pixel_is(result, 3, 1, 127, 0, 127)); // bottom-right: purple empty
 }
 
 // =========================================================================
@@ -748,12 +751,13 @@ TEST_CASE("stack_horizontal three images side by side", "[image][stack]") {
 
     Image result = stack_horizontal({red, green, blue});
 
-    // cell width = max(3,4,3) = 4, so total = 12
-    REQUIRE(result.width == 12);
+    // 1D horizontal: heights already match (all 5), no padding needed.
+    // Widths sum naturally: 3+4+3 = 10.
+    REQUIRE(result.width == 10);
     REQUIRE(result.height == 5);
-    REQUIRE(pixel_is(result, 1, 2, 255, 0, 0));  // left: red
-    REQUIRE(pixel_is(result, 6, 2, 0, 255, 0));  // center: green
-    REQUIRE(pixel_is(result, 10, 2, 0, 0, 255)); // right: blue
+    REQUIRE(pixel_is(result, 1, 2, 255, 0, 0));  // left: red (center of 3-wide)
+    REQUIRE(pixel_is(result, 5, 2, 0, 255, 0));  // center: green (center of 4-wide)
+    REQUIRE(pixel_is(result, 8, 2, 0, 0, 255));  // right: blue (center of 3-wide)
 }
 
 TEST_CASE("stack_horizontal mismatched heights pads vertically", "[image][stack]") {
@@ -763,12 +767,14 @@ TEST_CASE("stack_horizontal mismatched heights pads vertically", "[image][stack]
     Image result = stack_horizontal({tall, short_}, FitMode::PAD,
                                     Color(0, 0, 0, 1));
 
+    // 1D horizontal: normalize heights only. cell_h = max(8,4) = 8.
+    // short is padded from 2×4 to 2×8, tall stays 2×8.  Output: 4×8.
     REQUIRE(result.width == 4);
     REQUIRE(result.height == 8);
-    // short image is centered vertically with black padding above/below
-    REQUIRE(pixel_is(result, 3, 1, 0, 0, 0));     // padding below short
-    REQUIRE(pixel_is(result, 3, 5, 0, 255, 0));   // short image content
-    REQUIRE(pixel_is(result, 3, 7, 0, 0, 0));     // padding above short
+    // short image content centered vertically: y=2..5 within its cell.
+    REQUIRE(pixel_is(result, 3, 1, 0, 0, 0));     // black padding below short
+    REQUIRE(pixel_is(result, 3, 3, 0, 255, 0));   // short content
+    REQUIRE(pixel_is(result, 3, 6, 0, 0, 0));     // black padding above short
 }
 
 TEST_CASE("stack_vertical three images top to bottom", "[image][stack]") {
@@ -778,14 +784,14 @@ TEST_CASE("stack_vertical three images top to bottom", "[image][stack]") {
 
     Image result = stack_vertical({red, green, blue});
 
-    // cell height = max(3,4,3) = 4, so total = 12
+    // 1D vertical: widths already match (all 5), no padding needed.
+    // Heights sum naturally: 3+4+3 = 10.
     REQUIRE(result.width == 5);
-    REQUIRE(result.height == 12);
-    // With grid_arrange fixed: top row first, bottom row last.
-    // y=8..11: red, y=4..7: green, y=0..3: blue
-    REQUIRE(pixel_is(result, 2, 10, 255, 0, 0));  // top: red
-    REQUIRE(pixel_is(result, 2, 5, 0, 255, 0));   // middle: green
-    REQUIRE(pixel_is(result, 2, 1, 0, 0, 255));   // bottom: blue
+    REQUIRE(result.height == 10);
+    // y=7..9: red, y=3..6: green, y=0..2: blue
+    REQUIRE(pixel_is(result, 2, 8, 255, 0, 0));  // top: red
+    REQUIRE(pixel_is(result, 2, 5, 0, 255, 0));  // middle: green
+    REQUIRE(pixel_is(result, 2, 1, 0, 0, 255));  // bottom: blue
 }
 
 TEST_CASE("stack_vertical single image", "[image][stack]") {
