@@ -6,8 +6,11 @@
 // When building standalone examples (not the test suite), define the stb
 // implementation here.  The test suite provides its own definition in
 // test_primitives.cpp, so guard against double-definition at link time.
+// STBI_STATIC makes all stb symbols file-local, preventing linker clashes
+// when scimesh is linked alongside other libraries that also use stb_image.
 #ifdef SCIMESH_STB_WRITE_IMPL
 #ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBI_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #endif
 #endif
