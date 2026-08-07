@@ -64,7 +64,7 @@ struct AppConfig {
     int height = 600;
 
     // [mesh]
-    std::string meshFile;
+    std::vector<std::string> meshFiles;   // one or more mesh files
     std::string meshFormat;   // empty = auto-detect; "obj", "ply", "stl", or "fs"
     float meshColorR = 0.7f;
     float meshColorG = 0.7f;
@@ -143,7 +143,8 @@ static void printHelp(const char* prog) {
         "\n"
         "Options:\n"
         "  --config FILE       TOML config file (default: config.toml in cwd)\n"
-        "  --mesh FILE         Path to mesh file (.obj, .ply, .stl, .white)\n"
+        "  --mesh FILE         Path to mesh file (.obj, .ply, .stl, .white).\n"
+        "                      Repeatable for multiple meshes in one scene.\n"
         "  --mesh-format FMT    Force mesh format: obj, ply, stl, fs\n"
         "  --output FILE       Output filename without extension (default: render)\n"
         "  --format FMT        Output format: png, ppm, bmp (default: png)\n"
@@ -225,9 +226,17 @@ static AppConfig loadTOMLConfig(const std::string& path) {
 
         // [mesh]
         if (auto* ms = tbl["mesh"].as_table()) {
-            cfg.meshFile       = (*ms)["file"].value_or("");
             cfg.meshFormat     = (*ms)["format"].value_or("");
             cfg.computeNormals = (*ms)["compute_normals"].value_or(true);
+            // Support both single file (string) and multiple files (array)
+            if (auto* fileArr = (*ms)["file"].as_array()) {
+                for (const auto& f : *fileArr) {
+                    if (auto s = f.value<std::string>())
+                        cfg.meshFiles.push_back(*s);
+                }
+            } else if (auto s = (*ms)["file"].value<std::string>()) {
+                if (!s->empty()) cfg.meshFiles.push_back(*s);
+            }
             if (auto* col = (*ms)["color"].as_array()) {
                 if (col->size() >= 3) {
                     cfg.meshColorR = static_cast<float>((*col)[0].value_or(0.7));
@@ -375,7 +384,7 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
         } else if (arg == "--config") {
             nextStr(); // already handled before applyCLIArgs
         } else if (arg == "--mesh") {
-            cfg.meshFile = nextStr();
+            cfg.meshFiles.push_back(nextStr());
         } else if (arg == "--mesh-format") {
             cfg.meshFormat = nextStr();
         } else if (arg == "--output") {
@@ -701,8 +710,8 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    // 4. Require a mesh file
-    if (cfg.meshFile.empty()) {
+    // 4. Require at least one mesh file
+    if (cfg.meshFiles.empty()) {
         fprintf(stderr, "Error: no mesh file specified.\n");
         fprintf(stderr, "Set 'file' in [mesh] section of config.toml"
                         " or use --mesh <path>.\n");
@@ -710,34 +719,36 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // 5. Load mesh
-    std::cout << "Loading mesh: " << cfg.meshFile << std::endl;
-    Mesh mesh;
-    try {
-        mesh = loadMesh(cfg.meshFile, cfg.meshFormat);
-    } catch (const std::exception& e) {
-        fprintf(stderr, "Error loading mesh: %s\n", e.what());
-        return 1;
-    }
-
-    if (!mesh.is_valid()) {
-        fprintf(stderr, "Error: loaded mesh is invalid.\n");
-        return 1;
-    }
-    std::cout << "  Vertices: " << mesh.vertices.size()
-              << ", triangles: " << mesh.triangles.size() << std::endl;
-
-    // 6. Compute normals if needed
-    if (cfg.computeNormals && mesh.normals.empty()) {
-        std::cout << "  Computing vertex normals..." << std::endl;
-        scimesh::compute_vertex_normals(mesh, mesh.normals);
-    }
-
-    // 7. Build scene
+    // 5. Load meshes
     Scene scene;
-    scene.meshes.push_back(std::move(mesh));
+    for (const auto& mf : cfg.meshFiles) {
+        std::cout << "Loading mesh: " << mf << std::endl;
+        Mesh mesh;
+        try {
+            mesh = loadMesh(mf, cfg.meshFormat);
+        } catch (const std::exception& e) {
+            fprintf(stderr, "Error loading mesh '%s': %s\n", mf.c_str(), e.what());
+            return 1;
+        }
 
-    // 8. Set up camera with auto-framing
+        if (!mesh.is_valid()) {
+            fprintf(stderr, "Error: loaded mesh '%s' is invalid.\n", mf.c_str());
+            return 1;
+        }
+        std::cout << "  Vertices: " << mesh.vertices.size()
+                  << ", triangles: " << mesh.triangles.size() << std::endl;
+
+        // 6. Compute normals if needed
+        if (cfg.computeNormals && mesh.normals.empty()) {
+            std::cout << "  Computing vertex normals..." << std::endl;
+            scimesh::compute_vertex_normals(mesh, mesh.normals);
+        }
+
+        scene.meshes.push_back(std::move(mesh));
+    }
+    std::cout << "Scene: " << scene.meshes.size() << " mesh(es) total." << std::endl;
+
+    // 7. Set up camera with auto-framing (covers all meshes)
     Vec3 view_dir(cfg.viewDirX, cfg.viewDirY, cfg.viewDirZ);
     view_dir = glm::normalize(view_dir);
     Vec3 up(cfg.upX, cfg.upY, cfg.upZ);
@@ -756,10 +767,10 @@ int main(int argc, char** argv) {
     std::cout << "  fov    = " << cam.fov_degrees << "°\n";
     std::cout << "  projection = " << cfg.projection << "\n";
 
-    // 9. Build render options
+    // 8. Build render options
     RenderOptions opts = buildRenderOptions(cfg, cam);
 
-    // 10. Render
+    // 9. Render
     std::cout << "Rendering at " << opts.width << "×" << opts.height;
     if (opts.aa_samples > 1) {
         std::cout << " (" << opts.aa_samples << "× AA)";
@@ -772,7 +783,7 @@ int main(int argc, char** argv) {
     Renderer renderer;
     Image img = renderer.render_scene(scene, cam, opts);
 
-    // 11. Post-processing
+    // 10. Post-processing
     if (cfg.cropToContent) {
         img.crop_to_content(CropContentDirection::ALL, opts.background_color);
     }
@@ -781,7 +792,7 @@ int main(int argc, char** argv) {
                  opts.background_color);
     }
 
-    // 12. Write output
+    // 11. Write output
     std::string outPath = cfg.filename;
     bool ok = writeImage(img, outPath, cfg.format);
     if (ok) {
