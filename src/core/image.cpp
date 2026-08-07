@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 
 // When building standalone examples (not the test suite), define the stb
 // implementation here.  The test suite provides its own definition in
@@ -15,6 +16,14 @@
 #endif
 #endif
 #include "stb_image_write.h"
+
+#ifdef SCIMESH_STB_READ_IMPL
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STBI_STATIC
+#define STB_IMAGE_IMPLEMENTATION
+#endif
+#endif
+#include "stb_image.h"
 
 namespace scimesh {
 
@@ -508,6 +517,102 @@ bool Image::write_png(const std::string &filename) const {
     int stride = width * 4;
     return stbi_write_png(filename.c_str(), width, height, 4,
                           pixels.data(), stride) != 0;
+}
+
+// ---------------------------------------------------------------------------
+//  File input (stb_image)
+// ---------------------------------------------------------------------------
+
+Image Image::read_image(const std::string &path) {
+    int w = 0, h = 0, n = 0;
+    unsigned char *data = stbi_load(path.c_str(), &w, &h, &n, 4);
+    if (!data) return Image();
+    Image img(w, h);
+    std::memcpy(img.pixels.data(), data, w * h * 4);
+    stbi_image_free(data);
+    return img;
+}
+
+// ---------------------------------------------------------------------------
+//  Size normalization
+// ---------------------------------------------------------------------------
+
+void Image::pad_to_size(int target_w, int target_h, const Color &background) {
+    if (target_w <= width && target_h <= height) return;
+    int pad_top    = (target_h > height) ? (target_h - height) / 2 : 0;
+    int pad_bottom = (target_h > height) ? target_h - height - pad_top : 0;
+    int pad_left   = (target_w > width)  ? (target_w - width) / 2   : 0;
+    int pad_right  = (target_w > width)  ? target_w - width - pad_left : 0;
+    grow(pad_top, pad_bottom, pad_left, pad_right, background);
+}
+
+// ---------------------------------------------------------------------------
+//  grid_arrange
+// ---------------------------------------------------------------------------
+
+Image grid_arrange(const std::vector<Image> &images,
+                   int ncol, int nrow,
+                   FitMode fit_mode,
+                   const Color &background) {
+    if (images.empty()) return Image();
+
+    int n = static_cast<int>(images.size());
+
+    // Resolve grid dimensions
+    if (ncol <= 0 && nrow <= 0) {
+        ncol = static_cast<int>(std::ceil(std::sqrt(static_cast<double>(n))));
+        nrow = (n + ncol - 1) / ncol;
+    } else if (ncol <= 0) {
+        ncol = (n + nrow - 1) / nrow;
+    } else if (nrow <= 0) {
+        nrow = (n + ncol - 1) / ncol;
+    }
+
+    // Determine max cell dimensions
+    int cell_w = 0, cell_h = 0;
+    for (const auto &img : images) {
+        cell_w = std::max(cell_w, img.width);
+        cell_h = std::max(cell_h, img.height);
+    }
+    if (cell_w <= 0 || cell_h <= 0) return Image();
+
+    // Normalize all images to cell size
+    std::vector<Image> cells;
+    cells.reserve(n);
+    for (const auto &img : images) {
+        Image c = img;
+        if (fit_mode == FitMode::SCALE) {
+            c.scale(cell_w, cell_h);
+        } else {
+            c.pad_to_size(cell_w, cell_h, background);
+        }
+        cells.push_back(std::move(c));
+    }
+
+    // Fill remaining slots with background
+    Image blank(cell_w, cell_h);
+    blank.clear_float(background.r, background.g, background.b, background.a);
+    while (static_cast<int>(cells.size()) < ncol * nrow) {
+        cells.push_back(blank);
+    }
+
+    // Assemble rows
+    std::vector<Image> rows;
+    rows.reserve(nrow);
+    for (int r = 0; r < nrow; ++r) {
+        Image row_img = cells[r * ncol];
+        for (int c = 1; c < ncol; ++c) {
+            row_img.merge(cells[r * ncol + c], MergeDirection::RIGHT);
+        }
+        rows.push_back(std::move(row_img));
+    }
+
+    // Assemble final image
+    Image result = rows[0];
+    for (int r = 1; r < nrow; ++r) {
+        result.merge(rows[r], MergeDirection::BOTTOM);
+    }
+    return result;
 }
 
 } // namespace scimesh

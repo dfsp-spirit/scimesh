@@ -49,7 +49,7 @@ target_include_directories(scimesh SYSTEM PUBLIC
 
 # ---- compile features & definitions -----------------------------------------
 target_compile_features(scimesh PUBLIC cxx_std_17)
-target_compile_definitions(scimesh PRIVATE SCIMESH_STB_WRITE_IMPL)
+target_compile_definitions(scimesh PRIVATE SCIMESH_STB_WRITE_IMPL SCIMESH_STB_READ_IMPL)
 
 # ---- generated version header -----------------------------------------------
 # Generates scimesh/version.h from the project version declared above.

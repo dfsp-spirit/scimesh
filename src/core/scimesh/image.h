@@ -44,6 +44,14 @@ enum class CropContentDirection {
     ALL         ///< Crop all four edges.
 };
 
+/// @brief Strategy for normalizing images to a common cell size in grid_arrange().
+///
+/// @see grid_arrange()
+enum class FitMode {
+    PAD,   ///< Pad smaller images with background color (content stays pixel-perfect).
+    SCALE  ///< Scale all images to match the largest cell dimensions.
+};
+
 // ---------------------------------------------------------------------------
 //  Image
 // ---------------------------------------------------------------------------
@@ -327,6 +335,81 @@ struct Image {
     ///
     /// @see write_ppm(), write_bmp()
     bool write_png(const std::string &filename) const;
+
+    // ------------------------------------------------------------------
+    //  File input (stb_image)
+    // ------------------------------------------------------------------
+
+    /// @brief Read an image from a file (PNG, BMP, TGA, JPEG, etc.).
+    ///
+    /// Uses stb_image internally, which auto-detects the format from the
+    /// file header.  Returns an empty (0×0) image on failure.
+    ///
+    /// @param path Path to the image file.
+    /// @return The loaded Image, or empty Image on failure.
+    ///
+    /// @par Example
+    /// @code{.cpp}
+    /// Image img = Image::read_image("colorbar.png");
+    /// if (img.width == 0) { // handle error }
+    /// @endcode
+    static Image read_image(const std::string &path);
+
+    // ------------------------------------------------------------------
+    //  Size normalization
+    // ------------------------------------------------------------------
+
+    /// @brief Pad the image to a target size, centering the content.
+    ///
+    /// Adds borders filled with `background` so the image reaches
+    /// `target_w × target_h`.  Content stays pixel-perfect — no scaling.
+    /// If the image is already at or larger than the target size, this
+    /// is a no-op.
+    ///
+    /// @param target_w   Desired width in pixels.
+    /// @param target_h   Desired height in pixels.
+    /// @param background Fill color for the added borders.
+    ///
+    /// @par Example
+    /// @code{.cpp}
+    /// Image small(400, 300);
+    /// small.pad_to_size(800, 600, Color(1,1,1));
+    /// // small is now 800×600, original content centered
+    /// @endcode
+    ///
+    /// @see grow(), scale()
+    void pad_to_size(int target_w, int target_h, const Color &background);
 };
+
+// ---------------------------------------------------------------------------
+//  Free functions
+// ---------------------------------------------------------------------------
+
+/// @brief Arrange a list of images into a grid layout.
+///
+/// Images are placed left-to-right, top-to-bottom in an `ncol × nrow` grid.
+/// If the number of images is less than `ncol * nrow`, remaining cells are
+/// filled with `background`.  Before placement, all images are normalized
+/// to the same cell size using `fit_mode`.
+///
+/// @param images     The list of images to arrange.
+/// @param ncol       Number of columns (0 = auto-compute from nrow).
+/// @param nrow       Number of rows (0 = auto-compute from ncol).
+///                   If both are 0, a square-ish layout is chosen.
+/// @param fit_mode   How to handle size mismatches (PAD or SCALE).
+/// @param background Fill color for padding and empty cells.
+/// @return A new Image containing the arranged grid.
+///
+/// @par Example
+/// @code{.cpp}
+/// Image grid = grid_arrange({view1, view2, view3, view4}, 2, 2,
+///                            FitMode::PAD, Color(1,1,1));
+/// @endcode
+///
+/// @see FitMode, Image::pad_to_size(), Image::scale()
+Image grid_arrange(const std::vector<Image> &images,
+                   int ncol = 0, int nrow = 0,
+                   FitMode fit_mode = FitMode::PAD,
+                   const Color &background = Color(1.0f, 1.0f, 1.0f, 1.0f));
 
 } // namespace scimesh
