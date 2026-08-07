@@ -26,8 +26,8 @@ echo "Meshes: $LH, $RH"
 # Step 1: Render both hemispheres from three viewpoints
 echo ""
 echo "--- Step 1: Rendering views ---"
-"$RENDERER" --mesh "$LH" --mesh "$RH" --view-dir  1,0,0 --output lat --bg-color 1,1,1
-"$RENDERER" --mesh "$LH" --mesh "$RH" --view-dir -1,0,0 --output med --bg-color 1,1,1
+"$RENDERER" --mesh "$LH" --view-dir  1,0,0 --output lat --rotate 90 --bg-color 1,1,1
+"$RENDERER" --mesh "$RH" --view-dir -1,0,0 --output med --rotate 270 --bg-color 1,1,1
 "$RENDERER" --mesh "$LH" --mesh "$RH" --view-dir  0,0,1 --output sup --bg-color 1,1,1
 echo "Views rendered: lat.png, med.png, sup.png"
 
