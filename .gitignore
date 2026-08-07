@@ -76,6 +76,7 @@ Meta
 cpp_tests/*.png
 cpp_tests/*.ppm
 cpp_tests/*.bmp
+cpp_tests/*.tga
 
 examples/R/**/*.png
 examples/**/*.mp4
