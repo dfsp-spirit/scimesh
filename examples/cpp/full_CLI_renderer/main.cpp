@@ -313,10 +313,10 @@ static AppConfig loadTOMLConfig(const std::string& path) {
 }
 
 // =========================================================================
-// Helper: parse "R,G,B" string into three floats
+// Helper: parse "X,Y,Z" string into three floats
 // =========================================================================
 
-static bool parseRGB(const std::string& s, float& r, float& g, float& b) {
+static bool parseVec3(const std::string& s, float& r, float& g, float& b) {
     std::istringstream ss(s);
     std::string token;
     float vals[3];
@@ -333,7 +333,7 @@ static bool parseRGB(const std::string& s, float& r, float& g, float& b) {
 // CLI argument parsing
 // =========================================================================
 
-static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& configPath) {
+static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
@@ -351,7 +351,7 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             printHelp(argv[0]);
             exit(0);
         } else if (arg == "--config") {
-            configPath = nextStr();
+            nextStr(); // already handled before applyCLIArgs
         } else if (arg == "--mesh") {
             cfg.meshFile = nextStr();
         } else if (arg == "--mesh-format") {
@@ -362,17 +362,31 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             cfg.format = nextStr();
         } else if (arg == "--width") {
             cfg.width = nextInt();
+            if (cfg.width <= 0) {
+                fprintf(stderr, "Warning: --width must be > 0, using default 800.\n");
+                cfg.width = 800;
+            }
         } else if (arg == "--height") {
             cfg.height = nextInt();
+            if (cfg.height <= 0) {
+                fprintf(stderr, "Warning: --height must be > 0, using default 600.\n");
+                cfg.height = 600;
+            }
         } else if (arg == "--mesh-color") {
             std::string val = nextStr();
-            parseRGB(val, cfg.meshColorR, cfg.meshColorG, cfg.meshColorB);
+            if (!parseVec3(val, cfg.meshColorR, cfg.meshColorG, cfg.meshColorB)) {
+                fprintf(stderr, "Warning: invalid value for --mesh-color '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--no-normals") {
             cfg.computeNormals = false;
         } else if (arg == "--projection") {
             cfg.projection = nextStr();
         } else if (arg == "--fov") {
             cfg.fov = nextFloat();
+            if (cfg.fov <= 0.0f) {
+                fprintf(stderr, "Warning: --fov must be > 0, using default 45.\n");
+                cfg.fov = 45.0f;
+            }
         } else if (arg == "--margin") {
             cfg.margin = nextFloat();
         } else if (arg == "--near") {
@@ -381,10 +395,14 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             cfg.farPlane = nextFloat();
         } else if (arg == "--view-dir") {
             std::string val = nextStr();
-            parseRGB(val, cfg.viewDirX, cfg.viewDirY, cfg.viewDirZ);
+            if (!parseVec3(val, cfg.viewDirX, cfg.viewDirY, cfg.viewDirZ)) {
+                fprintf(stderr, "Warning: invalid value for --view-dir '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--up") {
             std::string val = nextStr();
-            parseRGB(val, cfg.upX, cfg.upY, cfg.upZ);
+            if (!parseVec3(val, cfg.upX, cfg.upY, cfg.upZ)) {
+                fprintf(stderr, "Warning: invalid value for --up '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--shading") {
             cfg.shadingMode = nextStr();
         } else if (arg == "--no-backface-cull") {
@@ -395,9 +413,15 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             cfg.wireframe = true;
         } else if (arg == "--wire-color") {
             std::string val = nextStr();
-            parseRGB(val, cfg.wireframeColorR, cfg.wireframeColorG, cfg.wireframeColorB);
+            if (!parseVec3(val, cfg.wireframeColorR, cfg.wireframeColorG, cfg.wireframeColorB)) {
+                fprintf(stderr, "Warning: invalid value for --wire-color '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--aa-samples") {
             cfg.aaSamples = nextInt();
+            if (cfg.aaSamples != 1 && cfg.aaSamples != 2 && cfg.aaSamples != 4 && cfg.aaSamples != 8) {
+                fprintf(stderr, "Warning: --aa-samples must be 1, 2, 4, or 8, using default 1.\n");
+                cfg.aaSamples = 1;
+            }
         } else if (arg == "--ssao") {
             cfg.ssaoEnabled = true;
         } else if (arg == "--no-ssao") {
@@ -408,7 +432,9 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             cfg.ssaoIntensity = nextFloat();
         } else if (arg == "--bg-color") {
             std::string val = nextStr();
-            parseRGB(val, cfg.bgColorR, cfg.bgColorG, cfg.bgColorB);
+            if (!parseVec3(val, cfg.bgColorR, cfg.bgColorG, cfg.bgColorB)) {
+                fprintf(stderr, "Warning: invalid value for --bg-color '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--ambient") {
             cfg.ambient = nextFloat();
         } else if (arg == "--fog") {
@@ -421,7 +447,9 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg, std::string& con
             cfg.fogEnd = nextFloat();
         } else if (arg == "--fog-color") {
             std::string val = nextStr();
-            parseRGB(val, cfg.fogColorR, cfg.fogColorG, cfg.fogColorB);
+            if (!parseVec3(val, cfg.fogColorR, cfg.fogColorG, cfg.fogColorB)) {
+                fprintf(stderr, "Warning: invalid value for --fog-color '%s', ignored.\n", val.c_str());
+            }
         } else if (arg == "--crop") {
             cfg.cropToContent = true;
         } else if (arg == "--grow") {
@@ -584,21 +612,22 @@ static bool writeImage(const Image& img, const std::string& filename,
 // =========================================================================
 
 int main(int argc, char** argv) {
-    // 1. Load defaults from TOML config
+    // 1. Scan for --config to determine which config file to load
     std::string configPath = "config.toml";
-    AppConfig   cfg        = loadTOMLConfig(configPath);
-
-    // 2. Apply CLI overrides (configPath may be changed by --config)
-    applyCLIArgs(argc, argv, cfg, configPath);
-
-    // Reload config if --config was specified
-    if (configPath != "config.toml") {
-        cfg = loadTOMLConfig(configPath);
-        // Re-apply CLI so CLI always wins
-        applyCLIArgs(argc, argv, cfg, configPath);
+    for (int i = 1; i < argc - 1; ++i) {
+        if (std::string(argv[i]) == "--config") {
+            configPath = argv[i + 1];
+            break;
+        }
     }
 
-    // 3. Require a mesh file
+    // 2. Load config once
+    AppConfig cfg = loadTOMLConfig(configPath);
+
+    // 3. Apply CLI overrides (single pass, --config is a no-op here)
+    applyCLIArgs(argc, argv, cfg);
+
+    // 4. Require a mesh file
     if (cfg.meshFile.empty()) {
         fprintf(stderr, "Error: no mesh file specified.\n");
         fprintf(stderr, "Set 'file' in [mesh] section of config.toml"
@@ -607,7 +636,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // 4. Load mesh
+    // 5. Load mesh
     std::cout << "Loading mesh: " << cfg.meshFile << std::endl;
     Mesh mesh;
     try {
@@ -624,17 +653,17 @@ int main(int argc, char** argv) {
     std::cout << "  Vertices: " << mesh.vertices.size()
               << ", triangles: " << mesh.triangles.size() << std::endl;
 
-    // 5. Compute normals if needed
+    // 6. Compute normals if needed
     if (cfg.computeNormals && mesh.normals.empty()) {
         std::cout << "  Computing vertex normals..." << std::endl;
         scimesh::compute_vertex_normals(mesh, mesh.normals);
     }
 
-    // 6. Build scene
+    // 7. Build scene
     Scene scene;
     scene.meshes.push_back(std::move(mesh));
 
-    // 7. Set up camera with auto-framing
+    // 8. Set up camera with auto-framing
     Vec3 view_dir(cfg.viewDirX, cfg.viewDirY, cfg.viewDirZ);
     view_dir = glm::normalize(view_dir);
     Vec3 up(cfg.upX, cfg.upY, cfg.upZ);
@@ -653,10 +682,10 @@ int main(int argc, char** argv) {
     std::cout << "  fov    = " << cam.fov_degrees << "°\n";
     std::cout << "  projection = " << cfg.projection << "\n";
 
-    // 8. Build render options
+    // 9. Build render options
     RenderOptions opts = buildRenderOptions(cfg, cam);
 
-    // 9. Render
+    // 10. Render
     std::cout << "Rendering at " << opts.width << "×" << opts.height;
     if (opts.aa_samples > 1) {
         std::cout << " (" << opts.aa_samples << "× AA)";
@@ -669,7 +698,7 @@ int main(int argc, char** argv) {
     Renderer renderer;
     Image img = renderer.render_scene(scene, cam, opts);
 
-    // 10. Post-processing
+    // 11. Post-processing
     if (cfg.cropToContent) {
         img.crop_to_content(CropContentDirection::ALL, opts.background_color);
     }
@@ -678,7 +707,7 @@ int main(int argc, char** argv) {
                  opts.background_color);
     }
 
-    // 11. Write output
+    // 12. Write output
     std::string outPath = cfg.filename;
     bool ok = writeImage(img, outPath, cfg.format);
     if (ok) {
