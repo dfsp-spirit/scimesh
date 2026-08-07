@@ -22,5 +22,8 @@ configure_file(
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/composite_workflow.sh
                ${CMAKE_CURRENT_BINARY_DIR}/composite_workflow.sh COPYONLY)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/composite_tight.sh
+               ${CMAKE_CURRENT_BINARY_DIR}/composite_tight.sh COPYONLY)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/colorbar.png
                ${CMAKE_CURRENT_BINARY_DIR}/colorbar.png COPYONLY)

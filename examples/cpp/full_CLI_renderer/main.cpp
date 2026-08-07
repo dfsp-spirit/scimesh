@@ -130,6 +130,9 @@ struct AppConfig {
     int  compositeCols = 0;   // 0 = auto
     int  compositeRows = 0;   // 0 = auto
     std::string fitMode = "pad";
+
+    // [info]
+    bool infoMode = false;    // --info: print image dimensions, no rendering
 };
 
 // =========================================================================
@@ -178,7 +181,9 @@ static void printHelp(const char* prog) {
         "  --fog-end N         Fog end distance (0 = auto, default: 0)\n"
         "  --fog-color R,G,B   Fog color [0-1] (default: 0.5,0.5,0.5)\n"
         "  --crop              Crop transparent/background border after render\n"
+        "                      (also applied to each image in composite mode)\n"
         "  --grow N            Add N pixels padding after cropping (default: 0)\n"
+        "                      (also applied to each image in composite mode)\n"
         "  --rotate DEG        Rotate output 0/90/180/270 degrees CW (default: 0)\n"
         "  -h, --help          Show this help and exit\n"
         "\n"
@@ -188,6 +193,12 @@ static void printHelp(const char* prog) {
         "  --cols N            Grid columns (0 = auto, default: 0)\n"
         "  --rows N            Grid rows (0 = auto, default: 0)\n"
         "  --fit-mode MODE     Size handling: pad (default) or scale\n"
+        "                      (--crop and --grow N also apply to each tile)\n"
+        "\n"
+        "Image info mode (print dimensions, no rendering):\n"
+        "  --info              Print '<path> WxH' for each given image file,\n"
+        "                      one per line, then exit. Useful for scripts\n"
+        "                      that must avoid external tools like 'identify'.\n"
         "\n"
         "Config file format is TOML; see config.toml for all defaults.\n"
         "CLI flags override config file values.\n"
@@ -491,13 +502,15 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             cfg.rotateDeg = nextInt();
         } else if (arg == "--composite") {
             cfg.compositeMode = true;
+        } else if (arg == "--info") {
+            cfg.infoMode = true;
         } else if (arg == "--cols") {
             cfg.compositeCols = nextInt();
         } else if (arg == "--rows") {
             cfg.compositeRows = nextInt();
         } else if (arg == "--fit-mode") {
             cfg.fitMode = nextStr();
-        } else if (cfg.compositeMode && !arg.empty() && arg[0] != '-') {
+        } else if ((cfg.compositeMode || cfg.infoMode) && !arg.empty() && arg[0] != '-') {
             cfg.compositeImages.push_back(arg);
         } else {
             fprintf(stderr, "Unknown option: %s\n", arg.c_str());
@@ -676,9 +689,12 @@ int main(int argc, char** argv) {
     if (cfg.compositeMode) {
         if (cfg.compositeImages.empty()) {
             fprintf(stderr, "Error: --composite requires at least one image file.\n");
-            fprintf(stderr, "Usage: %s --composite img1.png img2.png ... [--cols N] [--rows N] [--output name] [--format fmt] [--fit-mode pad|scale] [--bg-color R,G,B]\n", argv[0]);
+            fprintf(stderr, "Usage: %s --composite img1.png img2.png ... [--cols N] [--rows N] [--output name] [--format fmt] [--fit-mode pad|scale] [--bg-color R,G,B] [--crop] [--grow N]\n", argv[0]);
             return 1;
         }
+
+        FitMode fm = (cfg.fitMode == "scale") ? FitMode::SCALE : FitMode::PAD;
+        Color bg(cfg.bgColorR, cfg.bgColorG, cfg.bgColorB, 1.0f);
 
         std::vector<Image> images;
         for (const auto& path : cfg.compositeImages) {
@@ -687,12 +703,17 @@ int main(int argc, char** argv) {
                 fprintf(stderr, "Error: failed to load image '%s'\n", path.c_str());
                 return 1;
             }
+            // Pre-process each tile: crop uniform background border and/or add
+            // padding, using the same --crop/--grow flags as the render path.
+            if (cfg.cropToContent) {
+                img.crop_to_content(CropContentDirection::ALL, bg);
+            }
+            if (cfg.growPx > 0) {
+                img.grow(cfg.growPx, cfg.growPx, cfg.growPx, cfg.growPx, bg);
+            }
             std::cout << "Loaded " << path << " (" << img.width << "×" << img.height << ")\n";
             images.push_back(std::move(img));
         }
-
-        FitMode fm = (cfg.fitMode == "scale") ? FitMode::SCALE : FitMode::PAD;
-        Color bg(cfg.bgColorR, cfg.bgColorG, cfg.bgColorB, 1.0f);
 
         std::cout << "Arranging " << images.size() << " image(s) into grid"
                   << " (fit=" << cfg.fitMode << ")"
@@ -711,6 +732,24 @@ int main(int argc, char** argv) {
             return 1;
         }
         std::cout << "Done.\n";
+        return 0;
+    }
+
+    // 3c. Info mode: print image dimensions and exit.
+    if (cfg.infoMode) {
+        if (cfg.compositeImages.empty()) {
+            fprintf(stderr, "Error: --info requires at least one image file.\n");
+            fprintf(stderr, "Usage: %s --info img1.png img2.png ...\n", argv[0]);
+            return 1;
+        }
+        for (const auto& path : cfg.compositeImages) {
+            Image img = Image::read_image(path);
+            if (img.width == 0) {
+                fprintf(stderr, "Error: failed to load image '%s'\n", path.c_str());
+                return 1;
+            }
+            printf("%s %dx%d\n", path.c_str(), img.width, img.height);
+        }
         return 0;
     }
 
