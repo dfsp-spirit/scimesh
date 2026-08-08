@@ -17,13 +17,39 @@
 #include <cstdint>
 #include <cstring>
 
-#define LIBFS_VERSION "0.4.1"
-#define LIBFS_VERISION_MAJOR 0   # deprecated, use LIBFS_VERSION_MAJOR instead
-#define LIBFS_VERISION_MINOR 4   # deprecated, use LIBFS_VERSION_MINOR instead
-#define LIBFS_VERISION_PATCH 1   # deprecated, use LIBFS_VERSION_PATCH instead
+// -- Optional MGZ (gzipped MGH) support via zlib ----------------------------------
+// When LIBFS_HAS_ZLIB is defined, read_mgz() and write_mgz() become available.
+// Just link with -lz.
+//
+// Detection logic (in order of precedence):
+//   1. If you #define LIBFS_HAS_ZLIB before including this header, that is
+//      respected unconditionally — use this for non-CMake builds or when your
+//      toolchain does not support __has_include.
+//   2. Otherwise, if the compiler supports __has_include and <zlib.h> is found,
+//      it is auto-defined.  (The nested #if guards use only standard C++98
+//      defined() and short-circuit evaluation — no compiler-specific extensions
+//      are ever evaluated on toolchains that lack them.)
+//   3. If neither applies, the MGZ functions are simply absent.  Nothing breaks,
+//      no warning, no error.
+//
+// All of this is compile-time only; there is zero runtime overhead when MGZ
+// support is not enabled.
+#ifndef LIBFS_HAS_ZLIB
+#if defined(__has_include)
+#if __has_include(<zlib.h>)
+#define LIBFS_HAS_ZLIB
+#endif
+#endif
+#endif
+#ifdef LIBFS_HAS_ZLIB
+#include <zlib.h>
+#endif
+// -- End optional MGZ support -----------------------------------------------------
+
+#define LIBFS_VERSION "0.4.2"
 #define LIBFS_VERSION_MAJOR 0
 #define LIBFS_VERSION_MINOR 4
-#define LIBFS_VERSION_PATCH 1
+#define LIBFS_VERSION_PATCH 2
 
 // -- Security / defensive hardening configuration -------------------------------------
 // Users can #define any of these BEFORE including libfs.h to override the defaults.
@@ -834,8 +860,9 @@ namespace fs
     /// Construct an empty Mesh.
     Mesh() {}
 
-    std::vector<float> vertices; ///< *n x 3* vector of the *x*,*y*,*z* coordinates for the *n* vertices. The x,y,z coordinates for a single vertex form consecutive entries.
-    std::vector<int32_t> faces;  ///< *n x 3* vector of the 3 vertex indices for the *n* triangles or faces. The 3 vertices of a single face form consecutive entries.
+    std::vector<float> vertices;   ///< *n x 3* vector of the *x*,*y*,*z* coordinates for the *n* vertices. The x,y,z coordinates for a single vertex form consecutive entries.
+    std::vector<int32_t> faces;    ///< *n x 3* vector of the 3 vertex indices for the *n* triangles or faces. The 3 vertices of a single face form consecutive entries.
+    std::vector<uint8_t> vertex_colors; ///< *n x 3* vector of RGB color values, 3 per vertex (v0_r, v0_g, v0_b, v1_r, ...). Empty if no vertex colors are available. Populated by from_ply() and from_off() when the file contains colors. Same interleave format as used by to_ply(col) / to_off(col).
 
     /// @brief Construct and return a simple cube mesh.
     /// @return fs::Mesh instance representing a cube.
@@ -860,16 +887,16 @@ namespace fs
                        -1.0, -1.0, -1.0};
       mesh.faces = {0, 2, 3,
                     3, 1, 0,
-                    4, 6, 7,
-                    7, 5, 4,
-                    0, 4, 5,
-                    5, 1, 0,
+                    4, 7, 6,
+                    7, 4, 5,
+                    0, 5, 4,
+                    5, 0, 1,
                     2, 6, 7,
                     7, 3, 2,
                     0, 4, 6,
                     6, 2, 0,
-                    1, 5, 7,
-                    7, 3, 1};
+                    1, 7, 5,
+                    7, 1, 3};
       return mesh;
     }
 
@@ -892,8 +919,8 @@ namespace fs
                        1.0, 1.0, 0.0,
                        1.0, 0.0, 0.0,
                        0.5, 0.5, 1.0}; // apex
-      mesh.faces = {0, 2, 1,           // start with 2 base faces
-                    0, 3, 2,
+      mesh.faces = {0, 1, 2,           // start with 2 base faces
+                    0, 2, 3,
                     0, 4, 1, // now the 4 wall faces
                     1, 4, 2,
                     3, 2, 4,
@@ -936,6 +963,7 @@ namespace fs
       cur_x = cur_y = cur_z = 0.0;
       for (size_t i = 0; i < nx; i++)
       {
+        cur_y = 0.0;
         for (size_t j = 0; j < ny; j++)
         {
           vertices.push_back(cur_x);
@@ -981,10 +1009,38 @@ namespace fs
     /// @endcode
     std::string to_obj() const
     {
+      std::vector<uint8_t> empty_col;
+      return (this->to_obj(empty_col));
+    }
+
+    /// @brief Return string representing the mesh in Wavefront Object (.obj) format with vertex colors.
+    /// @param col u_char vector of RGB color values, 3 per vertex. They must appear by vertex, i.e. in order v0_red, v0_green, v0_blue, v1_red, v1_green, v1_blue. Leave empty if you do not want colors.
+    /// @details Colors are written using the widely-supported convention of 6 floats per vertex line: `v x y z r g b`, where RGB are floating-point values in [0, 1].
+    /// @throws std::invalid_argument if the number of vertex colors does not match the number of vertices.
+    ///
+    /// #### Examples
+    ///
+    /// @code
+    /// fs::Mesh surface = fs::Mesh::construct_cube();
+    /// std::vector<uint8_t> col = surface.vertex_colors;
+    /// std::string obj_rep = surface.to_obj(col);
+    /// @endcode
+    std::string to_obj(const std::vector<uint8_t> col) const
+    {
+      bool use_vertex_colors = col.size() != 0;
       std::stringstream objs;
       for (size_t vidx = 0; vidx < this->vertices.size(); vidx += 3)
       { // vertex coords
-        objs << "v " << vertices[vidx] << " " << vertices[vidx + 1] << " " << vertices[vidx + 2] << "\n";
+        objs << "v " << vertices[vidx] << " " << vertices[vidx + 1] << " " << vertices[vidx + 2];
+        if (use_vertex_colors)
+        {
+          if (col.size() != this->vertices.size())
+          {
+            throw std::invalid_argument("Number of vertex coordinates and vertex colors must match when writing OBJ file, but got " + std::to_string(this->vertices.size()) + " and " + std::to_string(col.size()) + ".");
+          }
+          objs << " " << (col[vidx] / 255.0f) << " " << (col[vidx + 1] / 255.0f) << " " << (col[vidx + 2] / 255.0f);
+        }
+        objs << "\n";
       }
       for (size_t fidx = 0; fidx < this->faces.size(); fidx += 3)
       { // faces: vertex indices, 1-based
@@ -1024,7 +1080,9 @@ namespace fs
     {
       size_t operator()(const std::tuple<size_t, size_t> &x) const
       {
-        return std::get<0>(x) ^ std::get<1>(x);
+        size_t a = std::get<0>(x);
+        size_t b = std::get<1>(x);
+        return a ^ (b << 1) ^ (b >> (sizeof(size_t) * 8 - 1));
       }
     };
 
@@ -1325,6 +1383,13 @@ namespace fs
       fs::util::str_to_file(filename, this->to_obj());
     }
 
+    /// @brief Export this mesh to a file in Wavefront OBJ format with vertex colors.
+    /// @throws std::runtime_error if the target file cannot be opened, std::invalid_argument if the number of vertex colors does not match the number of vertices.
+    void to_obj_file(const std::string &filename, const std::vector<uint8_t> col) const
+    {
+      fs::util::str_to_file(filename, this->to_obj(col));
+    }
+
     /// @brief Compute a new mesh that is a submesh of this mesh, based on a subset of the vertices of this mesh.
     /// @param old_vertex_indices vector of vertex indices of this mesh, which should be included in the submesh.
     /// @param mapdir_fulltosubmesh whether to return a map from the old (full mesh) to the new (submesh)  vertex indices (`true`), or the other way around (`false`, the default) as the first element of the returned pair.
@@ -1439,6 +1504,8 @@ namespace fs
 
       std::vector<float> vertices;
       std::vector<int> faces;
+      std::vector<uint8_t> vertex_colors;
+      int detected_format = -1; // -1 = unknown, 0 = no vertex colors, 1 = has vertex colors (r g b after x y z)
 
 #ifdef LIBFS_DBG_INFO
       size_t num_lines_ignored = 0; // Not comments, but custom extensions or material data lines which are ignored by libfs.
@@ -1466,6 +1533,66 @@ namespace fs
             vertices.push_back(x);
             vertices.push_back(y);
             vertices.push_back(z);
+
+            // Check for optional per-vertex colors: 6-value lines (x y z r g b) have colors,
+            // 3-value lines (x y z) and 4-value lines (x y z w) do not.
+            // Detect the format from the first vertex line.
+            if (detected_format == -1)
+            {
+              float vr, vg, vb;
+              if ((iss >> vr >> vg >> vb))
+              {
+                // We read 3 more floats successfully. Check if there is even more data
+                // (e.g., x y z w nx ny nz) — if so, treat as no-colors format.
+                float extra;
+                if (iss >> extra)
+                {
+                  detected_format = 0;
+                }
+                else
+                {
+                  detected_format = 1;
+                  // Store colors for the first vertex (already consumed from stream).
+                  int ri = static_cast<int>(vr * 255.0f + 0.5f);
+                  int gi = static_cast<int>(vg * 255.0f + 0.5f);
+                  int bi = static_cast<int>(vb * 255.0f + 0.5f);
+                  if (ri < 0) { ri = 0; }
+                  if (ri > 255) { ri = 255; }
+                  if (gi < 0) { gi = 0; }
+                  if (gi > 255) { gi = 255; }
+                  if (bi < 0) { bi = 0; }
+                  if (bi > 255) { bi = 255; }
+                  vertex_colors.push_back(static_cast<uint8_t>(ri));
+                  vertex_colors.push_back(static_cast<uint8_t>(gi));
+                  vertex_colors.push_back(static_cast<uint8_t>(bi));
+                }
+              }
+              else
+              {
+                detected_format = 0;
+              }
+            }
+            else if (detected_format == 1)
+            {
+              // Read colors for subsequent vertices.
+              float vr, vg, vb;
+              if (!(iss >> vr >> vg >> vb))
+              {
+                throw std::domain_error("Expected vertex colors (r g b) on line " + std::to_string(line_idx + 1) + " of OBJ data, but could not parse them.\n");
+              }
+              int ri = static_cast<int>(vr * 255.0f + 0.5f);
+              int gi = static_cast<int>(vg * 255.0f + 0.5f);
+              int bi = static_cast<int>(vb * 255.0f + 0.5f);
+              if (ri < 0) { ri = 0; }
+              if (ri > 255) { ri = 255; }
+              if (gi < 0) { gi = 0; }
+              if (gi > 255) { gi = 255; }
+              if (bi < 0) { bi = 0; }
+              if (bi > 255) { bi = 255; }
+              vertex_colors.push_back(static_cast<uint8_t>(ri));
+              vertex_colors.push_back(static_cast<uint8_t>(gi));
+              vertex_colors.push_back(static_cast<uint8_t>(bi));
+            }
           }
           else if (fs::util::starts_with(line, "f "))
           {
@@ -1493,7 +1620,7 @@ namespace fs
             }
             if (found_v2 != std::string::npos)
             {
-              v2raw = v0raw.substr(0, found_v2);
+              v2raw = v2raw.substr(0, found_v2);
             }
             v0 = std::stoi(v0raw);
             v1 = std::stoi(v1raw);
@@ -1522,6 +1649,7 @@ namespace fs
 #endif
       mesh->vertices = vertices;
       mesh->faces = faces;
+      mesh->vertex_colors = vertex_colors;
     }
 
     /// @brief Read a brainmesh from a Wavefront object format mesh file.
@@ -1577,10 +1705,11 @@ namespace fs
       size_t num_edges = 0;
       size_t num_verts_parsed = 0;
       size_t num_faces_parsed = 0;
+      bool has_vertex_colors = false;
       float x, y, z; // vertex xyz coords
-      // bool has_color;
-      // int r, g, b, a;   // vertex colors
+      int r, g, b, a;   // vertex colors
       int num_verts_this_face, v0, v1, v2; // face, defined by number of vertices and vertex indices.
+      std::vector<uint8_t> vertex_colors;
 
       while (std::getline(*is, line))
       {
@@ -1604,7 +1733,7 @@ namespace fs
             {
               throw std::domain_error("OFF magic string invalid, file " + msg_source_file_part + " not in OFF format.\n");
             }
-            // has_color = off_header_magic == "COFF";
+            has_vertex_colors = (off_header_magic == "COFF");
           }
           else if (noncomment_line_idx == 1)
           {
@@ -1618,9 +1747,22 @@ namespace fs
 
             if (num_verts_parsed < num_vertices)
             {
-              if (!(iss >> x >> y >> z))
+              if (has_vertex_colors)
               {
-                throw std::domain_error("Could not parse vertex coordinate line " + std::to_string(line_idx + 1) + " of OFF data " + msg_source_file_part + ", invalid format.\n");
+                if (!(iss >> x >> y >> z >> r >> g >> b >> a))
+                {
+                  throw std::domain_error("Could not parse vertex coordinate and color line " + std::to_string(line_idx + 1) + " of COFF data " + msg_source_file_part + ", invalid format.\n");
+                }
+                vertex_colors.push_back(static_cast<uint8_t>(r));
+                vertex_colors.push_back(static_cast<uint8_t>(g));
+                vertex_colors.push_back(static_cast<uint8_t>(b));
+              }
+              else
+              {
+                if (!(iss >> x >> y >> z))
+                {
+                  throw std::domain_error("Could not parse vertex coordinate line " + std::to_string(line_idx + 1) + " of OFF data " + msg_source_file_part + ", invalid format.\n");
+                }
               }
               vertices.push_back(x);
               vertices.push_back(y);
@@ -1658,6 +1800,7 @@ namespace fs
       }
       mesh->vertices = vertices;
       mesh->faces = faces;
+      mesh->vertex_colors = vertex_colors;
     }
 
     /// @brief Read a brainmesh from an OFF format mesh file.
@@ -1704,10 +1847,13 @@ namespace fs
 
       std::vector<float> vertices;
       std::vector<int> faces;
+      std::vector<uint8_t> vertex_colors;
 
-      bool in_header = true; // current status
+      bool in_header = true;                                              // current status
       int num_verts = -1;
       int num_faces = -1;
+      bool in_vertex_element = false;                                     // track whether we are inside 'element vertex' in header
+      std::vector<std::string> vertex_properties;                         // ordered list of property names under element vertex
       while (std::getline(*is, line))
       {
         line_idx += 1;
@@ -1743,6 +1889,7 @@ namespace fs
               {
                 throw std::domain_error("Could not parse element vertex line of PLY header, invalid format.\n");
               }
+              in_vertex_element = true;
             }
             else if (fs::util::starts_with(line, "element face"))
             {
@@ -1751,7 +1898,22 @@ namespace fs
               {
                 throw std::domain_error("Could not parse element face line of PLY header, invalid format.\n");
               }
-            } // Other properties like vertex colors and normals are ignored for now.
+              in_vertex_element = false;
+            }
+            else if (fs::util::starts_with(line, "element "))
+            {
+              // Some other element (e.g., edges): stop tracking vertex properties.
+              in_vertex_element = false;
+            }
+            else if (fs::util::starts_with(line, "property ") && in_vertex_element)
+            {
+              // Record property order for the vertex element so we can parse data lines correctly.
+              std::string kw, type, name;
+              if (iss >> kw >> type >> name)
+              {
+                vertex_properties.push_back(name);
+              }
+            }
           }
           else
           { // in data part.
@@ -1762,14 +1924,67 @@ namespace fs
             // Read vertices
             if (vertices.size() < (size_t)num_verts * 3)
             {
-              float x, y, z;
-              if (!(iss >> x >> y >> z))
+              float x = 0.0f, y = 0.0f, z = 0.0f;
+              int r = 0, g = 0, b = 0;
+              if (vertex_properties.empty())
               {
-                throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx) + " of PLY data, invalid format.\n");
+                // No property declarations tracked: fall back to default x y z order.
+                if (!(iss >> x >> y >> z))
+                {
+                  throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx) + " of PLY data, invalid format.\n");
+                }
+                vertices.push_back(x);
+                vertices.push_back(y);
+                vertices.push_back(z);
               }
-              vertices.push_back(x);
-              vertices.push_back(y);
-              vertices.push_back(z);
+              else
+              {
+                for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+                {
+                  const std::string &pname = vertex_properties[pi];
+                  if (pname == "x") { iss >> x; }
+                  else if (pname == "y") { iss >> y; }
+                  else if (pname == "z") { iss >> z; }
+                  else if (pname == "red") { iss >> r; }
+                  else if (pname == "green") { iss >> g; }
+                  else if (pname == "blue") { iss >> b; }
+                  else if (pname == "nx" || pname == "ny" || pname == "nz")
+                  {
+                    // Skip normals.
+                    float dummy; iss >> dummy;
+                  }
+                  else
+                  {
+                    // Skip unknown property.
+                    std::string dummy; iss >> dummy;
+                  }
+                  if (iss.fail())
+                  {
+                    throw std::domain_error("Could not parse vertex property '" + pname + "' at line " + std::to_string(line_idx) + " of PLY data.\n");
+                  }
+                }
+                if (iss.fail())
+                {
+                  throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx) + " of PLY data, invalid format.\n");
+                }
+                vertices.push_back(x);
+                vertices.push_back(y);
+                vertices.push_back(z);
+                // Only store colors if red/green/blue were declared in the header.
+                bool has_r = false, has_g = false, has_b = false;
+                for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+                {
+                  if (vertex_properties[pi] == "red") has_r = true;
+                  if (vertex_properties[pi] == "green") has_g = true;
+                  if (vertex_properties[pi] == "blue") has_b = true;
+                }
+                if (has_r && has_g && has_b)
+                {
+                  vertex_colors.push_back(static_cast<uint8_t>(r));
+                  vertex_colors.push_back(static_cast<uint8_t>(g));
+                  vertex_colors.push_back(static_cast<uint8_t>(b));
+                }
+              }
             }
             else
             {
@@ -1802,6 +2017,7 @@ namespace fs
       }
       mesh->vertices = vertices;
       mesh->faces = faces;
+      mesh->vertex_colors = vertex_colors;
     }
 
     /// @brief Read a brainmesh from a Stanford PLY format mesh file.
@@ -2533,7 +2749,11 @@ namespace fs
 #ifdef LIBFS_DBG_INFO
       if (fs::util::ends_with(filename, ".mgz"))
       {
-        std::cout << LIBFS_APPTAG << "Note: your MGH filename ends with '.mgz'. Keep in mind that MGZ format is not supported directly. You can ignore this message if you wrapped a gz stream.\n";
+#ifndef LIBFS_HAS_ZLIB
+        std::cout << LIBFS_APPTAG << "Note: your MGH filename ends with '.mgz'. MGZ support requires zlib: link with -lz. If you already have zlib and see this, #define LIBFS_HAS_ZLIB before including libfs.h, or upgrade your compiler.\n";
+#else
+        std::cout << LIBFS_APPTAG << "Note: your MGH filename ends with '.mgz'. Did you mean to call read_mgz() instead of read_mgh()?\n";
+#endif
       }
 #endif
       throw std::runtime_error("Not reading MGH data from file '" + filename + "', data type " + std::to_string(mgh->header.dtype) + " not supported yet.\n");
@@ -2565,6 +2785,35 @@ namespace fs
       subjects.push_back(line);
     }
     return (subjects);
+  }
+
+  /// @brief Write a vector of subject identifiers to a FreeSurfer subjects file.
+  /// @param filename Path to the output file (one subject ID per line).
+  /// @param subjects The subject identifiers to write.
+  /// @throws std::runtime_error if the file cannot be opened.
+  ///
+  /// #### Examples
+  ///
+  /// @code
+  /// std::vector<std::string> subjects = {"subject1", "subject2"};
+  /// fs::write_subjectsfile("subjects.txt", subjects);
+  /// @endcode
+  void write_subjectsfile(const std::string &filename, const std::vector<std::string> &subjects)
+  {
+    std::ofstream ofs;
+    ofs.open(filename, std::ofstream::out);
+    if (ofs.is_open())
+    {
+      for (size_t i = 0; i < subjects.size(); i++)
+      {
+        ofs << subjects[i] << "\n";
+      }
+      ofs.close();
+    }
+    else
+    {
+      throw std::runtime_error("Unable to open subjects file '" + filename + "' for writing.\n");
+    }
   }
 
   /// @brief Read MGH data from a stream.
@@ -3218,7 +3467,7 @@ namespace fs
       colortable->g.push_back(_freadt<int32_t>(*is));
       colortable->b.push_back(_freadt<int32_t>(*is));
       colortable->a.push_back(_freadt<int32_t>(*is));
-      colortable->label.push_back(colortable->r[i] + colortable->g[i] * 256 + colortable->b[i] * 65536 + colortable->a[i] * 16777216);
+      colortable->label.push_back(static_cast<uint32_t>(colortable->r[i]) + static_cast<uint32_t>(colortable->g[i]) * 256u + static_cast<uint32_t>(colortable->b[i]) * 65536u + static_cast<uint32_t>(colortable->a[i]) * 16777216u);
     }
   }
 
@@ -3446,7 +3695,7 @@ namespace fs
   /// @private
   int _fread3(std::istream &is)
   {
-    uint32_t i;
+    uint32_t i = 0;
     is.read(reinterpret_cast<char *>(&i), 3);
     if (static_cast<size_t>(is.gcount()) != 3)
     {
@@ -3488,16 +3737,22 @@ namespace fs
     unsigned char b2 = (i >> 8) & 255;
     unsigned char b3 = i & 255;
 
-    if (!_is_bigendian())
-    {
-      b1 = _swap_endian<unsigned char>(b1);
-      b2 = _swap_endian<unsigned char>(b2);
-      b3 = _swap_endian<unsigned char>(b3);
-    }
-
     os.write(reinterpret_cast<const char *>(&b1), sizeof(b1));
     os.write(reinterpret_cast<const char *>(&b2), sizeof(b2));
     os.write(reinterpret_cast<const char *>(&b3), sizeof(b3));
+  }
+
+  /// Write a fixed-length C-style string to a binary stream. Writes exactly @p len bytes
+  /// (padded with null bytes if the string is shorter, truncated if longer).
+  ///
+  /// THIS FUNCTION IS INTERNAL AND SHOULD NOT BE CALLED BY API CLIENTS.
+  /// @private
+  void _fwritefixedlengthstring(std::ostream &os, const std::string &str, size_t len)
+  {
+    std::string buf(len, '\0');
+    size_t copy_len = str.size() < len ? str.size() : len;
+    std::memcpy(&buf[0], str.data(), copy_len);
+    os.write(buf.data(), static_cast<std::streamsize>(len));
   }
 
   /// Read a '\n'-terminated ASCII string from a stream.
@@ -3541,6 +3796,82 @@ namespace fs
       str = str.substr(0, length - 1);
     }
     return str;
+  }
+
+  /// @brief Write a FreeSurfer annotation (brain surface parcellation) to a stream.
+  /// @param annot The Annot instance to write.
+  /// @param os An open output stream (binary mode).
+  /// @see There exists an overload to write to a file.
+  /// @throws std::domain_error if the annot or colortable data is inconsistent.
+  void write_annot(const Annot &annot, std::ostream &os)
+  {
+    int32_t num_vertices = static_cast<int32_t>(annot.num_vertices());
+    _fwritet<int32_t>(os, num_vertices);
+
+    // Interleaved vertex indices and labels.
+    for (size_t i = 0; i < static_cast<size_t>(num_vertices); i++)
+    {
+      _fwritet<int32_t>(os, annot.vertex_indices[i]);
+      _fwritet<int32_t>(os, annot.vertex_labels[i]);
+    }
+
+    // Colortable presence flag + version tag (version 2, no old-format entries).
+    _fwritet<int32_t>(os, 1);  // has_colortable
+    _fwritet<int32_t>(os, -2); // version tag: negative means new format, abs value is version
+
+    int32_t num_entries = static_cast<int32_t>(annot.colortable.num_entries());
+    _fwritet<int32_t>(os, num_entries);
+
+    // Original filename (not meaningful when writing, write "unknown" as placeholder).
+    std::string orig_filename = "unknown";
+    int32_t orig_filename_len = static_cast<int32_t>(orig_filename.size());
+    _fwritet<int32_t>(os, orig_filename_len);
+    _fwritefixedlengthstring(os, orig_filename, static_cast<size_t>(orig_filename_len));
+
+    // Duplicate num_entries (yes, the format stores it twice).
+    _fwritet<int32_t>(os, num_entries);
+
+    for (int32_t i = 0; i < num_entries; i++)
+    {
+      _fwritet<int32_t>(os, annot.colortable.id[i]);
+      // Name length: strlen + 1 for the trailing null byte, matching _freadfixedlengthstring(strip_last_char=true).
+      int32_t name_len = static_cast<int32_t>(annot.colortable.name[i].size()) + 1;
+      _fwritet<int32_t>(os, name_len);
+      _fwritefixedlengthstring(os, annot.colortable.name[i] + '\0', static_cast<size_t>(name_len));
+      _fwritet<int32_t>(os, annot.colortable.r[i]);
+      _fwritet<int32_t>(os, annot.colortable.g[i]);
+      _fwritet<int32_t>(os, annot.colortable.b[i]);
+      _fwritet<int32_t>(os, annot.colortable.a[i]);
+    }
+  }
+
+  /// @brief Write a FreeSurfer annotation (brain surface parcellation) to a file.
+  /// @param annot The Annot instance to write.
+  /// @param filename Path to the output file.
+  /// @see There exists an overload to write to a stream.
+  /// @throws std::runtime_error if the file cannot be opened.
+  ///
+  /// #### Examples
+  ///
+  /// @code
+  /// fs::Annot annot;
+  /// fs::read_annot(&annot, "lh.aparc.annot");
+  /// // modify annot here …
+  /// fs::write_annot(annot, "lh.aparc.modified.annot");
+  /// @endcode
+  void write_annot(const Annot &annot, const std::string &filename)
+  {
+    std::ofstream ofs;
+    ofs.open(filename, std::ofstream::out | std::ofstream::binary);
+    if (ofs.is_open())
+    {
+      write_annot(annot, ofs);
+      ofs.close();
+    }
+    else
+    {
+      throw std::runtime_error("Unable to open annot file '" + filename + "' for writing.\n");
+    }
   }
 
   /// @brief Write curv data to a stream.
@@ -3613,6 +3944,10 @@ namespace fs
     // Write RAS part of of header if flag is 1.
     if (mgh.header.ras_good_flag == 1)
     {
+      if (mgh.header.Mdc.size() < 9 || mgh.header.Pxyz_c.size() < 3)
+      {
+        throw std::logic_error("MGH header ras_good_flag set but Mdc and/or Pxyz_c vectors are undersized.\n");
+      }
       _fwritet<float>(os, mgh.header.xsize);
       _fwritet<float>(os, mgh.header.ysize);
       _fwritet<float>(os, mgh.header.zsize);
@@ -3715,6 +4050,99 @@ namespace fs
       throw std::runtime_error("Unable to open MGH file '" + filename + "' for writing.\n");
     }
   }
+
+#ifdef LIBFS_HAS_ZLIB
+
+  /// @brief Read a FreeSurfer volume file in MGZ format (gzipped MGH) into the given Mgh struct.
+  /// @details The MGZ format is just a gzipped MGH file. This function uses zlib to decompress the
+  ///          file and then delegates to the stream-based read_mgh(). Requires linking with -lz.
+  /// @param mgh An Mgh instance that should be filled with the data from the file.
+  /// @param filename Path to the input MGZ file.
+  /// @throws std::runtime_error if the file cannot be opened or decompressed.
+  ///
+  /// #### Examples
+  ///
+  /// @code
+  /// fs::Mgh mgh;
+  /// fs::read_mgz(&mgh, "brain.mgz");
+  /// @endcode
+  inline void read_mgz(Mgh *mgh, const std::string &filename)
+  {
+    gzFile gz = gzopen(filename.c_str(), "rb");
+    if (!gz)
+    {
+      int errnum = 0;
+      const char *errstr = gzerror(gz, &errnum);
+      throw std::runtime_error("Could not open MGZ file '" + filename + "' for reading: " +
+                               (errstr ? std::string(errstr) : "unknown error") + "\n");
+    }
+    std::vector<char> buf;
+    char chunk[131072];
+    int n;
+    while ((n = gzread(gz, chunk, sizeof(chunk))) > 0)
+    {
+      buf.insert(buf.end(), chunk, chunk + n);
+    }
+    if (n < 0)
+    {
+      int errnum = 0;
+      const char *errstr = gzerror(gz, &errnum);
+      gzclose(gz);
+      throw std::runtime_error("Error decompressing MGZ file '" + filename + "': " +
+                               (errstr ? std::string(errstr) : "unknown error") + "\n");
+    }
+    gzclose(gz);
+    std::istringstream iss(std::string(buf.data(), buf.size()));
+    read_mgh(mgh, &iss);
+  }
+
+  /// @brief Write MGH data to an MGZ format file (gzipped MGH).
+  /// @details This function uses zlib to compress the data after writing it with the
+  ///          stream-based write_mgh(). Requires linking with -lz.
+  /// @param mgh An Mgh instance that should be written.
+  /// @param filename Path to the output MGZ file.
+  /// @throws std::runtime_error if the file cannot be opened or written.
+  ///
+  /// #### Examples
+  ///
+  /// @code
+  /// fs::Mgh mgh;
+  /// fs::read_mgz(&mgh, "brain.mgz");
+  /// // Do something with 'mgh' here, maybe?
+  /// fs::write_mgz(mgh, "output.mgz");
+  /// @endcode
+  inline void write_mgz(const Mgh &mgh, const std::string &filename)
+  {
+    std::ostringstream oss;
+    write_mgh(mgh, oss);
+    std::string data = oss.str();
+
+    gzFile gz = gzopen(filename.c_str(), "wb");
+    if (!gz)
+    {
+      int errnum = 0;
+      const char *errstr = gzerror(gz, &errnum);
+      throw std::runtime_error("Could not open MGZ file '" + filename + "' for writing: " +
+                               (errstr ? std::string(errstr) : "unknown error") + "\n");
+    }
+    z_size_t total_written = 0;
+    while (total_written < data.size())
+    {
+      int written = gzwrite(gz, data.data() + total_written, static_cast<unsigned int>(data.size() - total_written));
+      if (written <= 0)
+      {
+        int errnum = 0;
+        const char *errstr = gzerror(gz, &errnum);
+        gzclose(gz);
+        throw std::runtime_error("Error writing MGZ file '" + filename + "': " +
+                                 (errstr ? std::string(errstr) : "unknown error") + "\n");
+      }
+      total_written += static_cast<z_size_t>(written);
+    }
+    gzclose(gz);
+  }
+
+#endif // LIBFS_HAS_ZLIB
 
   /// Models a FreeSurfer label.
   /// Can be a surface or volume label.
@@ -4016,6 +4444,39 @@ namespace fs
     else if (fs::util::ends_with(filename, {".off", ".OFF"}))
     {
       mesh.to_off_file(filename);
+    }
+    else
+    {
+      fs::write_surf(mesh, filename);
+    }
+  }
+
+  /// @brief Write a mesh to a file in different formats, with vertex colors.
+  /// @details The output format will be auto-determined from the file extension. The colors are written for PLY, OFF, and OBJ formats; the surf format ignores them.
+  /// @param mesh The fs::Mesh instance to write.
+  /// @param filename The path to the output file.
+  /// @param col u_char vector of RGB color values, 3 per vertex.
+  /// @throws std::runtime_error if the file cannot be opened.
+  ///
+  /// #### Examples
+  ///
+  /// @code
+  /// fs::Mesh surface = fs::Mesh::construct_cube();
+  /// fs::write_mesh(surface, "cube.ply", surface.vertex_colors);
+  /// @endcode
+  void write_mesh(const Mesh &mesh, const std::string &filename, const std::vector<uint8_t> col)
+  {
+    if (fs::util::ends_with(filename, {".ply", ".PLY"}))
+    {
+      mesh.to_ply_file(filename, col);
+    }
+    else if (fs::util::ends_with(filename, {".obj", ".OBJ"}))
+    {
+      mesh.to_obj_file(filename, col);
+    }
+    else if (fs::util::ends_with(filename, {".off", ".OFF"}))
+    {
+      mesh.to_off_file(filename, col);
     }
     else
     {
