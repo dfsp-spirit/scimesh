@@ -88,3 +88,4 @@ test_*.ppm
 test_*.bmp
 scimesh.Rcheck/
 examples/cpp/all_primitives/build_manual/
+docs

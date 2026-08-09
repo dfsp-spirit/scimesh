@@ -37,3 +37,5 @@
 CMakeLists.txt
 Doxyfile
 
+^_pkgdown\.yml$
+^pkgdown$

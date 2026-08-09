@@ -31,7 +31,7 @@ Description: A fast, GPU-free 3D software renderer written in modern C++17 with
     integration pipelines, making it suitable for scientific visualization
     across neuro-imaging, molecular structures, and general 3D graphics.
 License: MIT + file LICENSE
-URL: https://github.com/dfsp-spirit/scimesh
+URL: https://github.com/dfsp-spirit/scimesh, https://dfsp-spirit.github.io/scimesh/
 BugReports: https://github.com/dfsp-spirit/scimesh/issues
 Imports:
     Rcpp (>= 1.0.0)
@@ -51,4 +51,3 @@ Encoding: UTF-8
 NeedsCompilation: yes
 Config/roxygen2/version: 8.0.0
 RoxygenNote: 7.3.3
-
