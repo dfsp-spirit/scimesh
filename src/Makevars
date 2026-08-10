@@ -18,13 +18,4 @@ OBJECTS = rcpp_bindings.o \
     core/obj_io.o \
     core/ply_io.o
 
-# Cross-platform stripping
-.PHONY: strip-shlib
-strip-shlib: $(SHLIB)
-	@if [ "`uname -s`" = "Darwin" ]; then \
-		strip -x $(SHLIB); \
-	else \
-		strip --strip-debug $(SHLIB); \
-	fi
 
-all: $(SHLIB) strip-shlib
