@@ -4,6 +4,8 @@ scimesh Changes
 
 Current WIP
 ----------------------------
+- FIX: do not strip debug symbols for R build, as per CRAN policy
+- FIX: add more input checks and disable use of asserts in third-party code, as per CRAN policy that C++ code should not call assert
 - NEW: full_CLI_renderer example: composite mode now supports --crop/--grow to pre-process each tile (e.g. trim colorbar whitespace) before arranging
 - NEW: full_CLI_renderer example: add --info mode to print image dimensions ('<path> WxH') without external tools like ImageMagick's identify
 - NEW: add composite_tight.sh example that produces compact, publication-style multi-view figures: crop each rendered view (--crop --grow), arrange via --composite --fit-mode pad (auto max-extent padding, no manual image sizing), then attach a trimmed colorbar
