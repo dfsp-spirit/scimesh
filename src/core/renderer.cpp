@@ -29,6 +29,9 @@ struct DeferredTri {
 } // anonymous namespace
 
 Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const RenderOptions &options) {
+    if (options.width <= 0 || options.height <= 0) {
+        throw std::invalid_argument("RenderOptions width and height must be > 0");
+    }
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
     render_pipeline({&mesh}, camera, options, internal);
@@ -36,6 +39,9 @@ Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const Render
 }
 
 Image Renderer::render_scene(const Scene &scene, const Camera &camera, const RenderOptions &options) {
+    if (options.width <= 0 || options.height <= 0) {
+        throw std::invalid_argument("RenderOptions width and height must be > 0");
+    }
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
     std::vector<const Mesh *> mesh_ptrs;
@@ -74,6 +80,9 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
                                   float radius,
                                   const Camera &camera,
                                   const RenderOptions &options) {
+    if (options.width <= 0 || options.height <= 0) {
+        throw std::invalid_argument("RenderOptions width and height must be > 0");
+    }
     int np = static_cast<int>(positions.size());
     if (np == 0 || colors.empty()) {
         Image img(options.width, options.height);

@@ -2,6 +2,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <cmath>
+#include <stdexcept>
 
 namespace scimesh {
 
@@ -11,6 +12,18 @@ Mat4 Camera::get_view_matrix() const {
 
 Mat4 Camera::get_projection_matrix(float aspect_ratio, float near_plane, float far_plane) const {
     if (projection == ProjectionType::PERSPECTIVE) {
+        if (aspect_ratio <= 0.0f) {
+            throw std::invalid_argument(
+                "aspect_ratio must be > 0 for perspective projection");
+        }
+        if (near_plane <= 0.0f) {
+            throw std::invalid_argument(
+                "near_plane must be > 0 for perspective projection");
+        }
+        if (far_plane <= near_plane) {
+            throw std::invalid_argument(
+                "far_plane must be > near_plane for perspective projection");
+        }
         return glm::perspective(glm::radians(fov_degrees), aspect_ratio, near_plane, far_plane);
     } else {
         float dist = glm::length(eye - center);

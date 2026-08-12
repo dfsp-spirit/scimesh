@@ -9,6 +9,13 @@
 // test_primitives.cpp, so guard against double-definition at link time.
 // STBI_STATIC makes all stb symbols file-local, preventing linker clashes
 // when scimesh is linked alongside other libraries that also use stb_image.
+//
+// Override stb_image's default assert() behaviour: the library already
+// handles errors gracefully (returns NULL / 0), so converting asserts to
+// no-ops is safe and prevents process termination (CRAN policy).
+#define STBI_ASSERT(x) ((void)0)
+#define STBIW_ASSERT(x) ((void)0)
+
 #ifdef SCIMESH_STB_WRITE_IMPL
 #ifndef STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_STATIC
