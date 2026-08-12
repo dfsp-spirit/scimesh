@@ -1,0 +1,862 @@
+# Getting Started with scimesh
+
+## What is scimesh?
+
+**scimesh** is a fast, headless, GPU-free software renderer for 3D
+triangle meshes that produces **publication-quality images** for papers,
+slides, and presentations. It works anywhere R works — no X11, no
+OpenGL, no GPU required.
+
+Applications span any field that works with 3D surfaces: -
+**Neuroimaging**: cortical surface visualisation (FreeSurfer data) -
+**Structural biology**: molecule surfaces from PDB files - **Computer
+graphics**: Stanford models, procedural geometry, textured meshes -
+**Engineering and simulation**: mesh-based scientific visualisation of
+any kind
+
+All rendering is done in modern C++17 and returns in-memory RGBA images
+that can be saved to PNG or composed into multi-panel figures.
+
+While scimesh can serve as a drop-in renderer backend when rgl/OpenGL is
+unavailable (e.g., on macOS without XQuartz, on HPC clusters, in CI
+containers), it is a **general-purpose visualisation tool** — not tied
+to any specific domain or package.
+
+## Installation
+
+``` r
+
+# Install from GitHub
+remotes::install_github("dfsp-spirit/scimesh")
+```
+
+For the full viridis colormap family (magma, inferno, cividis, etc.),
+you may optionally install `viridisLite`:
+
+``` r
+
+install.packages("viridisLite")
+```
+
+But this is not required — scimesh ships built-in
+[`viridis_colormap()`](https://dfsp-spirit.github.io/scimesh/r/reference/viridis_colormap.md)
+and
+[`diverging_colormap()`](https://dfsp-spirit.github.io/scimesh/r/reference/diverging_colormap.md)
+functions that use only base R.
+
+## Quick Start
+
+``` r
+
+library(scimesh)
+
+sphere <- generate_sphere(c(0, 0, 0), radius = 1.2,
+                          segments = 32, color = c(0.9, 0.3, 0.2, 1.0))
+cam <- camera_auto(sphere, direction = c(1.2, 0.8, 1))
+
+# Flat-shaded sphere
+img <- render_mesh(sphere$vertices, sphere$triangles,
+    colors = sphere$colors, camera = cam,
+    options = render_options(
+        lights = list(
+            list(position = c(0.5, 1.0, 0.8), intensity = 1.5),
+            list(position = c(-0.5, 0.2, 0.6), intensity = 0.5))))
+
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
+printf("Rendered sphere written to: %s\n", tmp_file)
+```
+
+## Rendering Features
+
+### Render Options Reference
+
+All rendering is controlled via
+[`render_options()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_options.md).
+The following parameters are available:
+
+| Parameter | Type | Default | Description |
+|----|----|----|----|
+| `width`, `height` | integer | 800, 600 | Output image dimensions in pixels |
+| `shading` | `"smooth"` / `"flat"` | `"smooth"` | Per-vertex (smooth) or per-face (flat) shading |
+| `backface_culling` | logical | `TRUE` | Skip triangles facing away from camera |
+| `background_color` | RGBA vector | `c(0,0,0,0)` | Transparent black by default |
+| `default_color` | RGBA vector | `c(0.7,0.7,0.7,1)` | Fallback when no per-vertex colors |
+| `invert_normals` | logical | `FALSE` | Flip face orientation |
+| `wireframe` | logical | `FALSE` | Render edges only |
+| `wireframe_color` | RGBA vector | `c(0,0,0,1)` | Edge color in wireframe mode |
+| `projection` | `"perspective"` / `"orthographic"` | `"perspective"` | Camera projection type |
+| `specular_color` | RGBA vector | `c(0,0,0,0)` | Specular highlight color (off by default) |
+| `shininess` | numeric | 0 | Gloss tightness (8–128) |
+| `ambient` | numeric | 0.3 | Ambient light level (0–1) |
+| `contrast` | numeric | 1.0 | S-curve contrast multiplier |
+| `lights` | list or `NULL` | `NULL` | Custom light list (auto-default if `NULL`) |
+| `fog_enabled` | logical | `FALSE` | Enable depth fog |
+| `fog_start` | numeric | 0 | Near-plane fog start |
+| `fog_end` | numeric | 1 | Far-plane fog end |
+| `fog_color` | RGBA vector | `c(0,0,0,0)` | Fog color |
+| `aa_samples` | integer (1, 2, or 4) | 1 | Ordered-grid supersampling factor |
+| `ssao_enabled` | logical | `FALSE` | Enable screen-space ambient occlusion |
+| `ssao_radius` | numeric | 16 | SSAO sample radius in pixels |
+| `ssao_intensity` | numeric | 0.8 | SSAO occlusion strength (0–1) |
+| `threads` | integer | 0 | Number of CPU threads (0 = auto) |
+| `clip_planes` | list or `NULL` | `NULL` | Custom clipping planes |
+
+The following sections cover the most important options in detail.
+
+### Lighting and Shading
+
+scimesh uses a Blinn-Phong shading model with support for multiple light
+sources, specular highlights, ambient control, and contrast adjustments.
+
+#### Ambient Lighting
+
+The `ambient` parameter (default 0.3) controls how much light reaches
+surfaces that face away from the light source. Lower values produce
+deeper shadows and more contrast:
+
+``` r
+
+render_options(ambient = 0.15)  # deeper shadows
+```
+
+#### Multi-Light Setups
+
+Explicit lights give you full control over direction, colour, and
+intensity:
+
+``` r
+
+render_options(
+    ambient = 0.2,
+    contrast = 1.1,
+    lights = list(
+        list(position = c(0.5, 1.0, 0.8), color = c(1, 0.97, 0.9, 1),
+             intensity = 1.5),
+        list(position = c(-0.5, 0.2, 0.6), color = c(0.4, 0.5, 0.8, 1),
+             intensity = 0.5)))
+```
+
+#### Specular Highlights
+
+Add a glossy sheen to surfaces:
+
+``` r
+
+render_options(
+    specular_color = c(0.4, 0.4, 0.4, 1),  # white highlight
+    shininess = 64)                          # tight spot
+```
+
+| `shininess` value | Look                  |
+|-------------------|-----------------------|
+| 8–16              | Soft plastic          |
+| 32–64             | Shiny surface         |
+| 128               | Glass-like tight spot |
+
+#### Contrast Adjustment
+
+Pass `contrast` to
+[`render_options()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_options.md)
+to apply an S-curve contrast stretch after shading. Values \> 1.0 push
+darks toward black and lights toward white, increasing perceived
+contrast. The default 1.0 means no change:
+
+``` r
+
+render_options(contrast = 1.1)  # subtle S-curve
+```
+
+The formula applied is `(value - 0.5) * contrast + 0.5`, clamped to
+`[0, 1]`. Typical values are 1.1–1.2 for a gentle boost, or up to 1.5
+for a dramatic look.
+
+You can also apply contrast as post-processing to an existing image:
+
+``` r
+
+img <- render_mesh(mesh$vertices, mesh$triangles)
+img <- image_apply_contrast(img, contrast = 1.1)
+tmp_file <- tempfile(fileext = ".png")
+write_png(img, tmp_file)
+printf("Contrast-adjusted image written to: %s\n", tmp_file)
+```
+
+### Camera
+
+#### Auto-Framing
+
+[`camera_auto()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_auto.md)
+computes a camera that fits any mesh or vertex set:
+
+``` r
+
+verts <- matrix(rnorm(900), ncol = 3)
+cam <- camera_auto(verts, direction = c(1, 1, 1), fov = 45)
+```
+
+It accepts either an Nx3 matrix or a mesh descriptor list.
+
+#### Manual Camera
+
+For full control, use
+[`camera()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera.md):
+
+``` r
+
+cam <- camera(eye = c(0, 0, 10), center = c(0, 0, 0),
+              up = c(0, 1, 0), fov = 30)
+```
+
+#### Orbiting the Camera
+
+[`camera_orbit()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_orbit.md)
+rotates a camera’s eye and up vector around its center by a given angle
+about an axis. This is useful for generating turntable-style frame
+sequences:
+
+``` r
+
+cam <- camera_auto(mesh, direction = c(1, 1, 1))
+
+for (i in seq_len(8)) {
+    cam_i <- camera_orbit(cam, angle_degrees = 360 / 8 * (i - 1))
+    img   <- render_mesh(mesh$vertices, mesh$triangles, camera = cam_i,
+                         options = render_options(width = 600, height = 400))
+
+    # Construct the file path inside tempdir()
+    file_name <- sprintf("frame_%04d.png", i - 1)
+    file_path <- file.path(tempdir(), file_name)
+
+    # Write the image to the temporary directory
+    write_png(img, file_path)
+}
+
+message("Frames saved in: ", tempdir())
+```
+
+For more complex trajectories, replace
+[`camera_orbit()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_orbit.md)
+with your own function — it only needs to set `camera$eye` and
+`camera$up`.
+
+The resulting PNG frames can be assembled into a video with ffmpeg or
+into an animated GIF with your tool of choice. See
+`examples/R/video_frames_orbit/` for a runnable R example, and
+`examples/cpp/brain_video/` for a C++ version that renders 48 full-brain
+frames.
+
+#### rgl-Compatible Default View
+
+[`camera_auto()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_auto.md)
+accepts an `rgl_compat` parameter. When `TRUE`, it mimics rgl’s default
+view parameters:
+
+| Parameter      | scimesh default | `rgl_compat = TRUE` |
+|----------------|-----------------|---------------------|
+| FOV            | 45°             | 30°                 |
+| Elevation      | 0° (front-on)   | 15° above horizon   |
+| Distance basis | bounding box    | bounding sphere     |
+
+The distance formula follows rgl’s implementation exactly:
+`distance = sphere_radius / sin(FOV / 2)`, where `sphere_radius` is half
+the length of the axis-aligned bounding box diagonal.
+
+``` r
+
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+
+# scimesh default: straight front view
+img_default <- render_mesh(mesh)
+
+# rgl-compatible view: elevated, matching rgl's default look
+cam <- camera_auto(mesh, rgl_compat = TRUE)
+img_rgl   <- render_mesh(mesh, camera = cam)
+```
+
+This is especially useful when comparing outputs between scimesh and
+rgl, or when you prefer rgl’s slightly elevated default perspective.
+
+### Projection Type
+
+Perspective (default) or orthographic (parallel projection, matching
+rgl’s `view3d(fov = 0)` convention):
+
+``` r
+
+render_options(projection = "orthographic")
+```
+
+### Anti-Aliasing
+
+scimesh supports ordered-grid supersampling (SSAA). Pass
+`aa_samples = 2L` for 2x2 SSAA (renders internally at double resolution,
+downsamples by box averaging):
+
+``` r
+
+render_options(aa_samples = 2L)
+```
+
+Values of 1 (off), 2, or 4 are supported. Higher values give smoother
+edges but use proportionally more memory and time.
+
+### Wireframe Mode
+
+``` r
+
+render_options(wireframe = TRUE,
+    wireframe_color = c(0, 0, 0, 1))  # black edges
+```
+
+Edges are computed via barycentric distance testing inside the triangle
+rasterizer — no separate line primitives needed. Edge thickness adapts
+to triangle size so small triangles don’t disappear.
+
+### Screen-Space Ambient Occlusion (SSAO)
+
+SSAO adds contact shadows in crevices and concavities, dramatically
+improving depth perception and realism. It’s a screen-space
+post-processing effect — no extra geometry needed:
+
+``` r
+
+render_options(
+    ssao_enabled = TRUE,
+    ssao_radius = 12,       # sample radius in pixels
+    ssao_intensity = 0.5)   # occlusion strength (0–1)
+```
+
+Higher `ssao_radius` values sample a larger area (more expensive but
+softer shadows). Higher `ssao_intensity` darkens occluded regions more.
+Typical settings: radius 8–16, intensity 0.4–0.8.
+
+SSAO is demonstrated in the `spot_cow` and `dragon` R examples, and
+extensively in the C++ examples.
+
+### Depth Fog
+
+Atmospheric depth fog fades distant geometry toward a background color,
+useful for emphasising foreground objects or creating stylised renders:
+
+``` r
+
+render_options(
+    fog_enabled = TRUE,
+    fog_start = 0.6,              # begin fade at 60 % depth
+    fog_end = 1.0,                # fully fogged at far plane
+    fog_color = c(0.9, 0.95, 1, 1))  # pale blue fog
+```
+
+Fog is applied linearly between `fog_start` and `fog_end` in normalised
+device coordinates.
+
+### Semi-Transparent Overlays
+
+scimesh supports proper alpha blending with depth-sorted back-to-front
+rendering. This is useful for visualising nested surfaces (e.g., white
+matter and pial surface in neuroimaging), or for glass-brain effects.
+
+**R example:**
+
+``` r
+
+library(scimesh)
+
+white <- freesurferformats::read.fs.surface("sub-01/surf/lh.white")
+pial  <- freesurferformats::read.fs.surface("sub-01/surf/lh.pial")
+
+nv <- nrow(white$vertices)
+
+white_mesh <- list(
+    vertices  = white$vertices,
+    triangles = white$faces,
+    colors    = matrix(c(0.7, 0.7, 0.7, 1.0), nv, 4, byrow = TRUE))
+
+pial_mesh <- list(
+    vertices  = pial$vertices,
+    triangles = pial$faces,
+    colors    = matrix(c(0.9, 0.3, 0.2, 0.35), nv, 4, byrow = TRUE))
+
+cam <- camera_auto(pial_mesh, direction = c(-1, 0, 0.2))
+img <- render_scene(list(white_mesh, pial_mesh), cam,
+    render_options(width = 1200, height = 900,
+        backface_culling = FALSE,
+        specular_color = c(0.4, 0.4, 0.4, 1),
+        shininess = 64))
+temp_file <- tempfile(fileext = ".png")
+write_png(img, temp_file)
+printf("Transparent render written to: %s\n", temp_file)
+```
+
+**C++ example:** See `examples/cpp/transparency/` in the repository.
+
+### Background and Transparency
+
+By default, scimesh renders with a transparent background
+(`background_color = c(0, 0, 0, 0)`), which is ideal for compositing.
+
+For a solid background (e.g., white for papers), set:
+
+``` r
+
+render_options(background_color = c(1, 1, 1, 1))  # solid white
+```
+
+The background color is written to the output image’s alpha channel, so
+transparent backgrounds survive PNG export and can be further composited
+in tools like ImageMagick or layout packages.
+
+## Working with Meshes
+
+### Procedural Geometry
+
+scimesh provides C++ and R functions for generating primitive geometry:
+
+``` r
+
+cube    <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(1, 0, 0, 1))
+sphere  <- generate_sphere(c(0, 0, 0), radius = 1.2,
+                           segments = 32, color = c(0.9, 0.3, 0.2, 1))
+cyl     <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), 0.5, 32,
+                             c(0.1, 0.7, 0.3, 1))
+cone    <- generate_cone(c(0, -1.2, 0), c(0, 1.2, 0), 0.6, 32,
+                         c(0.9, 0.7, 0.1, 1))
+pyramid <- generate_pyramid(c(0, 0, 0), c(0, 1.5, 0), 1,
+                            c(0.7, 0.2, 0.8, 1))
+tetra   <- generate_tetrahedron(c(-1, -0.5, -1), c(1, -0.5, -1),
+            c(0, -0.5, 1), c(0, 1.2, 0), c(0.2, 0.8, 0.8, 1))
+torus   <- generate_torus(c(0, 0, 0), 1.0, 0.35, 24, 12,
+                          c(0.6, 0.4, 0.2, 1))
+plane   <- generate_plane(c(0, 0, 0), c(0, 1, 0), 1.2, 0.8,
+                          c(0.5, 0.5, 0.5, 1))
+```
+
+See `examples/R/primitives/run.R` for a gallery script that renders all
+primitives side-by-side in both shaded and wireframe mode.
+
+### Mesh I/O
+
+scimesh can read and write standard 3D mesh file formats. All readers
+return a mesh descriptor list with `vertices`, `triangles`, and
+optionally `normals`, `uv`, or `colors`.
+
+``` r
+
+# Read a Wavefront OBJ file (with optional UVs and normals)
+mesh <- read_obj("model.obj")
+
+# Read a Stanford PLY file (with optional vertex colors)
+mesh <- read_ply("model.ply")
+
+# Read an STL file (binary or ASCII)
+mesh <- read_stl("model.stl")
+
+# Write a mesh to STL
+tmp_file1 <- tempfile(fileext = ".stl")
+tmp_file2 <- tempfile(fileext = ".stl")
+
+write_stl(mesh, tmp_file1)               # binary (default)
+write_stl(mesh, tmp_file2, format = "ascii")
+```
+
+The OBJ reader supports multi-shape files and texture coordinates. The
+PLY reader supports per-vertex RGB colors. STL writes preserve vertex
+normals when available.
+
+### Mesh Transforms
+
+Translate, scale, rotate, or apply arbitrary 4x4 matrices to meshes:
+
+``` r
+
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(1, 0, 0, 1))
+mesh <- translate_mesh(mesh, c(5, 0, 0))
+mesh <- scale_mesh(mesh, 2.0)
+mesh <- rotate_mesh(mesh, pi / 4, c(0, 0, 1))
+mesh <- transform_mesh(mesh, my_4x4_matrix)
+```
+
+### Face Colors
+
+Per-face coloring lets you assign a single color to every vertex of a
+triangle. This is useful for parcellation overlays or material
+assignment:
+
+``` r
+
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))
+
+# 12 triangles, each gets a color
+fc <- matrix(c(1, 0, 0, 1), nrow = 12, ncol = 4, byrow = TRUE)
+img <- render_mesh(mesh$vertices, mesh$triangles, face_colors = fc)
+```
+
+When `face_colors` is provided, it takes precedence over vertex
+`colors`.
+
+### Texture Mapping
+
+Load a texture image and assign UV coordinates to render textured
+meshes:
+
+``` r
+
+# Requires the 'png' package
+library(png)
+tex <- readPNG("texture.png")
+
+# UV coordinates (Nx2, values 0-1) must match vertex order
+mesh <- read_obj("textured.obj")  # OBJ reader extracts UVs
+
+img <- render_mesh(mesh$vertices, mesh$triangles,
+    uv = mesh$uv, texture = tex)
+```
+
+Bilinear texture sampling is used for smooth results.
+
+### Mesh Utilities
+
+#### Bounding Box
+
+Compute or visualise the axis-aligned bounding box:
+
+``` r
+
+mesh <- generate_torus(c(0, 0, 0), 1.5, 0.4, 32, 16)
+bbox <- mesh_bbox(mesh)
+bbox$min  # c(xmin, ymin, zmin)
+bbox$max  # c(xmax, ymax, zmax)
+
+# Generate a wireframe bounding box mesh for rendering
+bbox_mesh <- generate_bbox(mesh, color = c(0, 0, 0, 1), radius = 0.02)
+```
+
+#### Axis Arrows
+
+Generate coloured XYZ axis arrows (red X, green Y, blue Z):
+
+``` r
+
+axes_mesh <- generate_axes(center = c(0, 0, 0), size = 2)
+# Render together with your mesh:
+img <- render_scene(list(mesh, axes_mesh), cam)
+```
+
+## Lower-Level Rendering
+
+Beyond
+[`render_mesh()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_mesh.md)
+and
+[`render_scene()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_scene.md),
+scimesh provides lower-level functions for special use cases.
+
+### Raw Triangles (no index buffer)
+
+Render geometry where positions and colors are flat arrays with 3
+vertices per triangle — useful for dynamically generated geometry:
+
+``` r
+
+positions <- matrix(c(0,0,0, 1,0,0, 0.5,1,0,
+                      0,0,1, 1,0,1, 0.5,1,1), ncol = 3, byrow = TRUE)
+colors <- matrix(c(1,0,0,1, 0,1,0,1, 0,0,1,1,
+                   1,1,0,1, 0,1,1,1, 1,0,1,1), ncol = 4, byrow = TRUE)
+cam <- camera_auto(positions)
+img <- render_triangles(positions, colors, cam)
+```
+
+### Points
+
+Render point cloud data with depth-tested circular markers:
+
+``` r
+
+pts <- matrix(rnorm(300), ncol = 3)
+cols <- matrix(c(1, 0.5, 0, 1), nrow = nrow(pts), ncol = 4, byrow = TRUE)
+img <- render_points(pts, cols, radius = 4)
+```
+
+### Lines (as Cylinders)
+
+Render line segments as thin cylinders:
+
+``` r
+
+from <- matrix(c(0,0,0, 0,0,0), ncol = 3, byrow = TRUE)
+to   <- matrix(c(1,0,0, 0,1,0), ncol = 3, byrow = TRUE)
+cols <- matrix(c(1,0,0,1, 0,1,0,1), ncol = 4, byrow = TRUE)
+img <- render_lines(from, to, radii = 0.05, colors = cols, cam)
+```
+
+## Image Utilities
+
+### Colour Bars
+
+scimesh can produce horizontal or vertical colour bars in pure R (no
+X11), ready to be composed alongside rendered images:
+
+``` r
+
+cbar <- colorbar_horizontal(viridis_colormap,
+    n_colors = 256, width = 600, height = 80,
+    ticks = c(0, 0.5, 1),
+    tick_labels = c("min", "mid", "max"),
+    title = "Value")
+```
+
+Both
+[`colorbar_horizontal()`](https://dfsp-spirit.github.io/scimesh/r/reference/colorbar_horizontal.md)
+and
+[`colorbar_vertical()`](https://dfsp-spirit.github.io/scimesh/r/reference/colorbar_vertical.md)
+accept any colormap, specified either as: - **A function** returning hex
+colors (e.g., `viridis_colormap`, `diverging_colormap`,
+[`grDevices::hcl.colors`](https://rdrr.io/r/grDevices/palettes.html), or
+[`viridisLite::viridis`](https://sjmgarnier.github.io/viridisLite/reference/viridis.html)) -
+**A vector of color strings** (e.g., `c("red", "white", "blue")`)
+
+Built-in colormaps (no extra packages required):
+
+``` r
+
+# Viridis (perceptually uniform, colourblind-friendly)
+viridis_colormap(256)
+
+# Blue-white-red diverging (for signed data like Z-scores)
+diverging_colormap(256)
+
+# Any base R palette via wrapper functions
+my_cmap <- function(n) grDevices::hcl.colors(n, palette = "inferno")
+cbar <- colorbar_horizontal(my_cmap)
+
+# Or pass colors directly
+cbar <- colorbar_horizontal(c("darkblue", "cyan", "yellow", "red"))
+```
+
+If you have `viridisLite` installed, you can use its full colormap
+family (magma, inferno, plasma, cividis) directly:
+
+``` r
+
+library(viridisLite)
+cbar <- colorbar_horizontal(viridis)  # viridisLite function
+```
+
+See `examples/R/colormaps/run.R` for a complete demonstration.
+
+### Compositing Multiple Images
+
+[`compose_layout()`](https://dfsp-spirit.github.io/scimesh/r/reference/compose_layout.md)
+arranges rendered images in a grid with optional per-row/per-column
+cropping to eliminate wasted whitespace:
+
+``` r
+
+img1 <- render_mesh(...)
+img2 <- render_mesh(...)
+result <- compose_layout(list(img1, img2), nrow = 1L, crop = TRUE)
+tmp_file <- tempfile(fileext = ".png")
+write_png(result, tmp_file)
+printf("Composed image written to: %s\n", tmp_file)
+```
+
+### Image Stacking
+
+Quick helpers for combining images:
+
+``` r
+
+# Horizontal stack (side by side)
+result <- stack_horizontal(img1, img2, img3)
+
+# Vertical stack (one below another)
+result <- stack_vertical(img1, img2)
+
+# With a colorbar
+result <- stack_horizontal(img1, img2,
+    colorbar = colorbar_horizontal(viridis_colormap))
+```
+
+## Interoperability with Other Packages
+
+### rgl / tmesh3d
+
+scimesh and [rgl](https://cran.r-project.org/package=rgl) mesh formats
+can be converted in both directions, and scimesh render functions accept
+rgl meshes **transparently** — no manual conversion needed.
+
+#### Rendering an rgl mesh directly
+
+Pass an rgl `tmesh3d` object (or any list with `vb` and `it` components)
+directly to
+[`render_mesh()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_mesh.md)
+or include it in a scene list for
+[`render_scene()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_scene.md)
+— the conversion happens automatically:
+
+``` r
+
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl_mesh <- rgl::tetrahedron3d()
+    img <- render_mesh(rgl_mesh)          # transparent conversion
+}
+```
+
+This also works when mixing scimesh and rgl meshes in a scene:
+
+``` r
+
+cube <- generate_cuboid(c(-1, 0, 0), c(0.5, 0.5, 0.5))
+img <- render_scene(list(cube, rgl_mesh), cam)   # mixed formats
+```
+
+#### rgl → scimesh (explicit)
+
+If you prefer explicit conversion, use
+[`mesh_from_rgl()`](https://dfsp-spirit.github.io/scimesh/r/reference/mesh_from_rgl.md).
+This also works **without the rgl package** installed — any list with
+`vb` and `it` components is accepted:
+
+``` r
+
+tmesh <- list(
+    vb = rbind(c(-1, -1, 1, 1), c(-1, 1, 1, -1), c(0, 0, 0, 0), c(1, 1, 1, 1)),
+    it = rbind(c(1L, 1L), c(2L, 3L), c(3L, 4L)))
+mesh <- mesh_from_rgl(tmesh)
+img  <- render_mesh(mesh)
+```
+
+#### scimesh → rgl (inverse)
+
+Convert a scimesh mesh back to rgl’s `tmesh3d` format with
+[`mesh_to_rgl()`](https://dfsp-spirit.github.io/scimesh/r/reference/mesh_to_rgl.md).
+Vertex colors are forwarded automatically if present in the mesh:
+
+``` r
+
+mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), color = c(1, 0, 0, 1))
+rgl_mesh <- mesh_to_rgl(mesh)
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl::shade3d(rgl::tmesh3d(
+        vertices = rgl_mesh$vb,
+        indices  = rgl_mesh$it), col = "red")
+}
+```
+
+The returned list has `vb` (4×N homogeneous coordinates), `it` (3×M
+index matrix), and optionally `normals` and `mat` (material/colors).
+
+#### Matching rgl’s Default View
+
+When rendering an rgl mesh with scimesh, you may want the output to
+visually match what you’d see in an rgl window. Pass `rgl_compat = TRUE`
+to
+[`camera_auto()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_auto.md)
+to get rgl’s default 30° FOV, 15° elevation, and bounding-sphere
+distance:
+
+``` r
+
+if (requireNamespace("rgl", quietly = TRUE)) {
+    rgl_mesh <- rgl::cube3d()             # rgl primitive
+    cam <- camera_auto(rgl_mesh, rgl_compat = TRUE)
+    img <- render_mesh(rgl_mesh, camera = cam)
+    write_png(img, "cube_rgl_view.png")
+}
+```
+
+The `rgl_compat` camera uses the same algorithm rgl uses internally: it
+computes the bounding sphere (half-diagonal of the AABB) and places the
+eye at `distance = sphere_radius / sin(FOV / 2)` along a direction
+tilted 15° above the −Z axis.
+
+#### Rvcg, Morpho, fsbrain, and other packages
+
+The rgl `mesh3d`/`tmesh3d` format is the lingua franca for 3D meshes in
+R. Packages like [Rvcg](https://cran.r-project.org/package=Rvcg) (mesh
+processing via VCGLIB),
+[Morpho](https://cran.r-project.org/package=Morpho) (geometric
+morphometrics), and
+[fsbrain](https://cran.r-project.org/package=fsbrain) (neuroimaging) all
+produce and consume rgl-format meshes. Since scimesh transparently
+accepts rgl meshes, you can process a mesh with any of these packages
+and render it with scimesh **without any conversion step**:
+
+``` r
+
+if (requireNamespace("Rvcg", quietly = TRUE)) {
+    mesh <- Rvcg::vcgSphere()          # returns rgl-format mesh
+    img  <- render_mesh(mesh)          # scimesh renders it directly
+}
+```
+
+## Examples
+
+The repository includes runnable R example scripts in `examples/R/`:
+
+| Example | What it shows |
+|----|----|
+| `spot_cow/run.R` | Textured OBJ mesh with multi-light setup and SSAO |
+| `dragon/run.R` | Stanford Dragon with specular highlights and 4x AA |
+| `primitives/run.R` | All procedural primitives in shaded + wireframe gallery |
+| `transparency/run.R` | Semi-transparent pial overlay on white matter |
+| `whole_brain_sulc/run.R` | Whole-brain sulcal depth with cortex masking |
+| `video_frames_orbit/run.R` | Turntable orbit frame sequence |
+| `colormaps/run.R` | Custom colormaps with colorbars |
+
+Run all examples at once:
+
+``` sh
+cd examples/R
+bash run_all_R.sh
+```
+
+For C++ examples, see `examples/cpp/` and
+[`docs/CPP_GETTING_STARTED.md`](https://github.com/dfsp-spirit/scimesh/blob/main/docs/CPP_GETTING_STARTED.md).
+
+## FAQ
+
+**How fast is it?** A typical cortical surface (~300k triangles) at
+1200x900 with 2x SSAA renders in 1–3 seconds on a modern CPU. Smaller
+meshes at lower resolution can render in 200 ms or less, depending on
+the CPU and number of lights.
+
+**Why is there no interactive 3D window in which I can rotate the
+mesh?** scimesh is a headless (off-screen) renderer, also known as a
+software rasterizer. It produces images in roughly seconds, on just the
+CPU. For interactive rotation or real-time animation, you need to render
+at least 30 images *per second*. This is only achievable with a hardware
+renderer, i.e., a graphics card and the full software stack required to
+make use of it. If you have a graphics card, the typical solution in R
+is to use rgl/OpenGL for interactive visualization.
+
+**What about volume data, like 3D MRI scans in neuroimaging?** scimesh
+renders 3D surface meshes. Volume slice visualisation (e.g.,
+`volvis.lb.with.surface()` in fsbrain) is done entirely in R/magick
+without 3D rendering — it works independently of the renderer backend.
+Technically it’s just a 2D image, no renderer needed. This means you can
+use the functions in fsbrain for volume visualisation even if you do not
+have rgl/OpenGL, and are using scimesh for surface (mesh) rendering.
+
+**My images look pixelated / jagged — how do I fix this?** Render at
+higher resolution, e.g. `(render_options(width = 2560, height = 1440))`,
+and enable anti-aliasing: `render_options(aa_samples = 2L)`, or even
+higher like `4L`.
+
+**How do I get a transparent background?** This is the default
+(`background_color = c(0, 0, 0, 0)`). See the Background and
+Transparency section under Rendering Features.
+
+**How do I control the number of CPU threads?** Set the `threads` option
+in
+[`render_options()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_options.md).
+The default 0 automatically uses all available cores. Set to 1 for
+single-threaded rendering, or any positive integer to cap the thread
+count.
+
+**What affects render performance?** The main factors are triangle
+count, output resolution (pixels), anti-aliasing level (`aa_samples`),
+number of lights, SSAO, and whether transparency sorting is needed. For
+largest meshes, the most effective optimisations are reducing
+`aa_samples` and output resolution. SSAO and multi-light setups each add
+roughly constant overhead per pixel.

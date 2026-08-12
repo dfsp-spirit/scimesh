@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>scimesh Documentation</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    h1 { margin: 0 0 0.5rem; color: #333; }
+    p.subtitle { color: #666; margin: 0 0 2rem; }
+    .cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      display: block;
+      padding: 2rem 2.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 600;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .card.r { background: #276dc6; }
+    .card.cpp { background: #2d8c4a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>scimesh</h1>
+    <p class="subtitle">Headless CPU-only 3D software renderer for scientific mesh visualization</p>
+    <div class="cards">
+      <a href="r/" class="card r">📦 R Package Docs</a>
+      <a href="cpp/" class="card cpp">⚙️ C++ API Docs</a>
+    </div>
+  </div>
+</body>
+</html>
