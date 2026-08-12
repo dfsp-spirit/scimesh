@@ -158,6 +158,9 @@ img <- stack_horizontal(img_shaded, img_wire)
 write_png(img, "sphere.png")
 ```
 
+
+### C++
+
 ## Documentation
 
 - **R vignette**: `vignettes/scimesh.Rmd` — comprehensive guide to the
@@ -167,13 +170,14 @@ write_png(img, "sphere.png")
   visualization.
 - **R live help**: Help for a specific function can be accessed in the usual R manner: `?<function>`, where you replace `<function>` with a function name. Like this: `?read_ply`.
 - **R live demos**: Run `example(<function>)` to see a live demo that uses the function `<function>`. Like this: `example(read_ply)`.
-- **C++ getting started**: [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
+- **R API Documentation**: [dfsp-spirit.github.io/scimesh/r](https://dfsp-spirit.github.io/scimesh/r)
+- **C++ getting started**: [`cpp_getting_started.html`](https://dfsp-spirit.github.io/scimesh/cpp/cpp_getting_started.html)
   — gentle introduction to the C++ renderer.
   \subpage cpp_getting_started
 - **C++ examples**: [`examples/cpp/`](examples/cpp/) — standalone
   programs covering textured OBJ, transparency, protein visualization,
   and whole-brain rendering.
-- **C++ API Documentation**: [dfsp-spirit.github.io/scimesh/](https://dfsp-spirit.github.io/scimesh/)
+- **C++ API Documentation**: [dfsp-spirit.github.io/scimesh/cpp](https://dfsp-spirit.github.io/scimesh/cpp)
 - **Tests:** Some of the [unit tests for cpp](./cpp_tests/) and [for R]((./tests/testthat/)) that come with this package are essentially examples that illustrate how to use the functions.
 
 
