@@ -8,6 +8,7 @@
 ^test_data$
 ^README\.md$
 ^README_DEVELOPMENT\.md$
+^CPP_GETTING_STARTED\.md$
 ^\.cache$
 ^build-.*
 ^CMakeFiles$
