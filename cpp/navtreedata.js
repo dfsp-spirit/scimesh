@@ -40,14 +40,15 @@ var NAVTREE =
       ] ]
     ] ],
     [ "Quick Start", "index.html#autotoc_md31", [
-      [ "R", "index.html#autotoc_md32", null ]
+      [ "R", "index.html#autotoc_md32", null ],
+      [ "C++", "index.html#autotoc_md33", null ]
     ] ],
-    [ "Documentation", "index.html#autotoc_md33", [
-      [ "Direct Links to Example Program Source Code", "index.html#autotoc_md34", null ]
+    [ "Documentation", "index.html#autotoc_md34", [
+      [ "Direct Links to Example Program Source Code", "index.html#autotoc_md35", null ]
     ] ],
-    [ "Acknowledgements", "index.html#autotoc_md35", null ],
-    [ "Developer Information", "index.html#autotoc_md36", null ],
-    [ "License and Author", "index.html#autotoc_md37", null ],
+    [ "Acknowledgements", "index.html#autotoc_md36", null ],
+    [ "Developer Information", "index.html#autotoc_md37", null ],
+    [ "License and Author", "index.html#autotoc_md38", null ],
     [ "Getting Started with scimesh C++", "cpp_getting_started.html", null ],
     [ "scimesh Development Information", "md_README__DEVELOPMENT.html", null ],
     [ "Namespaces", "namespaces.html", [
@@ -83,7 +84,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"ply__io_8h.html#aec1f211605b2f399e3e66d7711918711",
+"ply__io_8h.html",
 "structscimesh_1_1MultiApplyColormapResult.html#adab5acd3634c474b09d12c0a9e95d78a"
 ];
 

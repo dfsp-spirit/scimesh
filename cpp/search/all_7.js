@@ -8,7 +8,7 @@ var searchData=
   ['has_5fuvs_5',['has_uvs',['../structscimesh_1_1Mesh.html#a3804eab0e2dbbd06750eed5e38726532',1,'scimesh::Mesh']]],
   ['header_20source_6',['Manually (header + source)',['../index.html#autotoc_md30',1,'']]],
   ['height_7',['height',['../structscimesh_1_1Image.html#a1888bba630d14900cfde00fd949cfb3d',1,'scimesh::Image::height'],['../structscimesh_1_1Rasterizer.html#a617a7ac19b12317c2cac79e57f0163de',1,'scimesh::Rasterizer::height'],['../structscimesh_1_1RenderOptions.html#a4a26a61872a3a587bd0bf5d4d1478579',1,'scimesh::RenderOptions::height']]],
-  ['helpers_8',['Camera Helpers',['../cpp_getting_started.html#autotoc_md71',1,'']]],
+  ['helpers_8',['Camera Helpers',['../cpp_getting_started.html#autotoc_md72',1,'']]],
   ['hi_9',['hi',['../colormap_8cpp.html#aecdba1aaa307df97d3fe42e91192dc23',1,'colormap.cpp']]],
   ['horizontal_10',['HORIZONTAL',['../namespacescimesh.html#a0053cbaf13ff13f50a9220cb562f0ed0a86e5d0d8407ce71f7e2004ef3949894e',1,'scimesh']]],
   ['how_20a_20camera_20works_11',['How a camera works',['../structscimesh_1_1Camera.html#autotoc_md0',1,'']]]

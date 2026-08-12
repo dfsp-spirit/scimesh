@@ -93,8 +93,8 @@ $(document).ready(function(){initNavTree('md_README__DEVELOPMENT.html',''); init
   <div class="headertitle"><div class="title">scimesh Development Information</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md38"></a></p>
-<h2><a class="anchor" id="autotoc_md39"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md39"></a></p>
+<h2><a class="anchor" id="autotoc_md40"></a>
 Required system dev dependencies</h2>
 <p>To build and check the R package, you will need these:</p>
 <div class="fragment"><div class="line">sudo apt install build-essential qpdf tidy pandoc libuv1-dev libharfbuzz-dev libfribidi-dev</div>
@@ -104,19 +104,19 @@ Required system dev dependencies</h2>
 </div><!-- fragment --><p>And finally, install tinytex for vignette building:</p>
 <div class="fragment"><div class="line">install.packages(&quot;tinytex&quot;)</div>
 <div class="line">tinytex::install_tinytex()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md40"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md41"></a>
 Running the C++ unit tests</h2>
 <p>The C++ tests use <a href="https://github.com/catchorg/Catch2">Catch2</a> (amalgamated) and are in <code>cpp_tests/</code>:</p>
 <div class="fragment"><div class="line">cd cpp_tests</div>
 <div class="line">cmake -B build</div>
 <div class="line">cmake --build build</div>
 <div class="line">./build/scimesh_tests</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md41"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md42"></a>
 Running the R unit tests</h2>
 <div class="fragment"><div class="line">devtools::test()</div>
 </div><!-- fragment --><p>Or via R CMD check:</p>
 <div class="fragment"><div class="line">R CMD build . &amp;&amp; R CMD check scimesh_*.tar.gz</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md42"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md43"></a>
 Generating C++ API documentation</h2>
 <p>The C++ API documentation is generated with <a href="https://www.doxygen.nl/">Doxygen</a>. The configuration is in <code>Doxyfile</code> at the repository root.</p>
 <p><b>Prerequisites:</b> Install Doxygen (and optionally Graphviz for diagrams):</p>
@@ -127,7 +127,7 @@ Generating C++ API documentation</h2>
 </div><!-- fragment --><p>This produces HTML output in <code>docs/cpp_api/html/</code>. Open <code>docs/cpp_api/html/index.html</code> in a browser to view the docs.</p>
 <p>The published API documentation is available at: <code><a href="https://dfsp-spirit.github.io/scimesh/">https://dfsp-spirit.github.io/scimesh/</a></code></p>
 <p>It is built and deployed automatically via GitHub Actions (<code>.github/workflows/docs.yml</code>) on every push to <code>main</code>.</p>
-<h2><a class="anchor" id="autotoc_md43"></a>
+<h2><a class="anchor" id="autotoc_md44"></a>
 Making a release</h2>
 <ul>
 <li>bump version in all of these files:<ul>

@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['wavefront_20obj_0',['Wavefront OBJ',['../cpp_getting_started.html#autotoc_md61',1,'']]],
-  ['what_20is_20scimesh_20c_1',['What is scimesh C++?',['../cpp_getting_started.html#autotoc_md44',1,'']]],
+  ['wavefront_20obj_0',['Wavefront OBJ',['../cpp_getting_started.html#autotoc_md62',1,'']]],
+  ['what_20is_20scimesh_20c_1',['What is scimesh C++?',['../cpp_getting_started.html#autotoc_md45',1,'']]],
   ['what_20scimesh_20is_2',['What scimesh is',['../index.html#autotoc_md21',1,'']]],
   ['what_20scimesh_20is_20not_3',['What scimesh is not',['../index.html#autotoc_md25',1,'']]],
   ['white_4',['WHITE',['../namespacescimesh.html#a8552f8964b41e7ba07ccabef374449ae',1,'scimesh']]],
@@ -11,9 +11,9 @@ var searchData=
   ['wireframe_8',['wireframe',['../structscimesh_1_1RenderOptions.html#a9f971fb2a57d1e111bd3b8915d23e4dd',1,'scimesh::RenderOptions']]],
   ['wireframe_20overlay_9',['Wireframe overlay',['../structscimesh_1_1RenderOptions.html#autotoc_md12',1,'']]],
   ['wireframe_5fcolor_10',['wireframe_color',['../structscimesh_1_1RenderOptions.html#a50a676a3602481d76606059565938cab',1,'scimesh::RenderOptions']]],
-  ['with_20fetchcontent_20recommended_11',['CMake with FetchContent (Recommended)',['../cpp_getting_started.html#autotoc_md50',1,'']]],
+  ['with_20fetchcontent_20recommended_11',['CMake with FetchContent (Recommended)',['../cpp_getting_started.html#autotoc_md51',1,'']]],
   ['with_20scimesh_20c_12',['Getting Started with scimesh C++',['../cpp_getting_started.html',1,'index']]],
-  ['without_20cmake_13',['Manually (without CMake)',['../cpp_getting_started.html#autotoc_md51',1,'']]],
+  ['without_20cmake_13',['Manually (without CMake)',['../cpp_getting_started.html#autotoc_md52',1,'']]],
   ['works_14',['How a camera works',['../structscimesh_1_1Camera.html#autotoc_md0',1,'']]],
   ['write_5fbmp_15',['write_bmp',['../structscimesh_1_1Image.html#afd02f2c51604512b0b10e02844cdcdea',1,'scimesh::Image']]],
   ['write_5fpng_16',['write_png',['../structscimesh_1_1Image.html#ad8e792e87a526c7594c407faee0f6804',1,'scimesh::Image']]],
