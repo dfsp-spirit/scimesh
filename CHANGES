@@ -2,8 +2,8 @@ scimesh Changes
 ===============
 
 
-Current WIP
-----------------------------
+Version 0.3.2 -- CRAN review fixes
+-----------------------------------
 - FIX: do not strip debug symbols for R build, as per CRAN policy
 - FIX: add more input checks and disable use of asserts in third-party code, as per CRAN policy that C++ code should not call assert
 - NEW: full_CLI_renderer example: composite mode now supports --crop/--grow to pre-process each tile (e.g. trim colorbar whitespace) before arranging
@@ -11,8 +11,8 @@ Current WIP
 - NEW: add composite_tight.sh example that produces compact, publication-style multi-view figures: crop each rendered view (--crop --grow), arrange via --composite --fit-mode pad (auto max-extent padding, no manual image sizing), then attach a trimmed colorbar
 
 
-Version 0.3.1
---------------
+Version 0.3.1 -- TGA support, macOS fix
+----------------------------------------
 - FIX: make R package compile again unter MacOS by avoiding strip --strip-debug in Makevars, the MacOS version of strip does not support --strip-debug.
 - NEW: add TGA image export (own uncompressed true-color writer, no dependencies) to the C++ layer and the R layer via new `write_tga()` function (32-bit RGBA default, optional 24-bit RGB)
 - improve all c++ doc strings for better API docs
@@ -22,8 +22,8 @@ Version 0.3.1
 - DOC: add file in source tree that lists all third-party details with full licenses, see src/third_party/THIRD_PARTY_LICENSES.md (and a copy for R at LICENSE.note)
 
 
-Version 0.3.0
----------------
+Version 0.3.0 -- Dpendencies, repo structure, C++ versioning
+------------------------------------------------------------
 - BRK: move scimesh code from src/core/ to src/core/scimesh and all required downstream adjustments. avoids conflicts with other libraries in C++ layer
 - NEW: get proper versioning in place for C++ layer
 - SEC: Update libfs to v0.4.1
