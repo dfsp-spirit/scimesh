@@ -23,13 +23,6 @@ as part of the library.
 - **License:** Public Domain or BSD 2-Clause
 - **Usage:** PLY mesh file reader
 
-### tiny_obj_loader.h
-
-- **Project:** [tinyobjloader/tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)
-- **Author:** Syoyo Fujita
-- **License:** MIT
-- **Usage:** Wavefront OBJ mesh file reader
-
 ### libfs.h
 
 - **Project:** [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs)

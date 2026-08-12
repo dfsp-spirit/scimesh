@@ -11,11 +11,7 @@
 ///
 /// Output: spot_cow.ppm, spot_cow.bmp
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "libfs.h"
 
 #include <scimesh/renderer.h>
 #include <scimesh/camera.h>
@@ -44,65 +40,59 @@ using scimesh::Image;
 using scimesh::Triangle;
 
 static Image load_texture(const char *path) {
-    int w, h, ch;
-    unsigned char *data = stbi_load(path, &w, &h, &ch, 4);
-    if (!data) {
-        std::cerr << "Failed to load texture: " << path
-                  << " (" << stbi_failure_reason() << ")\n";
+    Image tex = Image::read_image(path);
+    if (tex.width == 0) {
+        std::cerr << "Failed to load texture: " << path << "\n";
         return Image();
     }
-    Image tex(w, h);
-    tex.pixels.assign(data, data + w * h * 4);
-    stbi_image_free(data);
-    std::cout << "Texture: " << w << "x" << h << "\n";
+    std::cout << "Texture: " << tex.width << "x" << tex.height << "\n";
     return tex;
 }
 
 static Mesh load_spot_cow(const char *obj_path, const char *tex_path) {
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
+    fs::Mesh fs_mesh;
+    fs::Mesh::from_obj(&fs_mesh, obj_path);
 
-    bool ok = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
-                               obj_path, nullptr, true, false);
-    if (!warn.empty()) std::cout << "Warn: " << warn << "\n";
-    if (!err.empty()) std::cerr << "Error: " << err << "\n";
-    if (!ok) return Mesh();
-
-    int nv = static_cast<int>(attrib.vertices.size()) / 3;
-    int nt_u = static_cast<int>(attrib.texcoords.size()) / 2;
-    std::cout << "OBJ: " << nv << " verts, " << nt_u << " texcoords, "
-              << shapes[0].mesh.indices.size() << " face corners\n";
+    size_t nv = fs_mesh.num_vertices();
+    size_t nf = fs_mesh.num_faces();
+    size_t nt = fs_mesh.vertex_texcoords.size() / 2;
+    bool has_tex = fs_mesh.has_texcoords();
+    std::cout << "OBJ: " << nv << " verts, " << nt << " texcoords, "
+              << nf << " faces\n";
 
     Mesh mesh;
     mesh.texture = load_texture(tex_path);
 
-    const auto &indices = shapes[0].mesh.indices;
-    for (size_t i = 0; i + 2 < indices.size(); i += 3) {
-        Triangle tri;
-        for (int c = 0; c < 3; ++c) {
-            const auto &idx = indices[i + c];
+    // Copy vertex positions (libfs deduplicates by (pos, uv, normal) so
+    // each vertex has a unique texcoord — no more texture seam artifacts).
+    mesh.vertices.reserve(nv);
+    for (size_t i = 0; i < nv; i++) {
+        mesh.vertices.push_back(Vec3(
+            fs_mesh.vertices[i * 3],
+            fs_mesh.vertices[i * 3 + 1],
+            fs_mesh.vertices[i * 3 + 2]));
+    }
 
-            Vec3 pos(attrib.vertices[idx.vertex_index * 3 + 0],
-                     attrib.vertices[idx.vertex_index * 3 + 1],
-                     attrib.vertices[idx.vertex_index * 3 + 2]);
-
-            Vec2 uv(0, 0);
-            if (idx.texcoord_index >= 0) {
-            uv = Vec2(attrib.texcoords[idx.texcoord_index * 2 + 0],
-                      1.0f - attrib.texcoords[idx.texcoord_index * 2 + 1]);
-            }
-
-            mesh.uvs.push_back(uv);
-            mesh.vertices.push_back(pos);
-            mesh.colors.push_back(Color(1, 1, 1, 1));
-
-            if (c == 0) tri.v0 = static_cast<uint32_t>(mesh.vertices.size() - 1);
-            if (c == 1) tri.v1 = static_cast<uint32_t>(mesh.vertices.size() - 1);
-            if (c == 2) tri.v2 = static_cast<uint32_t>(mesh.vertices.size() - 1);
+    // Copy texture coordinates (flip V: OBJ origin bottom-left → top-left).
+    mesh.uvs.reserve(nv);
+    if (has_tex) {
+        for (size_t i = 0; i < nv; i++) {
+            mesh.uvs.push_back(Vec2(
+                fs_mesh.vertex_texcoords[i * 2],
+                1.0f - fs_mesh.vertex_texcoords[i * 2 + 1]));
         }
-        mesh.triangles.push_back(tri);
+    }
+
+    // Fill per-vertex colors (white — texture provides the color).
+    mesh.colors.assign(nv, Color(1, 1, 1, 1));
+
+    // Copy face indices.
+    mesh.triangles.reserve(nf);
+    for (size_t i = 0; i < nf; i++) {
+        mesh.triangles.push_back(Triangle{
+            static_cast<uint32_t>(fs_mesh.faces[i * 3]),
+            static_cast<uint32_t>(fs_mesh.faces[i * 3 + 1]),
+            static_cast<uint32_t>(fs_mesh.faces[i * 3 + 2])});
     }
 
     std::cout << "Mesh: " << mesh.vertices.size() << " verts, "

@@ -36,15 +36,17 @@ namespace obj_io {
 /// @par Supported features
 /// - Vertex positions (v)
 /// - Faces as triangles (f v1 v2 v3)
-/// - Vertex normals (vn)
-/// - Texture coordinates (vt)
+/// - Quads and n-gons (fan-triangulated automatically)
+/// - Negative relative indices (e.g., f -1 -2 -3)
+/// - Face index slash notation (e.g., f 1/2/3, f 1//3)
 ///
 /// @par Unsupported
-/// - Polygons with more than 3 vertices (use triangulated meshes)
+/// - Vertex normals (vn) — call compute_vertex_normals() after loading
+/// - Texture coordinates (vt) — UVs default to (0,0)
 /// - Materials (.mtl) — only geometry is loaded, colors are not imported
 ///   from material files.
 ///
-/// @see read_ply(), read_stl(), Mesh::is_valid()
+/// @see read_ply(), read_stl(), Mesh::is_valid(), compute_vertex_normals()
 Mesh read_obj(const std::string &path);
 
 } // namespace obj_io

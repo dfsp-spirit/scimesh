@@ -9,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <map>
+#include <tuple>
 #include <unordered_set>
 #include <unordered_map>
 #include <cmath>
@@ -47,7 +48,7 @@
 ///          file headers.  For programmatic version checks, prefer the
 ///          individual `LIBFS_VERSION_MAJOR`, `LIBFS_VERSION_MINOR`, and
 ///          `LIBFS_VERSION_PATCH` integer macros.
-#define LIBFS_VERSION "0.5.0"
+#define LIBFS_VERSION "0.6.0"
 
 /// @brief Major version number (incompatible API changes).
 /// @details Incremented when the public API changes in a way that breaks
@@ -61,7 +62,7 @@
 /// @details Incremented when new functionality is added without breaking
 ///          existing API contracts.  Together with `LIBFS_VERSION_MAJOR` this
 ///          forms the `MAJOR.MINOR` prefix used in release tags.
-#define LIBFS_VERSION_MINOR 5
+#define LIBFS_VERSION_MINOR 6
 
 /// @brief Patch version number (backward-compatible bug fixes).
 /// @details Incremented for bug-fix releases that do not add new features or
@@ -89,6 +90,53 @@
 /// Maximum number of entries in an annotation colortable.
 #ifndef LIBFS_MAX_COLORTABLE_ENTRIES
 #define LIBFS_MAX_COLORTABLE_ENTRIES 10000
+#endif
+
+/// Maximum line length when reading OBJ files (prevents single-line memory-exhaustion DoS).
+/// A single line longer than this causes a parse error.
+#ifndef LIBFS_MAX_OBJ_LINE_LENGTH
+#define LIBFS_MAX_OBJ_LINE_LENGTH 1048576  // 1 MiB
+#endif
+
+/// Maximum number of lines parsed from an OBJ file (prevents many-tiny-lines CPU-exhaustion DoS).
+#ifndef LIBFS_MAX_OBJ_LINES
+#define LIBFS_MAX_OBJ_LINES 100000000  // 100M lines
+#endif
+
+/// Maximum file size for an OBJ file checked before parsing (prevents reading huge files).
+/// Defaults to the same value as LIBFS_MAX_ALLOC_BYTES.
+#ifndef LIBFS_MAX_OBJ_FILE_SIZE
+#define LIBFS_MAX_OBJ_FILE_SIZE LIBFS_MAX_ALLOC_BYTES
+#endif
+
+/// Maximum line length when reading OFF files (prevents single-line memory-exhaustion DoS).
+#ifndef LIBFS_MAX_OFF_LINE_LENGTH
+#define LIBFS_MAX_OFF_LINE_LENGTH 1048576  // 1 MiB
+#endif
+
+/// Maximum number of lines parsed from an OFF file (prevents many-tiny-lines CPU-exhaustion DoS).
+#ifndef LIBFS_MAX_OFF_LINES
+#define LIBFS_MAX_OFF_LINES 100000000  // 100M lines
+#endif
+
+/// Maximum file size for an OFF file checked before parsing.
+#ifndef LIBFS_MAX_OFF_FILE_SIZE
+#define LIBFS_MAX_OFF_FILE_SIZE LIBFS_MAX_ALLOC_BYTES
+#endif
+
+/// Maximum line length when reading PLY files (prevents single-line memory-exhaustion DoS).
+#ifndef LIBFS_MAX_PLY_LINE_LENGTH
+#define LIBFS_MAX_PLY_LINE_LENGTH 1048576  // 1 MiB
+#endif
+
+/// Maximum number of lines parsed from a PLY file (prevents many-tiny-lines CPU-exhaustion DoS).
+#ifndef LIBFS_MAX_PLY_LINES
+#define LIBFS_MAX_PLY_LINES 100000000  // 100M lines
+#endif
+
+/// Maximum file size for a PLY file checked before parsing.
+#ifndef LIBFS_MAX_PLY_FILE_SIZE
+#define LIBFS_MAX_PLY_FILE_SIZE LIBFS_MAX_ALLOC_BYTES
 #endif
 // -- End security configuration --------------------------------------------------------
 
@@ -292,7 +340,9 @@ namespace fs
     /// @param loglevel the log level, one of `fs::util::LOGTAG_*`.
     inline void log(std::string const &message, std::string const loglevel = "INFO")
     {
+#ifdef LIBFS_DBG_ERROR
       std::cout << LIBFS_APPTAG << "[" << loglevel << "] [" << fs::util::time_tag(std::chrono::system_clock::now()) << "] " << message << "\n";
+#endif
     }
 
     // -- Security / defensive hardening helpers -----------------------------------------
@@ -883,6 +933,8 @@ namespace fs
   /// of length `3n`, in which 3 consecutive values represent the x, y and z coordinate of the same vertex.
   /// The `m` faces are stored as a vector of `3m` integers, where 3 consecutive values represent the 3 vertices (by index)
   /// making up the respective face. Vertex indices are 0-based.
+  /// Optional per-vertex data (colors, normals, texture coordinates) use the same interleaved layout:
+  /// all values for vertex 0 appear first, then vertex 1, etc. Empty vectors indicate absent data.
   /// #### Examples
   ///
   /// @code
@@ -925,6 +977,16 @@ namespace fs
     std::vector<float> vertices;   ///< *n x 3* vector of the *x*,*y*,*z* coordinates for the *n* vertices. The x,y,z coordinates for a single vertex form consecutive entries.
     std::vector<int32_t> faces;    ///< *n x 3* vector of the 3 vertex indices for the *n* triangles or faces. The 3 vertices of a single face form consecutive entries.
     std::vector<uint8_t> vertex_colors; ///< *n x 3* vector of RGB color values, 3 per vertex (v0_r, v0_g, v0_b, v1_r, ...). Empty if no vertex colors are available. Populated by from_ply() and from_off() when the file contains colors. Same interleave format as used by to_ply(col) / to_off(col).
+    std::vector<float> vertex_normals;  ///< *n x 3* vector of normal vectors (nx,ny,nz), one per vertex in the same order as `vertices`. Empty if no normals are available. Populated by from_obj() when the OBJ file contains `vn` lines.
+    std::vector<float> vertex_texcoords; ///< *n x 2* vector of texture coordinates (u,v), one per vertex in the same order as `vertices`. Empty if no texcoords are available. Populated by from_obj() when the OBJ file contains `vt` lines.
+
+    /// @brief Return whether this mesh has per-vertex normals.
+    /// @return true if `vertex_normals` is non-empty (and thus its size matches `vertices.size()`).
+    bool has_normals() const { return !vertex_normals.empty(); }
+
+    /// @brief Return whether this mesh has per-vertex texture coordinates.
+    /// @return true if `vertex_texcoords` is non-empty (and thus its size matches `vertices.size() / 3 * 2`).
+    bool has_texcoords() const { return !vertex_texcoords.empty(); }
 
     /// @brief Construct and return a simple cube mesh.
     /// @return fs::Mesh instance representing a cube.
@@ -1078,6 +1140,8 @@ namespace fs
     /// @brief Return string representing the mesh in Wavefront Object (.obj) format with vertex colors.
     /// @param col u_char vector of RGB color values, 3 per vertex. They must appear by vertex, i.e. in order v0_red, v0_green, v0_blue, v1_red, v1_green, v1_blue. Leave empty if you do not want colors.
     /// @details Colors are written using the widely-supported convention of 6 floats per vertex line: `v x y z r g b`, where RGB are floating-point values in [0, 1].
+    /// If the mesh has vertex normals (`vertex_normals` non-empty), `vn` lines are emitted and faces use `v//vn` notation.
+    /// If the mesh has texture coordinates (`vertex_texcoords` non-empty), `vt` lines are emitted and faces use `v/vt` or `v/vt/vn` notation.
     /// @throws std::invalid_argument if the number of vertex colors does not match the number of vertices.
     ///
     /// #### Examples
@@ -1090,6 +1154,9 @@ namespace fs
     std::string to_obj(const std::vector<uint8_t> col) const
     {
       bool use_vertex_colors = col.size() != 0;
+      bool use_normals = this->has_normals();
+      bool use_texcoords = this->has_texcoords();
+
       std::stringstream objs;
       for (size_t vidx = 0; vidx < this->vertices.size(); vidx += 3)
       { // vertex coords
@@ -1104,9 +1171,55 @@ namespace fs
         }
         objs << "\n";
       }
+
+      // Emit texture coordinates if present.
+      if (use_texcoords)
+      {
+        for (size_t vidx = 0; vidx < this->vertex_texcoords.size(); vidx += 2)
+        {
+          objs << "vt " << vertex_texcoords[vidx] << " " << vertex_texcoords[vidx + 1] << "\n";
+        }
+      }
+
+      // Emit vertex normals if present.
+      if (use_normals)
+      {
+        for (size_t vidx = 0; vidx < this->vertex_normals.size(); vidx += 3)
+        {
+          objs << "vn " << vertex_normals[vidx] << " " << vertex_normals[vidx + 1] << " " << vertex_normals[vidx + 2] << "\n";
+        }
+      }
+
       for (size_t fidx = 0; fidx < this->faces.size(); fidx += 3)
       { // faces: vertex indices, 1-based
-        objs << "f " << faces[fidx] + 1 << " " << faces[fidx + 1] + 1 << " " << faces[fidx + 2] + 1 << "\n";
+        int v0 = faces[fidx] + 1;
+        int v1 = faces[fidx + 1] + 1;
+        int v2 = faces[fidx + 2] + 1;
+
+        objs << "f ";
+        if (use_texcoords && use_normals)
+        {
+          objs << v0 << "/" << v0 << "/" << v0 << " "
+               << v1 << "/" << v1 << "/" << v1 << " "
+               << v2 << "/" << v2 << "/" << v2;
+        }
+        else if (use_texcoords)
+        {
+          objs << v0 << "/" << v0 << " "
+               << v1 << "/" << v1 << " "
+               << v2 << "/" << v2;
+        }
+        else if (use_normals)
+        {
+          objs << v0 << "//" << v0 << " "
+               << v1 << "//" << v1 << " "
+               << v2 << "//" << v2;
+        }
+        else
+        {
+          objs << v0 << " " << v1 << " " << v2;
+        }
+        objs << "\n";
       }
       return (objs.str());
     }
@@ -1571,21 +1684,56 @@ namespace fs
     /// @endcode
     static void from_obj(Mesh *mesh, std::istream *is)
     {
+      // -- Security: null-pointer check (plan #8) --
+      if (!mesh)
+      {
+        throw std::invalid_argument("mesh pointer must not be null");
+      }
+
       std::string line;
       int line_idx = -1;
+      size_t total_lines_processed = 0;
 
       std::vector<float> vertices;
       std::vector<int> faces;
       std::vector<uint8_t> vertex_colors;
+      std::vector<float> raw_normals;    // raw `vn` data: 3 floats per normal, 1-based indexed
+      std::vector<float> raw_texcoords;  // raw `vt` data: 2 floats per texcoord, 1-based indexed
+      std::vector<int> face_vt_indices;  // per-face-vertex texcoord index (0 = absent), parallel to `faces`
+      std::vector<int> face_vn_indices;  // per-face-vertex normal index (0 = absent), parallel to `faces`
+      bool has_any_vt = false;
+      bool has_any_vn = false;
       int detected_format = -1; // -1 = unknown, 0 = no vertex colors, 1 = has vertex colors (r g b after x y z)
 
 #ifdef LIBFS_DBG_INFO
       size_t num_lines_ignored = 0; // Not comments, but custom extensions or material data lines which are ignored by libfs.
 #endif
 
-      while (std::getline(*is, line))
+      while (total_lines_processed < LIBFS_MAX_OBJ_LINES)
       {
-        line_idx += 1;
+        // -- Use std::getline for performance (buffered I/O), then post-check length (plan #10) --
+        if (!std::getline(*is, line))
+        {
+          break; // EOF or read error
+        }
+        total_lines_processed++;
+        line_idx++;
+
+        if (line.size() > LIBFS_MAX_OBJ_LINE_LENGTH)
+        {
+          throw std::runtime_error("OBJ line " + std::to_string(line_idx + 1) +
+                                   " exceeds maximum allowed line length of " +
+                                   std::to_string(LIBFS_MAX_OBJ_LINE_LENGTH) + " bytes.\n");
+        }
+
+        // -- Security: check allocation limits before parsing this line (plan #5) --
+        if (!util::check_alloc(vertices.size() + 3, sizeof(float)) ||
+            !util::check_alloc(faces.size() + 12, sizeof(int)) ||
+            !util::check_alloc(vertex_colors.size() + 3, sizeof(uint8_t)))
+        {
+          throw std::runtime_error("OBJ data exceeds maximum allowed memory allocation (" + std::to_string(LIBFS_MAX_ALLOC_BYTES) + " bytes).\n");
+        }
+
         std::istringstream iss(line);
         if (fs::util::starts_with(line, "#"))
         {
@@ -1602,6 +1750,13 @@ namespace fs
               throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx + 1) + " of OBJ data, invalid format.\n");
             }
             assert(elem_type_identifier == "v");
+
+            // -- Security: validate finite coordinates --
+            if (!util::is_finite_float(x) || !util::is_finite_float(y) || !util::is_finite_float(z))
+            {
+              throw std::domain_error("Non-finite vertex coordinate on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+            }
+
             vertices.push_back(x);
             vertices.push_back(y);
             vertices.push_back(z);
@@ -1666,42 +1821,182 @@ namespace fs
               vertex_colors.push_back(static_cast<uint8_t>(bi));
             }
           }
+          else if (fs::util::starts_with(line, "vn "))
+          {
+            // -- Feature: parse vertex normals (plan #3) --
+            std::string elem_type_identifier;
+            float nx, ny, nz;
+            if (!(iss >> elem_type_identifier >> nx >> ny >> nz))
+            {
+              throw std::domain_error("Could not parse vertex normal line " + std::to_string(line_idx + 1) + " of OBJ data, invalid format.\n");
+            }
+            assert(elem_type_identifier == "vn");
+            if (!util::is_finite_float(nx) || !util::is_finite_float(ny) || !util::is_finite_float(nz))
+            {
+              throw std::domain_error("Non-finite vertex normal on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+            }
+            raw_normals.push_back(nx);
+            raw_normals.push_back(ny);
+            raw_normals.push_back(nz);
+          }
+          else if (fs::util::starts_with(line, "vt "))
+          {
+            // -- Feature: parse texture coordinates (plan #4) --
+            std::string elem_type_identifier;
+            float u, v;
+            if (!(iss >> elem_type_identifier >> u >> v))
+            {
+              throw std::domain_error("Could not parse texture coordinate line " + std::to_string(line_idx + 1) + " of OBJ data, invalid format.\n");
+            }
+            assert(elem_type_identifier == "vt");
+            if (!util::is_finite_float(u) || !util::is_finite_float(v))
+            {
+              throw std::domain_error("Non-finite texture coordinate on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+            }
+            raw_texcoords.push_back(u);
+            raw_texcoords.push_back(v);
+            // Ignore optional 3rd component (w), if present.
+          }
           else if (fs::util::starts_with(line, "f "))
           {
-            std::string elem_type_identifier, v0raw, v1raw, v2raw;
-            int v0, v1, v2;
-            if (!(iss >> elem_type_identifier >> v0raw >> v1raw >> v2raw))
+            std::string elem_type_identifier;
+
+            // -- Feature: read all vertex tokens (plan #1) --
+            if (!(iss >> elem_type_identifier))
             {
               throw std::domain_error("Could not parse face line " + std::to_string(line_idx + 1) + " of OBJ data, invalid format.\n");
             }
             assert(elem_type_identifier == "f");
 
-            // The OBJ format allows to specifiy face indices with slashes to also set normal and material indices.
-            // So instead of a line like 'f 22 34 45', we could get 'f 3/1 4/2 5/3' or 'f 6/4/1 3/5/3 7/6/5' or 'f 7//1 8//2 9//3'.
-            // We need to extract the stuff before the first slash and interprete it as int to get the vertex index we are looking for.
-            std::size_t found_v0 = v0raw.find("/");
-            std::size_t found_v1 = v1raw.find("/");
-            std::size_t found_v2 = v2raw.find("/");
-            if (found_v0 != std::string::npos)
+            std::vector<std::string> face_tokens;
             {
-              v0raw = v0raw.substr(0, found_v0);
+              std::string token;
+              while (iss >> token)
+              {
+                face_tokens.push_back(token);
+              }
             }
-            if (found_v1 != std::string::npos)
-            {
-              v1raw = v1raw.substr(0, found_v1);
-            }
-            if (found_v2 != std::string::npos)
-            {
-              v2raw = v2raw.substr(0, found_v2);
-            }
-            v0 = std::stoi(v0raw);
-            v1 = std::stoi(v1raw);
-            v2 = std::stoi(v2raw);
 
-            // The vertex indices in Wavefront OBJ files are 1-based, so we have to substract 1 here.
-            faces.push_back(v0 - 1);
-            faces.push_back(v1 - 1);
-            faces.push_back(v2 - 1);
+            if (face_tokens.size() < 3)
+            {
+              throw std::domain_error("Face line " + std::to_string(line_idx + 1) + " has fewer than 3 vertices, invalid format.\n");
+            }
+
+            // -- Warning for quads/n-gons (plan #13) --
+#ifdef LIBFS_DBG_WARNING
+            if (face_tokens.size() > 3)
+            {
+              std::cout << LIBFS_APPTAG << "[WARNING] Face line " << (line_idx + 1)
+                        << " has " << face_tokens.size() << " vertices; fan-triangulating.\n";
+            }
+#endif
+
+            // Parse all vertex indices from tokens, properly splitting v/vt/vn.
+            std::vector<int> raw_indices;
+            std::vector<int> tok_vt_indices;
+            std::vector<int> tok_vn_indices;
+            raw_indices.reserve(face_tokens.size());
+            tok_vt_indices.reserve(face_tokens.size());
+            tok_vn_indices.reserve(face_tokens.size());
+            for (size_t ti = 0; ti < face_tokens.size(); ti++)
+            {
+              const std::string &token = face_tokens[ti];
+
+              // Split "v/vt/vn", "v//vn", "v/vt", or just "v".
+              // Count slashes to determine format.
+              size_t slash1 = token.find('/');
+              std::string v_part, vt_part, vn_part;
+              if (slash1 == std::string::npos)
+              {
+                // "v" only
+                v_part = token;
+              }
+              else
+              {
+                v_part = token.substr(0, slash1);
+                size_t slash2 = token.find('/', slash1 + 1);
+                if (slash2 == std::string::npos)
+                {
+                  // "v/vt" — texcoord only, no normal
+                  vt_part = token.substr(slash1 + 1);
+                }
+                else
+                {
+                  // "v//vn" or "v/vt/vn"
+                  if (slash2 == slash1 + 1)
+                  {
+                    // "v//vn" — empty texcoord field
+                    vn_part = token.substr(slash2 + 1);
+                  }
+                  else
+                  {
+                    // "v/vt/vn"
+                    vt_part = token.substr(slash1 + 1, slash2 - slash1 - 1);
+                    vn_part = token.substr(slash2 + 1);
+                  }
+                }
+              }
+
+              // Parse vertex index.
+              int vi;
+              try { vi = std::stoi(v_part); }
+              catch (const std::invalid_argument &) {
+                throw std::domain_error("Invalid face vertex index '" + v_part + "' on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+              }
+              catch (const std::out_of_range &) {
+                throw std::domain_error("Face vertex index '" + v_part + "' out of integer range on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+              }
+              raw_indices.push_back(vi);
+
+              // Parse optional texcoord index.
+              int vti = 0;
+              if (!vt_part.empty())
+              {
+                try { vti = std::stoi(vt_part); }
+                catch (const std::invalid_argument &) {
+                  throw std::domain_error("Invalid texcoord index '" + vt_part + "' on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+                }
+                catch (const std::out_of_range &) {
+                  throw std::domain_error("Texcoord index '" + vt_part + "' out of integer range on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+                }
+                has_any_vt = true;
+              }
+              tok_vt_indices.push_back(vti);
+
+              // Parse optional normal index.
+              int vni = 0;
+              if (!vn_part.empty())
+              {
+                try { vni = std::stoi(vn_part); }
+                catch (const std::invalid_argument &) {
+                  throw std::domain_error("Invalid normal index '" + vn_part + "' on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+                }
+                catch (const std::out_of_range &) {
+                  throw std::domain_error("Normal index '" + vn_part + "' out of integer range on line " + std::to_string(line_idx + 1) + " of OBJ data.\n");
+                }
+                has_any_vn = true;
+              }
+              tok_vn_indices.push_back(vni);
+            }
+
+            // -- Feature: fan triangulation for quads and n-gons (plan #1) --
+            // Emit triangles: (v[0], v[1], v[2]), (v[0], v[2], v[3]), ...
+            // Indices are stored as-is (1-based, possibly negative) and resolved in the post-parse pass.
+            for (size_t ti = 1; ti + 1 < raw_indices.size(); ti++)
+            {
+              // Vertex indices
+              faces.push_back(raw_indices[0]);
+              faces.push_back(raw_indices[ti]);
+              faces.push_back(raw_indices[ti + 1]);
+              // Parallel texcoord indices
+              face_vt_indices.push_back(tok_vt_indices[0]);
+              face_vt_indices.push_back(tok_vt_indices[ti]);
+              face_vt_indices.push_back(tok_vt_indices[ti + 1]);
+              // Parallel normal indices
+              face_vn_indices.push_back(tok_vn_indices[0]);
+              face_vn_indices.push_back(tok_vn_indices[ti]);
+              face_vn_indices.push_back(tok_vn_indices[ti + 1]);
+            }
           }
           else
           {
@@ -1713,15 +2008,212 @@ namespace fs
           }
         }
       }
+
+      // -- Security: check if we hit the max-lines limit (plan #11) --
+      if (total_lines_processed >= LIBFS_MAX_OBJ_LINES && !is->eof())
+      {
+        throw std::runtime_error("OBJ file exceeds maximum allowed line count of " + std::to_string(LIBFS_MAX_OBJ_LINES) + ".\n");
+      }
+
 #ifdef LIBFS_DBG_INFO
       if (num_lines_ignored > 0)
       {
         std::cout << LIBFS_APPTAG << "Ignored " << num_lines_ignored << " lines in Wavefront OBJ format mesh file.\n";
       }
 #endif
-      mesh->vertices = vertices;
-      mesh->faces = faces;
-      mesh->vertex_colors = vertex_colors;
+
+      // -- Post-parse: resolve negative indices and convert to 0-based (plan #2, #6, #12) --
+      int32_t nv = static_cast<int32_t>(vertices.size() / 3);
+      if (nv == 0)
+      {
+        throw std::domain_error("OBJ file contains no vertices.\n");
+      }
+
+      for (size_t fi = 0; fi < faces.size(); fi++)
+      {
+        int idx = faces[fi];
+        if (idx == 0)
+        {
+          throw std::domain_error("Face index 0 in OBJ data: OBJ indices are 1-based, index 0 is invalid.\n");
+        }
+        if (idx < 0)
+        {
+          // -- Security: guard against integer overflow in negative-index resolution (plan #12) --
+          if (idx < -nv)
+          {
+            throw std::domain_error("Negative face index " + std::to_string(idx) + " exceeds vertex count " + std::to_string(nv) + ".\n");
+          }
+          // Convert negative 1-based-relative to 0-based: -1 → nv-1, -2 → nv-2, etc.
+          idx = nv + idx;
+        }
+        else
+        {
+          // Convert positive 1-based to 0-based.
+          idx = idx - 1;
+        }
+
+        // -- Security: validate face index range (plan #6) --
+        if (idx < 0 || idx >= nv)
+        {
+          throw std::domain_error("Face index " + std::to_string(idx) + " out of range [0, " + std::to_string(nv - 1) + "] after resolution.\n");
+        }
+
+        faces[fi] = idx;
+      }
+
+      // -- Integrity: validate face count is a multiple of 3 (plan #14) --
+      if (faces.size() % 3 != 0)
+      {
+        throw std::domain_error("Internal error: parsed face count " + std::to_string(faces.size()) + " is not a multiple of 3.\n");
+      }
+
+      // -- Post-parse: vertex deduplication by (position, texcoord, normal) tuple --
+      // OBJ's data model is per-face-corner: the same vertex position can appear
+      // with different texcoords/normals in different faces (at texture seams and
+      // sharp edges). We build a new vertex list where each unique combination
+      // becomes its own vertex, correctly handling these cases.
+      int32_t num_normals = static_cast<int32_t>(raw_normals.size() / 3);
+      int32_t num_texcoords = static_cast<int32_t>(raw_texcoords.size() / 2);
+
+      if (has_any_vn && num_normals == 0)
+      {
+        throw std::domain_error("OBJ file references vertex normals in faces but contains no 'vn' lines.\n");
+      }
+      if (has_any_vt && num_texcoords == 0)
+      {
+        throw std::domain_error("OBJ file references texture coordinates in faces but contains no 'vt' lines.\n");
+      }
+
+      // Tuple key: (vertex_index, texcoord_index, normal_index)
+      // Use -1 for absent texcoord or normal.
+      using CornerKey = std::tuple<int32_t, int32_t, int32_t>;
+      std::map<CornerKey, int32_t> corner_to_new_vertex;
+
+      std::vector<float> dedup_vertices;
+      std::vector<float> dedup_texcoords;
+      std::vector<float> dedup_normals;
+      std::vector<uint8_t> dedup_vertex_colors;
+      std::vector<int> dedup_faces;
+
+      size_t num_face_corners = faces.size();
+      dedup_faces.reserve(num_face_corners);
+
+      for (size_t fi = 0; fi < num_face_corners; fi++)
+      {
+        int32_t vidx = static_cast<int32_t>(faces[fi]); // already 0-based vertex index
+
+        // Resolve texcoord index: -1 means absent.
+        int32_t tidx = -1;
+        if (has_any_vt)
+        {
+          int vt_raw = face_vt_indices[fi];
+          if (vt_raw != 0)
+          {
+            if (vt_raw < 0)
+            {
+              if (vt_raw < -num_texcoords)
+              {
+                throw std::domain_error("Negative texcoord index " + std::to_string(vt_raw) + " exceeds texcoord count " + std::to_string(num_texcoords) + ".\n");
+              }
+              tidx = num_texcoords + vt_raw; // -1 → num_texcoords-1
+            }
+            else
+            {
+              tidx = vt_raw - 1;
+            }
+            if (tidx < 0 || tidx >= num_texcoords)
+            {
+              throw std::domain_error("Texcoord index out of range [1, " + std::to_string(num_texcoords) + "].\n");
+            }
+          }
+        }
+
+        // Resolve normal index: -1 means absent.
+        int32_t nidx = -1;
+        if (has_any_vn)
+        {
+          int vn_raw = face_vn_indices[fi];
+          if (vn_raw != 0)
+          {
+            if (vn_raw < 0)
+            {
+              if (vn_raw < -num_normals)
+              {
+                throw std::domain_error("Negative normal index " + std::to_string(vn_raw) + " exceeds normal count " + std::to_string(num_normals) + ".\n");
+              }
+              nidx = num_normals + vn_raw; // -1 → num_normals-1
+            }
+            else
+            {
+              nidx = vn_raw - 1;
+            }
+            if (nidx < 0 || nidx >= num_normals)
+            {
+              throw std::domain_error("Normal index out of range [1, " + std::to_string(num_normals) + "].\n");
+            }
+          }
+        }
+
+        CornerKey key(vidx, tidx, nidx);
+        auto it = corner_to_new_vertex.find(key);
+        if (it != corner_to_new_vertex.end())
+        {
+          // Existing combination: reuse index.
+          dedup_faces.push_back(it->second);
+        }
+        else
+        {
+          // New combination: create vertex entry.
+          int32_t new_idx = static_cast<int32_t>(dedup_vertices.size() / 3);
+          corner_to_new_vertex[key] = new_idx;
+          dedup_faces.push_back(new_idx);
+
+          // Copy vertex position.
+          dedup_vertices.push_back(vertices[static_cast<size_t>(vidx) * 3]);
+          dedup_vertices.push_back(vertices[static_cast<size_t>(vidx) * 3 + 1]);
+          dedup_vertices.push_back(vertices[static_cast<size_t>(vidx) * 3 + 2]);
+
+          // Copy texcoord (or 0,0 if absent).
+          if (tidx >= 0)
+          {
+            dedup_texcoords.push_back(raw_texcoords[static_cast<size_t>(tidx) * 2]);
+            dedup_texcoords.push_back(raw_texcoords[static_cast<size_t>(tidx) * 2 + 1]);
+          }
+          else if (has_any_vt)
+          {
+            dedup_texcoords.push_back(0.0f);
+            dedup_texcoords.push_back(0.0f);
+          }
+
+          // Copy normal (or 0,0,0 if absent).
+          if (nidx >= 0)
+          {
+            dedup_normals.push_back(raw_normals[static_cast<size_t>(nidx) * 3]);
+            dedup_normals.push_back(raw_normals[static_cast<size_t>(nidx) * 3 + 1]);
+            dedup_normals.push_back(raw_normals[static_cast<size_t>(nidx) * 3 + 2]);
+          }
+          else if (has_any_vn)
+          {
+            dedup_normals.push_back(0.0f);
+            dedup_normals.push_back(0.0f);
+            dedup_normals.push_back(0.0f);
+          }
+
+          // Copy vertex color from the source position vertex (if colors exist).
+          if (detected_format == 1)
+          {
+            dedup_vertex_colors.push_back(vertex_colors[static_cast<size_t>(vidx) * 3]);
+            dedup_vertex_colors.push_back(vertex_colors[static_cast<size_t>(vidx) * 3 + 1]);
+            dedup_vertex_colors.push_back(vertex_colors[static_cast<size_t>(vidx) * 3 + 2]);
+          }
+        }
+      }
+
+      mesh->vertices = dedup_vertices;
+      mesh->faces = dedup_faces;
+      mesh->vertex_colors = dedup_vertex_colors;
+      mesh->vertex_normals = dedup_normals;
+      mesh->vertex_texcoords = dedup_texcoords;
     }
 
     /// @brief Read a brainmesh from a Wavefront object format mesh file.
@@ -1743,6 +2235,14 @@ namespace fs
 #ifdef LIBFS_DBG_INFO
       std::cout << LIBFS_APPTAG << "Reading brain mesh from Wavefront object format file " << filename << ".\n";
 #endif
+      // -- Security: file-size pre-check to reject huge files before parsing (plan #9) --
+      size_t file_size = util::get_file_size(filename);
+      if (file_size > LIBFS_MAX_OBJ_FILE_SIZE)
+      {
+        throw std::runtime_error("OBJ file '" + filename + "' size (" + std::to_string(file_size) +
+                                 " bytes) exceeds maximum allowed (" + std::to_string(LIBFS_MAX_OBJ_FILE_SIZE) + " bytes).\n");
+      }
+
       std::ifstream input(filename, std::fstream::in);
       if (input.is_open())
       {
@@ -1763,12 +2263,18 @@ namespace fs
     /// @throws std::domain_error if the file format is invalid.
     static void from_off(Mesh *mesh, std::istream *is, const std::string &source_filename = "")
     {
+      // -- Security: null-pointer check (O3) --
+      if (!mesh)
+      {
+        throw std::invalid_argument("mesh pointer must not be null");
+      }
 
       std::string msg_source_file_part = source_filename.empty() ? "" : "'" + source_filename + "'";
 
       std::string line;
       int line_idx = -1;
       int noncomment_line_idx = -1;
+      size_t total_lines_processed = 0;
 
       std::vector<float> vertices;
       std::vector<int> faces;
@@ -1783,9 +2289,23 @@ namespace fs
       int num_verts_this_face, v0, v1, v2; // face, defined by number of vertices and vertex indices.
       std::vector<uint8_t> vertex_colors;
 
-      while (std::getline(*is, line))
+      while (total_lines_processed < LIBFS_MAX_OFF_LINES)
       {
+        // -- Security: bounded line read (O4) --
+        if (!std::getline(*is, line))
+        {
+          break; // EOF or read error
+        }
+        total_lines_processed++;
         line_idx++;
+
+        if (line.size() > LIBFS_MAX_OFF_LINE_LENGTH)
+        {
+          throw std::runtime_error("OFF line " + std::to_string(line_idx + 1) +
+                                   " exceeds maximum allowed line length of " +
+                                   std::to_string(LIBFS_MAX_OFF_LINE_LENGTH) + " bytes.\n");
+        }
+
         std::istringstream iss(line);
         if (fs::util::starts_with(line, "#"))
         {
@@ -1813,6 +2333,14 @@ namespace fs
             {
               throw std::domain_error("Could not parse element count header line " + std::to_string(line_idx + 1) + " of OFF data " + msg_source_file_part + ", invalid format.\n");
             }
+
+            // -- Security: validate header counts against allocation limit (O1) --
+            if (!util::check_alloc(num_vertices, 3 * sizeof(float)) ||
+                !util::check_alloc(num_faces, 3 * sizeof(int)))
+            {
+              throw std::runtime_error("OFF data " + msg_source_file_part + " header declares more vertices/faces than allowed by allocation limit (" +
+                                       std::to_string(LIBFS_MAX_ALLOC_BYTES) + " bytes).\n");
+            }
           }
           else
           {
@@ -1825,6 +2353,10 @@ namespace fs
                 {
                   throw std::domain_error("Could not parse vertex coordinate and color line " + std::to_string(line_idx + 1) + " of COFF data " + msg_source_file_part + ", invalid format.\n");
                 }
+                // -- Security: clamp vertex colors to [0,255] (O8) --
+                if (r < 0) { r = 0; } if (r > 255) { r = 255; }
+                if (g < 0) { g = 0; } if (g > 255) { g = 255; }
+                if (b < 0) { b = 0; } if (b > 255) { b = 255; }
                 vertex_colors.push_back(static_cast<uint8_t>(r));
                 vertex_colors.push_back(static_cast<uint8_t>(g));
                 vertex_colors.push_back(static_cast<uint8_t>(b));
@@ -1836,6 +2368,13 @@ namespace fs
                   throw std::domain_error("Could not parse vertex coordinate line " + std::to_string(line_idx + 1) + " of OFF data " + msg_source_file_part + ", invalid format.\n");
                 }
               }
+
+              // -- Security: validate finite coordinates (O7) --
+              if (!util::is_finite_float(x) || !util::is_finite_float(y) || !util::is_finite_float(z))
+              {
+                throw std::domain_error("Non-finite vertex coordinate on line " + std::to_string(line_idx + 1) + " of OFF data " + msg_source_file_part + ".\n");
+              }
+
               vertices.push_back(x);
               vertices.push_back(y);
               vertices.push_back(z);
@@ -1862,6 +2401,13 @@ namespace fs
           }
         }
       }
+
+      // -- Security: max-lines exceeded (O5) --
+      if (total_lines_processed >= LIBFS_MAX_OFF_LINES && !is->eof())
+      {
+        throw std::runtime_error("OFF file exceeds maximum allowed line count of " + std::to_string(LIBFS_MAX_OFF_LINES) + ".\n");
+      }
+
       if (num_verts_parsed < num_vertices)
       {
         throw std::domain_error("Vertex count mismatch between OFF data " + msg_source_file_part + " header (" + std::to_string(num_vertices) + ") and data (" + std::to_string(num_verts_parsed) + ").\n");
@@ -1870,6 +2416,18 @@ namespace fs
       {
         throw std::domain_error("Face count mismatch between OFF data " + msg_source_file_part + " header  (" + std::to_string(num_faces) + ") and data (" + std::to_string(num_faces_parsed) + ").\n");
       }
+
+      // -- Security: validate face indices against vertex count (O2) --
+      int32_t nv = static_cast<int32_t>(num_vertices);
+      for (size_t fi = 0; fi < faces.size(); fi++)
+      {
+        int idx = faces[fi];
+        if (idx < 0 || idx >= nv)
+        {
+          throw std::domain_error("Face index " + std::to_string(idx) + " out of range [0, " + std::to_string(nv - 1) + "] in OFF data " + msg_source_file_part + ".\n");
+        }
+      }
+
       mesh->vertices = vertices;
       mesh->faces = faces;
       mesh->vertex_colors = vertex_colors;
@@ -1894,6 +2452,14 @@ namespace fs
 #ifdef LIBFS_DBG_INFO
       std::cout << LIBFS_APPTAG << "Reading brain mesh from OFF format file " << filename << ".\n";
 #endif
+      // -- Security: file-size pre-check (O6) --
+      size_t file_size = util::get_file_size(filename);
+      if (file_size > LIBFS_MAX_OFF_FILE_SIZE)
+      {
+        throw std::runtime_error("OFF file '" + filename + "' size (" + std::to_string(file_size) +
+                                 " bytes) exceeds maximum allowed (" + std::to_string(LIBFS_MAX_OFF_FILE_SIZE) + " bytes).\n");
+      }
+
       std::ifstream input(filename, std::fstream::in);
       if (input.is_open())
       {
@@ -1913,22 +2479,48 @@ namespace fs
     /// @throws std::domain_error if the file format is invalid.
     static void from_ply(Mesh *mesh, std::istream *is)
     {
+      // -- Security: null-pointer check (P4) --
+      if (!mesh)
+      {
+        throw std::invalid_argument("mesh pointer must not be null");
+      }
+
       std::string line;
       int line_idx = -1;
       int noncomment_line_idx = -1;
+      size_t total_lines_processed = 0;
 
       std::vector<float> vertices;
       std::vector<int> faces;
       std::vector<uint8_t> vertex_colors;
+      std::vector<float> ply_normals;    // collected per-vertex normals (3 floats per vertex)
+      std::vector<float> ply_texcoords;  // collected per-vertex texcoords (2 floats per vertex)
 
-      bool in_header = true;                                              // current status
-      int num_verts = -1;
-      int num_faces = -1;
-      bool in_vertex_element = false;                                     // track whether we are inside 'element vertex' in header
-      std::vector<std::string> vertex_properties;                         // ordered list of property names under element vertex
-      while (std::getline(*is, line))
+      bool in_header = true;
+      size_t num_verts = 0;
+      size_t num_faces = 0;
+      bool have_num_verts = false;
+      bool have_num_faces = false;
+      bool in_vertex_element = false;
+      std::vector<std::string> vertex_properties;
+
+      while (total_lines_processed < LIBFS_MAX_PLY_LINES)
       {
-        line_idx += 1;
+        // -- Security: bounded line read (P6) --
+        if (!std::getline(*is, line))
+        {
+          break; // EOF or read error
+        }
+        total_lines_processed++;
+        line_idx++;
+
+        if (line.size() > LIBFS_MAX_PLY_LINE_LENGTH)
+        {
+          throw std::runtime_error("PLY line " + std::to_string(line_idx + 1) +
+                                   " exceeds maximum allowed line length of " +
+                                   std::to_string(LIBFS_MAX_PLY_LINE_LENGTH) + " bytes.\n");
+        }
+
         std::istringstream iss(line);
         if (fs::util::starts_with(line, "comment"))
         {
@@ -1953,23 +2545,55 @@ namespace fs
             if (line == "end_header")
             {
               in_header = false;
+
+              // -- Security: validate header counts after header is complete --
+              if (!have_num_verts || !have_num_faces)
+              {
+                throw std::domain_error("Invalid PLY file: missing element count lines in header.\n");
+              }
+
+              // -- Security: validate header counts against allocation limit (P2) --
+              if (!util::check_alloc(num_verts, 3 * sizeof(float)) ||
+                  !util::check_alloc(num_faces, 3 * sizeof(int)))
+              {
+                throw std::runtime_error("PLY header declares more vertices/faces than allowed by allocation limit (" +
+                                         std::to_string(LIBFS_MAX_ALLOC_BYTES) + " bytes).\n");
+              }
             }
             else if (fs::util::starts_with(line, "element vertex"))
             {
               std::string elem, elem_type_identifier;
-              if (!(iss >> elem >> elem_type_identifier >> num_verts))
+
+              // -- Security: parse count as long long to avoid int overflow (P1) --
+              long long parsed_num_verts;
+              if (!(iss >> elem >> elem_type_identifier >> parsed_num_verts))
               {
                 throw std::domain_error("Could not parse element vertex line of PLY header, invalid format.\n");
               }
+              if (parsed_num_verts < 0)
+              {
+                throw std::domain_error("Negative vertex count in PLY header.\n");
+              }
+              num_verts = static_cast<size_t>(parsed_num_verts);
+              have_num_verts = true;
               in_vertex_element = true;
             }
             else if (fs::util::starts_with(line, "element face"))
             {
               std::string elem, elem_type_identifier;
-              if (!(iss >> elem >> elem_type_identifier >> num_faces))
+
+              // -- Security: parse count as long long to avoid int overflow (P1) --
+              long long parsed_num_faces;
+              if (!(iss >> elem >> elem_type_identifier >> parsed_num_faces))
               {
                 throw std::domain_error("Could not parse element face line of PLY header, invalid format.\n");
               }
+              if (parsed_num_faces < 0)
+              {
+                throw std::domain_error("Negative face count in PLY header.\n");
+              }
+              num_faces = static_cast<size_t>(parsed_num_faces);
+              have_num_faces = true;
               in_vertex_element = false;
             }
             else if (fs::util::starts_with(line, "element "))
@@ -1989,14 +2613,16 @@ namespace fs
           }
           else
           { // in data part.
-            if (num_verts < 1 || num_faces < 1)
+            if (!have_num_verts || !have_num_faces)
             {
               throw std::domain_error("Invalid PLY file: missing element count lines of header.");
             }
             // Read vertices
-            if (vertices.size() < (size_t)num_verts * 3)
+            if (vertices.size() < num_verts * 3)
             {
               float x = 0.0f, y = 0.0f, z = 0.0f;
+              float nx = 0.0f, ny = 0.0f, nz = 0.0f;
+              float s = 0.0f, t = 0.0f;
               int r = 0, g = 0, b = 0;
               if (vertex_properties.empty())
               {
@@ -2005,9 +2631,6 @@ namespace fs
                 {
                   throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx) + " of PLY data, invalid format.\n");
                 }
-                vertices.push_back(x);
-                vertices.push_back(y);
-                vertices.push_back(z);
               }
               else
               {
@@ -2017,14 +2640,14 @@ namespace fs
                   if (pname == "x") { iss >> x; }
                   else if (pname == "y") { iss >> y; }
                   else if (pname == "z") { iss >> z; }
+                  else if (pname == "nx") { iss >> nx; }
+                  else if (pname == "ny") { iss >> ny; }
+                  else if (pname == "nz") { iss >> nz; }
+                  else if (pname == "s" || pname == "u") { iss >> s; }
+                  else if (pname == "t" || pname == "v") { iss >> t; }
                   else if (pname == "red") { iss >> r; }
                   else if (pname == "green") { iss >> g; }
                   else if (pname == "blue") { iss >> b; }
-                  else if (pname == "nx" || pname == "ny" || pname == "nz")
-                  {
-                    // Skip normals.
-                    float dummy; iss >> dummy;
-                  }
                   else
                   {
                     // Skip unknown property.
@@ -2039,28 +2662,76 @@ namespace fs
                 {
                   throw std::domain_error("Could not parse vertex line " + std::to_string(line_idx) + " of PLY data, invalid format.\n");
                 }
-                vertices.push_back(x);
-                vertices.push_back(y);
-                vertices.push_back(z);
-                // Only store colors if red/green/blue were declared in the header.
-                bool has_r = false, has_g = false, has_b = false;
-                for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+              }
+
+              // -- Security: validate finite coordinates (P9) --
+              if (!util::is_finite_float(x) || !util::is_finite_float(y) || !util::is_finite_float(z))
+              {
+                throw std::domain_error("Non-finite vertex coordinate on line " + std::to_string(line_idx) + " of PLY data.\n");
+              }
+
+              vertices.push_back(x);
+              vertices.push_back(y);
+              vertices.push_back(z);
+
+              // Only store colors if red/green/blue were declared in the header.
+              bool has_r = false, has_g = false, has_b = false;
+              for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+              {
+                if (vertex_properties[pi] == "red") has_r = true;
+                if (vertex_properties[pi] == "green") has_g = true;
+                if (vertex_properties[pi] == "blue") has_b = true;
+              }
+              if (has_r && has_g && has_b)
+              {
+                // -- Security: clamp vertex colors to [0,255] (P10) --
+                if (r < 0) { r = 0; } if (r > 255) { r = 255; }
+                if (g < 0) { g = 0; } if (g > 255) { g = 255; }
+                if (b < 0) { b = 0; } if (b > 255) { b = 255; }
+                vertex_colors.push_back(static_cast<uint8_t>(r));
+                vertex_colors.push_back(static_cast<uint8_t>(g));
+                vertex_colors.push_back(static_cast<uint8_t>(b));
+              }
+
+              // Collect normals if declared in header.
+              bool has_nx = false, has_ny = false, has_nz = false;
+              for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+              {
+                if (vertex_properties[pi] == "nx") has_nx = true;
+                if (vertex_properties[pi] == "ny") has_ny = true;
+                if (vertex_properties[pi] == "nz") has_nz = true;
+              }
+              if (has_nx && has_ny && has_nz)
+              {
+                if (!util::is_finite_float(nx) || !util::is_finite_float(ny) || !util::is_finite_float(nz))
                 {
-                  if (vertex_properties[pi] == "red") has_r = true;
-                  if (vertex_properties[pi] == "green") has_g = true;
-                  if (vertex_properties[pi] == "blue") has_b = true;
+                  throw std::domain_error("Non-finite normal on line " + std::to_string(line_idx) + " of PLY data.\n");
                 }
-                if (has_r && has_g && has_b)
+                ply_normals.push_back(nx);
+                ply_normals.push_back(ny);
+                ply_normals.push_back(nz);
+              }
+
+              // Collect texcoords if declared in header.
+              bool has_s = false, has_t = false;
+              for (size_t pi = 0; pi < vertex_properties.size(); pi++)
+              {
+                if (vertex_properties[pi] == "s" || vertex_properties[pi] == "u") has_s = true;
+                if (vertex_properties[pi] == "t" || vertex_properties[pi] == "v") has_t = true;
+              }
+              if (has_s && has_t)
+              {
+                if (!util::is_finite_float(s) || !util::is_finite_float(t))
                 {
-                  vertex_colors.push_back(static_cast<uint8_t>(r));
-                  vertex_colors.push_back(static_cast<uint8_t>(g));
-                  vertex_colors.push_back(static_cast<uint8_t>(b));
+                  throw std::domain_error("Non-finite texcoord on line " + std::to_string(line_idx) + " of PLY data.\n");
                 }
+                ply_texcoords.push_back(s);
+                ply_texcoords.push_back(t);
               }
             }
             else
             {
-              if (faces.size() < (size_t)num_faces * 3)
+              if (faces.size() < num_faces * 3)
               {
                 int verts_per_face, v0, v1, v2;
                 if (!(iss >> verts_per_face >> v0 >> v1 >> v2))
@@ -2079,17 +2750,49 @@ namespace fs
           }
         }
       }
-      if (vertices.size() != (size_t)num_verts * 3)
+
+      // -- Security: max-lines exceeded (P7) --
+      if (total_lines_processed >= LIBFS_MAX_PLY_LINES && !is->eof())
       {
-        std::cerr << "PLY header mentions " << num_verts << " vertices, but found " << vertices.size() / 3 << ".\n";
+        throw std::runtime_error("PLY file exceeds maximum allowed line count of " + std::to_string(LIBFS_MAX_PLY_LINES) + ".\n");
       }
-      if (faces.size() != (size_t)num_faces * 3)
+
+      // -- Throw if header was never terminated --
+      if (in_header)
       {
-        std::cerr << "PLY header mentions " << num_faces << " faces, but found " << faces.size() / 3 << ".\n";
+        throw std::domain_error("Invalid PLY file: header not terminated with 'end_header'.\n");
       }
+
+      // -- Security: throw on count mismatch instead of just warning (P5) --
+      if (vertices.size() != num_verts * 3)
+      {
+        throw std::domain_error("PLY vertex count mismatch: header declares " + std::to_string(num_verts) +
+                                " vertices, but found " + std::to_string(vertices.size() / 3) + ".\n");
+      }
+      if (faces.size() != num_faces * 3)
+      {
+        throw std::domain_error("PLY face count mismatch: header declares " + std::to_string(num_faces) +
+                                " faces, but found " + std::to_string(faces.size() / 3) + ".\n");
+      }
+
+      // -- Security: validate face indices against vertex count (P3) --
+      {
+        int32_t nv = static_cast<int32_t>(num_verts);
+        for (size_t fi = 0; fi < faces.size(); fi++)
+        {
+          int idx = faces[fi];
+          if (idx < 0 || idx >= nv)
+          {
+            throw std::domain_error("Face index " + std::to_string(idx) + " out of range [0, " + std::to_string(nv - 1) + "] in PLY data.\n");
+          }
+        }
+      }
+
       mesh->vertices = vertices;
       mesh->faces = faces;
       mesh->vertex_colors = vertex_colors;
+      mesh->vertex_normals = ply_normals;
+      mesh->vertex_texcoords = ply_texcoords;
     }
 
     /// @brief Read a brainmesh from a Stanford PLY format mesh file.
@@ -2110,6 +2813,14 @@ namespace fs
 #ifdef LIBFS_DBG_INFO
       std::cout << LIBFS_APPTAG << "Reading brain mesh from PLY format file " << filename << ".\n";
 #endif
+      // -- Security: file-size pre-check (P8) --
+      size_t file_size = util::get_file_size(filename);
+      if (file_size > LIBFS_MAX_PLY_FILE_SIZE)
+      {
+        throw std::runtime_error("PLY file '" + filename + "' size (" + std::to_string(file_size) +
+                                 " bytes) exceeds maximum allowed (" + std::to_string(LIBFS_MAX_PLY_FILE_SIZE) + " bytes).\n");
+      }
+
       std::ifstream input(filename, std::fstream::in);
       if (input.is_open())
       {
@@ -2270,10 +2981,20 @@ namespace fs
     std::string to_ply(const std::vector<uint8_t> col) const
     {
       bool use_vertex_colors = col.size() != 0;
+      bool use_normals = this->has_normals();
+      bool use_texcoords = this->has_texcoords();
       std::stringstream plys;
       plys << "ply\nformat ascii 1.0\n";
       plys << "element vertex " << this->num_vertices() << "\n";
       plys << "property float x\nproperty float y\nproperty float z\n";
+      if (use_normals)
+      {
+        plys << "property float nx\nproperty float ny\nproperty float nz\n";
+      }
+      if (use_texcoords)
+      {
+        plys << "property float s\nproperty float t\n";
+      }
       if (use_vertex_colors)
       {
         if (col.size() != this->vertices.size())
@@ -2293,6 +3014,15 @@ namespace fs
       for (size_t vidx = 0; vidx < this->vertices.size(); vidx += 3)
       { // vertex coords
         plys << vertices[vidx] << " " << vertices[vidx + 1] << " " << vertices[vidx + 2];
+        if (use_normals)
+        {
+          plys << " " << vertex_normals[vidx] << " " << vertex_normals[vidx + 1] << " " << vertex_normals[vidx + 2];
+        }
+        if (use_texcoords)
+        {
+          size_t tcidx = (vidx / 3) * 2;
+          plys << " " << vertex_texcoords[tcidx] << " " << vertex_texcoords[tcidx + 1];
+        }
         if (use_vertex_colors)
         {
           plys << " " << (int)col[vidx] << " " << (int)col[vidx + 1] << " " << (int)col[vidx + 2];
@@ -2461,7 +3191,9 @@ namespace fs
       size_t num_ids = this->id.size();
       if (this->name.size() != num_ids || this->r.size() != num_ids || this->g.size() != num_ids || this->b.size() != num_ids || this->a.size() != num_ids || this->label.size() != num_ids)
       {
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "Inconsistent Colortable, vector sizes do not match.\n";
+#endif
       }
       return num_ids;
     }
@@ -2510,7 +3242,9 @@ namespace fs
       }
       else
       {
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "No such region in annot, returning empty vector.\n";
+#endif
         std::vector<int32_t> empty;
         return (empty);
       }
@@ -3046,7 +3780,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_INT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_INT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<int32_t>(mgh_header, filename));
   }
@@ -3059,7 +3795,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_INT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_INT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<int32_t>(mgh_header, is));
   }
@@ -3072,7 +3810,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_SHORT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_SHORT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<short>(mgh_header, filename));
   }
@@ -3085,7 +3825,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_SHORT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_SHORT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<short>(mgh_header, is));
   }
@@ -3194,7 +3936,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_FLOAT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_FLOAT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<float>(mgh_header, filename));
   }
@@ -3207,7 +3951,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_FLOAT)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_FLOAT << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<float>(mgh_header, is));
   }
@@ -3220,7 +3966,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_UCHAR)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_UCHAR << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<uint8_t>(mgh_header, filename));
   }
@@ -3233,7 +3981,9 @@ namespace fs
   {
     if (mgh_header->dtype != MRI_UCHAR)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Expected MRI data type " << MRI_UCHAR << ", but found " << mgh_header->dtype << ".\n";
+#endif
     }
     return (_read_mgh_data<uint8_t>(mgh_header, is));
   }
@@ -3521,7 +4271,9 @@ namespace fs
     int32_t num_entries_duplicated = _freadt<int32_t>(*is); // Yes, once more.
     if (num_entries != num_entries_duplicated)
     {
+#ifdef LIBFS_DBG_ERROR
       std::cerr << "Warning: the two num_entries header fields of this annotation do not match. Use with care.\n";
+#endif
     }
 
     colortable->id.reserve(static_cast<size_t>(num_entries));
@@ -3705,7 +4457,9 @@ namespace fs
       }
       if (num_gt_1 > 1)
       {
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "MGH file '" << filename << "' contains more than one non-empty dimension. Returning concatinated data.\n";
+#endif
       }
       return mgh.data.data_mri_float;
     }
@@ -3728,7 +4482,9 @@ namespace fs
       }
       if (num_gt_1 > 1)
       {
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "NIfTI file '" << filename << "' contains more than one non-empty dimension. Returning concatenated data.\n";
+#endif
       }
       return mgh.data.data_mri_float;
     }
@@ -5138,7 +5894,9 @@ namespace fs
     {
       if (surface_num_verts < this->vertex.size())
       { // nonsense, so we warn (but don't throw, maybe the user really wants this).
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "Invalid number of vertices for surface, must be at least " << this->vertex.size() << "\n";
+#endif
       }
       std::vector<bool> is_in = std::vector<bool>(surface_num_verts, false);
 
@@ -5155,7 +5913,9 @@ namespace fs
       size_t num_ent = this->vertex.size();
       if (this->coord_x.size() != num_ent || this->coord_y.size() != num_ent || this->coord_z.size() != num_ent || this->value.size() != num_ent)
       {
+#ifdef LIBFS_DBG_ERROR
         std::cerr << "Inconsistent label: sizes of property vectors do not match.\n";
+#endif
       }
       return (num_ent);
     }
