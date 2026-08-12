@@ -1,4 +1,5 @@
-url: https://dfsp-spirit.github.io/scimesh/
+url: https://dfsp-spirit.github.io/scimesh/r/
+destination: docs/r
 template:
   bootstrap: 5
 
