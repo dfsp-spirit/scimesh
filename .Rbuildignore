@@ -39,3 +39,4 @@ Doxyfile
 
 ^_pkgdown\.yml$
 ^pkgdown$
+landing
