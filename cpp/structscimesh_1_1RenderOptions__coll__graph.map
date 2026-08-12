@@ -1,0 +1,5 @@
+<map id="scimesh::RenderOptions" name="scimesh::RenderOptions">
+<area shape="rect" id="Node000001" title="All settings that control rendering output." alt="" coords="5,152,185,177"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="36,5,155,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,45,98,152,93,152,93,45"/>
+</map>

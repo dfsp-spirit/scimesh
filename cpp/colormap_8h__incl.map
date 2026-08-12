@@ -1,0 +1,25 @@
+<map id="src/core/scimesh/colormap.h" name="src/core/scimesh/colormap.h">
+<area shape="rect" id="Node000001" title="Colormap data structure and data&#45;to&#45;color mapping utilities." alt="" coords="625,5,833,31"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="449,79,577,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="695,33,561,77,560,72,693,28"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="647,152,709,177"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="727,32,689,140,684,138,722,30"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="734,152,801,177"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="734,30,763,138,758,139,729,32"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="767,79,829,104"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="742,29,779,67,775,71,738,33"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="853,79,924,104"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="755,28,851,71,849,75,753,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="512,152,623,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="524,103,552,140,548,143,520,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,152,116,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="449,105,130,154,129,149,448,100"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="140,152,251,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="462,107,260,152,259,146,461,101"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="275,152,404,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="486,106,381,149,379,144,484,102"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="540,102,640,144,637,149,538,106"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="554,101,721,148,720,153,553,107"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="429,152,487,177"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="506,106,477,143,473,140,502,103"/>
+</map>

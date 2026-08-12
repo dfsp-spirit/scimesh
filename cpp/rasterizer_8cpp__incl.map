@@ -1,0 +1,38 @@
+<map id="src/core/rasterizer.cpp" name="src/core/rasterizer.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="704,5,869,31"/>
+<area shape="rect" id="Node000002" href="$rasterizer_8h.html" title="The Rasterizer — the per&#45;pixel rendering engine." alt="" coords="429,79,582,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="742,33,565,78,563,73,741,28"/>
+<area shape="rect" id="Node000012" href="$math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="647,79,809,104"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="779,33,748,70,744,67,775,29"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="861,152,947,177"/>
+<area shape="poly" id="edge20_Node000001_Node000014" title=" " alt="" coords="798,29,888,140,884,143,794,33"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="885,79,947,104"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="809,28,884,69,881,74,806,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="315,225,443,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="502,106,484,140,457,179,434,201,410,219,407,215,430,197,453,176,480,137,498,103"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="737,299,799,324"/>
+<area shape="poly" id="edge15_Node000002_Node000008" title=" " alt="" coords="521,102,608,175,745,288,742,292,605,179,517,106"/>
+<area shape="rect" id="Node000011" href="$image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="309,152,443,177"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="486,106,411,147,408,143,483,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="467,299,578,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="403,248,488,290,486,295,401,253"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="602,299,713,324"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="424,248,600,293,598,298,423,253"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="179,299,290,324"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="357,253,272,295,269,290,354,248"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="314,299,443,324"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="381,251,381,285,376,285,376,251"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="444,246,569,267,723,296,722,301,568,272,443,251"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="5,299,72,324"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="319,253,86,301,85,296,318,248"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="96,299,155,324"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="339,253,169,301,167,296,337,248"/>
+<area shape="poly" id="edge11_Node000011_Node000003" title=" " alt="" coords="379,178,380,212,375,212,374,178"/>
+<area shape="poly" id="edge12_Node000011_Node000008" title=" " alt="" coords="392,175,444,211,513,248,568,267,614,277,723,296,723,301,613,282,567,272,511,253,441,216,389,180"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="349,180,232,228,78,295,76,290,230,223,346,175"/>
+<area shape="poly" id="edge14_Node000011_Node000010" title=" " alt="" coords="357,180,159,294,156,289,355,175"/>
+<area shape="poly" id="edge17_Node000012_Node000003" title=" " alt="" coords="701,107,420,223,418,218,699,102"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="619,152,837,177"/>
+<area shape="poly" id="edge18_Node000012_Node000013" title=" " alt="" coords="731,104,731,138,725,138,725,104"/>
+<area shape="poly" id="edge19_Node000012_Node000014" title=" " alt="" coords="757,102,863,144,861,149,755,106"/>
+</map>

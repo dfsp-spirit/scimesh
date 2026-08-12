@@ -1,0 +1,26 @@
+<map id="src/core/scimesh/rasterizer.h" name="src/core/scimesh/rasterizer.h">
+<area shape="rect" id="Node000001" title="The Rasterizer — the per&#45;pixel rendering engine." alt="" coords="222,5,430,31"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="353,152,481,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="330,31,337,64,354,103,371,124,390,141,387,145,367,127,349,105,332,66,325,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,225,68,251"/>
+<area shape="poly" id="edge14_Node000001_Node000007" title=" " alt="" coords="312,33,65,219,61,215,309,29"/>
+<area shape="rect" id="Node000010" href="$image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="363,79,497,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="344,28,403,68,400,73,341,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="92,225,203,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,180,205,224,203,219,373,175"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="227,225,337,251"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="396,180,317,221,315,216,394,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="361,225,472,251"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="419,178,419,212,414,212,414,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="496,225,625,251"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="441,175,526,217,524,221,439,180"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="353,178,231,198,82,228,81,222,230,193,352,173"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="733,225,799,251"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="481,175,720,222,719,228,480,180"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="650,225,709,251"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="460,175,638,223,636,228,458,180"/>
+<area shape="poly" id="edge10_Node000010_Node000002" title=" " alt="" coords="430,105,424,139,419,138,425,104"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="409,107,337,141,246,180,82,227,81,222,244,175,335,137,406,102"/>
+<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="459,102,575,150,729,217,727,222,573,154,457,107"/>
+<area shape="poly" id="edge13_Node000010_Node000009" title=" " alt="" coords="451,102,649,216,646,221,449,107"/>
+</map>

@@ -1,0 +1,27 @@
+var structscimesh_1_1Rasterizer =
+[
+    [ "Rasterizer", "structscimesh_1_1Rasterizer.html#a42eb6381075961b6b119cedb9503796d", null ],
+    [ "apply_ssao", "structscimesh_1_1Rasterizer.html#a4f3261210c13a660cd2313edd814fdb5", null ],
+    [ "clear", "structscimesh_1_1Rasterizer.html#a0cd181b811d1017c74076224a8c05468", null ],
+    [ "rasterize_point", "structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e", null ],
+    [ "rasterize_triangle", "structscimesh_1_1Rasterizer.html#ac12d54b304b8ab18bcb4c83e8221c10f", null ],
+    [ "set_blend_mode", "structscimesh_1_1Rasterizer.html#a87d8ee558c345663de2253d00ea0396d", null ],
+    [ "active_texture", "structscimesh_1_1Rasterizer.html#a6399b18ccd1dbbbf96c8e4b0a4755247", null ],
+    [ "ambient", "structscimesh_1_1Rasterizer.html#a789ababf9ff6a4c5f18d97953d83049b", null ],
+    [ "blend_mode", "structscimesh_1_1Rasterizer.html#ad6d3d9dd7ea6b39b7f17f24b451acf15", null ],
+    [ "contrast", "structscimesh_1_1Rasterizer.html#ae1d95cbcbddfe8d584bcb2e06129ffbf", null ],
+    [ "fog_color", "structscimesh_1_1Rasterizer.html#a1c07a3cef37ccdcc7899eafbf2cc8bc4", null ],
+    [ "fog_enabled", "structscimesh_1_1Rasterizer.html#a1ce05c153000be7d9b4381f8f1c3a45a", null ],
+    [ "fog_end", "structscimesh_1_1Rasterizer.html#a1abcb000b8eff187ee81c2807cb0e94a", null ],
+    [ "fog_start", "structscimesh_1_1Rasterizer.html#a30a3f9d2d66c20c9ecdee9803ab3e41f", null ],
+    [ "height", "structscimesh_1_1Rasterizer.html#a617a7ac19b12317c2cac79e57f0163de", null ],
+    [ "lights", "structscimesh_1_1Rasterizer.html#a9a1fa8d2588157af1d2e51bebe399fe8", null ],
+    [ "normal_buffer", "structscimesh_1_1Rasterizer.html#ae2f17079774d76e11affd9e286447388", null ],
+    [ "shininess", "structscimesh_1_1Rasterizer.html#aaec94d8432b067611979a1a1e7280332", null ],
+    [ "specular_color", "structscimesh_1_1Rasterizer.html#a8c86c7eeb39ba2261136d9fd14cd6516", null ],
+    [ "ssao_enabled", "structscimesh_1_1Rasterizer.html#ac6d5177d62341820aab75c1bba241925", null ],
+    [ "ssao_intensity", "structscimesh_1_1Rasterizer.html#a68ac02414c0ee3ea18e25b27e93f266e", null ],
+    [ "ssao_radius", "structscimesh_1_1Rasterizer.html#a0a1402b90c41c97c3bc14a77f0d7bd4a", null ],
+    [ "width", "structscimesh_1_1Rasterizer.html#a86b5ae9c312d93ade8c392df59d70459", null ],
+    [ "z_buffer", "structscimesh_1_1Rasterizer.html#acb902d6d18babf4962629851700916ef", null ]
+];

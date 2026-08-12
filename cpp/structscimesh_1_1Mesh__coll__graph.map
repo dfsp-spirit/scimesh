@@ -1,0 +1,7 @@
+<map id="scimesh::Mesh" name="scimesh::Mesh">
+<area shape="rect" id="Node000001" title="A 3D triangle mesh using an indexed face set representation." alt="" coords="82,93,201,119"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1Image.html" title="A 2D RGBA image buffer." alt="" coords="5,5,131,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,39,133,91,129,95,85,43"/>
+<area shape="rect" id="Node000003" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="155,5,274,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,43,154,95,150,91,194,39"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="src/core/scimesh/math_utils.h" name="src/core/scimesh/math_utils.h">
+<area shape="rect" id="Node000001" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="587,5,756,45"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="410,93,538,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="625,48,517,91,515,86,623,43"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="563,93,780,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="674,46,674,79,669,79,669,46"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="805,93,890,119"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="715,43,810,85,808,90,712,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,167,116,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="410,121,130,169,129,164,409,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="140,167,251,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="430,121,254,166,253,161,429,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="275,167,385,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="452,121,367,163,365,158,450,116"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="409,167,539,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="477,119,477,153,471,153,471,119"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="563,167,625,192"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="495,116,564,157,561,162,492,121"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="650,167,717,192"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="508,116,638,160,636,165,507,121"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="741,167,799,192"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="526,116,728,164,727,169,525,121"/>
+</map>

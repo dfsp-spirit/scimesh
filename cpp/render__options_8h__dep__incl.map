@@ -1,0 +1,9 @@
+<map id="src/core/scimesh/render_options.h" name="src/core/scimesh/render_options.h">
+<area shape="rect" id="Node000001" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="116,5,293,45"/>
+<area shape="rect" id="Node000002" href="$renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="5,101,207,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,57,121,102,118,98,170,53"/>
+<area shape="rect" id="Node000004" href="$to__string_8h.html" title=" " alt="" coords="231,93,379,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="239,52,284,91,281,95,235,56"/>
+<area shape="rect" id="Node000003" href="$renderer_8cpp.html" title=" " alt="" coords="27,181,185,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,140,109,181,103,181,103,140"/>
+</map>

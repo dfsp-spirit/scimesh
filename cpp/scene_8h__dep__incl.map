@@ -1,0 +1,19 @@
+<map id="src/core/scimesh/scene.h" name="src/core/scimesh/scene.h">
+<area shape="rect" id="Node000001" title="The Scene — a collection of meshes rendered together." alt="" coords="196,5,381,31"/>
+<area shape="rect" id="Node000002" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="191,79,387,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="291,44,291,79,286,79,286,44"/>
+<area shape="rect" id="Node000005" href="$renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="409,247,611,273"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="347,32,391,50,438,74,482,108,500,128,515,151,523,177,524,204,516,248,511,247,519,203,518,178,510,153,496,131,478,112,435,79,389,54,345,37"/>
+<area shape="rect" id="Node000007" href="$to__string_8h.html" title=" " alt="" coords="5,240,153,280"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="237,38,195,55,151,80,111,112,95,132,82,153,75,175,73,198,77,239,72,240,67,198,69,174,77,151,91,129,108,109,148,75,193,50,235,33"/>
+<area shape="rect" id="Node000003" href="$camera_8cpp.html" title=" " alt="" coords="117,159,271,185"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,115,210,161,206,157,262,111"/>
+<area shape="rect" id="Node000004" href="$render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="295,152,472,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="315,111,362,150,359,154,311,115"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="401,103,447,121,468,134,487,150,502,174,510,201,513,247,508,247,505,202,497,176,483,154,465,138,445,126,399,108"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="182,110,141,127,107,154,94,174,86,197,81,240,76,240,81,196,89,171,103,150,138,123,180,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="424,198,494,245,491,249,421,202"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="304,198,147,243,145,237,302,193"/>
+<area shape="rect" id="Node000006" href="$renderer_8cpp.html" title=" " alt="" coords="431,328,589,353"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="513,286,513,328,507,328,507,286"/>
+</map>

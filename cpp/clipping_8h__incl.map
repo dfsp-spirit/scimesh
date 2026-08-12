@@ -1,0 +1,20 @@
+<map id="src/core/scimesh/clipping.h" name="src/core/scimesh/clipping.h">
+<area shape="rect" id="Node000001" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="487,5,685,31"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="471,79,599,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="580,33,554,69,549,66,575,29"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="737,152,800,177"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="603,29,745,141,742,145,599,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,116,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="472,104,130,154,129,149,471,99"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="140,152,251,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="481,107,264,152,263,147,480,101"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="275,152,385,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="503,107,377,150,375,145,501,101"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="409,152,539,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="527,106,495,143,491,140,523,103"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="574,101,725,147,724,152,572,107"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="563,152,630,177"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="547,103,580,140,576,143,543,106"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="654,152,713,177"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="560,102,648,144,646,148,558,106"/>
+</map>

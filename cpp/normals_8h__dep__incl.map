@@ -1,0 +1,9 @@
+<map id="src/core/scimesh/normals.h" name="src/core/scimesh/normals.h">
+<area shape="rect" id="Node000001" title="Compute per&#45;vertex surface normals for lighting." alt="" coords="172,5,372,31"/>
+<area shape="rect" id="Node000002" href="$normals_8cpp.html" title=" " alt="" coords="5,79,163,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,38,116,81,114,76,228,33"/>
+<area shape="rect" id="Node000003" href="$primitives_8cpp.html" title=" " alt="" coords="187,79,357,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="275,44,275,79,269,79,269,44"/>
+<area shape="rect" id="Node000004" href="$renderer_8cpp.html" title=" " alt="" coords="382,79,541,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="316,33,431,76,429,81,314,38"/>
+</map>

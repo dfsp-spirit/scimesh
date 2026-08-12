@@ -1,0 +1,24 @@
+<map id="src/core/clipping.cpp" name="src/core/clipping.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="578,5,733,31"/>
+<area shape="rect" id="Node000002" href="$clipping_8h.html" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="515,79,657,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="646,33,609,71,605,67,642,29"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="682,79,767,104"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="669,29,706,67,702,71,665,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="471,152,599,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="580,106,554,142,549,139,575,103"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="737,225,800,251"/>
+<area shape="poly" id="edge10_Node000002_Node000008" title=" " alt="" coords="603,102,745,214,742,219,599,107"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,225,116,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="472,177,130,228,129,222,471,172"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="140,225,251,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="481,180,264,225,263,220,480,175"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="275,225,385,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="503,180,377,223,375,218,501,175"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="409,225,539,251"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="527,179,495,217,491,213,523,176"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="574,175,725,221,724,226,572,180"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="563,225,630,251"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="547,176,580,213,576,217,543,179"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="654,225,713,251"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="560,175,648,217,646,222,558,180"/>
+</map>

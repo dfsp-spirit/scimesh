@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['wavefront_20obj_0',['Wavefront OBJ',['../cpp_getting_started.html#autotoc_md61',1,'']]],
+  ['what_20is_20scimesh_20c_1',['What is scimesh C++?',['../cpp_getting_started.html#autotoc_md44',1,'']]],
+  ['what_20scimesh_20is_2',['What scimesh is',['../index.html#autotoc_md21',1,'']]],
+  ['what_20scimesh_20is_20not_3',['What scimesh is not',['../index.html#autotoc_md25',1,'']]],
+  ['white_4',['WHITE',['../namespacescimesh.html#a8552f8964b41e7ba07ccabef374449ae',1,'scimesh']]],
+  ['width_5',['width',['../structscimesh_1_1Rasterizer.html#a86b5ae9c312d93ade8c392df59d70459',1,'scimesh::Rasterizer::width'],['../structscimesh_1_1Image.html#a3332229225425a47f8afe7d60fa8852a',1,'scimesh::Image::width'],['../structscimesh_1_1RenderOptions.html#a533958c458a0c8f7796d66716ace8976',1,'scimesh::RenderOptions::width']]],
+  ['winsor_5fhi_6',['winsor_hi',['../structscimesh_1_1ApplyColormapResult.html#ab6a89c539396244383b122266f7dfb26',1,'scimesh::ApplyColormapResult']]],
+  ['winsor_5flo_7',['winsor_lo',['../structscimesh_1_1ApplyColormapResult.html#aba0c79134227c98a4a1b2e234db31ac8',1,'scimesh::ApplyColormapResult']]],
+  ['wireframe_8',['wireframe',['../structscimesh_1_1RenderOptions.html#a9f971fb2a57d1e111bd3b8915d23e4dd',1,'scimesh::RenderOptions']]],
+  ['wireframe_20overlay_9',['Wireframe overlay',['../structscimesh_1_1RenderOptions.html#autotoc_md12',1,'']]],
+  ['wireframe_5fcolor_10',['wireframe_color',['../structscimesh_1_1RenderOptions.html#a50a676a3602481d76606059565938cab',1,'scimesh::RenderOptions']]],
+  ['with_20fetchcontent_20recommended_11',['CMake with FetchContent (Recommended)',['../cpp_getting_started.html#autotoc_md50',1,'']]],
+  ['with_20scimesh_20c_12',['Getting Started with scimesh C++',['../cpp_getting_started.html',1,'index']]],
+  ['without_20cmake_13',['Manually (without CMake)',['../cpp_getting_started.html#autotoc_md51',1,'']]],
+  ['works_14',['How a camera works',['../structscimesh_1_1Camera.html#autotoc_md0',1,'']]],
+  ['write_5fbmp_15',['write_bmp',['../structscimesh_1_1Image.html#afd02f2c51604512b0b10e02844cdcdea',1,'scimesh::Image']]],
+  ['write_5fpng_16',['write_png',['../structscimesh_1_1Image.html#ad8e792e87a526c7594c407faee0f6804',1,'scimesh::Image']]],
+  ['write_5fppm_17',['write_ppm',['../structscimesh_1_1Image.html#a2abc715b041120a98dd28d138405a284',1,'scimesh::Image']]],
+  ['write_5fstl_18',['write_stl',['../namespacescimesh_1_1stl__io.html#a02a08a7de9af5c95af5e3ce3b6186929',1,'scimesh::stl_io']]],
+  ['write_5fstl_5fascii_19',['write_stl_ascii',['../namespacescimesh_1_1stl__io.html#aa41b1a23b4f8cae5829e563d39c84019',1,'scimesh::stl_io']]],
+  ['write_5fstl_5fbinary_20',['write_stl_binary',['../namespacescimesh_1_1stl__io.html#a8459b31153dd4cf8886312c92d2f76ad',1,'scimesh::stl_io']]],
+  ['write_5ftga_21',['write_tga',['../structscimesh_1_1Image.html#a1f6dfc1dbb5bd5b756cdfa3c671a9c25',1,'scimesh::Image']]]
+];

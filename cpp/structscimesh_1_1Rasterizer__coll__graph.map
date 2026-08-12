@@ -1,0 +1,7 @@
+<map id="scimesh::Rasterizer" name="scimesh::Rasterizer">
+<area shape="rect" id="Node000001" title="Low&#45;level triangle rasterizer with depth buffering and lighting." alt="" coords="63,108,213,133"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,43,79,63,89,82,117,106,114,110,85,86,74,66,67,45"/>
+<area shape="rect" id="Node000003" href="$structscimesh_1_1Image.html" title="A 2D RGBA image buffer." alt="" coords="149,5,274,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,45,184,86,158,110,154,106,180,82,201,42"/>
+</map>
