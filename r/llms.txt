@@ -244,12 +244,9 @@ scimesh is built upon:
 - `src/third_party/tinyply.{h,cpp}`:
   [ddiakopoulos/tinyply](https://github.com/ddiakopoulos/tinyply) — PLY
   file reader by Dimitri Diakopoulos
-- `src/third_party/tiny_obj_loader.h`:
-  [tinyobjloader/tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)
-  — Wavefront OBJ by Syoyo Fujita
 - `src/third_party/libfs.h`:
   [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs) — FreeSurfer
-  file format reader by Tim Schäfer
+  file format reader + OBJ mesh loader by Tim Schäfer
 - `src/third_party/stl_reader.h`:
   [sreiter/stl_reader](https://github.com/sreiter/stl_reader) — STL file
   reader, maintained by Sebastian Reiter
