@@ -28,7 +28,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/dfsp-spirit/scimesh/blob/v0.3.2/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/dfsp-spirit/scimesh/blob/main/DESCRIPTION)
 
 Schäfer T (2026). *scimesh: Headless Publication-Quality 3D Mesh
 Rendering Engine*. R package version 0.3.2,
