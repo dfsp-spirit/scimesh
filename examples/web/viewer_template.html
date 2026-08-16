@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scimesh — offline glTF viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #f2f2f2; }
+  #info { position: fixed; top: 8px; left: 12px; font: 12px sans-serif; color: #555; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="info">scimesh export &mdash; drag to rotate &middot; scroll to zoom &middot; right-drag to pan</div>
+
+<!--
+  Why three.js (vendored classic scripts) and NOT Google's <model-viewer>?
+  <model-viewer> would make this markup a single line, but it loads as an ES
+  module from a CDN. That needs internet and does not work from file:// URLs
+  (the "double-click the HTML" case), because browsers block ES-module imports
+  and fetch() from file://. Here we vendor three.js + GLTFLoader + OrbitControls
+  as classic scripts and inline the .glb as base64, so this page is fully
+  self-contained and works offline by double-clicking.
+-->
+<script>__THREE_MIN_JS__</script>
+<script>__GLTF_LOADER_JS__</script>
+<script>__ORBIT_CONTROLS_JS__</script>
+<script>
+(function () {
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf2f2f2);
+
+  var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  var hemi = new THREE.HemisphereLight(0xffffff, 0x777777, 0.9);
+  scene.add(hemi);
+  var dir = new THREE.DirectionalLight(0xffffff, 0.7);
+  dir.position.set(1, 2, 1);
+  scene.add(dir);
+
+  // The .glb is embedded as base64 so no fetch() (and therefore no server
+  // or CORS issues) is needed from file://.
+  var bin = atob("__GLB_BASE64__");
+  var bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; ++i) bytes[i] = bin.charCodeAt(i);
+
+  new THREE.GLTFLoader().parse(bytes.buffer, "", function (gltf) {
+    var obj = gltf.scene;
+    scene.add(obj);
+
+    // Defensive material setup: scimesh exports are diffuse (non-PBR), but a
+    // generic glTF might default to metallic=1 (renders black under simple
+    // lighting), lack normals, or need vertex colors enabled.  Normalize all
+    // of these so the mesh is always visible.
+    obj.traverse(function (m) {
+      if (m.isMesh) {
+        if (m.geometry && !m.geometry.attributes.normal) m.geometry.computeVertexNormals();
+        if (m.material) {
+          m.material.metalness = 0;
+          m.material.roughness = 1;
+          m.material.vertexColors = true;
+        }
+      }
+    });
+
+    // Auto-frame the camera to the loaded geometry.
+    var box = new THREE.Box3().setFromObject(obj);
+    var center = box.getCenter(new THREE.Vector3());
+    var size = box.getSize(new THREE.Vector3()).length();
+    var dist = size / (2 * Math.tan(THREE.MathUtils.degToRad(25)));
+    controls.target.copy(center);
+    camera.position.copy(center).add(new THREE.Vector3(0.6, 0.3, 1.0).multiplyScalar(dist * 1.1));
+    camera.near = dist / 100;
+    camera.far = dist * 100;
+    camera.updateProjectionMatrix();
+    controls.update();
+  });
+
+  window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  renderer.setAnimationLoop(function () { controls.update(); renderer.render(scene, camera); });
+})();
+</script>
+</body>
+</html>

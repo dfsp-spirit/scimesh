@@ -1,0 +1,22 @@
+{
+  "asset": {"version": "2.0", "generator": "scimesh"},
+  "buffers": [{"byteLength": 15733908, "uri": "brain.bin"}],
+  "bufferViews": [
+    {"buffer": 0, "byteOffset": 0, "byteLength": 1790928}, {"buffer": 0, "byteOffset": 1790928, "byteLength": 1790928}, {"buffer": 0, "byteOffset": 3581856, "byteLength": 596976}, {"buffer": 0, "byteOffset": 4178832, "byteLength": 3581808}, {"buffer": 0, "byteOffset": 7760640, "byteLength": 1839996}, {"buffer": 0, "byteOffset": 9600636, "byteLength": 1839996}, {"buffer": 0, "byteOffset": 11440632, "byteLength": 613332}, {"buffer": 0, "byteOffset": 12053964, "byteLength": 3679944}
+  ],
+  "accessors": [
+    {"bufferView": 0, "componentType": 5126, "count": 149244, "type": "VEC3", "min": [-60.6362991, -108.620392, -8.28079891], "max": [5.58989286, 58.7330208, 106.174294]}, {"bufferView": 1, "componentType": 5126, "count": 149244, "type": "VEC3"}, {"bufferView": 2, "componentType": 5121, "count": 149244, "normalized": true, "type": "VEC4"}, {"bufferView": 3, "componentType": 5125, "count": 895452, "type": "SCALAR"}, {"bufferView": 4, "componentType": 5126, "count": 153333, "type": "VEC3", "min": [-1.04499555, -108.000107, 0.108957253], "max": [63.6393967, 60.0588951, 105.902031]}, {"bufferView": 5, "componentType": 5126, "count": 153333, "type": "VEC3"}, {"bufferView": 6, "componentType": 5121, "count": 153333, "normalized": true, "type": "VEC4"}, {"bufferView": 7, "componentType": 5125, "count": 919986, "type": "SCALAR"}
+  ],
+  "materials": [
+    {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 1], "metallicFactor": 0.0, "roughnessFactor": 1.0}}, {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 1], "metallicFactor": 0.0, "roughnessFactor": 1.0}}
+  ],
+  "meshes": [
+    {"primitives": [{"attributes": {"POSITION": 0, "NORMAL": 1, "COLOR_0": 2}, "indices": 3, "material": 0}]}, {"primitives": [{"attributes": {"POSITION": 4, "NORMAL": 5, "COLOR_0": 6}, "indices": 7, "material": 1}]}
+  ],
+  "cameras": [{"type": "perspective", "perspective": {"yfov": 0.785398185, "znear": 0.1}}],
+  "nodes": [
+    {"mesh": 0}, {"mesh": 1}, {"camera": 0, "name": "camera"}
+  ],
+  "scenes": [{"nodes": [0, 1, 2]}],
+  "scene": 0
+}

@@ -161,6 +161,11 @@ TEST_CASE("gltf_io writes .gltf JSON with geometry, colors, and camera", "[gltf]
     REQUIRE(json.find("\"2.0\"") != std::string::npos);
     REQUIRE(json.find("\"COLOR_0\"") != std::string::npos);
     REQUIRE(json.find("\"POSITION\"") != std::string::npos);
+    // Normals are computed when a mesh lacks them (make_colored_cube has none).
+    REQUIRE(json.find("\"NORMAL\"") != std::string::npos);
+    // Materials are fully diffuse so PBR viewers don't render them black.
+    REQUIRE(json.find("\"metallicFactor\": 0.0") != std::string::npos);
+    REQUIRE(json.find("\"roughnessFactor\": 1.0") != std::string::npos);
     REQUIRE(json.find("\"cameras\"") != std::string::npos);
     REQUIRE(json.find("\"yfov\"") != std::string::npos);
     REQUIRE(json.find("\"matrix\"") != std::string::npos);

@@ -7,8 +7,8 @@
 ///
 /// ## What is exported
 ///
-/// - Geometry: vertex positions (FLOAT32), normals (FLOAT32) when present,
-///   indices (UINT32).
+/// - Geometry: vertex positions (FLOAT32), normals (FLOAT32) when present
+///   (computed if missing, matching what the renderer does), indices (UINT32).
 /// - Vertex colors mapped to the glTF `COLOR_0` attribute (normalized UNSIGNED
 ///   BYTE RGBA).  Per-face colors have no direct glTF equivalent, so they are
 ///   exported by **splitting vertices** (each triangle gets its own three
@@ -16,6 +16,9 @@
 /// - Per-mesh placement transforms as node `matrix` (column-major, matching
 ///   what the renderer applies) and node `name`s.
 /// - An optional perspective camera (when a `Camera*` is supplied).
+/// - Diffuse materials (`metallicFactor` 0, `roughnessFactor` 1): scimesh is
+///   not physically-based, so exports default to fully diffuse so they are not
+///   rendered pitch black by PBR viewers.
 ///
 /// Renderer-specific settings (shading mode, fog, SSAO, ...) are deliberately
 /// NOT exported — they are not part of the glTF standard.
@@ -36,6 +39,7 @@
 #include <scimesh/scene.h>
 #include <scimesh/camera.h>
 #include <scimesh/mesh.h>
+#include <scimesh/normals.h>
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -119,7 +123,15 @@ inline PackedMesh pack_mesh(const Mesh &mesh) {
     pm.base_a = mesh.default_color.a;
 
     const std::vector<Vec3> *normals = nullptr;
-    if (mesh.has_normals()) normals = &mesh.normals;
+    std::vector<Vec3> computed_normals;
+    if (mesh.has_normals()) {
+        normals = &mesh.normals;
+    } else if (!mesh.triangles.empty()) {
+        // scimesh computes normals at render time when a mesh lacks them;
+        // export them so standard viewers shade the mesh correctly too.
+        compute_vertex_normals(mesh, computed_normals);
+        normals = &computed_normals;
+    }
 
     if (mesh.has_face_colors()) {
         // glTF colors are per-vertex; split vertices so each face carries its
@@ -286,9 +298,12 @@ inline GltfOutput build(const Scene &scene, const Camera *camera) {
         float b = m.has_colors ? 1.0f : m.base_b;
         float a = m.has_colors ? 1.0f : m.base_a;
         std::ostringstream mat;
+        // Fully diffuse (metallic 0 / roughness 1): scimesh is not PBR, and the
+        // glTF default (metallic 1 / roughness 1) renders black under simple
+        // lighting in most viewers.
         mat << "{\"pbrMetallicRoughness\": {\"baseColorFactor\": ["
             << fmt(r) << ", " << fmt(g) << ", " << fmt(b) << ", " << fmt(a)
-            << "]}}";
+            << "], \"metallicFactor\": 0.0, \"roughnessFactor\": 1.0}}";
         materials_json.push_back(mat.str());
     }
     j << "  \"materials\": [\n    " << join_impl(materials_json) << "\n  ],\n";
