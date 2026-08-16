@@ -150,7 +150,10 @@ public:
 
 private:
     /// @brief Internal pipeline: transforms, clips, and rasterizes meshes.
-    void render_pipeline(const std::vector<const Mesh *> &meshes,
+    ///
+    /// Each node's placement transform is applied as a model matrix before
+    /// the view transform.
+    void render_pipeline(const std::vector<SceneNodeRef> &nodes,
                          const Camera &camera,
                          const RenderOptions &options,
                          Image &output);

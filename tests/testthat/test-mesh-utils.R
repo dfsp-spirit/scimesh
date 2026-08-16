@@ -78,3 +78,16 @@ test_that("transform_mesh with scaling matrix works", {
     result <- transform_mesh(mesh, m)
     expect_equal(result$vertices[1, ], c(2, 9, 20), tolerance = 1e-6)
 })
+
+test_that("transform_mesh applies translation matrix in standard convention", {
+    verts <- cbind(c(0, 1), c(0, 1), c(0, 1))
+    tris <- rbind(c(1L, 2L, 1L))
+    mesh <- list(vertices = verts, triangles = tris)
+    # Standard row-major homogeneous matrix: +2 along X, -1 along Y
+    m <- diag(1, 4)
+    m[1, 4] <- 2
+    m[2, 4] <- -1
+    result <- transform_mesh(mesh, m)
+    expect_equal(result$vertices[1, ], c(2, -1, 0), tolerance = 1e-6)
+    expect_equal(result$vertices[2, ], c(3, 0, 1), tolerance = 1e-6)
+})

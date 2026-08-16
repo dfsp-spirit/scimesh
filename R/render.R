@@ -115,14 +115,18 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #' or an rgl-style mesh (with \code{vb}/\code{it}); rgl meshes are
 #' transparently converted.
 #'
-#' @param meshes A list of mesh descriptors. Each element is a list
-#'   with components \code{vertices} (Nx3 matrix), \code{triangles}
-#'   (Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
-#'   \code{normals}, and \code{default_color}.
-#'   Elements may also be rgl-style lists (with \code{vb} and \code{it}),
-#'   which are converted automatically.
+#' @param meshes Either a \code{scimesh_scene} object (see
+#'   \code{\link{scene}()}), a list of mesh descriptors, or a list of scene
+#'   nodes.  Each mesh descriptor is a list with components
+#'   \code{vertices} (Nx3 matrix), \code{triangles} (Mx3 integer matrix),
+#'   and optionally \code{colors}, \code{face_colors}, \code{normals}, and
+#'   \code{default_color}.  Elements may also be rgl-style lists (with
+#'   \code{vb} and \code{it}), which are converted automatically.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
+#'   Ignored (falls back to the scene's camera) when \code{meshes} is a
+#'   \code{scimesh_scene} and \code{camera} is \code{NULL}.
 #' @param options A render options list from \code{render_options()}.
+#'   Defaults to the scene's options (if any) or \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
 #'   \code{pixels} (raw vector of RGBA values).
 #'
@@ -144,21 +148,35 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'     render_options(width = 400, height = 300, background_color = c(1, 1, 1, 1)))
 #'
 #' @export
-render_scene <- function(meshes, camera, options = render_options()) {
+render_scene <- function(meshes, camera = NULL, options = NULL) {
+    if (inherits(meshes, "scimesh_scene")) {
+        sc <- meshes
+        meshes <- sc$meshes
+        if (is.null(camera)) {
+            camera <- sc$camera
+        }
+        if (is.null(options)) {
+            options <- sc$options
+        }
+    }
     if (!is.list(meshes)) {
-        stop("meshes must be a list of mesh descriptors")
+        stop("meshes must be a list of mesh descriptors or scene nodes")
     }
-    for (i in seq_along(meshes)) {
-        meshes[[i]] <- as_scimesh_mesh(meshes[[i]])
+    if (is.null(options)) {
+        options <- render_options()
     }
-    for (i in seq_along(meshes)) {
-        m <- meshes[[i]]
+    if (is.null(camera)) {
+        stop("camera must be provided (or set in the scene)")
+    }
+    scene_data <- lapply(meshes, as_scimesh_scene_node)
+    for (i in seq_along(scene_data)) {
+        m <- scene_data[[i]]$mesh
         if (!is.list(m) || is.null(m$vertices) || is.null(m$triangles)) {
             stop("each mesh must be a list with 'vertices' and 'triangles'")
         }
     }
 
-    scimesh_render_scene(meshes, camera, options)
+    scimesh_render_scene(scene_data, camera, options)
 }
 
 #' Create render options

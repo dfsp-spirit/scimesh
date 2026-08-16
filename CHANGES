@@ -2,6 +2,34 @@ scimesh Changes
 ===============
 
 
+Version 0.3.3 -- Scene transforms, scene object, glTF export
+------------------------------------------------------------
+- NEW: per-mesh placement transforms in the C++ Scene.  A scene now stores an
+  optional model matrix (and name) per mesh; the renderer applies it as a model
+  transform at render time, so meshes are no longer modified in place.  See
+  Scene::add(), Scene::set_transform(), Scene::node()/nodes() in scene.h.
+  Scene::compute_bounding_box() now accounts for placement transforms.
+- NEW: first-class scene object in the R layer: `scene()` builds an S3 object
+  of class 'scimesh_scene' bundling meshes (each with an optional 4x4 placement
+  transform and name), a camera, and render options.  `render_scene()` accepts
+  it (and still accepts plain mesh lists as before).
+- NEW: glTF 2.0 export, one-way interoperability: new C++ header gltf_io.h
+  writes .gltf (+ external .bin) and self-contained .glb files with geometry,
+  per-node transforms and names, vertex colors (COLOR_0), and an optional
+  camera.  New R function `write_gltf()` wraps it.  Renderer-specific settings
+  (fog, SSAO, shading mode) are not part of glTF and are not exported;
+  per-face colors are exported by splitting vertices.
+- CHG: `transform_mesh()` and the Rcpp matrix conversion now interpret 4x4
+  matrices in the standard row-major convention (M * p, translation in the
+  last column).  Previously the matrix was effectively applied transposed,
+  which only diagonal (scaling) matrices hid; non-diagonal inputs now behave
+  as written.  `scene()` placement transforms follow the same convention.
+- CHG: `render_scene()`'s `camera` and `options` arguments are now optional
+  and fall back to the values stored in a 'scimesh_scene' when present
+  (backwards compatible).
+- DOC: new R docs for scene(), write_gltf(); updated render_scene() docs.
+
+
 Version 0.3.2 -- CRAN review fixes
 -----------------------------------
 - FIX: do not strip debug symbols for R build, as per CRAN policy
@@ -22,7 +50,7 @@ Version 0.3.1 -- TGA support, macOS fix
 - DOC: add file in source tree that lists all third-party details with full licenses, see src/third_party/THIRD_PARTY_LICENSES.md (and a copy for R at LICENSE.note)
 
 
-Version 0.3.0 -- Dpendencies, repo structure, C++ versioning
+Version 0.3.0 -- Dependencies, repo structure, C++ versioning
 ------------------------------------------------------------
 - BRK: move scimesh code from src/core/ to src/core/scimesh and all required downstream adjustments. avoids conflicts with other libraries in C++ layer
 - NEW: get proper versioning in place for C++ layer

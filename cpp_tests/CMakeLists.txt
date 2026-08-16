@@ -26,6 +26,7 @@ add_executable(scimesh_tests
     test_brain_mesh.cpp
     test_primitives.cpp
     test_colormap.cpp
+    test_scene_transforms.cpp
 )
 
 target_link_libraries(scimesh_tests PRIVATE scimesh)

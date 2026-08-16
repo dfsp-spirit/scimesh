@@ -4,19 +4,23 @@
 \alias{render_scene}
 \title{Render multiple meshes to an image}
 \usage{
-render_scene(meshes, camera, options = render_options())
+render_scene(meshes, camera = NULL, options = NULL)
 }
 \arguments{
-\item{meshes}{A list of mesh descriptors. Each element is a list
-with components \code{vertices} (Nx3 matrix), \code{triangles}
-(Mx3 integer matrix), and optionally \code{colors}, \code{face_colors},
-\code{normals}, and \code{default_color}.
-Elements may also be rgl-style lists (with \code{vb} and \code{it}),
-which are converted automatically.}
+\item{meshes}{Either a \code{scimesh_scene} object (see
+\code{\link{scene}()}), a list of mesh descriptors, or a list of scene
+nodes.  Each mesh descriptor is a list with components
+\code{vertices} (Nx3 matrix), \code{triangles} (Mx3 integer matrix),
+and optionally \code{colors}, \code{face_colors}, \code{normals}, and
+\code{default_color}.  Elements may also be rgl-style lists (with
+\code{vb} and \code{it}), which are converted automatically.}
 
-\item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
+\item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.
+Ignored (falls back to the scene's camera) when \code{meshes} is a
+\code{scimesh_scene} and \code{camera} is \code{NULL}.}
 
-\item{options}{A render options list from \code{render_options()}.}
+\item{options}{A render options list from \code{render_options()}.
+Defaults to the scene's options (if any) or \code{render_options()}.}
 }
 \value{
 A list with components \code{width}, \code{height}, and

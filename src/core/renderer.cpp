@@ -34,7 +34,9 @@ Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const Render
     }
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
-    render_pipeline({&mesh}, camera, options, internal);
+    std::vector<SceneNodeRef> nodes;
+    nodes.push_back({&mesh, Mat4(1.0f), ""});
+    render_pipeline(nodes, camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -44,11 +46,8 @@ Image Renderer::render_scene(const Scene &scene, const Camera &camera, const Ren
     }
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
-    std::vector<const Mesh *> mesh_ptrs;
-    for (const auto &m : scene.meshes) {
-        mesh_ptrs.push_back(&m);
-    }
-    render_pipeline(mesh_ptrs, camera, options, internal);
+    std::vector<SceneNodeRef> nodes = scene.nodes();
+    render_pipeline(nodes, camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -147,13 +146,13 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     return output.downsample_box(aa);
 }
 
-void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
+void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
                                const Camera &camera,
                                const RenderOptions &options,
                                Image &output) {
     // Validate all non-empty meshes before rendering
-    for (size_t i = 0; i < meshes.size(); ++i) {
-        const auto *mp = meshes[i];
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        const auto *mp = nodes[i].mesh;
         if (mp->empty()) continue;          // empty is harmless
         if (!mp->is_valid()) {
             throw std::invalid_argument(
@@ -202,15 +201,20 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
 
     bool scene_has_transparency = false;
-    for (const auto *mp : meshes) {
-        if (mp->has_transparency) { scene_has_transparency = true; break; }
+    for (const auto &nd : nodes) {
+        if (nd.mesh->has_transparency) { scene_has_transparency = true; break; }
     }
 
     std::vector<DeferredTri> deferred;
 
-    for (const auto *mesh_ptr : meshes) {
-        const Mesh &mesh = *mesh_ptr;
+    for (const auto &node : nodes) {
+        const Mesh &mesh = *node.mesh;
         if (mesh.empty()) continue;
+
+        // Placement transform for this mesh (model matrix in world space).
+        const Mat4 &model = node.transform;
+        const Mat4 view_model = view * model;
+        const Mat4 view_proj_model = view_projection * model;
 
         if (mesh.has_uvs() && mesh.has_texture()) {
             rasterizer.active_texture = const_cast<Image *>(&mesh.texture);
@@ -231,7 +235,8 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
         for (size_t i = 0; i < normals_ptr->size(); ++i) {
             Vec3 n = (*normals_ptr)[i];
             if (options.invert_normals) n = -n;
-            view_normals[i] = glm::normalize(transform_direction(view, n));
+            view_normals[i] = glm::normalize(
+                transform_direction(view, transform_direction(model, n)));
         }
 
         for (int ti = 0; ti < static_cast<int>(mesh.triangles.size()); ++ti) {
@@ -263,11 +268,11 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                 (c0.a < 1.0f - 1e-6f || c1.a < 1.0f - 1e-6f || c2.a < 1.0f - 1e-6f);
 
             ClipVertex cv0, cv1, cv2;
-            cv0.position = transform_point_homogeneous(view_projection, v0);
+            cv0.position = transform_point_homogeneous(view_proj_model, v0);
             cv0.color = c0; cv0.normal = n0; cv0.uv = uv0;
-            cv1.position = transform_point_homogeneous(view_projection, v1);
+            cv1.position = transform_point_homogeneous(view_proj_model, v1);
             cv1.color = c1; cv1.normal = n1; cv1.uv = uv1;
-            cv2.position = transform_point_homogeneous(view_projection, v2);
+            cv2.position = transform_point_homogeneous(view_proj_model, v2);
             cv2.color = c2; cv2.normal = n2; cv2.uv = uv2;
 
             bool has_user_clips = !view_clip_planes.empty();
@@ -276,9 +281,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
             std::vector<Triangle> clipped_triangles;
 
             if (has_user_clips) {
-                Vec3 vv0 = transform_point(view, v0);
-                Vec3 vv1 = transform_point(view, v1);
-                Vec3 vv2 = transform_point(view, v2);
+                Vec3 vv0 = transform_point(view_model, v0);
+                Vec3 vv1 = transform_point(view_model, v1);
+                Vec3 vv2 = transform_point(view_model, v2);
 
                 std::vector<ClipVertex> view_clipped;
                 std::vector<Triangle> view_clip_tris;
@@ -364,9 +369,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                 Vec3 flat_normal_a, flat_normal_b, flat_normal_c;
                 if (!smooth) {
                     Vec3 face_normal = compute_face_normal(
-                        transform_point(view, mesh.vertices[tri.v0]),
-                        transform_point(view, mesh.vertices[tri.v1]),
-                        transform_point(view, mesh.vertices[tri.v2]));
+                        transform_point(view_model, mesh.vertices[tri.v0]),
+                        transform_point(view_model, mesh.vertices[tri.v1]),
+                        transform_point(view_model, mesh.vertices[tri.v2]));
                     flat_normal_a = flat_normal_b = flat_normal_c = face_normal;
                 }
 
@@ -375,9 +380,9 @@ void Renderer::render_pipeline(const std::vector<const Mesh *> &meshes,
                 const Vec3 &normal_c = smooth ? cv_c.normal : flat_normal_c;
 
                 if (tri_transparent) {
-                    Vec3 centroid_vs = (transform_point(view, v0) +
-                                        transform_point(view, v1) +
-                                        transform_point(view, v2)) * (1.0f / 3.0f);
+                    Vec3 centroid_vs = (transform_point(view_model, v0) +
+                                        transform_point(view_model, v1) +
+                                        transform_point(view_model, v2)) * (1.0f / 3.0f);
                     deferred.push_back({
                         screen_v0, screen_v1, screen_v2,
                         cv_a.color, cv_b.color, cv_c.color,

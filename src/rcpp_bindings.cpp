@@ -9,6 +9,7 @@
 #include <scimesh/stl_io.h>
 #include <scimesh/obj_io.h>
 #include <scimesh/ply_io.h>
+#include <scimesh/gltf_io.h>
 
 using namespace Rcpp;
 
@@ -407,6 +408,57 @@ List mesh_to_r_list(const scimesh::Mesh &mesh) {
     return out;
 }
 
+scimesh::Mat4 mat4_from_r(const NumericMatrix &m) {
+    // Standard homogeneous convention: the R matrix M (displayed row-major)
+    // is applied as M * p.  glm stores column-major, so the glm element at
+    // (column c, row r) holds M(r, c).
+    scimesh::Mat4 out;
+    for (int r = 0; r < 4; r++)
+        for (int c = 0; c < 4; c++)
+            out[c][r] = static_cast<float>(m(r, c));
+    return out;
+}
+
+/// Build a scimesh Scene from an R list of mesh descriptors or scene nodes.
+///
+/// Each entry may be a bare mesh descriptor (scimesh or rgl format, via
+/// build_mesh_from_r) or a scene node list with components `mesh` (a mesh
+/// descriptor), optional `transform` (4x4 NumericMatrix), and optional
+/// `name` (string).
+scimesh::Scene build_scene_from_r(List scene_data) {
+    scimesh::Scene scene;
+    for (int i = 0; i < scene_data.size(); i++) {
+        List entry = scene_data[i];
+        scimesh::Mesh mesh;
+        scimesh::Mat4 t(1.0f);
+        std::string name;
+        SEXP me = entry["mesh"];
+        if (TYPEOF(me) == VECSXP) {
+            // scene node form: list(mesh = ..., transform = ..., name = ...)
+            mesh = build_mesh_from_r(entry["mesh"]);
+            if (entry.containsElementNamed("transform")) {
+                SEXP tr = entry["transform"];
+                if (tr != R_NilValue) {
+                    t = mat4_from_r(NumericMatrix(tr));
+                }
+            }
+            if (entry.containsElementNamed("name")) {
+                SEXP nm = entry["name"];
+                if (nm != R_NilValue) {
+                    name = as<std::string>(nm);
+                }
+            }
+        } else {
+            // bare mesh descriptor
+            mesh = build_mesh_from_r(entry);
+        }
+        scene.meshes.push_back(mesh);
+        scene.transforms.push_back(t);
+        scene.names.push_back(name);
+    }
+    return scene;
+}
+
 } // anonymous namespace
 
 
@@ -425,12 +477,7 @@ List scimesh_render_mesh(List mesh_data, List camera_data, List options_data) {
 
 // [[Rcpp::export]]
 List scimesh_render_scene(List scene_data, List camera_data, List options_data) {
-    List meshes = scene_data;
-    scimesh::Scene scene;
-
-    for (int i = 0; i < meshes.size(); i++) {
-        scene.meshes.push_back(build_mesh_from_r(meshes[i]));
-    }
+    scimesh::Scene scene = build_scene_from_r(scene_data);
 
     scimesh::Camera cam = build_camera_from_r(camera_data);
     scimesh::RenderOptions opts = build_options_from_r(options_data);
@@ -477,11 +524,7 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
 // [[Rcpp::export]]
 List scimesh_transform_mesh(List mesh_data, NumericMatrix matrix_4x4) {
     scimesh::Mesh mesh = build_mesh_from_r(mesh_data);
-    scimesh::Mat4 m;
-    for (int r = 0; r < 4; r++)
-        for (int c = 0; c < 4; c++)
-            m[r][c] = static_cast<float>(matrix_4x4(r, c));
-    scimesh::transform_mesh(mesh, m);
+    scimesh::transform_mesh(mesh, mat4_from_r(matrix_4x4));
     return mesh_to_r_list(mesh);
 }
 
@@ -726,6 +769,32 @@ List scimesh_read_ply(CharacterVector path) {
     std::string p = as<std::string>(path);
     scimesh::Mesh mesh = scimesh::ply_io::read_ply(p);
     return mesh_to_r_list(mesh);
+}
+
+// ---- glTF I/O ---------------------------------------------------------------
+// [[Rcpp::export]]
+void scimesh_write_gltf(List scene_data, CharacterVector path,
+                        Nullable<List> camera_data = R_NilValue,
+                        String format = "gltf") {
+    scimesh::Scene scene = build_scene_from_r(scene_data);
+    std::string p = as<std::string>(path);
+    std::string fmt = format;
+
+    scimesh::Camera cam_storage;
+    scimesh::Camera *cam = nullptr;
+    if (camera_data.isNotNull()) {
+        List cd(camera_data);
+        if (cd.size() > 0) {
+            cam_storage = build_camera_from_r(cd);
+            cam = &cam_storage;
+        }
+    }
+
+    if (fmt == "glb") {
+        scimesh::gltf_io::write_glb(p, scene, cam);
+    } else {
+        scimesh::gltf_io::write_gltf(p, scene, cam);
+    }
 }
 
 // ---- Image I/O --------------------------------------------------------------

@@ -93,6 +93,10 @@ scimesh_read_ply <- function(path) {
     .Call(`_scimesh_scimesh_read_ply`, path)
 }
 
+scimesh_write_gltf <- function(scene_data, path, camera_data = NULL, format = "gltf") {
+    invisible(.Call(`_scimesh_scimesh_write_gltf`, scene_data, path, camera_data, format))
+}
+
 scimesh_write_png <- function(image, filename) {
     .Call(`_scimesh_scimesh_write_png`, image, filename)
 }

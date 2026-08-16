@@ -321,6 +321,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_write_gltf
+void scimesh_write_gltf(List scene_data, CharacterVector path, Nullable<List> camera_data, String format);
+RcppExport SEXP _scimesh_scimesh_write_gltf(SEXP scene_dataSEXP, SEXP pathSEXP, SEXP camera_dataSEXP, SEXP formatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type scene_data(scene_dataSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< Nullable<List> >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< String >::type format(formatSEXP);
+    scimesh_write_gltf(scene_data, path, camera_data, format);
+    return R_NilValue;
+END_RCPP
+}
 // scimesh_write_png
 bool scimesh_write_png(List image, CharacterVector filename);
 RcppExport SEXP _scimesh_scimesh_write_png(SEXP imageSEXP, SEXP filenameSEXP) {
@@ -551,6 +564,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_write_stl", (DL_FUNC) &_scimesh_scimesh_write_stl, 3},
     {"_scimesh_scimesh_read_obj", (DL_FUNC) &_scimesh_scimesh_read_obj, 1},
     {"_scimesh_scimesh_read_ply", (DL_FUNC) &_scimesh_scimesh_read_ply, 1},
+    {"_scimesh_scimesh_write_gltf", (DL_FUNC) &_scimesh_scimesh_write_gltf, 4},
     {"_scimesh_scimesh_write_png", (DL_FUNC) &_scimesh_scimesh_write_png, 2},
     {"_scimesh_scimesh_write_tga", (DL_FUNC) &_scimesh_scimesh_write_tga, 3},
     {"_scimesh_scimesh_image_crop", (DL_FUNC) &_scimesh_scimesh_image_crop, 5},
