@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['empty_0',['empty',['../structscimesh_1_1ColorMap.html#a854670b289150a81718afbf9f0cd9044',1,'scimesh::ColorMap::empty()'],['../structscimesh_1_1Mesh.html#a93feee5c1dd6a584186ebe5324b994dd',1,'scimesh::Mesh::empty()']]]
+  ['dirname_0',['dirname',['../namespacescimesh_1_1gltf__io_1_1detail.html#aa6b0ab92f710f529ebd8e604687000de',1,'scimesh::gltf_io::detail']]],
+  ['downsample_5fbox_1',['downsample_box',['../structscimesh_1_1Image.html#acec4b4478ac85999115cce27452755d5',1,'scimesh::Image']]]
 ];

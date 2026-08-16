@@ -1,8 +1,19 @@
 var searchData=
 [
-  ['has_5fcolors_0',['has_colors',['../structscimesh_1_1Mesh.html#a97282f7ea3227bbca4814f9c1df89597',1,'scimesh::Mesh']]],
-  ['has_5fface_5fcolors_1',['has_face_colors',['../structscimesh_1_1Mesh.html#a4d9d5af4069984f9978917b3e4cc5257',1,'scimesh::Mesh']]],
-  ['has_5fnormals_2',['has_normals',['../structscimesh_1_1Mesh.html#aa24db6634133100357bdbdb7ddac2a6f',1,'scimesh::Mesh']]],
-  ['has_5ftexture_3',['has_texture',['../structscimesh_1_1Mesh.html#acdf80cb517672c06af7a3b39128e0a66',1,'scimesh::Mesh']]],
-  ['has_5fuvs_4',['has_uvs',['../structscimesh_1_1Mesh.html#a3804eab0e2dbbd06750eed5e38726532',1,'scimesh::Mesh']]]
+  ['generate_5farrow_0',['generate_arrow',['../namespacescimesh.html#a784ef29545c8a859ce0c247be5783d95',1,'scimesh']]],
+  ['generate_5fcone_1',['generate_cone',['../namespacescimesh.html#ad625a8e567437f3fb9893a6992bd2ff0',1,'scimesh']]],
+  ['generate_5fcuboid_2',['generate_cuboid',['../namespacescimesh.html#a571112aee7458b20991fd8fe8146c2d6',1,'scimesh']]],
+  ['generate_5fcylinder_3',['generate_cylinder',['../namespacescimesh.html#a7ad3dd67b9d5c4a62c93c552b77198e3',1,'scimesh']]],
+  ['generate_5fmulti_5fcylinders_4',['generate_multi_cylinders',['../namespacescimesh.html#af06ef3e2c9cf95c2b2350e90575935ca',1,'scimesh']]],
+  ['generate_5fmulti_5fspheres_5',['generate_multi_spheres',['../namespacescimesh.html#a8e2e4c21efc16ecddd37b02f44757297',1,'scimesh']]],
+  ['generate_5fplane_6',['generate_plane',['../namespacescimesh.html#acf3fdfb69c9067b2aeb7d9128a0342e8',1,'scimesh']]],
+  ['generate_5fpyramid_7',['generate_pyramid',['../namespacescimesh.html#a2c74ea1046fe5316f96115ed73995fea',1,'scimesh']]],
+  ['generate_5fsphere_8',['generate_sphere',['../namespacescimesh.html#a49edd254b732a0233b1fe91aabb21289',1,'scimesh']]],
+  ['generate_5ftetrahedron_9',['generate_tetrahedron',['../namespacescimesh.html#a44e84ad850aae278747b46e1b9371260',1,'scimesh']]],
+  ['generate_5ftorus_10',['generate_torus',['../namespacescimesh.html#a8db32069d1a87b20ca1e309322d026dc',1,'scimesh']]],
+  ['get_5fpixel_11',['get_pixel',['../structscimesh_1_1Image.html#ab49688c8fe145b9e364f55873f52d47d',1,'scimesh::Image']]],
+  ['get_5fprojection_5fmatrix_12',['get_projection_matrix',['../structscimesh_1_1Camera.html#affb691e838b1324e1f89f0c8cbfa9f59',1,'scimesh::Camera']]],
+  ['get_5fview_5fmatrix_13',['get_view_matrix',['../structscimesh_1_1Camera.html#a614529efba00bfe6b66e96774bdeb8ac',1,'scimesh::Camera']]],
+  ['grid_5farrange_14',['grid_arrange',['../namespacescimesh.html#a0409deae41f25894fddd12ad3003f5b1',1,'scimesh']]],
+  ['grow_15',['grow',['../structscimesh_1_1Image.html#a957270476b532a9d93d4048d27198349',1,'scimesh::Image']]]
 ];

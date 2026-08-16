@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['mesh_0',['Mesh',['../structscimesh_1_1Mesh.html',1,'scimesh']]],
-  ['multiapplycolormapresult_1',['MultiApplyColormapResult',['../structscimesh_1_1MultiApplyColormapResult.html',1,'scimesh']]]
+  ['light_0',['Light',['../structscimesh_1_1Light.html',1,'scimesh']]]
 ];

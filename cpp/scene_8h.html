@@ -100,39 +100,49 @@ $(document).ready(function(){initNavTree('scene_8h.html',''); initResizable(); }
 <p>The Scene — a collection of meshes rendered together.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="mesh_8h_source.html">scimesh/mesh.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="math__utils_8h_source.html">scimesh/math_utils.h</a>&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for scene.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="scene_8h__incl.png" border="0" usemap="#asrc_2core_2scimesh_2scene_8h" alt=""/></div>
 <map name="asrc_2core_2scimesh_2scene_8h" id="asrc_2core_2scimesh_2scene_8h">
-<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="285,5,471,31"/>
-<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="314,79,442,104"/>
-<area shape="poly" title=" " alt="" coords="381,31,381,65,375,65,375,31"/>
-<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="353,225,481,251"/>
-<area shape="poly" title=" " alt="" coords="371,106,354,139,350,158,354,176,368,198,387,215,384,219,364,201,349,178,345,158,349,137,367,103"/>
-<area shape="rect" title=" " alt="" coords="5,299,68,324"/>
-<area shape="poly" title=" " alt="" coords="362,106,68,293,65,289,359,102"/>
-<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="363,152,497,177"/>
-<area shape="poly" title=" " alt="" coords="389,103,416,139,411,142,384,106"/>
-<area shape="rect" title=" " alt="" coords="521,152,584,177"/>
-<area shape="poly" title=" " alt="" coords="407,102,512,144,510,149,405,106"/>
-<area shape="rect" title=" " alt="" coords="92,299,203,324"/>
-<area shape="poly" title=" " alt="" coords="374,253,205,298,203,293,373,248"/>
-<area shape="rect" title=" " alt="" coords="227,299,337,324"/>
-<area shape="poly" title=" " alt="" coords="396,253,317,294,315,290,394,248"/>
-<area shape="rect" title=" " alt="" coords="361,299,472,324"/>
-<area shape="poly" title=" " alt="" coords="419,251,419,285,414,285,414,251"/>
-<area shape="rect" title=" " alt="" coords="496,299,625,324"/>
-<area shape="poly" title=" " alt="" coords="441,248,526,290,524,295,439,253"/>
-<area shape="poly" title=" " alt="" coords="353,252,231,272,82,301,81,296,230,267,352,246"/>
-<area shape="rect" title=" " alt="" coords="733,299,799,324"/>
-<area shape="poly" title=" " alt="" coords="481,248,720,296,719,301,480,253"/>
-<area shape="rect" title=" " alt="" coords="650,299,709,324"/>
-<area shape="poly" title=" " alt="" coords="460,248,638,296,636,301,458,253"/>
-<area shape="poly" title=" " alt="" coords="430,178,424,212,419,211,425,177"/>
-<area shape="poly" title=" " alt="" coords="409,180,337,215,246,253,82,301,81,296,244,248,335,210,406,175"/>
-<area shape="poly" title=" " alt="" coords="459,175,575,223,729,290,727,295,573,228,457,180"/>
-<area shape="poly" title=" " alt="" coords="451,175,649,289,646,294,449,180"/>
+<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="703,5,889,31"/>
+<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="497,79,625,104"/>
+<area shape="poly" title=" " alt="" coords="759,33,613,77,612,72,758,28"/>
+<area shape="rect" title=" " alt="" coords="741,299,800,324"/>
+<area shape="poly" title=" " alt="" coords="881,28,967,47,1011,60,1050,76,1081,96,1102,119,1107,133,1108,147,1104,163,1096,179,1068,212,1035,239,997,260,958,277,879,299,814,310,813,304,878,294,956,272,995,255,1032,234,1064,208,1091,176,1099,161,1102,147,1102,134,1097,122,1078,100,1047,81,1009,65,966,52,880,33"/>
+<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="715,79,877,104"/>
+<area shape="poly" title=" " alt="" coords="799,31,799,65,793,65,793,31"/>
+<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="395,225,523,251"/>
+<area shape="poly" title=" " alt="" coords="541,106,511,126,485,154,471,183,464,213,459,211,466,181,480,150,508,122,538,102"/>
+<area shape="rect" title=" " alt="" coords="654,299,717,324"/>
+<area shape="poly" title=" " alt="" coords="585,102,615,122,642,150,661,184,673,221,686,285,680,286,668,222,656,187,638,154,611,126,582,106"/>
+<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="495,152,628,177"/>
+<area shape="poly" title=" " alt="" coords="564,104,564,138,559,138,559,104"/>
+<area shape="rect" title=" " alt="" coords="357,152,419,177"/>
+<area shape="poly" title=" " alt="" coords="534,106,430,149,428,144,532,102"/>
+<area shape="rect" title=" " alt="" coords="250,299,361,324"/>
+<area shape="poly" title=" " alt="" coords="435,253,344,295,342,290,433,248"/>
+<area shape="rect" title=" " alt="" coords="385,299,495,324"/>
+<area shape="poly" title=" " alt="" coords="458,252,449,286,444,285,453,250"/>
+<area shape="rect" title=" " alt="" coords="519,299,630,324"/>
+<area shape="poly" title=" " alt="" coords="479,248,545,289,543,294,476,253"/>
+<area shape="rect" title=" " alt="" coords="97,299,226,324"/>
+<area shape="poly" title=" " alt="" coords="412,253,223,298,222,293,410,248"/>
+<area shape="poly" title=" " alt="" coords="496,248,642,294,640,299,494,253"/>
+<area shape="rect" title=" " alt="" coords="5,299,72,324"/>
+<area shape="poly" title=" " alt="" coords="395,250,257,271,86,301,85,296,256,265,394,245"/>
+<area shape="poly" title=" " alt="" coords="514,248,729,296,729,296,728,301,727,301,513,253"/>
+<area shape="poly" title=" " alt="" coords="546,180,488,219,485,215,543,175"/>
+<area shape="poly" title=" " alt="" coords="566,177,577,211,598,249,623,272,650,290,647,294,619,276,594,252,572,213,561,178"/>
+<area shape="poly" title=" " alt="" coords="521,180,87,300,85,294,519,175"/>
+<area shape="poly" title=" " alt="" coords="580,175,744,288,741,293,577,180"/>
+<area shape="poly" title=" " alt="" coords="779,107,718,141,641,180,576,205,514,224,513,219,574,200,639,175,716,137,776,102"/>
+<area shape="rect" title=" " alt="" coords="863,152,1081,177"/>
+<area shape="poly" title=" " alt="" coords="825,102,931,144,929,149,823,106"/>
+<area shape="rect" title=" " alt="" coords="753,152,839,177"/>
+<area shape="poly" title=" " alt="" coords="799,104,799,138,793,138,793,104"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -140,23 +150,26 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="scene_8h__dep__incl.png" border="0" usemap="#asrc_2core_2scimesh_2scene_8hdep" alt=""/></div>
 <map name="asrc_2core_2scimesh_2scene_8hdep" id="asrc_2core_2scimesh_2scene_8hdep">
-<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="196,5,381,31"/>
-<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="191,79,387,104"/>
-<area shape="poly" title=" " alt="" coords="291,44,291,79,286,79,286,44"/>
-<area shape="rect" href="renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="409,247,611,273"/>
-<area shape="poly" title=" " alt="" coords="347,32,391,50,438,74,482,108,500,128,515,151,523,177,524,204,516,248,511,247,519,203,518,178,510,153,496,131,478,112,435,79,389,54,345,37"/>
-<area shape="rect" href="to__string_8h.html" title=" " alt="" coords="5,240,153,280"/>
-<area shape="poly" title=" " alt="" coords="237,38,195,55,151,80,111,112,95,132,82,153,75,175,73,198,77,239,72,240,67,198,69,174,77,151,91,129,108,109,148,75,193,50,235,33"/>
-<area shape="rect" href="camera_8cpp.html" title=" " alt="" coords="117,159,271,185"/>
-<area shape="poly" title=" " alt="" coords="266,115,210,161,206,157,262,111"/>
-<area shape="rect" href="render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="295,152,472,192"/>
-<area shape="poly" title=" " alt="" coords="315,111,362,150,359,154,311,115"/>
-<area shape="poly" title=" " alt="" coords="401,103,447,121,468,134,487,150,502,174,510,201,513,247,508,247,505,202,497,176,483,154,465,138,445,126,399,108"/>
-<area shape="poly" title=" " alt="" coords="182,110,141,127,107,154,94,174,86,197,81,240,76,240,81,196,89,171,103,150,138,123,180,105"/>
-<area shape="poly" title=" " alt="" coords="424,198,494,245,491,249,421,202"/>
-<area shape="poly" title=" " alt="" coords="304,198,147,243,145,237,302,193"/>
-<area shape="rect" href="renderer_8cpp.html" title=" " alt="" coords="431,328,589,353"/>
-<area shape="poly" title=" " alt="" coords="513,286,513,328,507,328,507,286"/>
+<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="189,5,374,31"/>
+<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="281,79,477,104"/>
+<area shape="poly" title=" " alt="" coords="310,37,365,76,362,81,307,41"/>
+<area shape="rect" href="gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="33,159,221,185"/>
+<area shape="poly" title=" " alt="" coords="262,42,141,161,137,157,259,38"/>
+<area shape="rect" href="renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="336,247,537,273"/>
+<area shape="poly" title=" " alt="" coords="219,37,138,61,97,77,60,96,30,117,12,140,9,152,9,164,13,177,22,190,42,206,72,219,152,238,246,249,335,254,335,260,245,254,151,243,70,224,39,210,18,194,8,179,3,165,3,151,8,137,27,113,57,91,95,72,136,56,217,31"/>
+<area shape="rect" href="to__string_8h.html" title=" " alt="" coords="616,240,764,280"/>
+<area shape="poly" title=" " alt="" coords="361,31,453,50,553,77,641,111,673,130,695,150,704,173,706,197,699,240,694,239,701,197,699,174,690,154,670,134,638,116,552,82,452,56,360,36"/>
+<area shape="rect" href="camera_8cpp.html" title=" " alt="" coords="245,159,398,185"/>
+<area shape="poly" title=" " alt="" coords="365,117,332,161,328,158,360,114"/>
+<area shape="poly" title=" " alt="" coords="330,111,164,162,163,157,329,106"/>
+<area shape="rect" href="render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="474,152,652,192"/>
+<area shape="poly" title=" " alt="" coords="419,107,520,149,518,154,417,112"/>
+<area shape="poly" title=" " alt="" coords="395,115,412,151,428,204,437,247,432,248,423,205,407,153,390,117"/>
+<area shape="poly" title=" " alt="" coords="491,101,594,120,636,133,665,150,680,171,688,195,693,240,688,240,683,196,675,173,661,154,634,138,593,125,490,106"/>
+<area shape="poly" title=" " alt="" coords="525,202,455,249,452,245,522,198"/>
+<area shape="poly" title=" " alt="" coords="604,198,663,238,660,242,601,202"/>
+<area shape="rect" href="renderer_8cpp.html" title=" " alt="" coords="357,328,516,353"/>
+<area shape="poly" title=" " alt="" coords="439,286,439,328,434,328,434,286"/>
 </map>
 </div>
 </div>
@@ -164,6 +177,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1SceneNodeRef.html">scimesh::SceneNodeRef</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A lightweight, non-owning reference to one mesh in a scene, together with its placement transform (and optional name).  <a href="structscimesh_1_1SceneNodeRef.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html">scimesh::Scene</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A collection of <code><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a></code> objects to be rendered together.  <a href="structscimesh_1_1Scene.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -143,25 +143,27 @@ Functions</h2></td></tr>
 <div class="line"><span class="keywordflow">if</span> (!model.<a class="code hl_function" href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb">is_valid</a>()) {</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load valid mesh from OBJ file\n&quot;</span>;</div>
 <div class="line">}</div>
-<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00013">obj_io.cpp:13</a></div></div>
+<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00008">obj_io.cpp:8</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html"><div class="ttname"><a href="structscimesh_1_1Mesh.html">scimesh::Mesh</a></div><div class="ttdoc">A 3D triangle mesh using an indexed face set representation.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00076">mesh.h:76</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html_a44fe684a6f5e9dd61b65709eeed1b1eb"><div class="ttname"><a href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb">scimesh::Mesh::is_valid</a></div><div class="ttdeci">bool is_valid() const</div><div class="ttdoc">Check whether the mesh is in a valid, renderable state.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00231">mesh.h:231</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Supported features</dt><dd><ul>
 <li>Vertex positions (v)</li>
 <li>Faces as triangles (f v1 v2 v3)</li>
-<li>Vertex normals (vn)</li>
-<li>Texture coordinates (vt)</li>
+<li>Quads and n-gons (fan-triangulated automatically)</li>
+<li>Negative relative indices (e.g., f -1 -2 -3)</li>
+<li>Face index slash notation (e.g., f 1/2/3, f 1//3)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Unsupported</dt><dd><ul>
-<li>Polygons with more than 3 vertices (use triangulated meshes)</li>
+<li>Vertex normals (vn) — call <a class="el" href="namespacescimesh.html#a48db43f881f780c9b217915748be0d37" title="Compute per-vertex normals by averaging adjacent face normals.">compute_vertex_normals()</a> after loading</li>
+<li>Texture coordinates (vt) — UVs default to (0,0)</li>
 <li>Materials (.mtl) — only geometry is loaded, colors are not imported from material files.</li>
 </ul>
 </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>read_ply(), read_stl(), <a class="el" href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb" title="Check whether the mesh is in a valid, renderable state.">Mesh::is_valid()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>read_ply(), read_stl(), <a class="el" href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb" title="Check whether the mesh is in a valid, renderable state.">Mesh::is_valid()</a>, <a class="el" href="namespacescimesh.html#a48db43f881f780c9b217915748be0d37" title="Compute per-vertex normals by averaging adjacent face normals.">compute_vertex_normals()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="obj__io_8cpp_source.html#l00013">13</a> of file <a class="el" href="obj__io_8cpp_source.html">obj_io.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="obj__io_8cpp_source.html#l00008">8</a> of file <a class="el" href="obj__io_8cpp_source.html">obj_io.cpp</a>.</p>
 
 </div>
 </div>

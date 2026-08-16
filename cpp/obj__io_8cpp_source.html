@@ -98,111 +98,35 @@ $(document).ready(function(){initNavTree('obj__io_8cpp_source.html',''); initRes
   <div class="headertitle"><div class="title">obj_io.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="obj__io_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno"><a class="line" href="obj__io_8cpp.html#af14fac7fbc250522a78849d58d5b0811">    1</a></span><span class="preprocessor">#define TINYOBJLOADER_IMPLEMENTATION</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;tiny_obj_loader.h&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;<a class="code" href="obj__io_8h.html">scimesh/obj_io.h</a>&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">scimesh/types.h</a>&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;fstream&gt;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacescimesh.html">scimesh</a> {</div>
-<div class="foldopen" id="foldopen00011" data-start="{" data-end="}">
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="namespacescimesh_1_1obj__io.html">   11</a></span><span class="keyword">namespace </span>obj_io {</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="foldopen" id="foldopen00013" data-start="{" data-end="}">
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">   13</a></span><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_function" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">read_obj</a>(<span class="keyword">const</span> std::string &amp;path) {</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    tinyobj::attrib_t attrib;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    std::vector&lt;tinyobj::shape_t&gt; shapes;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    std::vector&lt;tinyobj::material_t&gt; materials;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    std::string warn, err;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    std::string base_dir;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keyword">auto</span> slash = path.find_last_of(<span class="stringliteral">&quot;/\\&quot;</span>);</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordflow">if</span> (slash != std::string::npos) {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        base_dir = path.substr(0, slash);</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    }</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordtype">bool</span> ok = tinyobj::LoadObj(&amp;attrib, &amp;shapes, &amp;materials, &amp;warn, &amp;err,</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                               path.c_str(), base_dir.empty() ? <span class="keyword">nullptr</span> : base_dir.c_str(),</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                               <span class="keyword">true</span>, <span class="keyword">false</span>);</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordflow">if</span> (!warn.empty()) {</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="comment">// OBJ loader warning suppressed to avoid R CMD check NOTE</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="comment">// about compiled code writing to stderr.</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    }</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">if</span> (!err.empty()) {</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Failed to load OBJ file &#39;&quot;</span> + path + <span class="stringliteral">&quot;&#39;: &quot;</span> + err);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    }</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordflow">if</span> (!ok) {</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Failed to load OBJ file &#39;&quot;</span> + path + <span class="stringliteral">&quot;&#39;&quot;</span>);</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    }</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> mesh;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;shape : shapes) {</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;indices = shape.mesh.indices;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i + 2 &lt; indices.size(); i += 3) {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>            <a class="code hl_struct" href="structscimesh_1_1Triangle.html">Triangle</a> tri;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> c = 0; c &lt; 3; ++c) {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                <span class="keyword">const</span> <span class="keyword">auto</span> &amp;idx = indices[i + c];</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                <a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> pos(</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                    attrib.vertices[idx.vertex_index * 3 + 0],</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                    attrib.vertices[idx.vertex_index * 3 + 1],</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                    attrib.vertices[idx.vertex_index * 3 + 2]);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c">vertices</a>.push_back(pos);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                <span class="keywordflow">if</span> (idx.texcoord_index &gt;= 0 &amp;&amp;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                    idx.texcoord_index * 2 + 1 &lt; <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(attrib.texcoords.size())) {</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>                    mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da">uvs</a>.push_back(<a class="code hl_typedef" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a>(</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                        attrib.texcoords[idx.texcoord_index * 2 + 0],</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>                        1.0f - attrib.texcoords[idx.texcoord_index * 2 + 1]));</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>                } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>                    mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da">uvs</a>.push_back(<a class="code hl_typedef" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a>(0.0f, 0.0f));</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>                }</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>                <span class="keywordflow">if</span> (idx.normal_index &gt;= 0 &amp;&amp;</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                    idx.normal_index * 3 + 2 &lt; <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(attrib.normals.size())) {</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>                    mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#aa2092283d1400704fb9371409b864b06">normals</a>.push_back(<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>                        attrib.normals[idx.normal_index * 3 + 0],</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>                        attrib.normals[idx.normal_index * 3 + 1],</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>                        attrib.normals[idx.normal_index * 3 + 2]));</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>                }</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>                uint32_t vi = <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c">vertices</a>.size() - 1);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>                <span class="keywordflow">if</span> (c == 0) tri.<a class="code hl_variable" href="structscimesh_1_1Triangle.html#ae379043b274924ff2236e39a324a50a7">v0</a> = vi;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>                <span class="keywordflow">if</span> (c == 1) tri.<a class="code hl_variable" href="structscimesh_1_1Triangle.html#ade2e27653584f0cfb7e87c5b5fd3cb98">v1</a> = vi;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>                <span class="keywordflow">if</span> (c == 2) tri.<a class="code hl_variable" href="structscimesh_1_1Triangle.html#a584bc9ecb201459947f5dcb67e33489c">v2</a> = vi;</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>            }</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>            mesh.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ae5bc35d3b894ba07c018d4513d767046">triangles</a>.push_back(tri);</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        }</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    }</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordflow">return</span> mesh;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>}</div>
+<a href="obj__io_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &lt;<a class="code" href="obj__io_8h.html">scimesh/obj_io.h</a>&gt;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;<a class="code" href="fs__mesh__converter_8h.html">scimesh/fs_mesh_converter.h</a>&gt;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;libfs.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacescimesh.html">scimesh</a> {</div>
+<div class="foldopen" id="foldopen00006" data-start="{" data-end="}">
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="namespacescimesh_1_1obj__io.html">    6</a></span><span class="keyword">namespace </span>obj_io {</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="foldopen" id="foldopen00008" data-start="{" data-end="}">
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">    8</a></span><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_function" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">read_obj</a>(<span class="keyword">const</span> std::string &amp;path) {</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    fs::Mesh fs_mesh;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    fs::Mesh::from_obj(&amp;fs_mesh, path);</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="comment">// Convert to scimesh Mesh.  Normals are not loaded from OBJ — call</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    <span class="comment">// compute_vertex_normals() on the result if lighting is needed.</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="comment">// Texture coordinates (vt) and materials (mtllib) are not loaded.</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespacescimesh.html#a44b3c7e09511942b10602377dcdbc6dc">convert_fs_mesh</a>(fs_mesh);</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>}</div>
 </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>} <span class="comment">// namespace obj_io</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>} <span class="comment">// namespace obj_io</span></div>
 </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>} <span class="comment">// namespace scimesh</span></div>
-<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00013">obj_io.cpp:13</a></div></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>} <span class="comment">// namespace scimesh</span></div>
+<div class="ttc" id="afs__mesh__converter_8h_html"><div class="ttname"><a href="fs__mesh__converter_8h.html">fs_mesh_converter.h</a></div><div class="ttdoc">Convert FreeSurfer meshes (libfs) to scimesh Mesh objects.</div></div>
+<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00008">obj_io.cpp:8</a></div></div>
 <div class="ttc" id="anamespacescimesh_html"><div class="ttname"><a href="namespacescimesh.html">scimesh</a></div><div class="ttdef"><b>Definition</b> <a href="camera_8cpp_source.html#l00007">camera.cpp:7</a></div></div>
-<div class="ttc" id="anamespacescimesh_html_a17e3c4a58dcc18d0b6050479e4151da8"><div class="ttname"><a href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">scimesh::Vec2</a></div><div class="ttdeci">glm::vec2 Vec2</div><div class="ttdoc">2-component floating-point vector (xy).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00032">types.h:32</a></div></div>
-<div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
+<div class="ttc" id="anamespacescimesh_html_a44b3c7e09511942b10602377dcdbc6dc"><div class="ttname"><a href="namespacescimesh.html#a44b3c7e09511942b10602377dcdbc6dc">scimesh::convert_fs_mesh</a></div><div class="ttdeci">Mesh convert_fs_mesh(const fs::Mesh &amp;fs_mesh)</div><div class="ttdoc">Convert a FreeSurfer mesh to a scimesh Mesh (no colors).</div><div class="ttdef"><b>Definition</b> <a href="fs__mesh__converter_8h_source.html#l00037">fs_mesh_converter.h:37</a></div></div>
 <div class="ttc" id="aobj__io_8h_html"><div class="ttname"><a href="obj__io_8h.html">obj_io.h</a></div><div class="ttdoc">Read Wavefront OBJ files (.obj).</div></div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html"><div class="ttname"><a href="structscimesh_1_1Mesh.html">scimesh::Mesh</a></div><div class="ttdoc">A 3D triangle mesh using an indexed face set representation.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00076">mesh.h:76</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_aa2092283d1400704fb9371409b864b06"><div class="ttname"><a href="structscimesh_1_1Mesh.html#aa2092283d1400704fb9371409b864b06">scimesh::Mesh::normals</a></div><div class="ttdeci">std::vector&lt; Vec3 &gt; normals</div><div class="ttdoc">Per-vertex surface normals (unit-length direction vectors).</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00125">mesh.h:125</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_ab9765dc4fa9dde15c08beead8503ea7c"><div class="ttname"><a href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c">scimesh::Mesh::vertices</a></div><div class="ttdeci">std::vector&lt; Vec3 &gt; vertices</div><div class="ttdoc">3D vertex positions.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00086">mesh.h:86</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_ad79cc804a9e8fde7a4592aa00a4d11da"><div class="ttname"><a href="structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da">scimesh::Mesh::uvs</a></div><div class="ttdeci">std::vector&lt; Vec2 &gt; uvs</div><div class="ttdoc">Per-vertex texture coordinates (UVs).</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00134">mesh.h:134</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_ae5bc35d3b894ba07c018d4513d767046"><div class="ttname"><a href="structscimesh_1_1Mesh.html#ae5bc35d3b894ba07c018d4513d767046">scimesh::Mesh::triangles</a></div><div class="ttdeci">std::vector&lt; Triangle &gt; triangles</div><div class="ttdoc">Triangle index triplets.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00094">mesh.h:94</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Triangle_html"><div class="ttname"><a href="structscimesh_1_1Triangle.html">scimesh::Triangle</a></div><div class="ttdoc">A triangle defined by three vertex indices.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00127">types.h:127</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Triangle_html_a584bc9ecb201459947f5dcb67e33489c"><div class="ttname"><a href="structscimesh_1_1Triangle.html#a584bc9ecb201459947f5dcb67e33489c">scimesh::Triangle::v2</a></div><div class="ttdeci">uint32_t v2</div><div class="ttdoc">Index of the third vertex in Mesh::vertices.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00133">types.h:133</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Triangle_html_ade2e27653584f0cfb7e87c5b5fd3cb98"><div class="ttname"><a href="structscimesh_1_1Triangle.html#ade2e27653584f0cfb7e87c5b5fd3cb98">scimesh::Triangle::v1</a></div><div class="ttdeci">uint32_t v1</div><div class="ttdoc">Index of the second vertex in Mesh::vertices.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00131">types.h:131</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Triangle_html_ae379043b274924ff2236e39a324a50a7"><div class="ttname"><a href="structscimesh_1_1Triangle.html#ae379043b274924ff2236e39a324a50a7">scimesh::Triangle::v0</a></div><div class="ttdeci">uint32_t v0</div><div class="ttdoc">Index of the first vertex in Mesh::vertices.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00129">types.h:129</a></div></div>
-<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div><div class="ttdoc">Fundamental types used throughout the scimesh rendering engine.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

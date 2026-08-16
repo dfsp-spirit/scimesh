@@ -1,23 +1,13 @@
 var searchData=
 [
-  ['making_20a_20release_0',['Making a release',['../md_README__DEVELOPMENT.html#autotoc_md44',1,'']]],
-  ['manually_20header_20source_1',['Manually (header + source)',['../index.html#autotoc_md30',1,'']]],
-  ['manually_20without_20cmake_2',['Manually (without CMake)',['../cpp_getting_started.html#autotoc_md52',1,'']]],
-  ['mat4_3',['Mat4',['../namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8',1,'scimesh']]],
-  ['math_5futils_2eh_4',['math_utils.h',['../math__utils_8h.html',1,'']]],
-  ['max_5fortho_5fextent_5',['max_ortho_extent',['../namespacescimesh.html#ac4e4507b948196dc8a7686ef68a5c96b',1,'scimesh']]],
-  ['merge_6',['merge',['../structscimesh_1_1Image.html#ab4a8769f0d60553095c9c6ddca6dcabc',1,'scimesh::Image']]],
-  ['merge_5fmesh_7',['merge_mesh',['../namespacescimesh.html#a5ef13b6953ece9851682b24f98d56720',1,'scimesh']]],
-  ['merged_20primitives_8',['Merged Primitives',['../cpp_getting_started.html#autotoc_md65',1,'']]],
-  ['mergedirection_9',['MergeDirection',['../namespacescimesh.html#a40f7e86f0a96b5c40655788176833371',1,'scimesh']]],
-  ['mesh_10',['mesh',['../cpp_getting_started.html#autotoc_md49',1,'Loading a PLY Mesh'],['../structscimesh_1_1Mesh.html',1,'scimesh::Mesh'],['../cpp_getting_started.html#autotoc_md54',1,'Mesh']]],
-  ['mesh_20i_20o_11',['Mesh I/O',['../cpp_getting_started.html#autotoc_md60',1,'']]],
-  ['mesh_20needed_12',['Raw rendering (no mesh needed)',['../classscimesh_1_1Renderer.html#autotoc_md16',1,'']]],
-  ['mesh_20transforms_13',['Mesh Transforms',['../cpp_getting_started.html#autotoc_md66',1,'']]],
-  ['mesh_2eh_14',['mesh.h',['../mesh_8h.html',1,'']]],
-  ['mesh_5ffrom_5ffs_15',['mesh_from_fs',['../namespacescimesh.html#ab985c7b1e6ccf77ae9f48406a7f887f8',1,'scimesh']]],
-  ['meshes_16',['meshes',['../structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7',1,'scimesh::Scene::meshes'],['../classscimesh_1_1Renderer.html#autotoc_md15',1,'Rendering multiple meshes'],['../cpp_getting_started.html#autotoc_md71',1,'Semi-Transparent Meshes']]],
-  ['minimal_20example_17',['Minimal Example',['../cpp_getting_started.html#autotoc_md48',1,'']]],
-  ['multiapplycolormapresult_18',['MultiApplyColormapResult',['../structscimesh_1_1MultiApplyColormapResult.html',1,'scimesh']]],
-  ['multiple_20meshes_19',['Rendering multiple meshes',['../classscimesh_1_1Renderer.html#autotoc_md15',1,'']]]
+  ['layer_0',['layer',['../index.html#autotoc_md25',1,'C++ layer'],['../index.html#autotoc_md26',1,'R Layer']]],
+  ['layout_1',['Project Layout',['../cpp_getting_started.html#autotoc_md49',1,'']]],
+  ['left_2',['left',['../namespacescimesh.html#a40f7e86f0a96b5c40655788176833371a684d325a7303f52e64011467ff5c5758',1,'scimesh::LEFT'],['../namespacescimesh.html#a0053cbaf13ff13f50a9220cb562f0ed0a684d325a7303f52e64011467ff5c5758',1,'scimesh::LEFT']]],
+  ['license_20and_20author_3',['License and Author',['../index.html#autotoc_md40',1,'']]],
+  ['light_4',['Light',['../structscimesh_1_1Light.html',1,'scimesh']]],
+  ['lighting_5',['Lighting',['../cpp_getting_started.html#autotoc_md69',1,'']]],
+  ['lights_6',['lights',['../structscimesh_1_1RenderOptions.html#autotoc_md12',1,'Adding lights'],['../structscimesh_1_1Rasterizer.html#a9a1fa8d2588157af1d2e51bebe399fe8',1,'scimesh::Rasterizer::lights'],['../structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9',1,'scimesh::RenderOptions::lights']]],
+  ['links_20to_20example_20program_20source_20code_7',['Direct Links to Example Program Source Code',['../index.html#autotoc_md37',1,'']]],
+  ['lo_8',['lo',['../colormap_8cpp.html#a1d3847d5ad801b1b748f625d807df1e5',1,'colormap.cpp']]],
+  ['loading_20a_20ply_20mesh_9',['Loading a PLY Mesh',['../cpp_getting_started.html#autotoc_md51',1,'']]]
 ];

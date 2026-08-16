@@ -187,16 +187,16 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A 2D RGBA image buffer. </p>
-<h2><a class="anchor" id="autotoc_md2"></a>
+<h2><a class="anchor" id="autotoc_md4"></a>
 Overview</h2>
 <p>The <code><a class="el" href="structscimesh_1_1Image.html" title="A 2D RGBA image buffer.">Image</a></code> class stores pixels as 4 bytes per pixel (red, green, blue, alpha) in <b>row-major</b> order. Pixel (0, 0) is the <b>bottom-left</b> corner (matching OpenGL texture convention).</p>
 <p>Images are used both as render targets (the output of the renderer) and as texture sources for textured meshes.</p>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h2><a class="anchor" id="autotoc_md5"></a>
 Construction</h2>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Image.html">Image</a> img(800, 600);              <span class="comment">// 800×600 blank (transparent black)</span></div>
 <div class="line">img.clear(1.0f, 1.0f, 1.0f, 1.0f); <span class="comment">// fill with opaque white</span></div>
 <div class="ttc" id="astructscimesh_1_1Image_html"><div class="ttname"><a href="structscimesh_1_1Image.html">scimesh::Image</a></div><div class="ttdoc">A 2D RGBA image buffer.</div><div class="ttdef"><b>Definition</b> <a href="image_8h_source.html#l00087">image.h:87</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
 Saving</h2>
 <div class="fragment"><div class="line">img.write_png(<span class="stringliteral">&quot;output.png&quot;</span>);   <span class="comment">// PNG (recommended)</span></div>
 <div class="line">img.write_ppm(<span class="stringliteral">&quot;output.ppm&quot;</span>);   <span class="comment">// PPM (simple text/binary format, for debugging)</span></div>

@@ -1,5 +1,6 @@
 var namespacescimesh =
 [
+    [ "gltf_io", "namespacescimesh_1_1gltf__io.html", "namespacescimesh_1_1gltf__io" ],
     [ "obj_io", "namespacescimesh_1_1obj__io.html", [
       [ "read_obj", "namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59", null ]
     ] ],
@@ -26,6 +27,7 @@ var namespacescimesh =
     [ "Renderer", "classscimesh_1_1Renderer.html", "classscimesh_1_1Renderer" ],
     [ "RenderOptions", "structscimesh_1_1RenderOptions.html", "structscimesh_1_1RenderOptions" ],
     [ "Scene", "structscimesh_1_1Scene.html", "structscimesh_1_1Scene" ],
+    [ "SceneNodeRef", "structscimesh_1_1SceneNodeRef.html", "structscimesh_1_1SceneNodeRef" ],
     [ "Triangle", "structscimesh_1_1Triangle.html", "structscimesh_1_1Triangle" ],
     [ "ViewClipVertex", "structscimesh_1_1ViewClipVertex.html", "structscimesh_1_1ViewClipVertex" ],
     [ "Mat4", "namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8", null ],

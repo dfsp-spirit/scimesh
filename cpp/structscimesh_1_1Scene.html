@@ -105,8 +105,35 @@ $(document).ready(function(){initNavTree('structscimesh_1_1Scene.html',''); init
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:acbe7cea460bfacba4658f5d68ba5f06e" id="r_acbe7cea460bfacba4658f5d68ba5f06e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#acbe7cea460bfacba4658f5d68ba5f06e">add</a> (const <a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> &amp;mesh, const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;<a class="el" href="structscimesh_1_1Scene.html#a70eda1478dbbd76387ebc90c83881bb1">transform</a>=<a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a>(1.0f), const std::string &amp;<a class="el" href="structscimesh_1_1Scene.html#add1eb4aa5452bea486afd934a5e56a27">name</a>=&quot;&quot;)</td></tr>
+<tr class="memdesc:acbe7cea460bfacba4658f5d68ba5f06e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a mesh to the scene with an optional placement transform and name.  <br /></td></tr>
+<tr class="separator:acbe7cea460bfacba4658f5d68ba5f06e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a054c513f5666319b6e97d4f55f10edf1" id="r_a054c513f5666319b6e97d4f55f10edf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a054c513f5666319b6e97d4f55f10edf1">set_transform</a> (size_t index, const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;<a class="el" href="structscimesh_1_1Scene.html#a70eda1478dbbd76387ebc90c83881bb1">transform</a>)</td></tr>
+<tr class="memdesc:a054c513f5666319b6e97d4f55f10edf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the placement transform of the mesh at <code>index</code>.  <br /></td></tr>
+<tr class="separator:a054c513f5666319b6e97d4f55f10edf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab96e1c2d2fb824bdf68676d6b3ceb22e" id="r_ab96e1c2d2fb824bdf68676d6b3ceb22e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#ab96e1c2d2fb824bdf68676d6b3ceb22e">set_name</a> (size_t index, const std::string &amp;<a class="el" href="structscimesh_1_1Scene.html#add1eb4aa5452bea486afd934a5e56a27">name</a>)</td></tr>
+<tr class="memdesc:ab96e1c2d2fb824bdf68676d6b3ceb22e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the name of the mesh at <code>index</code>.  <br /></td></tr>
+<tr class="separator:ab96e1c2d2fb824bdf68676d6b3ceb22e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70eda1478dbbd76387ebc90c83881bb1" id="r_a70eda1478dbbd76387ebc90c83881bb1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a70eda1478dbbd76387ebc90c83881bb1">transform</a> (size_t index) const</td></tr>
+<tr class="memdesc:a70eda1478dbbd76387ebc90c83881bb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The placement transform of the mesh at <code>index</code> (identity when unset).  <br /></td></tr>
+<tr class="separator:a70eda1478dbbd76387ebc90c83881bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add1eb4aa5452bea486afd934a5e56a27" id="r_add1eb4aa5452bea486afd934a5e56a27"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#add1eb4aa5452bea486afd934a5e56a27">name</a> (size_t index) const</td></tr>
+<tr class="memdesc:add1eb4aa5452bea486afd934a5e56a27"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of the mesh at <code>index</code> (empty when unset).  <br /></td></tr>
+<tr class="separator:add1eb4aa5452bea486afd934a5e56a27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c4e409e0531ad7f4f7b8a380d8e1c1f" id="r_a8c4e409e0531ad7f4f7b8a380d8e1c1f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a8c4e409e0531ad7f4f7b8a380d8e1c1f">size</a> () const</td></tr>
+<tr class="memdesc:a8c4e409e0531ad7f4f7b8a380d8e1c1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of meshes in the scene.  <br /></td></tr>
+<tr class="separator:a8c4e409e0531ad7f4f7b8a380d8e1c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a322d92e2a7ae08eb1190dcd00c96efd9" id="r_a322d92e2a7ae08eb1190dcd00c96efd9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a322d92e2a7ae08eb1190dcd00c96efd9">empty</a> () const</td></tr>
+<tr class="memdesc:a322d92e2a7ae08eb1190dcd00c96efd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the scene holds no meshes.  <br /></td></tr>
+<tr class="separator:a322d92e2a7ae08eb1190dcd00c96efd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af52d5e62c17d0e0bcee782988846c1bd" id="r_af52d5e62c17d0e0bcee782988846c1bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1SceneNodeRef.html">SceneNodeRef</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#af52d5e62c17d0e0bcee782988846c1bd">node</a> (size_t index) const</td></tr>
+<tr class="memdesc:af52d5e62c17d0e0bcee782988846c1bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">A non-owning reference to the mesh at <code>index</code> (mesh + transform + name).  <br /></td></tr>
+<tr class="separator:af52d5e62c17d0e0bcee782988846c1bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc233cdf6c45dfa7fd710b12a1271728" id="r_abc233cdf6c45dfa7fd710b12a1271728"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structscimesh_1_1SceneNodeRef.html">SceneNodeRef</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#abc233cdf6c45dfa7fd710b12a1271728">nodes</a> () const</td></tr>
+<tr class="memdesc:abc233cdf6c45dfa7fd710b12a1271728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Non-owning references to all meshes, in draw order.  <br /></td></tr>
+<tr class="separator:abc233cdf6c45dfa7fd710b12a1271728"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4132aca3c00181782914281fae10c693" id="r_a4132aca3c00181782914281fae10c693"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693">compute_bounding_box</a> (<a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;min_bound, <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;max_bound) const</td></tr>
-<tr class="memdesc:a4132aca3c00181782914281fae10c693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the combined axis-aligned bounding box of all meshes.  <br /></td></tr>
+<tr class="memdesc:a4132aca3c00181782914281fae10c693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the combined axis-aligned bounding box of all meshes, after applying each mesh's placement transform.  <br /></td></tr>
 <tr class="separator:a4132aca3c00181782914281fae10c693"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -114,32 +141,94 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a10d1c0a9734d6d082bcf03cab6f18fe7" id="r_a10d1c0a9734d6d082bcf03cab6f18fe7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">meshes</a></td></tr>
 <tr class="memdesc:a10d1c0a9734d6d082bcf03cab6f18fe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The meshes in this scene, drawn in order.  <br /></td></tr>
 <tr class="separator:a10d1c0a9734d6d082bcf03cab6f18fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a414534d24451da3cef818a35aa4af5ac" id="r_a414534d24451da3cef818a35aa4af5ac"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#a414534d24451da3cef818a35aa4af5ac">transforms</a></td></tr>
+<tr class="memdesc:a414534d24451da3cef818a35aa4af5ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-mesh placement transforms, parallel to <code>meshes</code>.  <br /></td></tr>
+<tr class="separator:a414534d24451da3cef818a35aa4af5ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac46e48124ccc800a7a55ee51fbc2b5d9" id="r_ac46e48124ccc800a7a55ee51fbc2b5d9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Scene.html#ac46e48124ccc800a7a55ee51fbc2b5d9">names</a></td></tr>
+<tr class="memdesc:ac46e48124ccc800a7a55ee51fbc2b5d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional per-mesh node names, parallel to <code>meshes</code>.  <br /></td></tr>
+<tr class="separator:ac46e48124ccc800a7a55ee51fbc2b5d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A collection of <code><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a></code> objects to be rendered together. </p>
-<p>A <code><a class="el" href="structscimesh_1_1Scene.html" title="A collection of Mesh objects to be rendered together.">Scene</a></code> is simply a list of meshes. When rendered, meshes are drawn in order — later meshes appear on top of earlier ones.</p>
-<h2><a class="anchor" id="autotoc_md17"></a>
+<p>A <code><a class="el" href="structscimesh_1_1Scene.html" title="A collection of Mesh objects to be rendered together.">Scene</a></code> is a list of meshes with optional per-mesh placement transforms and names. When rendered, meshes are drawn in order — later meshes appear on top of earlier ones. Each mesh's placement transform is applied as a model matrix at render time (meshes themselves are never modified).</p>
+<h2><a class="anchor" id="autotoc_md19"></a>
 Construction</h2>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Scene.html">Scene</a> scene;</div>
-<div class="line">scene.<a class="code hl_variable" href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">meshes</a>.push_back(sphere);</div>
-<div class="line">scene.<a class="code hl_variable" href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">meshes</a>.push_back(cube);</div>
-<div class="line">scene.<a class="code hl_variable" href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">meshes</a>.push_back(arrow);</div>
-<div class="ttc" id="astructscimesh_1_1Scene_html"><div class="ttname"><a href="structscimesh_1_1Scene.html">scimesh::Scene</a></div><div class="ttdoc">A collection of Mesh objects to be rendered together.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00035">scene.h:35</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Scene_html_a10d1c0a9734d6d082bcf03cab6f18fe7"><div class="ttname"><a href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">scimesh::Scene::meshes</a></div><div class="ttdeci">std::vector&lt; Mesh &gt; meshes</div><div class="ttdoc">The meshes in this scene, drawn in order.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00037">scene.h:37</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md18"></a>
+<div class="line">scene.<a class="code hl_function" href="structscimesh_1_1Scene.html#acbe7cea460bfacba4658f5d68ba5f06e">add</a>(sphere);   <span class="comment">// identity transform</span></div>
+<div class="line">scene.<a class="code hl_function" href="structscimesh_1_1Scene.html#acbe7cea460bfacba4658f5d68ba5f06e">add</a>(cube, glm::translate(<a class="code hl_typedef" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a>(1.0f), <a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(2.0f, 0.0f, 0.0f)));</div>
+<div class="line">scene.<a class="code hl_function" href="structscimesh_1_1Scene.html#acbe7cea460bfacba4658f5d68ba5f06e">add</a>(arrow_mesh, glm::rotate(<a class="code hl_typedef" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a>(1.0f), 0.5f, <a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0,1,0)), <span class="stringliteral">&quot;arrow&quot;</span>);</div>
+<div class="ttc" id="anamespacescimesh_html_a45b6c7d1253ca6c20e8c6dc2de7ecbf8"><div class="ttname"><a href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">scimesh::Mat4</a></div><div class="ttdeci">glm::mat4 Mat4</div><div class="ttdoc">4×4 floating-point matrix.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00065">types.h:65</a></div></div>
+<div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
+<div class="ttc" id="astructscimesh_1_1Scene_html"><div class="ttname"><a href="structscimesh_1_1Scene.html">scimesh::Scene</a></div><div class="ttdoc">A collection of Mesh objects to be rendered together.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00057">scene.h:57</a></div></div>
+<div class="ttc" id="astructscimesh_1_1Scene_html_acbe7cea460bfacba4658f5d68ba5f06e"><div class="ttname"><a href="structscimesh_1_1Scene.html#acbe7cea460bfacba4658f5d68ba5f06e">scimesh::Scene::add</a></div><div class="ttdeci">void add(const Mesh &amp;mesh, const Mat4 &amp;transform=Mat4(1.0f), const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">Add a mesh to the scene with an optional placement transform and name.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00075">scene.h:75</a></div></div>
+</div><!-- fragment --><p>For convenience the raw <code>meshes</code> vector is still public and can be modified directly (e.g. <code>scene.meshes.push_back(m)</code>); any mesh without a matching transform is treated as identity.</p>
+<h2><a class="anchor" id="autotoc_md20"></a>
 Bounding box</h2>
-<p>The combined bounding box of all meshes can be computed for camera framing:</p>
+<p>The combined bounding box of all meshes (after their transforms) can be computed for camera framing:</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> bmin, bmax;</div>
 <div class="line">scene.<a class="code hl_function" href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693">compute_bounding_box</a>(bmin, bmax);</div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> cam = <a class="code hl_function" href="namespacescimesh.html#a1f78967f2f246d98c26c02fff45c1e23">camera_look_at</a>((bmin+bmax)*0.5f, ...);</div>
 <div class="ttc" id="anamespacescimesh_html_a1f78967f2f246d98c26c02fff45c1e23"><div class="ttname"><a href="namespacescimesh.html#a1f78967f2f246d98c26c02fff45c1e23">scimesh::camera_look_at</a></div><div class="ttdeci">Camera camera_look_at(const Vec3 &amp;center, float radius, const Vec3 &amp;direction, const Vec3 &amp;up, float fov_degrees, float margin, ProjectionType projection)</div><div class="ttdoc">Create a camera that looks at a point from a given distance and direction.</div><div class="ttdef"><b>Definition</b> <a href="camera_8cpp_source.html#l00038">camera.cpp:38</a></div></div>
-<div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Camera_html"><div class="ttname"><a href="structscimesh_1_1Camera.html">scimesh::Camera</a></div><div class="ttdoc">A virtual camera that defines the viewpoint for rendering.</div><div class="ttdef"><b>Definition</b> <a href="camera_8h_source.html#l00077">camera.h:77</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Scene_html_a4132aca3c00181782914281fae10c693"><div class="ttname"><a href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693">scimesh::Scene::compute_bounding_box</a></div><div class="ttdeci">void compute_bounding_box(Vec3 &amp;min_bound, Vec3 &amp;max_bound) const</div><div class="ttdoc">Compute the combined axis-aligned bounding box of all meshes.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00055">scene.h:55</a></div></div>
-</div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a>, <a class="el" href="classscimesh_1_1Renderer.html#aaaa91a8867fe20c94ee630bc584d0922" title="Render a scene (collection of meshes) to an image.">Renderer::render_scene()</a>, <a class="el" href="namespacescimesh.html#a5e7e30f1dd1c79560cd6d65afce7b81a" title="Create a camera that automatically frames an entire Scene.">camera_fit_scene()</a> </dd></dl>
+<div class="ttc" id="astructscimesh_1_1Scene_html_a4132aca3c00181782914281fae10c693"><div class="ttname"><a href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693">scimesh::Scene::compute_bounding_box</a></div><div class="ttdeci">void compute_bounding_box(Vec3 &amp;min_bound, Vec3 &amp;max_bound) const</div><div class="ttdoc">Compute the combined axis-aligned bounding box of all meshes, after applying each mesh's placement tr...</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00152">scene.h:152</a></div></div>
+</div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a>, <a class="el" href="structscimesh_1_1SceneNodeRef.html" title="A lightweight, non-owning reference to one mesh in a scene, together with its placement transform (an...">SceneNodeRef</a>, <a class="el" href="classscimesh_1_1Renderer.html#aaaa91a8867fe20c94ee630bc584d0922" title="Render a scene (collection of meshes) to an image.">Renderer::render_scene()</a>, <a class="el" href="namespacescimesh.html#a5e7e30f1dd1c79560cd6d65afce7b81a" title="Create a camera that automatically frames an entire Scene.">camera_fit_scene()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00035">35</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00057">57</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="acbe7cea460bfacba4658f5d68ba5f06e" name="acbe7cea460bfacba4658f5d68ba5f06e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbe7cea460bfacba4658f5d68ba5f06e">&#9670;&#160;</a></span>add()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void scimesh::Scene::add </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;&#160;</td>
+          <td class="paramname"><em>transform</em> = <code><a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a>(1.0f)</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Add a mesh to the scene with an optional placement transform and name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mesh</td><td>The mesh to add (copied into the scene). </td></tr>
+    <tr><td class="paramname">transform</td><td>Model matrix placing the mesh in world space (default: identity). </td></tr>
+    <tr><td class="paramname">name</td><td>Optional node name (used by exporters / debugging). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00075">75</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
 <a id="a4132aca3c00181782914281fae10c693" name="a4132aca3c00181782914281fae10c693"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4132aca3c00181782914281fae10c693">&#9670;&#160;</a></span>compute_bounding_box()</h2>
 
@@ -174,8 +263,8 @@ Bounding box</h2>
 </table>
 </div><div class="memdoc">
 
-<p>Compute the combined axis-aligned bounding box of all meshes. </p>
-<p>Iterates over all meshes and computes the union of their individual bounding boxes. Empty meshes are skipped.</p>
+<p>Compute the combined axis-aligned bounding box of all meshes, after applying each mesh's placement transform. </p>
+<p>Iterates over all meshes, transforms the 8 corners of each mesh's bounding box, and computes the union. Empty meshes are skipped.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">min_bound</td><td>Minimum corner of the combined AABB. </td></tr>
@@ -183,13 +272,267 @@ Bounding box</h2>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> bmin, bmax;</div>
-<div class="line">scene.compute_bounding_box(bmin, bmax);</div>
-<div class="line">std::cout &lt;&lt; <span class="stringliteral">&quot;Scene spans &quot;</span> &lt;&lt; (bmax - bmin) &lt;&lt; std::endl;</div>
-</div><!-- fragment --></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Mesh.html#aad670e42aebe7a26a69660afeb133574" title="Compute the axis-aligned bounding box (AABB) of the mesh.">Mesh::compute_bounding_box()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00055">55</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00152">152</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="a322d92e2a7ae08eb1190dcd00c96efd9" name="a322d92e2a7ae08eb1190dcd00c96efd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a322d92e2a7ae08eb1190dcd00c96efd9">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool scimesh::Scene::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Whether the scene holds no meshes. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00120">120</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="add1eb4aa5452bea486afd934a5e56a27" name="add1eb4aa5452bea486afd934a5e56a27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add1eb4aa5452bea486afd934a5e56a27">&#9670;&#160;</a></span>name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; scimesh::Scene::name </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The name of the mesh at <code>index</code> (empty when unset). </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00109">109</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="af52d5e62c17d0e0bcee782988846c1bd" name="af52d5e62c17d0e0bcee782988846c1bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af52d5e62c17d0e0bcee782988846c1bd">&#9670;&#160;</a></span>node()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structscimesh_1_1SceneNodeRef.html">SceneNodeRef</a> scimesh::Scene::node </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A non-owning reference to the mesh at <code>index</code> (mesh + transform + name). </p>
+<dl class="section pre"><dt>Precondition</dt><dd><code>index &lt; meshes.size()</code> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00125">125</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="abc233cdf6c45dfa7fd710b12a1271728" name="abc233cdf6c45dfa7fd710b12a1271728"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc233cdf6c45dfa7fd710b12a1271728">&#9670;&#160;</a></span>nodes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="structscimesh_1_1SceneNodeRef.html">SceneNodeRef</a> &gt; scimesh::Scene::nodes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Non-owning references to all meshes, in draw order. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00134">134</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="ab96e1c2d2fb824bdf68676d6b3ceb22e" name="ab96e1c2d2fb824bdf68676d6b3ceb22e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab96e1c2d2fb824bdf68676d6b3ceb22e">&#9670;&#160;</a></span>set_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void scimesh::Scene::set_name </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the name of the mesh at <code>index</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00092">92</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="a054c513f5666319b6e97d4f55f10edf1" name="a054c513f5666319b6e97d4f55f10edf1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a054c513f5666319b6e97d4f55f10edf1">&#9670;&#160;</a></span>set_transform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void scimesh::Scene::set_transform </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;&#160;</td>
+          <td class="paramname"><em>transform</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the placement transform of the mesh at <code>index</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00083">83</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="a8c4e409e0531ad7f4f7b8a380d8e1c1f" name="a8c4e409e0531ad7f4f7b8a380d8e1c1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c4e409e0531ad7f4f7b8a380d8e1c1f">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t scimesh::Scene::size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of meshes in the scene. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00117">117</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="a70eda1478dbbd76387ebc90c83881bb1" name="a70eda1478dbbd76387ebc90c83881bb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70eda1478dbbd76387ebc90c83881bb1">&#9670;&#160;</a></span>transform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp; scimesh::Scene::transform </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The placement transform of the mesh at <code>index</code> (identity when unset). </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00101">101</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
 
 </div>
 </div>
@@ -208,7 +551,44 @@ Bounding box</h2>
 
 <p>The meshes in this scene, drawn in order. </p>
 
-<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00037">37</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00059">59</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="ac46e48124ccc800a7a55ee51fbc2b5d9" name="ac46e48124ccc800a7a55ee51fbc2b5d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac46e48124ccc800a7a55ee51fbc2b5d9">&#9670;&#160;</a></span>names</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; scimesh::Scene::names</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Optional per-mesh node names, parallel to <code>meshes</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00067">67</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
+
+</div>
+</div>
+<a id="a414534d24451da3cef818a35aa4af5ac" name="a414534d24451da3cef818a35aa4af5ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a414534d24451da3cef818a35aa4af5ac">&#9670;&#160;</a></span>transforms</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a>&gt; scimesh::Scene::transforms</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Per-mesh placement transforms, parallel to <code>meshes</code>. </p>
+<p>May be shorter than <code>meshes</code>; missing entries default to identity. </p>
+
+<p class="definition">Definition at line <a class="el" href="scene_8h_source.html#l00064">64</a> of file <a class="el" href="scene_8h_source.html">scene.h</a>.</p>
 
 </div>
 </div>

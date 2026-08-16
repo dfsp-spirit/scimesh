@@ -1,17 +1,11 @@
 var searchData=
 [
-  ['v0_0',['v0',['../structscimesh_1_1Triangle.html#ae379043b274924ff2236e39a324a50a7',1,'scimesh::Triangle']]],
-  ['v1_1',['v1',['../structscimesh_1_1Triangle.html#ade2e27653584f0cfb7e87c5b5fd3cb98',1,'scimesh::Triangle']]],
-  ['v2_2',['v2',['../structscimesh_1_1Triangle.html#a584bc9ecb201459947f5dcb67e33489c',1,'scimesh::Triangle']]],
-  ['validation_3',['Validation',['../structscimesh_1_1Mesh.html#autotoc_md7',1,'']]],
-  ['vec2_4',['Vec2',['../namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8',1,'scimesh']]],
-  ['vec3_5',['Vec3',['../namespacescimesh.html#a500854f7e819a236d4887daef660f0bc',1,'scimesh']]],
-  ['vec4_6',['Vec4',['../namespacescimesh.html#af8f1a95bc594998bed4f4c2b7cb24c02',1,'scimesh']]],
-  ['vertical_7',['VERTICAL',['../namespacescimesh.html#a0053cbaf13ff13f50a9220cb562f0ed0a3e1b74251c07310c5f1b968145bf00dc',1,'scimesh']]],
-  ['vertices_8',['vertices',['../structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c',1,'scimesh::Mesh']]],
-  ['via_20cmake_20fetchcontent_20recommended_9',['Via CMake FetchContent (recommended)',['../index.html#autotoc_md29',1,'']]],
-  ['view_5fz_10',['view_z',['../renderer_8cpp.html#a40d8266555b4f83bc1aa82188466bea6',1,'renderer.cpp']]],
-  ['viewclipvertex_11',['ViewClipVertex',['../structscimesh_1_1ViewClipVertex.html',1,'scimesh']]],
-  ['viridis_12',['viridis',['../structscimesh_1_1ColorMap.html#a9a834c63714782f694056b6f2d14f6e2',1,'scimesh::ColorMap']]],
-  ['visualization_20examples_13',['Visualization Examples',['../index.html#autotoc_md20',1,'']]]
+  ['unit_20tests_0',['unit tests',['../md_README__DEVELOPMENT.html#autotoc_md43',1,'Running the C++ unit tests'],['../md_README__DEVELOPMENT.html#autotoc_md44',1,'Running the R unit tests']]],
+  ['up_1',['up',['../structscimesh_1_1Camera.html#aad99d0633c14a23e223aaf0173bcb849',1,'scimesh::Camera']]],
+  ['usage_2',['usage',['../classscimesh_1_1Renderer.html#autotoc_md16',1,'Basic usage'],['../gltf__io_8h.html#autotoc_md3',1,'Usage'],['../structscimesh_1_1Rasterizer.html#autotoc_md10',1,'Usage']]],
+  ['uv_3',['uv',['../structscimesh_1_1ViewClipVertex.html#a3bdbefa24623a37867e7739415ce8cb8',1,'scimesh::ViewClipVertex::uv'],['../structscimesh_1_1ClipVertex.html#a3a7e1be915999cf18720f9c7b6affcb1',1,'scimesh::ClipVertex::uv']]],
+  ['uv0_4',['uv0',['../renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9',1,'renderer.cpp']]],
+  ['uv1_5',['uv1',['../renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6',1,'renderer.cpp']]],
+  ['uv2_6',['uv2',['../renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f',1,'renderer.cpp']]],
+  ['uvs_7',['uvs',['../structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da',1,'scimesh::Mesh']]]
 ];

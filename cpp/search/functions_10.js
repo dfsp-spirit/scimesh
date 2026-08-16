@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['write_5fbmp_0',['write_bmp',['../structscimesh_1_1Image.html#afd02f2c51604512b0b10e02844cdcdea',1,'scimesh::Image']]],
-  ['write_5fpng_1',['write_png',['../structscimesh_1_1Image.html#ad8e792e87a526c7594c407faee0f6804',1,'scimesh::Image']]],
-  ['write_5fppm_2',['write_ppm',['../structscimesh_1_1Image.html#a2abc715b041120a98dd28d138405a284',1,'scimesh::Image']]],
-  ['write_5fstl_3',['write_stl',['../namespacescimesh_1_1stl__io.html#a02a08a7de9af5c95af5e3ce3b6186929',1,'scimesh::stl_io']]],
-  ['write_5fstl_5fascii_4',['write_stl_ascii',['../namespacescimesh_1_1stl__io.html#aa41b1a23b4f8cae5829e563d39c84019',1,'scimesh::stl_io']]],
-  ['write_5fstl_5fbinary_5',['write_stl_binary',['../namespacescimesh_1_1stl__io.html#a8459b31153dd4cf8886312c92d2f76ad',1,'scimesh::stl_io']]],
-  ['write_5ftga_6',['write_tga',['../structscimesh_1_1Image.html#a1f6dfc1dbb5bd5b756cdfa3c671a9c25',1,'scimesh::Image']]]
+  ['transform_0',['transform',['../structscimesh_1_1Scene.html#a70eda1478dbbd76387ebc90c83881bb1',1,'scimesh::Scene']]],
+  ['transform_5fdirection_1',['transform_direction',['../namespacescimesh.html#a505d90614924a937a4e94183bc89a765',1,'scimesh']]],
+  ['transform_5fmesh_2',['transform_mesh',['../namespacescimesh.html#aba0a8bcaee3d93143864d2e39a5badba',1,'scimesh']]],
+  ['transform_5fpoint_3',['transform_point',['../namespacescimesh.html#a997efb19d4db723b7005fb2827115deb',1,'scimesh']]],
+  ['transform_5fpoint_5fhomogeneous_4',['transform_point_homogeneous',['../namespacescimesh.html#af80a35fe48d81dbfa525da3ddfc6b7b2',1,'scimesh']]],
+  ['translate_5fmesh_5',['translate_mesh',['../namespacescimesh.html#ac99d9fe7e0e7d2104e352d00125db005',1,'scimesh']]]
 ];

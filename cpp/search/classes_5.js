@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['rasterizer_0',['Rasterizer',['../structscimesh_1_1Rasterizer.html',1,'scimesh']]],
-  ['renderer_1',['Renderer',['../classscimesh_1_1Renderer.html',1,'scimesh']]],
-  ['renderoptions_2',['RenderOptions',['../structscimesh_1_1RenderOptions.html',1,'scimesh']]]
+  ['mesh_0',['Mesh',['../structscimesh_1_1Mesh.html',1,'scimesh']]],
+  ['multiapplycolormapresult_1',['MultiApplyColormapResult',['../structscimesh_1_1MultiApplyColormapResult.html',1,'scimesh']]]
 ];

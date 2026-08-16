@@ -1,17 +1,37 @@
 <map id="src/core/scimesh/math_utils.h" name="src/core/scimesh/math_utils.h">
-<area shape="rect" id="Node000001" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="286,5,455,45"/>
+<area shape="rect" id="Node000001" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="439,5,609,45"/>
 <area shape="rect" id="Node000002" href="$primitives_8cpp.html" title=" " alt="" coords="5,167,176,192"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,38,212,46,152,58,102,75,84,84,72,95,65,112,67,130,84,165,80,167,62,132,60,111,67,92,81,80,100,70,151,53,211,41,272,33"/>
-<area shape="rect" id="Node000003" href="$rasterizer_8cpp.html" title=" " alt="" coords="81,93,247,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="309,53,195,96,194,91,307,48"/>
-<area shape="rect" id="Node000004" href="$renderer_8cpp.html" title=" " alt="" coords="429,167,587,192"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="433,50,461,68,485,92,496,110,503,131,510,166,505,167,498,132,491,113,481,95,457,72,430,54"/>
-<area shape="rect" id="Node000005" href="$normals_8h.html" title="Compute per&#45;vertex surface normals for lighting." alt="" coords="271,93,471,119"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="373,59,373,93,368,93,368,59"/>
-<area shape="rect" id="Node000007" href="$transforms_8cpp.html" title=" " alt="" coords="546,93,721,119"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="448,47,596,91,594,96,446,52"/>
-<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="313,125,137,169,135,164,312,119"/>
-<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="406,122,487,164,484,169,403,127"/>
-<area shape="rect" id="Node000006" href="$normals_8cpp.html" title=" " alt="" coords="247,167,404,192"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="358,132,335,168,330,165,354,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="426,33,339,40,248,52,168,70,138,82,116,95,104,111,97,130,93,166,88,166,92,129,100,109,113,91,135,77,167,65,247,47,339,35,426,28"/>
+<area shape="rect" id="Node000003" href="$rasterizer_8cpp.html" title=" " alt="" coords="127,93,292,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="436,51,256,96,255,91,435,46"/>
+<area shape="rect" id="Node000004" href="$renderer_8cpp.html" title=" " alt="" coords="499,416,658,441"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="623,29,769,43,851,54,930,69,1001,88,1059,112,1082,126,1099,142,1109,159,1113,178,1113,261,1114,321,1107,346,1087,370,1064,381,1025,390,911,406,658,426,658,420,910,400,1024,385,1063,375,1084,366,1102,343,1109,320,1108,261,1108,178,1105,161,1094,145,1078,131,1057,117,999,94,929,74,850,59,769,48,622,34"/>
+<area shape="rect" id="Node000005" href="$normals_8h.html" title="Compute per&#45;vertex surface normals for lighting." alt="" coords="316,93,516,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="488,56,434,95,431,91,485,51"/>
+<area shape="rect" id="Node000007" href="$scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="541,93,726,119"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="563,51,618,91,615,95,560,56"/>
+<area shape="rect" id="Node000014" href="$transforms_8cpp.html" title=" " alt="" coords="1149,93,1323,119"/>
+<area shape="poly" id="edge21_Node000001_Node000014" title=" " alt="" coords="623,35,1149,92,1148,98,622,40"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="351,124,144,169,143,164,350,119"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="305,124,274,135,251,149,239,168,238,178,241,191,266,236,299,276,339,311,382,341,469,386,541,413,539,418,466,391,379,345,335,315,296,280,262,239,236,193,233,179,234,166,247,145,272,130,304,119"/>
+<area shape="rect" id="Node000006" href="$normals_8cpp.html" title=" " alt="" coords="251,167,408,192"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="393,129,345,169,342,164,390,125"/>
+<area shape="rect" id="Node000008" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="571,167,767,192"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="648,130,666,165,661,168,643,132"/>
+<area shape="rect" id="Node000010" href="$gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="353,247,541,273"/>
+<area shape="poly" id="edge18_Node000007_Node000010" title=" " alt="" coords="609,130,560,169,462,249,459,245,557,165,606,125"/>
+<area shape="rect" id="Node000012" href="$renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="478,335,679,361"/>
+<area shape="poly" id="edge19_Node000007_Node000012" title=" " alt="" coords="592,126,443,187,376,219,342,242,334,261,337,277,347,292,365,304,418,323,478,335,477,340,416,328,363,309,344,296,332,279,329,260,338,238,373,214,441,182,590,121"/>
+<area shape="rect" id="Node000013" href="$to__string_8h.html" title=" " alt="" coords="925,328,1073,368"/>
+<area shape="poly" id="edge20_Node000007_Node000013" title=" " alt="" coords="740,110,811,122,886,146,923,162,957,183,987,208,1013,239,1022,261,1022,285,1010,329,1005,327,1017,285,1017,262,1008,241,983,212,953,187,920,167,884,151,810,127,739,115"/>
+<area shape="rect" id="Node000009" href="$camera_8cpp.html" title=" " alt="" coords="818,247,971,273"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="716,194,863,245,861,250,714,199"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="625,199,480,250,478,245,623,194"/>
+<area shape="rect" id="Node000011" href="$render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="617,240,794,280"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="683,203,699,239,694,241,678,205"/>
+<area shape="poly" id="edge16_Node000008_Node000012" title=" " alt="" coords="643,202,623,220,606,241,595,266,588,292,582,336,577,335,583,291,590,264,602,239,619,216,639,198"/>
+<area shape="poly" id="edge17_Node000008_Node000013" title=" " alt="" coords="782,185,843,193,902,203,953,218,972,227,986,238,999,259,1005,283,1005,328,999,328,1000,284,994,261,982,242,969,232,951,223,901,209,842,198,781,191"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="668,290,597,337,594,333,665,286"/>
+<area shape="poly" id="edge15_Node000011_Node000013" title=" " alt="" coords="783,281,935,325,934,331,782,286"/>
+<area shape="poly" id="edge14_Node000012_Node000004" title=" " alt="" coords="581,374,581,416,576,416,576,374"/>
 </map>

@@ -211,7 +211,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>All settings that control rendering output. </p>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md11"></a>
 Quick start</h2>
 <p>The defaults produce a reasonable result for most cases: </p><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> opts;  <span class="comment">// all defaults</span></div>
 <div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a533958c458a0c8f7796d66716ace8976">width</a>  = 1920;</div>
@@ -219,7 +219,7 @@ Quick start</h2>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html">scimesh::RenderOptions</a></div><div class="ttdoc">All settings that control rendering output.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00074">render_options.h:74</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a4a26a61872a3a587bd0bf5d4d1478579"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a4a26a61872a3a587bd0bf5d4d1478579">scimesh::RenderOptions::height</a></div><div class="ttdeci">int height</div><div class="ttdoc">Image height in pixels (default: 600).</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00082">render_options.h:82</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a533958c458a0c8f7796d66716ace8976"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a533958c458a0c8f7796d66716ace8976">scimesh::RenderOptions::width</a></div><div class="ttdeci">int width</div><div class="ttdoc">Image width in pixels (default: 800).</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00079">render_options.h:79</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md10"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md12"></a>
 Adding lights</h2>
 <div class="fragment"><div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">lights</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0,0,1), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,1,1), 1.0f, <span class="keyword">true</span>});</div>
 <div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a3430cffbbd9b8633a60a0dd672b28877">ambient</a> = 0.4f;  <span class="comment">// brighter ambient light</span></div>
@@ -228,11 +228,11 @@ Adding lights</h2>
 <div class="ttc" id="astructscimesh_1_1Light_html"><div class="ttname"><a href="structscimesh_1_1Light.html">scimesh::Light</a></div><div class="ttdoc">A light source for the Blinn-Phong shading model.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00179">types.h:179</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a02344509b41c4ade2809002b4a9129c9"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">scimesh::RenderOptions::lights</a></div><div class="ttdeci">std::vector&lt; Light &gt; lights</div><div class="ttdoc">List of light sources.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00188">render_options.h:188</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a3430cffbbd9b8633a60a0dd672b28877"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a3430cffbbd9b8633a60a0dd672b28877">scimesh::RenderOptions::ambient</a></div><div class="ttdeci">float ambient</div><div class="ttdoc">Ambient light level (default: 0.3).</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00195">render_options.h:195</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md11"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md13"></a>
 Anti-aliasing</h2>
 <div class="fragment"><div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a9bc5a63be7c691b04b608988878ba846">aa_samples</a> = 4;  <span class="comment">// 4× supersampling for smooth edges</span></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a9bc5a63be7c691b04b608988878ba846"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a9bc5a63be7c691b04b608988878ba846">scimesh::RenderOptions::aa_samples</a></div><div class="ttdeci">int aa_samples</div><div class="ttdoc">Anti-aliasing sample count (default: 1 = no AA).</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00151">render_options.h:151</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md12"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md14"></a>
 Wireframe overlay</h2>
 <div class="fragment"><div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a9f971fb2a57d1e111bd3b8915d23e4dd">wireframe</a> = <span class="keyword">true</span>;</div>
 <div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a50a676a3602481d76606059565938cab">wireframe_color</a> = <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(0,0,0);  <span class="comment">// black edges</span></div>

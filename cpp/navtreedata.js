@@ -25,30 +25,30 @@
 var NAVTREE =
 [
   [ "scimesh", "index.html", [
-    [ "Visualization Examples", "index.html#autotoc_md20", null ],
-    [ "What scimesh is", "index.html#autotoc_md21", null ],
-    [ "Features", "index.html#autotoc_md22", [
-      [ "C++ layer", "index.html#autotoc_md23", null ],
-      [ "R Layer", "index.html#autotoc_md24", null ]
+    [ "Visualization Examples", "index.html#autotoc_md22", null ],
+    [ "What scimesh is", "index.html#autotoc_md23", null ],
+    [ "Features", "index.html#autotoc_md24", [
+      [ "C++ layer", "index.html#autotoc_md25", null ],
+      [ "R Layer", "index.html#autotoc_md26", null ]
     ] ],
-    [ "What scimesh is not", "index.html#autotoc_md25", null ],
-    [ "Installation", "index.html#autotoc_md26", [
-      [ "R package", "index.html#autotoc_md27", null ],
-      [ "C++", "index.html#autotoc_md28", [
-        [ "Via CMake FetchContent (recommended)", "index.html#autotoc_md29", null ],
-        [ "Manually (header + source)", "index.html#autotoc_md30", null ]
+    [ "What scimesh is not", "index.html#autotoc_md27", null ],
+    [ "Installation", "index.html#autotoc_md28", [
+      [ "R package", "index.html#autotoc_md29", null ],
+      [ "C++", "index.html#autotoc_md30", [
+        [ "Via CMake FetchContent (recommended)", "index.html#autotoc_md31", null ],
+        [ "Manually (header + source)", "index.html#autotoc_md32", null ]
       ] ]
     ] ],
-    [ "Quick Start", "index.html#autotoc_md31", [
-      [ "R", "index.html#autotoc_md32", null ],
-      [ "C++", "index.html#autotoc_md33", null ]
+    [ "Quick Start", "index.html#autotoc_md33", [
+      [ "R", "index.html#autotoc_md34", null ],
+      [ "C++", "index.html#autotoc_md35", null ]
     ] ],
-    [ "Documentation", "index.html#autotoc_md34", [
-      [ "Direct Links to Example Program Source Code", "index.html#autotoc_md35", null ]
+    [ "Documentation", "index.html#autotoc_md36", [
+      [ "Direct Links to Example Program Source Code", "index.html#autotoc_md37", null ]
     ] ],
-    [ "Acknowledgements", "index.html#autotoc_md36", null ],
-    [ "Developer Information", "index.html#autotoc_md37", null ],
-    [ "License and Author", "index.html#autotoc_md38", null ],
+    [ "Acknowledgements", "index.html#autotoc_md38", null ],
+    [ "Developer Information", "index.html#autotoc_md39", null ],
+    [ "License and Author", "index.html#autotoc_md40", null ],
     [ "Getting Started with scimesh C++", "cpp_getting_started.html", null ],
     [ "scimesh Development Information", "md_README__DEVELOPMENT.html", null ],
     [ "Namespaces", "namespaces.html", [
@@ -84,8 +84,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"ply__io_8h.html",
-"structscimesh_1_1MultiApplyColormapResult.html#adab5acd3634c474b09d12c0a9e95d78a"
+"namespacescimesh_1_1gltf__io_1_1detail.html#ad19181a3152fe554d66a89b60adc60f3",
+"structscimesh_1_1Mesh.html#aa24db6634133100357bdbdb7ddac2a6f",
+"transforms_8h.html#aa87b98fab9bce771e51225c1a196d25e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

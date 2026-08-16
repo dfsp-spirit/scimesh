@@ -96,22 +96,22 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p><a class="anchor" id="md_README"></a> Scimesh is a 3D renderer built for scientific mesh visualization, delivering publication-quality imagery entirely on the CPU.</p>
 <p>Scientific compute environments are often constrained by the absence of graphical interfaces, specialized hardware, or complex driver stacks. Scimesh eliminates these bottlenecks by providing a zero-dependency, headless rendering pipeline—no OpenGL, no X11, and no GPU drivers required. Whether you are running complex visualization scripts on HPC clusters, inside isolated containers, or even on a modern macOS laptop where missing support for X11 makes traditional tools like rgl a challenge, Scimesh works reliably wherever your C++17 or R code runs.</p>
 <p><a href="https://doi.org/10.5281/zenodo.21374840"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21374840.svg" alt="DOI" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/dfsp-spirit/scimesh/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/dfsp-spirit/scimesh/actions"><img src="https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_cpp.yml/badge.svg?branch=main" alt="tests_cpp" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/dfsp-spirit/scimesh/actions"><img src="https://github.com/dfsp-spirit/scimesh/actions/workflows/tests_R.yml/badge.svg?branch=main" alt="tests_R" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/dfsp-spirit/scimesh/actions"><img src="https://github.com/dfsp-spirit/scimesh/actions/workflows/docs.yml/badge.svg?branch=main" alt="docs" style="pointer-events: none;" class="inline"/></a></p>
-<h1><a class="anchor" id="autotoc_md20"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 Visualization Examples</h1>
 <p><img src="web/images/dragon.png" alt="Stanford Dragon rendered with scimesh" class="inline"/></p>
 <p><em>The <a href="https://graphics.stanford.edu/data/3Dscanrep/">Stanford Dragon</a> (871k triangles), rendered with scimesh's software rasterizer using smooth shading, three-point Blinn-Phong lighting, and 4x anti-aliasing. Render time 5.2 seconds on the author's mini PC (AMD Ryzen 7 8745H CPU). Source code: <a href="examples/R/dragon/run.R">R</a> | <a href="examples/cpp/dragon/main.cpp">C++</a></em></p>
 <p><img src="web/images/whole_brain_sulc.png" alt="FreeSurfer reconstruction of human brain rendered with scimesh" class="inline"/></p>
 <p><em>A FreeSurfer reconstruction of a human brain surface based on an MRI scan (300k triangles), rendered with scimesh's software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seconds on the author's mini PC. Source code: <a href="examples/R/whole_brain_sulc/run.R">R</a> | <a href="examples/cpp/whole_brain_sulc/main.cpp">C++</a></em></p>
-<h1><a class="anchor" id="autotoc_md21"></a>
+<h1><a class="anchor" id="autotoc_md23"></a>
 What scimesh is</h1>
 <ul>
 <li>A <b>headless software renderer</b> — renders 3D triangle meshes to images without any GPU or display server. This means you could use scimesh for non-interactive rendering when rgl/OpenGL is unavailable.</li>
 <li>Designed for <b>scientific mesh visualization</b> (neuroimaging, molecular structures, geometric primitives).</li>
 <li><b>Beautiful</b> enough for publication figures, and still <b>fast</b> enough for batch processing on headless servers: all rendering is done in optimized C++, optionally with OpenMP parallelization.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md22"></a>
+<h1><a class="anchor" id="autotoc_md24"></a>
 Features</h1>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 C++ layer</h2>
 <ul>
 <li>Software rasterization with z-buffer, smooth and flat shading</li>
@@ -132,7 +132,7 @@ C++ layer</h2>
 <li>Basic mesh transform utilities: translate, scale, rotate, arbitrary 4x4 matrices</li>
 <li>Basic image composition: cropping, stacking</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 R Layer</h2>
 <p>The R layer gives access to all C++ layer features, and adds on top:</p>
 <ul>
@@ -141,7 +141,7 @@ R Layer</h2>
 <li>Colorbars (combine with your main plot with image composition!)</li>
 </ul>
 <p>If you need colorbars in C++, have a look at <a href="https://github.com/dfsp-spirit/scibar">scibar</a>.</p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md27"></a>
 What scimesh is not</h1>
 <ul>
 <li>Not a plotting framework — use ggplot2, lattice, or plotly for statistical plots. scimesh renders 3D geometry.</li>
@@ -149,18 +149,18 @@ What scimesh is not</h1>
 <li>Not a system for physical based rendering — no PBR materials, no raytracing, etc.</li>
 <li>Not a mesh editing/manipulation framework — it reads, transforms, and renders meshes but does not provide interactive editing, mesh repair, remeshing, or boolean operations. For mesh repair and remeshing in R, see the <a href="https://cran.r-project.org/package=Rvcg">Rvcg</a> package (wraps VCGLib).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md26"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 Installation</h1>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md29"></a>
 R package</h2>
 <div class="fragment"><div class="line"># Install from GitHub</div>
 <div class="line">remotes::install_github(&quot;dfsp-spirit/scimesh&quot;)</div>
 <div class="line"> </div>
 <div class="line"># For FreeSurfer neuroimaging data</div>
 <div class="line">remotes::install_github(&quot;dfsp-spirit/freesurferformats&quot;)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md28"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md30"></a>
 C++</h2>
-<h3><a class="anchor" id="autotoc_md29"></a>
+<h3><a class="anchor" id="autotoc_md31"></a>
 Via CMake FetchContent (recommended)</h3>
 <div class="fragment"><div class="line">include(FetchContent)</div>
 <div class="line">FetchContent_Declare(</div>
@@ -173,12 +173,12 @@ Via CMake FetchContent (recommended)</h3>
 <div class="line">add_executable(my_app main.cpp)</div>
 <div class="line">target_link_libraries(my_app PRIVATE scimesh)</div>
 </div><!-- fragment --><p>That's it — no manual source listing, include paths, or preprocessor defines needed.</p>
-<h3><a class="anchor" id="autotoc_md30"></a>
+<h3><a class="anchor" id="autotoc_md32"></a>
 Manually (header + source)</h3>
 <p>The C++ core lives in <code>src/core/</code>. To use scimesh in a C++ project without CMake, add the source files and include paths to your build system. See `docs/CPP_GETTING_STARTED.md` for details.</p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md33"></a>
 Quick Start</h1>
-<h2><a class="anchor" id="autotoc_md32"></a>
+<h2><a class="anchor" id="autotoc_md34"></a>
 R</h2>
 <div class="fragment"><div class="line">library(scimesh)</div>
 <div class="line"> </div>
@@ -206,9 +206,9 @@ R</h2>
 <div class="line"># Side-by-side</div>
 <div class="line">img &lt;- stack_horizontal(img_shaded, img_wire)</div>
 <div class="line">write_png(img, &quot;sphere.png&quot;)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md33"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md35"></a>
 C++</h2>
-<h1><a class="anchor" id="autotoc_md34"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
 Documentation</h1>
 <ul>
 <li><b>R vignette</b>: <code>vignettes/scimesh.Rmd</code> — comprehensive guide to the R package with examples for all major features.</li>
@@ -221,7 +221,7 @@ Documentation</h1>
 <li><b>C++ API Documentation</b>: <a href="https://dfsp-spirit.github.io/scimesh/cpp">dfsp-spirit.github.io/scimesh/cpp</a></li>
 <li><b>Tests:</b> Some of the <a href="./cpp_tests/">unit tests for cpp</a> and <a href="(./tests/testthat/)">for R</a> that come with this package are essentially examples that illustrate how to use the functions.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md35"></a>
+<h2><a class="anchor" id="autotoc_md37"></a>
 Direct Links to Example Program Source Code</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -261,25 +261,24 @@ Direct Links to Example Program Source Code</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="examples/cpp/full_CLI_renderer/"><code>examples/cpp/full_CLI_renderer/</code></a>   </td><td class="markdownTableBodyNone">C++   </td><td class="markdownTableBodyNone">Self-contained CLI renderer with TOML config + CLI overrides   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Acknowledgements</h1>
 <p>Thanks heaps to the authors of these great software packages that scimesh is built upon:</p>
 <ul>
 <li><code>cpp_tests/catch_amalgamated.{h,cpp}</code>: <a href="https://github.com/catchorg/Catch2/tree/devel/extras">catchorg/Catch2</a> — C++ test framework by Martin Hořeňovský</li>
 <li><code>src/third_party/glm/</code>: <a href="https://github.com/g-truc/glm">g-truc/glm</a> — header-only C++ math library.</li>
 <li><code>src/third_party/tinyply.{h,cpp}</code>: <a href="https://github.com/ddiakopoulos/tinyply">ddiakopoulos/tinyply</a> — PLY file reader by Dimitri Diakopoulos</li>
-<li><code>src/third_party/tiny_obj_loader.h</code>: <a href="https://github.com/tinyobjloader/tinyobjloader">tinyobjloader/tinyobjloader</a> — Wavefront OBJ by Syoyo Fujita</li>
-<li><code>src/third_party/libfs.h</code>: <a href="https://github.com/dfsp-spirit/libfs">dfsp-spirit/libfs</a> — FreeSurfer file format reader by Tim Schäfer</li>
+<li><code>src/third_party/libfs.h</code>: <a href="https://github.com/dfsp-spirit/libfs">dfsp-spirit/libfs</a> — FreeSurfer file format reader + OBJ mesh loader by Tim Schäfer</li>
 <li><code>src/third_party/stl_reader.h</code>: <a href="https://github.com/sreiter/stl_reader">sreiter/stl_reader</a> — STL file reader, maintained by Sebastian Reiter</li>
 <li><code>src/third_party/stb_image.h</code>, <code>src/third_party/stb_image_write.h</code>: <a href="https://github.com/nothings/stb">nothings/stb</a> — image loading/saving, maintained by Sean Barrett</li>
 </ul>
 <p>And of course, thanks to the authors of the dependencies of these packages, and their dependencies...</p>
 <p>Detailed information on the licenses for all these packages (all MIT-compatible) can be found in the file THIRD_PARTY_LICENSES.md.</p>
 <p><em>Note: This section is to give credit only. Users do <b>not</b> need to worry about installing these dependencies, they come vendored with scimesh already.</em></p>
-<h1><a class="anchor" id="autotoc_md37"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 Developer Information</h1>
 <p>Please refer to <a class="el" href="md_README__DEVELOPMENT.html">README_DEVELOPMENT.md</a>.</p>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 License and Author</h1>
 <p>License: <a href="./LICENSE">MIT</a></p>
 <p>Author: <a href="https://ts.rcmd.org/">Tim Schäfer</a> </p>

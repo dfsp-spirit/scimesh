@@ -4,6 +4,7 @@ var dir_d671df59d79ac4b20c1afedf3349acfe =
     [ "clipping.h", "clipping_8h.html", "clipping_8h" ],
     [ "colormap.h", "colormap_8h.html", "colormap_8h" ],
     [ "fs_mesh_converter.h", "fs__mesh__converter_8h.html", "fs__mesh__converter_8h" ],
+    [ "gltf_io.h", "gltf__io_8h.html", "gltf__io_8h" ],
     [ "image.h", "image_8h.html", "image_8h" ],
     [ "math_utils.h", "math__utils_8h.html", "math__utils_8h" ],
     [ "mesh.h", "mesh_8h.html", "mesh_8h" ],

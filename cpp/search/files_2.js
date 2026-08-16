@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['image_2ecpp_0',['image.cpp',['../image_8cpp.html',1,'']]],
-  ['image_2eh_1',['image.h',['../image_8h.html',1,'']]]
+  ['gltf_5fio_2eh_0',['gltf_io.h',['../gltf__io_8h.html',1,'']]]
 ];

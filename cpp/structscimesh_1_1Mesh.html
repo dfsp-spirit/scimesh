@@ -177,7 +177,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A 3D triangle mesh using an indexed face set representation. </p>
-<h2><a class="anchor" id="autotoc_md5"></a>
+<h2><a class="anchor" id="autotoc_md7"></a>
 Overview</h2>
 <p>The <code><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a></code> is the heart of scimesh. It holds:</p><ul>
 <li><b>vertices</b> — 3D positions (required)</li>
@@ -189,7 +189,7 @@ Overview</h2>
 <li><b>texture</b> — an <a class="el" href="structscimesh_1_1Image.html" title="A 2D RGBA image buffer.">Image</a> used as a texture map (optional)</li>
 </ul>
 <p>The mesh uses an <b>indexed face set</b>. This means vertices are stored exactly once, and triangles store <em>indices</em> into the vertex array. This saves memory when vertices are shared by multiple triangles.</p>
-<h2><a class="anchor" id="autotoc_md6"></a>
+<h2><a class="anchor" id="autotoc_md8"></a>
 Construction</h2>
 <p>There is no special constructor — create an empty mesh and populate it:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> m;</div>
@@ -204,9 +204,9 @@ Construction</h2>
 <div class="ttc" id="anamespacescimesh_html_a49edd254b732a0233b1fe91aabb21289"><div class="ttname"><a href="namespacescimesh.html#a49edd254b732a0233b1fe91aabb21289">scimesh::generate_sphere</a></div><div class="ttdeci">Mesh generate_sphere(const Vec3 &amp;center, float radius, int segments, const Color &amp;color)</div><div class="ttdoc">Generate a UV-sphere (latitude/longitude tessellation).</div><div class="ttdef"><b>Definition</b> <a href="primitives_8cpp_source.html#l00020">primitives.cpp:20</a></div></div>
 </div><!-- fragment --><p>Or load from a file: </p><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> brain = <a class="code hl_function" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a>(<span class="stringliteral">&quot;/data/brain.obj&quot;</span>);</div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> skull = <a class="code hl_function" href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a>(<span class="stringliteral">&quot;/data/skull.ply&quot;</span>);</div>
-<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00013">obj_io.cpp:13</a></div></div>
+<div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00008">obj_io.cpp:8</a></div></div>
 <div class="ttc" id="anamespacescimesh_1_1ply__io_html_aec1f211605b2f399e3e66d7711918711"><div class="ttname"><a href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a></div><div class="ttdeci">Mesh read_ply(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Stanford PLY file.</div><div class="ttdef"><b>Definition</b> <a href="ply__io_8cpp_source.html#l00012">ply_io.cpp:12</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md7"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md9"></a>
 Validation</h2>
 <p>Call <code><a class="el" href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb" title="Check whether the mesh is in a valid, renderable state.">is_valid()</a></code> before rendering to detect common problems:</p><ul>
 <li>missing vertices or triangles</li>
@@ -271,7 +271,7 @@ read_obj(), read_ply(), read_stl() </dd>
 <div class="line"><a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> size   = bmax - bmin;             <span class="comment">// dimensions</span></div>
 <div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
 </div><!-- fragment --></dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693" title="Compute the combined axis-aligned bounding box of all meshes.">Scene::compute_bounding_box()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Scene.html#a4132aca3c00181782914281fae10c693" title="Compute the combined axis-aligned bounding box of all meshes, after applying each mesh&#39;s placement tr...">Scene::compute_bounding_box()</a> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mesh_8h_source.html#l00289">289</a> of file <a class="el" href="mesh_8h_source.html">mesh.h</a>.</p>
 

@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['max_5fortho_5fextent_0',['max_ortho_extent',['../namespacescimesh.html#ac4e4507b948196dc8a7686ef68a5c96b',1,'scimesh']]],
-  ['merge_1',['merge',['../structscimesh_1_1Image.html#ab4a8769f0d60553095c9c6ddca6dcabc',1,'scimesh::Image']]],
-  ['merge_5fmesh_2',['merge_mesh',['../namespacescimesh.html#a5ef13b6953ece9851682b24f98d56720',1,'scimesh']]],
-  ['mesh_5ffrom_5ffs_3',['mesh_from_fs',['../namespacescimesh.html#ab985c7b1e6ccf77ae9f48406a7f887f8',1,'scimesh']]]
+  ['image_0',['image',['../structscimesh_1_1Image.html#a47cdd689418e98a37543cd4437412cd5',1,'scimesh::Image::Image()=default'],['../structscimesh_1_1Image.html#ab76ec938f3252f658f20a0c6b3c85d05',1,'scimesh::Image::Image(int w, int h)']]],
+  ['is_5fvalid_1',['is_valid',['../structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb',1,'scimesh::Mesh']]]
 ];

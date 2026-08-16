@@ -1,42 +1,49 @@
 <map id="src/core/camera.cpp" name="src/core/camera.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="891,5,1044,31"/>
-<area shape="rect" id="Node000002" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="610,79,751,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="922,33,741,78,740,73,921,28"/>
-<area shape="rect" id="Node000014" title=" " alt="" coords="807,299,869,324"/>
-<area shape="poly" id="edge22_Node000001_Node000014" title=" " alt="" coords="919,33,881,51,863,64,850,80,837,105,828,132,822,189,826,242,834,284,829,285,821,243,817,189,823,131,832,103,845,77,860,60,878,46,917,28"/>
-<area shape="rect" id="Node000015" title=" " alt="" coords="859,79,1076,104"/>
-<area shape="poly" id="edge20_Node000001_Node000015" title=" " alt="" coords="970,31,970,65,965,65,965,31"/>
-<area shape="rect" id="Node000016" title=" " alt="" coords="1100,79,1267,104"/>
-<area shape="poly" id="edge21_Node000001_Node000016" title=" " alt="" coords="1003,28,1136,72,1135,77,1001,33"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="1291,79,1377,104"/>
-<area shape="poly" id="edge23_Node000001_Node000017" title=" " alt="" coords="1029,28,1278,76,1277,81,1028,33"/>
-<area shape="rect" id="Node000003" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="449,372,577,397"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="662,106,633,126,605,154,573,207,548,264,531,317,520,359,515,358,526,316,543,262,568,204,601,150,629,122,659,102"/>
-<area shape="rect" id="Node000011" href="$scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="615,152,746,177"/>
-<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="683,104,683,138,678,138,678,104"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="159,445,269,471"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="465,400,276,445,275,439,464,395"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="293,445,404,471"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="487,400,389,442,387,437,485,395"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="428,445,539,471"/>
-<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="510,399,496,434,491,432,505,397"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="5,445,135,471"/>
-<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="449,399,148,447,148,442,448,394"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="737,445,800,471"/>
-<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="555,395,725,442,723,447,553,400"/>
-<area shape="rect" id="Node000009" title=" " alt="" coords="646,445,713,471"/>
-<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="540,395,641,437,639,442,538,400"/>
-<area shape="rect" id="Node000010" title=" " alt="" coords="563,445,622,471"/>
-<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="527,395,571,434,568,438,524,399"/>
-<area shape="rect" id="Node000012" href="$mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="617,225,745,251"/>
-<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="683,178,683,212,678,212,678,178"/>
-<area shape="poly" id="edge12_Node000012_Node000003" title=" " alt="" coords="660,253,625,274,588,301,557,332,531,362,527,359,553,328,584,297,622,269,657,249"/>
-<area shape="poly" id="edge18_Node000012_Node000008" title=" " alt="" coords="700,249,724,269,746,297,760,332,768,369,772,432,767,432,762,369,754,334,741,300,720,273,696,253"/>
-<area shape="rect" id="Node000013" href="$image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="598,299,731,324"/>
-<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="681,252,673,286,668,285,675,250"/>
-<area shape="poly" id="edge19_Node000012_Node000014" title=" " alt="" coords="707,248,801,291,799,295,705,253"/>
-<area shape="poly" id="edge14_Node000013_Node000003" title=" " alt="" coords="641,326,551,369,549,364,639,322"/>
-<area shape="poly" id="edge15_Node000013_Node000008" title=" " alt="" coords="675,323,755,433,750,436,671,326"/>
-<area shape="poly" id="edge16_Node000013_Node000009" title=" " alt="" coords="669,324,679,431,674,432,663,325"/>
-<area shape="poly" id="edge17_Node000013_Node000010" title=" " alt="" coords="661,326,607,434,602,432,656,323"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="720,5,873,31"/>
+<area shape="rect" id="Node000002" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="451,79,593,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="753,33,580,78,579,73,752,28"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="83,299,145,324"/>
+<area shape="poly" id="edge27_Node000001_Node000014" title=" " alt="" coords="720,28,587,45,513,61,440,81,354,109,287,134,227,169,160,227,139,256,124,287,120,285,134,254,156,224,224,164,285,129,352,104,439,76,512,55,587,40,719,22"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="589,299,807,324"/>
+<area shape="poly" id="edge25_Node000001_Node000016" title=" " alt="" coords="795,32,709,286,704,285,790,30"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="835,79,1001,104"/>
+<area shape="poly" id="edge26_Node000001_Node000018" title=" " alt="" coords="818,28,888,69,885,74,815,33"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1025,79,1112,104"/>
+<area shape="poly" id="edge28_Node000001_Node000019" title=" " alt="" coords="841,28,1013,73,1011,78,840,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="271,372,399,397"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="452,101,356,117,301,132,246,152,193,178,144,211,103,251,72,300,68,312,72,322,83,332,100,341,147,356,202,366,258,374,257,379,202,372,146,361,98,346,80,336,68,326,63,312,68,298,99,248,141,206,190,173,244,147,300,127,354,112,451,96"/>
+<area shape="rect" id="Node000011" href="$scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="457,152,587,177"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="525,104,525,138,519,138,519,104"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="515,445,625,471"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="374,395,520,439,518,444,372,400"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="92,445,203,471"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="306,400,192,443,190,438,304,395"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="227,445,337,471"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="329,399,301,436,297,433,324,396"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="361,445,491,471"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="352,395,402,434,399,439,348,399"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,445,68,471"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="285,400,82,448,81,442,284,395"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="650,445,717,471"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="399,395,637,442,636,448,398,400"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="741,445,799,471"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="400,391,546,410,727,443,726,448,545,416,399,396"/>
+<area shape="poly" id="edge24_Node000011_Node000010" title=" " alt="" coords="588,172,647,186,712,210,744,226,773,246,800,269,822,297,830,315,832,334,826,371,809,407,790,436,786,433,805,404,821,370,827,333,824,316,817,300,796,273,770,250,741,231,710,214,646,191,587,177"/>
+<area shape="rect" id="Node000012" href="$mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="170,225,298,251"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="476,180,294,225,293,219,475,175"/>
+<area shape="rect" id="Node000015" href="$math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="441,225,603,251"/>
+<area shape="poly" id="edge20_Node000011_Node000015" title=" " alt="" coords="525,178,525,212,519,212,519,178"/>
+<area shape="poly" id="edge12_Node000012_Node000003" title=" " alt="" coords="239,250,249,284,268,323,287,344,308,362,305,366,283,348,264,325,244,286,234,252"/>
+<area shape="poly" id="edge18_Node000012_Node000008" title=" " alt="" coords="225,253,59,436,55,433,221,249"/>
+<area shape="rect" id="Node000013" href="$image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="322,299,455,324"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="260,248,352,290,350,295,258,253"/>
+<area shape="poly" id="edge19_Node000012_Node000014" title=" " alt="" coords="216,253,147,294,144,289,213,248"/>
+<area shape="poly" id="edge14_Node000013_Node000003" title=" " alt="" coords="382,326,354,363,350,360,378,323"/>
+<area shape="poly" id="edge15_Node000013_Node000008" title=" " alt="" coords="365,326,203,400,82,444,80,439,201,395,363,322"/>
+<area shape="poly" id="edge16_Node000013_Node000009" title=" " alt="" coords="413,322,649,437,647,442,411,327"/>
+<area shape="poly" id="edge17_Node000013_Node000010" title=" " alt="" coords="423,322,555,370,730,438,728,443,553,374,421,327"/>
+<area shape="poly" id="edge21_Node000015_Node000003" title=" " alt="" coords="447,253,365,273,332,286,312,300,307,314,307,329,321,359,316,362,302,330,301,313,308,297,330,281,363,268,446,248"/>
+<area shape="poly" id="edge22_Node000015_Node000016" title=" " alt="" coords="551,248,657,291,655,296,549,253"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="479,299,565,324"/>
+<area shape="poly" id="edge23_Node000015_Node000017" title=" " alt="" coords="525,251,525,285,519,285,519,251"/>
 </map>
