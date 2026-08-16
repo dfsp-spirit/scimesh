@@ -7,18 +7,21 @@ mesh (with `vb`/`it`); rgl meshes are transparently converted.
 ## Usage
 
 ``` r
-render_scene(meshes, camera, options = render_options())
+render_scene(meshes, camera = NULL, options = NULL)
 ```
 
 ## Arguments
 
 - meshes:
 
-  A list of mesh descriptors. Each element is a list with components
-  `vertices` (Nx3 matrix), `triangles` (Mx3 integer matrix), and
-  optionally `colors`, `face_colors`, `normals`, and `default_color`.
-  Elements may also be rgl-style lists (with `vb` and `it`), which are
-  converted automatically.
+  Either a `scimesh_scene` object (see
+  [`scene()`](https://dfsp-spirit.github.io/scimesh/r/reference/scene.md)),
+  a list of mesh descriptors, or a list of scene nodes. Each mesh
+  descriptor is a list with components `vertices` (Nx3 matrix),
+  `triangles` (Mx3 integer matrix), and optionally `colors`,
+  `face_colors`, `normals`, and `default_color`. Elements may also be
+  rgl-style lists (with `vb` and `it`), which are converted
+  automatically.
 
 - camera:
 
@@ -26,10 +29,14 @@ render_scene(meshes, camera, options = render_options())
   [`camera()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera.md)
   or
   [`camera_auto()`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_auto.md).
+  Ignored (falls back to the scene's camera) when `meshes` is a
+  `scimesh_scene` and `camera` is `NULL`.
 
 - options:
 
   A render options list from
+  [`render_options()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_options.md).
+  Defaults to the scene's options (if any) or
   [`render_options()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_options.md).
 
 ## Value

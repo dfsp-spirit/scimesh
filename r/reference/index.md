@@ -88,6 +88,8 @@
   : Rotate a mesh around an axis
 - [`scale_mesh()`](https://dfsp-spirit.github.io/scimesh/r/reference/scale_mesh.md)
   : Scale a mesh uniformly or per-axis
+- [`scene()`](https://dfsp-spirit.github.io/scimesh/r/reference/scene.md)
+  : Create a scene descriptor
 - [`stack_horizontal()`](https://dfsp-spirit.github.io/scimesh/r/reference/stack_horizontal.md)
   : Stack images horizontally
 - [`stack_vertical()`](https://dfsp-spirit.github.io/scimesh/r/reference/stack_vertical.md)
@@ -98,6 +100,8 @@
   : Translate a mesh
 - [`viridis_colormap()`](https://dfsp-spirit.github.io/scimesh/r/reference/viridis_colormap.md)
   : Viridis colormap
+- [`write_gltf()`](https://dfsp-spirit.github.io/scimesh/r/reference/write_gltf.md)
+  : Write a scene or mesh list to a glTF file
 - [`write_png()`](https://dfsp-spirit.github.io/scimesh/r/reference/write_png.md)
   : Write a rendered image to a PNG file
 - [`write_stl()`](https://dfsp-spirit.github.io/scimesh/r/reference/write_stl.md)

@@ -34,5 +34,5 @@ mat <- diag(4)
 mat[1:3, 4] <- c(2, 3, 4)
 translated <- transform_mesh(mesh, mat)
 translated$vertices[1, ]
-#> [1] -1 -1  1
+#> [1] 1 2 5
 ```

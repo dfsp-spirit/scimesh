@@ -53,11 +53,13 @@
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/render_triangles.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/rotate_mesh.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/scale_mesh.html</loc></url>
+<url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/scene.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/stack_horizontal.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/stack_vertical.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/transform_mesh.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/translate_mesh.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/viridis_colormap.html</loc></url>
+<url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/write_gltf.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/write_png.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/write_stl.html</loc></url>
 <url><loc>https://dfsp-spirit.github.io/scimesh/r/reference/write_tga.html</loc></url>

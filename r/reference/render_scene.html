@@ -13,7 +13,7 @@ transparently converted."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@ transparently converted.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">render_scene</span><span class="op">(</span><span class="va">meshes</span>, <span class="va">camera</span>, options <span class="op">=</span> <span class="fu"><a href="render_options.html">render_options</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">render_scene</span><span class="op">(</span><span class="va">meshes</span>, camera <span class="op">=</span> <span class="cn">NULL</span>, options <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -56,20 +56,24 @@ transparently converted.</p>
 
 
 <dl><dt id="arg-meshes">meshes<a class="anchor" aria-label="anchor" href="#arg-meshes"></a></dt>
-<dd><p>A list of mesh descriptors. Each element is a list
-with components <code>vertices</code> (Nx3 matrix), <code>triangles</code>
-(Mx3 integer matrix), and optionally <code>colors</code>, <code>face_colors</code>,
-<code>normals</code>, and <code>default_color</code>.
-Elements may also be rgl-style lists (with <code>vb</code> and <code>it</code>),
-which are converted automatically.</p></dd>
+<dd><p>Either a <code>scimesh_scene</code> object (see
+<code><a href="scene.html">scene()</a></code>), a list of mesh descriptors, or a list of scene
+nodes.  Each mesh descriptor is a list with components
+<code>vertices</code> (Nx3 matrix), <code>triangles</code> (Mx3 integer matrix),
+and optionally <code>colors</code>, <code>face_colors</code>, <code>normals</code>, and
+<code>default_color</code>.  Elements may also be rgl-style lists (with
+<code>vb</code> and <code>it</code>), which are converted automatically.</p></dd>
 
 
 <dt id="arg-camera">camera<a class="anchor" aria-label="anchor" href="#arg-camera"></a></dt>
-<dd><p>A camera list from <code><a href="camera.html">camera()</a></code> or <code><a href="camera_auto.html">camera_auto()</a></code>.</p></dd>
+<dd><p>A camera list from <code><a href="camera.html">camera()</a></code> or <code><a href="camera_auto.html">camera_auto()</a></code>.
+Ignored (falls back to the scene's camera) when <code>meshes</code> is a
+<code>scimesh_scene</code> and <code>camera</code> is <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
-<dd><p>A render options list from <code><a href="render_options.html">render_options()</a></code>.</p></dd>
+<dd><p>A render options list from <code><a href="render_options.html">render_options()</a></code>.
+Defaults to the scene's options (if any) or <code><a href="render_options.html">render_options()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
