@@ -122,8 +122,7 @@ defines needed.
 
 The C++ core lives in `src/core/`.  To use scimesh in a C++ project
 without CMake, add the source files and include paths to your build
-system.  See [`docs/CPP_GETTING_STARTED.md`](docs/CPP_GETTING_STARTED.md)
-for details.
+system.  See [`CPP_GETTING_STARTED.md`](CPP_GETTING_STARTED.md) for details.
 
 ## Quick Start
 

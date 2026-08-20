@@ -765,9 +765,6 @@ cd examples/R
 bash run_all_R.sh
 ```
 
-For C++ examples, see `examples/cpp/` and
-[`docs/CPP_GETTING_STARTED.md`](https://github.com/dfsp-spirit/scimesh/blob/main/docs/CPP_GETTING_STARTED.md).
-
 
 ## FAQ
 

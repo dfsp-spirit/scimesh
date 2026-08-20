@@ -25,7 +25,7 @@ set -e
 #       └── third_party/
 #           └── glm/
 #
-# This mirrors the manual build described in docs/CPP_GETTING_STARTED.md:
+# This mirrors the manual build described in CPP_GETTING_STARTED.md:
 # the scimesh src/ directory sits as a sibling to the project and is
 # referenced via relative ".." paths from the build directory.
 
