@@ -31,13 +31,13 @@ Source:
 [`DESCRIPTION`](https://github.com/dfsp-spirit/scimesh/blob/main/DESCRIPTION)
 
 Schäfer T (2026). *scimesh: Headless Publication-Quality 3D Mesh
-Rendering Engine*. R package version 0.3.3,
+Rendering Engine*. R package version 0.3.4,
 <https://github.com/dfsp-spirit/scimesh>.
 
     @Manual{,
       title = {scimesh: Headless Publication-Quality 3D Mesh Rendering Engine},
       author = {Tim Schäfer},
       year = {2026},
-      note = {R package version 0.3.3},
+      note = {R package version 0.3.4},
       url = {https://github.com/dfsp-spirit/scimesh},
     }
