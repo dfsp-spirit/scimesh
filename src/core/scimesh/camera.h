@@ -246,8 +246,10 @@ Camera camera_look_at(const Vec3 &center, float radius,
 /// to show everything.
 ///
 /// @param scene       The scene to frame.
-/// @param direction   View direction (e.g., {0,0,1} for front view).
-/// @param up          Up vector (e.g., {0,1,0}).
+/// @param direction   Direction from the scene centre towards the camera, i.e.
+///                    the side you want to look from (e.g. {0,0,1} for a front
+///                    view, {-1,0,0} to look at the scene from its -x side).
+/// @param up          Up vector (e.g. {0,1,0}).
 /// @param fov_degrees Field of view in degrees.
 /// @param margin      Extra zoom margin (default 1.1 = 10% padding).
 /// @param projection  Projection type (default: PERSPECTIVE).

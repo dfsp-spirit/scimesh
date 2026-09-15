@@ -41,6 +41,7 @@ add_executable(scimesh_tests
     test_fog.cpp
     test_io.cpp
     test_transforms.cpp
+    test_transparency.cpp
     test_to_string.cpp
     test_render_features.cpp
     test_rasterizer.cpp

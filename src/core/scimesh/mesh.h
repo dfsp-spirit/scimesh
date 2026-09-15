@@ -161,8 +161,15 @@ struct Mesh {
 
     /// @brief Whether the mesh contains any transparent fragments.
     ///
-    /// When `true`, the rasterizer enables alpha blending.  Set this
-    /// manually if your mesh's colors have alpha < 1.0.
+    /// You normally do **not** have to set this yourself: `is_transparent()`
+    /// inspects `default_color`, `colors` and `face_colors` and is what the
+    /// renderer uses, so a mesh whose colors have alpha < 1.0 renders
+    /// translucent automatically (as do meshes loaded with such colors).
+    /// Setting this to `true` forces the alpha-blending pass for a mesh that is
+    /// not detected automatically (e.g. one whose transparency comes from an
+    /// RGBA texture: the texture alpha is applied per fragment).
+    ///
+    /// @see is_transparent(), update_transparency(), colors, face_colors
     bool has_transparency = false;
 
     /// @}
@@ -195,6 +202,46 @@ struct Mesh {
     /// @return `true` if `texture.width > 0`.
     /// @see texture, uvs
     bool has_texture() const { return texture.width > 0; }
+
+    /// @brief Do any of the mesh's colors have alpha < 1.0?
+    ///
+    /// Scans `default_color`, `colors` and `face_colors`.  This is a plain
+    /// query: it does not look at `has_transparency`.
+    ///
+    /// @return `true` if at least one color is not fully opaque.
+    /// @see is_transparent(), colors, face_colors, default_color
+    bool has_alpha() const {
+        const float threshold = 1.0f - 1e-6f;
+        if (default_color.a < threshold) return true;
+        for (const auto &c : colors) {
+            if (c.a < threshold) return true;
+        }
+        for (const auto &c : face_colors) {
+            if (c.a < threshold) return true;
+        }
+        return false;
+    }
+
+    /// @brief Does the mesh need the alpha-blending pass?
+    ///
+    /// True when `has_transparency` is set manually, or when any color (or
+    /// `default_color`) has alpha < 1.0.  The renderer asks this instead of
+    /// requiring you to keep `has_transparency` in sync, so per-vertex,
+    /// per-face and uniform transparency all work out of the box.
+    ///
+    /// @return `true` if the mesh contains translucent fragments.
+    /// @see has_alpha(), update_transparency(), has_transparency
+    bool is_transparent() const { return has_transparency || has_alpha(); }
+
+    /// @brief Recompute `has_transparency` from the mesh's colors.
+    ///
+    /// Sets the flag when `has_alpha()` reports translucent colors.  It never
+    /// clears the flag, so a manually requested blend pass survives.
+    ///
+    /// @see is_transparent(), has_alpha()
+    void update_transparency() {
+        if (has_alpha()) has_transparency = true;
+    }
 
     // ------------------------------------------------------------------
     //  Validation

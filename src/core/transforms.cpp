@@ -126,14 +126,7 @@ Mesh mesh_from_fs(const std::vector<float> &fs_vertices,
 
     // Transparent vertices (NaN per-vertex values with detect_transparency) need
     // the renderer's blended pass.
-    if (detect_transparency) {
-        for (const auto &c : out.colors) {
-            if (c.a < 1.0f - 1e-6f) {
-                out.has_transparency = true;
-                break;
-            }
-        }
-    }
+    out.update_transparency();
 
     return out;
 }

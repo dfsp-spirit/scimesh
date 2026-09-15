@@ -23,7 +23,9 @@ struct DeferredTri {
     Vec3   normal0, normal1, normal2;
     Vec2   uv0, uv1, uv2;
     bool   smooth;
-    float  view_z;  // centroid depth in view space, for back-to-front sort
+    /// Centroid depth in view space: the camera looks down -Z, so a *smaller*
+    /// (more negative) value is farther away.
+    float  view_z;
 };
 
 } // anonymous namespace
@@ -212,16 +214,16 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
 
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
 
-    bool scene_has_transparency = false;
-    for (const auto &nd : nodes) {
-        if (nd.mesh->has_transparency) { scene_has_transparency = true; break; }
-    }
-
     std::vector<DeferredTri> deferred;
 
     for (const auto &node : nodes) {
         const Mesh &mesh = *node.mesh;
         if (mesh.empty()) continue;
+
+        // Translucent meshes are deferred to the blended pass.  This is derived
+        // from the mesh's colors (and default_color), so callers no longer have
+        // to keep Mesh::has_transparency in sync by hand.
+        const bool mesh_transparent = mesh.is_transparent();
 
         // Placement transform for this mesh (model matrix in world space).
         const Mat4 &model = node.transform;
@@ -276,7 +278,7 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
             Vec2 uv1 = mesh.has_uvs() ? mesh.uvs[tri.v1] : Vec2(0, 0);
             Vec2 uv2 = mesh.has_uvs() ? mesh.uvs[tri.v2] : Vec2(0, 0);
 
-            bool tri_transparent = scene_has_transparency &&
+            bool tri_transparent = mesh_transparent &&
                 (c0.a < 1.0f - 1e-6f || c1.a < 1.0f - 1e-6f || c2.a < 1.0f - 1e-6f);
 
             ClipVertex cv0, cv1, cv2;
@@ -421,9 +423,14 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
     }
 
     if (!deferred.empty()) {
+        // Painter's algorithm: farthest triangle first, nearest last, so that
+        // nearer translucent surfaces are blended *over* the ones behind them.
+        // Ascending view-space z is farthest-to-nearest (the camera looks down
+        // -Z); sorting the other way round blends front-to-back and makes the
+        // nearest surface disappear behind the ones behind it.
         std::sort(deferred.begin(), deferred.end(),
                   [](const DeferredTri &a, const DeferredTri &b) {
-                      return a.view_z > b.view_z;
+                      return a.view_z < b.view_z;
                   });
 
         rasterizer.set_blend_mode(true);

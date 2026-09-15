@@ -78,6 +78,7 @@ inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh, const Color &solid_color) {
     for (size_t i = 0; i < nv; i++) {
         out.colors.push_back(solid_color);
     }
+    out.update_transparency();
     return out;
 }
 
@@ -109,6 +110,7 @@ inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh,
             rgb_colors[i * 3 + 2] / 255.0f,
             1.0f));
     }
+    out.update_transparency();
     return out;
 }
 
@@ -117,12 +119,19 @@ inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh,
 ///
 /// This is the most feature-rich converter.  Each vertex gets:
 /// - An RGB color from `rgb_colors` (3 bytes per vertex).
-/// - If `morph_data[i]` is NaN, the vertex is colored white (often used to
-///   mark the medial wall or "unknown" regions in brain surface data).
+/// - If `morph_data[i]` is NaN, the vertex is colored white with alpha
+///   `nan_alpha` (often used to mark the medial wall or "unknown" regions in
+///   brain surface data).
 ///
 /// @param fs_mesh    The FreeSurfer mesh to convert.
 /// @param morph_data Per-vertex scalar values (NaN = mark as white).
 /// @param rgb_colors Flat array of RGB bytes (size = 3 × vertex count).
+/// @param nan_alpha  Alpha for the NaN vertices.  The default (1.0) renders
+///                   them as opaque white.  Pass 0.0 to punch holes (the
+///                   renderer then shows the geometry behind the medial wall)
+///                   or an intermediate value such as 0.5 to draw it
+///                   translucently.  Any value < 1 switches the mesh to the
+///                   alpha-blending pass.
 /// @return A scimesh Mesh with per-vertex colors.
 ///
 /// @par Example
@@ -130,19 +139,22 @@ inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh,
 /// fs::Mesh fs_brain = fs::read_fs_mesh("lh.white");
 /// std::vector<float> curv = fs::read_curv("lh.thickness");
 /// std::vector<uint8_t> rgb = fs_mesh.get_vertex_rgb();
-/// Mesh brain = scimesh::convert_fs_mesh(fs_brain, curv, rgb);
+/// // Medial wall (NaN) rendered half transparent:
+/// Mesh brain = scimesh::convert_fs_mesh(fs_brain, curv, rgb, 0.5f);
 /// @endcode
 ///
 /// @see convert_fs_mesh(const fs::Mesh&, const std::vector<uint8_t>&)
+/// @see mesh_from_fs()
 inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh,
                             const std::vector<float> &morph_data,
-                            const std::vector<uint8_t> &rgb_colors) {
+                            const std::vector<uint8_t> &rgb_colors,
+                            float nan_alpha = 1.0f) {
     Mesh out = convert_fs_mesh(fs_mesh);
     size_t nv = out.vertices.size();
     out.colors.reserve(nv);
     for (size_t i = 0; i < nv; i++) {
         if (std::isnan(morph_data[i])) {
-            out.colors.push_back(Color(1.0f, 1.0f, 1.0f, 1.0f));
+            out.colors.push_back(Color(1.0f, 1.0f, 1.0f, nan_alpha));
         } else {
             out.colors.push_back(Color(
                 rgb_colors[i * 3] / 255.0f,
@@ -151,6 +163,7 @@ inline Mesh convert_fs_mesh(const fs::Mesh &fs_mesh,
                 1.0f));
         }
     }
+    out.update_transparency();
     return out;
 }
 

@@ -131,6 +131,59 @@ Current WIP
   built from the world-unit depth difference.  Dead code (`depth_C/D/E`,
   `radius_scale`) was removed, and the new tests (C++ and R) assert that SSAO
   actually changes pixels for a perspective and for an orthographic render.
+- FIX: translucent geometry lying *behind* opaque geometry was blended on top of
+  it, which is what made a very transparent mesh look wrong: the blended pass
+  ignored the depth buffer entirely
+  (`if (blend_mode || depth < z_buffer[idx])`), so a translucent medial wall
+  painted over the structures inside the brain.  Translucent fragments now pass
+  the same depth test as opaque ones; they still do not *write* depth, so the
+  buffer always holds the nearest opaque surface.
+- FIX: the translucent pass sorted its triangles the wrong way round.  The
+  centroid depth is a view-space z (the camera looks down -Z, so nearer is
+  larger), and the sort was descending, i.e. front-to-back: the nearest
+  translucent surface was drawn first and then covered by the ones behind it.
+  Sorting is now back-to-front (`a.view_z < b.view_z`), which makes the result
+  independent of the order in which the meshes were added to the scene.
+- NEW: transparency no longer has to be declared.  `Mesh::is_transparent()`
+  derives it from `default_color`, `colors` and `face_colors`, and that is what
+  the renderer uses, so per-vertex, per-face and uniform-alpha meshes blend
+  without setting `Mesh::has_transparency` (which is still honored as a manual
+  override, never cleared by `Mesh::update_transparency()`).  Readers, the
+  FreeSurfer converters and `Scene::add()` refresh the flag so it is accurate
+  when inspected, and the R layer derives it from the colors it receives.
+- NEW: PLY vertex colors now keep their alpha.  RGBA files (8-bit `alpha` as
+  well as float `alpha`, including the common case of 8-bit RGB with a float
+  alpha) are read into `Color::a` and mark the mesh as translucent; previously
+  alpha was silently dropped (`a = 1.0`).  Alpha without any RGB is kept as a
+  white vertex with that alpha.
+- NEW: C++ `convert_fs_mesh(fs_mesh, morph_data, rgb_colors, nan_alpha)` gained
+  the `nan_alpha` parameter (default 1.0 = unchanged behaviour): pass 0.0 to
+  punch holes at vertices without data (the medial wall) or e.g. 0.5 to draw
+  them half transparent.  `mesh_from_fs(detect_transparency = TRUE)` keeps
+  producing holes.
+- NEW: R `set_mesh_alpha(mesh, alpha)` returns a mesh with a uniform alpha
+  (creating colors from `default_color`/gray if the mesh has none), the
+  one-liner for a 10 % reference shell.
+- DOC: document transparency end to end: the alpha column of `colors`, the
+  per-vertex interpolation, the back-to-front ordering and depth test, the
+  medial-wall recipe and the remaining limitations (per-triangle ordering,
+  no occlusion by translucent surfaces, `render_points()` does not blend) in
+  the vignette, `?render_mesh`, `?set_mesh_alpha`, `Mesh`, `Rasterizer` and
+  `Scene::add()`.
+- DOC: `camera_auto()`/`camera_fit_scene()`/`camera_fit_mesh()` documented
+  `direction` as the direction the camera looks along, but the camera is placed
+  at `center + direction * distance`, i.e. it is the side you view the mesh
+  from (`c(0,0,1)` = front view of a +Z facing mesh).  The parameter docs now
+  say so; the behaviour is unchanged.
+- DEV: new `examples/cpp/transparency/` and `examples/R/transparency/` (both
+  built and run by the examples CI job) render three scenes: translucent spheres
+  with an opaque sphere inside the shell and one behind it, an alpha ramp from
+  1.0 to 0.05, and a hemisphere whose medial wall is 50 % transparent with two
+  opaque "voxels" inside it and an 80 % transparent sphere in front.
+- DEV: new C++ tests (cpp_tests/test_transparency.cpp) and R tests
+  (tests/testthat/test-transparency.R) cover detection, blending, the depth-test
+  and ordering fixes, per-vertex alpha interpolation, alpha 0 holes, PLY alpha
+  round-trips and the FreeSurfer `nan_alpha` option.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------

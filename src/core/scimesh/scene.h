@@ -68,6 +68,10 @@ struct Scene {
 
     /// @brief Add a mesh to the scene with an optional placement transform and name.
     ///
+    /// The mesh's transparency flag is refreshed on the stored copy, so
+    /// meshes whose `colors` (or `default_color`) have alpha < 1.0 are
+    /// rendered translucently without any extra bookkeeping by the caller.
+    ///
     /// @param mesh      The mesh to add (copied into the scene).
     /// @param transform Model matrix placing the mesh in world space
     ///                  (default: identity).
@@ -75,6 +79,7 @@ struct Scene {
     void add(const Mesh &mesh, const Mat4 &transform = Mat4(1.0f),
              const std::string &name = "") {
         meshes.push_back(mesh);
+        meshes.back().update_transparency();
         transforms.push_back(transform);
         names.push_back(name);
     }

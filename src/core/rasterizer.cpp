@@ -57,7 +57,13 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
         return;
 
     int idx = y * width + x;
-    if (blend_mode || depth < z_buffer[idx]) {
+    // Translucent fragments never write the depth buffer (see below), so
+    // `z_buffer` always holds the nearest *opaque* surface.  Testing against it
+    // in the blended pass as well hides translucent geometry that lies behind
+    // opaque geometry, while translucent geometry in front of it still blends;
+    // the correct order among translucent fragments comes from the
+    // back-to-front sort in Renderer::render_pipeline().
+    if (depth < z_buffer[idx]) {
         Color shaded;
         if (lights.empty()) {
             shaded = shade_pixel(color, normal, light_direction,
