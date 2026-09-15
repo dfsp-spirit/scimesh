@@ -44,6 +44,25 @@ Current WIP
   coordinate spaces, camera invariance, plane combination and input validation.
   `RenderOptions::clip_planes` and the fog space had no test coverage at all
   before this release.
+- FIX: the `full_CLI_renderer` example could not be linked (and neither could any
+  other consumer that includes libfs.h in more than one translation unit): the
+  vendored libfs header defined its 49 free functions without `inline`, so
+  linking `libscimesh.a` (which contains them, via `obj_io.cpp`) together with a
+  TU that also includes `libfs.h`/`fs_mesh_converter.h` failed with "multiple
+  definition of `fs::...`" errors.  The fix belongs to libfs itself (libfs commit
+  ab88cb4, "CHG: inline some functions") and is included in the vendored copy
+  (see the DEP entry below).
+- DEP: update the vendored libfs (src/third_party/libfs.h) from v0.6.0 to libfs
+  commit ab88cb4 ("CHG: inline some functions"), i.e. v0.6.1 (upstream commit
+  7bd0c26, "Volume header fixes": NIfTI sform/qform and vox2ras handling now
+  match FreeSurfer's `mri_convert`) plus the fix that marks all 49 libfs free
+  functions `inline`, so that the header can be included from more than one
+  translation unit.  ab88cb4 is on the libfs `develop` branch and not part of a
+  libfs release yet; the next libfs release should therefore be picked up when
+  it is tagged.  scimesh only reads meshes through libfs (OBJ via
+  `fs::Mesh::from_obj`, FreeSurfer surfaces via fs_mesh_converter.h), so the
+  volume/geometry fixes do not change rendering output; the libfs test suite
+  (150339 assertions) passes with the change.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------

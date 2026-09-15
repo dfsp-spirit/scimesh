@@ -35,6 +35,8 @@ as part of the library.
 - **Project:** [dfsp-spirit/libfs](https://github.com/dfsp-spirit/libfs)
 - **Author:** Tim Schäfer
 - **License:** MIT
+- **Version:** libfs [commit ab88cb4](https://github.com/dfsp-spirit/libfs/commit/ab88cb4)
+  (v0.6.1 plus the `inline` fix; see the DEP entry in CHANGES)
 - **Usage:** FreeSurfer neuroimaging file format reader (surf, curv, annot, label, MGH/MGZ)
 
 ### stl_reader.h
