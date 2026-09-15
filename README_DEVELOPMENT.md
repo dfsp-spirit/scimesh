@@ -72,6 +72,19 @@ Notes:
 in R for that.  The C++ code inside the R package is a separate build (see
 `src/Makevars`) and is not covered by this script.
 
+### Examples
+
+The example programs are part of what we ship, so they are built and run:
+
+```sh
+./examples/cpp/run_all_cpp.sh      # builds and runs every C++ example
+./examples/R/run_all_R.sh          # runs every R example (needs scimesh installed)
+```
+
+Both can take a name to run a single example.  The `Examples` CI workflow does
+this on every push/PR, because the C++ examples are not compiled by any test
+target - breakage in them would otherwise go unnoticed.
+
 ### Running the R unit tests
 
 ```r

@@ -82,6 +82,12 @@ Current WIP
   src/core: 71.8 % lines, 66.1 % branches - with `ply_io.cpp` at 0 % and
   `obj_io.cpp`/`transforms.cpp` not even linked into the test binary (no C++
   test references them).
+- DEV: CI: new `examples.yml` workflow builds and runs all C++ examples
+  (Linux and macOS) plus the R examples on every push/PR.  Previously no CI job
+  compiled the examples at all, which is how the full_CLI_renderer link error
+  could go unnoticed.  New `coverage.yml` workflow (manual dispatch or push to
+  develop) runs the coverage script and stores the HTML report as a build
+  artifact.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------
