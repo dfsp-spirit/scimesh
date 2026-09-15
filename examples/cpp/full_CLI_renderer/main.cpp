@@ -113,6 +113,7 @@ struct AppConfig {
 
     // [fog]
     bool  fogEnabled = false;
+    std::string fogSpace = "world";   // "world" (world units) or "ndc"
     float fogStart = 0.0f;
     float fogEnd   = 0.0f;
     float fogColorR = 0.5f;
@@ -150,8 +151,11 @@ static void printHelp(const char* prog) {
         "  --mesh FILE         Path to mesh file (.obj, .ply, .stl, .white).\n"
         "                      Repeatable for multiple meshes in one scene.\n"
         "  --mesh-format FMT    Force mesh format: obj, ply, stl, fs\n"
-        "  --output FILE       Output filename without extension (default: render)\n"
-        "  --format FMT        Output format: png, ppm, bmp (default: png)\n"
+        "  --output FILE       Output filename, extension optional (default: render)\n"
+        "                      A supported extension (.png, .ppm, .bmp) selects\n"
+        "                      the format and overrides --format.\n"
+        "  --format FMT        Output format for names without extension:\n"
+        "                      png, ppm, bmp (default: png)\n"
         "  --width N           Image width in pixels (default: 800)\n"
         "  --height N          Image height in pixels (default: 600)\n"
         "  --mesh-color R,G,B  Default mesh color [0-1] (default: 0.7,0.7,0.7)\n"
@@ -179,6 +183,7 @@ static void printHelp(const char* prog) {
         "  --no-fog            Disable fog\n"
         "  --fog-start N       Fog start distance (default: 0)\n"
         "  --fog-end N         Fog end distance (0 = auto, default: 0)\n"
+        "  --fog-space S       Fog distance unit: world (default) or ndc\n"
         "  --fog-color R,G,B   Fog color [0-1] (default: 0.5,0.5,0.5)\n"
         "  --crop              Crop transparent/background border after render\n"
         "                      (also applied to each image in composite mode)\n"
@@ -332,6 +337,7 @@ static AppConfig loadTOMLConfig(const std::string& path) {
         // [fog]
         if (auto* fg = tbl["fog"].as_table()) {
             cfg.fogEnabled = (*fg)["enabled"].value_or(false);
+            cfg.fogSpace   = (*fg)["space"].value_or(std::string("world"));
             cfg.fogStart   = static_cast<float>((*fg)["start"].value_or(0.0));
             cfg.fogEnd     = static_cast<float>((*fg)["end"].value_or(0.0));
             if (auto* col = (*fg)["color"].as_array()) {
@@ -489,6 +495,8 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             cfg.fogStart = nextFloat();
         } else if (arg == "--fog-end") {
             cfg.fogEnd = nextFloat();
+        } else if (arg == "--fog-space") {
+            cfg.fogSpace = nextStr();
         } else if (arg == "--fog-color") {
             std::string val = nextStr();
             if (!parseVec3(val, cfg.fogColorR, cfg.fogColorG, cfg.fogColorB)) {
@@ -629,6 +637,15 @@ static RenderOptions buildRenderOptions(const AppConfig& cfg, const Camera& cam)
     opts.fog_start   = cfg.fogStart;
     opts.fog_end     = cfg.fogEnd;
     opts.fog_color   = Color(cfg.fogColorR, cfg.fogColorG, cfg.fogColorB, 1.0f);
+    if (cfg.fogSpace == "ndc") {
+        opts.fog_space = scimesh::FogSpace::NDC;
+    } else {
+        if (cfg.fogSpace != "world") {
+            fprintf(stderr, "Warning: unknown fog space '%s', using world units.\n",
+                    cfg.fogSpace.c_str());
+        }
+        opts.fog_space = scimesh::FogSpace::WORLD;   // distances in world units
+    }
 
     // Near/far planes
     opts.near_plane = cfg.nearPlane;
@@ -646,23 +663,55 @@ static RenderOptions buildRenderOptions(const AppConfig& cfg, const Camera& cam)
 // Write image in the requested format
 // =========================================================================
 
+// Map a supported image file extension to its format name.  Returns true and
+// sets `format` for ".png"/".ppm"/".bmp" (any case), false otherwise.
+static bool imageFormatForExtension(const std::string& path, std::string& format) {
+    const std::string ext = fileExtension(path);   // lowercase, includes the dot
+    if (ext == ".png") { format = "png"; return true; }
+    if (ext == ".ppm") { format = "ppm"; return true; }
+    if (ext == ".bmp") { format = "bmp"; return true; }
+    return false;
+}
+
+// Turn the requested output name into the path that is actually written.
+// If the name already ends in a supported image extension, it is used as-is
+// and defines the format (so `--output brain.png` does not become
+// `brain.png.png`).  Otherwise the extension of `format` is appended.
+// `format` is updated in place when the extension takes precedence.
+static std::string resolveOutputPath(const std::string& filename,
+                                     std::string& format) {
+    std::string ext_format;
+    if (imageFormatForExtension(filename, ext_format)) {
+        if (ext_format != format) {
+            fprintf(stderr, "Note: writing '%s' format (from the file extension), "
+                            "ignoring --format %s.\n",
+                    ext_format.c_str(), format.c_str());
+        }
+        format = ext_format;
+        return filename;
+    }
+    return filename + "." + format;
+}
+
 static bool writeImage(const Image& img, const std::string& filename,
-                       const std::string& format) {
-    std::string path = filename;
+                       std::string format, std::string* path_written = nullptr) {
+    const std::string path = resolveOutputPath(filename, format);
+    bool ok = false;
     if (format == "png") {
-        path += ".png";
-        return img.write_png(path);
+        ok = img.write_png(path);
     } else if (format == "ppm") {
-        path += ".ppm";
-        return img.write_ppm(path);
+        ok = img.write_ppm(path);
     } else if (format == "bmp") {
-        path += ".bmp";
-        return img.write_bmp(path);
+        ok = img.write_bmp(path);
     } else {
         fprintf(stderr, "Error: unsupported format '%s'. Use png, ppm, or bmp.\n",
                 format.c_str());
         return false;
     }
+    if (ok && path_written != nullptr) {
+        *path_written = path;
+    }
+    return ok;
 }
 
 // =========================================================================
@@ -724,9 +773,10 @@ int main(int argc, char** argv) {
 
         std::cout << "Output: " << result.width << "×" << result.height << "\n";
 
-        bool ok = writeImage(result, cfg.filename, cfg.format);
+        std::string written;
+        bool ok = writeImage(result, cfg.filename, cfg.format, &written);
         if (ok) {
-            std::cout << "Wrote " << cfg.filename << "." << cfg.format << std::endl;
+            std::cout << "Wrote " << written << std::endl;
         } else {
             std::cerr << "Error writing output image.\n";
             return 1;
@@ -847,9 +897,10 @@ int main(int argc, char** argv) {
 
     // 11. Write output
     std::string outPath = cfg.filename;
-    bool ok = writeImage(img, outPath, cfg.format);
+    std::string written;
+    bool ok = writeImage(img, outPath, cfg.format, &written);
     if (ok) {
-        std::cout << "Wrote " << outPath << "." << cfg.format << std::endl;
+        std::cout << "Wrote " << written << std::endl;
     } else {
         std::cerr << "Error writing output image.\n";
         return 1;

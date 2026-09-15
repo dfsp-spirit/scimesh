@@ -2,8 +2,8 @@
 # All values can be overridden via command-line flags.
 
 [output]
-filename = "render"           # output filename (without extension)
-format   = "png"              # "png", "ppm", or "bmp"
+filename = "render"           # output filename; extension is optional (.png/.ppm/.bmp wins over 'format')
+format   = "png"              # "png", "ppm", or "bmp"; used when filename has no image extension
 width    = 800
 height   = 600
 
@@ -49,6 +49,7 @@ ambient = 0.3                 # ambient light level [0, 1]
 
 [fog]
 enabled = false
+space   = "world"             # fog distance unit: "world" (world units) or "ndc"
 start   = 0.0                 # distance where fog begins
 end     = 0.0                 # distance where fog is fully opaque (0 = auto)
 color   = [0.5, 0.5, 0.5]   # fog color

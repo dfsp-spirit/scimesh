@@ -63,6 +63,16 @@ Current WIP
   `fs::Mesh::from_obj`, FreeSurfer surfaces via fs_mesh_converter.h), so the
   volume/geometry fixes do not change rendering output; the libfs test suite
   (150339 assertions) passes with the change.
+- NEW: full_CLI_renderer example: new `[fog] space` config key and
+  `--fog-space` flag ("world" or "ndc").
+- FIX: `full_CLI_renderer` example: an unknown `--fog-space` value now warns and
+  falls back to world units.
+- FIX: `full_CLI_renderer` example: `--output` now honours a supported image
+  extension (`.png`, `.ppm`, `.bmp`, any case) instead of appending it a second
+  time (`--output brain.png` used to write `brain.png.png`).  Such an extension
+  selects the output format and overrides `--format`; names without an extension
+  still get the extension of `--format` appended, and the "Wrote <file>" message
+  now reports the path that was actually written.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------
