@@ -83,7 +83,10 @@ static Mesh load_ply_mesh(const std::string &filename) {
 }
 
 TEST_CASE("Render real brain hemisphere mesh from PLY") {
-    const std::string ply_path = "../test_data/ply/lh_mesh_sulc_viridis.ply";
+    // The test binary runs from cpp_tests/build (or a build-<variant> dir), so
+    // the repository's test_data/ is two levels up.  With one ".." this test
+    // silently skipped itself for a long time.
+    const std::string ply_path = "../../test_data/ply/lh_mesh_sulc_viridis.ply";
     if (!std::filesystem::exists(ply_path)) {
         WARN("Skipping brain render test: PLY file not found at " << ply_path);
         return;

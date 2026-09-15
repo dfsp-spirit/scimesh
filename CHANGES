@@ -81,7 +81,16 @@ Current WIP
   local tool only: no upload, no badge, no coverage gates.  First baseline for
   src/core: 71.8 % lines, 66.1 % branches - with `ply_io.cpp` at 0 % and
   `obj_io.cpp`/`transforms.cpp` not even linked into the test binary (no C++
-  test references them).
+  test references them).  New C++ tests for mesh file I/O (`test_io.cpp`),
+  mesh transforms (`test_transforms.cpp`), renderer features/SSAO
+  (`test_render_features.cpp`), string formatting (`test_to_string.cpp`),
+  colormaps (viridis and empty input, in `test_colormap.cpp`) and the
+  FreeSurfer/PLY brain mesh path (in `test_brain_mesh.cpp`, whose test data path
+  was wrong so the test silently did nothing) raise this to 91.6 % lines and
+  79.0 % branches, with `ply_io.cpp`, `obj_io.cpp` and `transforms.cpp` now
+  linked and covered (`transforms.cpp` at 100 %).  The new R test
+  `tests/testthat/test-ssao.R` covers screen-space ambient occlusion through the
+  R API.
 - DEV: CI: new `examples.yml` workflow builds and runs all C++ examples
   (Linux and macOS) plus the R examples on every push/PR.  Previously no CI job
   compiled the examples at all, which is how the full_CLI_renderer link error

@@ -33,6 +33,10 @@
 ^.*\.png$
 ^.*\.bmp$
 ^.*\.ppm$
+^.*\.tga$
+^coverage$
+^test_output.*$
+^test_read_roundtrip.*$
 ^reference_images$
 ^LICENSE\.md$
 CMakeLists.txt

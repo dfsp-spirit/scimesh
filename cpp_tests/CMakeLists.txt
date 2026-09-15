@@ -39,6 +39,10 @@ add_executable(scimesh_tests
     test_clipping.cpp
     test_clip_planes.cpp
     test_fog.cpp
+    test_io.cpp
+    test_transforms.cpp
+    test_to_string.cpp
+    test_render_features.cpp
     test_rasterizer.cpp
     test_integration.cpp
     test_visual_validation.cpp
