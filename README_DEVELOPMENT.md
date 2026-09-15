@@ -36,6 +36,42 @@ cmake --build build
 ./build/scimesh_tests
 ```
 
+### C++ code coverage
+
+Coverage of the C++ core is measured with clang's source-based coverage and
+reported with `llvm-cov`.  The helper script builds the test suite with
+instrumentation, runs it and writes a report:
+
+```sh
+dev_tools/coverage_cpp.sh                 # build, run all tests, report
+dev_tools/coverage_cpp.sh "[fog]"         # only matching Catch2 tests
+CXX=clang++-18 dev_tools/coverage_cpp.sh  # use a specific clang
+```
+
+**Requirements (Linux):** `clang`, plus `llvm-profdata` and `llvm-cov` of the
+same major version, and `cmake`.  On Debian/Ubuntu: `sudo apt install clang llvm`.
+
+The report is written to `coverage/` (gitignored): `coverage/html/index.html`
+for browsing, `coverage/lcov.info` if you want coverage gutters in your editor
+(e.g. the VS Code "Coverage Gutters" extension).
+
+Notes:
+
+* Test code, the Catch2 amalgamation and all vendored third-party code
+  (`src/third_party/`, whose header-only libraries are inlined into the core)
+  are excluded from the report.
+* Library files that no test references are not linked into the test binary at
+  all, so they do not show up in the report - not even as 0 % (e.g.
+  `obj_io.cpp` and `transforms.cpp`, which are exercised from R instead).  A file
+  shown at 0 % is linked but never executed (e.g. `ply_io.cpp`).
+* Coverage is a local development tool: nothing is uploaded, there is no badge
+  and there are no coverage thresholds (vendored third-party headers would break
+  any gate).  The `Coverage (C++)` CI workflow stores the HTML report as an
+  artifact but never fails on low coverage.
+* Coverage of the R layer is not measured here - use `covr::package_coverage()`
+in R for that.  The C++ code inside the R package is a separate build (see
+`src/Makevars`) and is not covered by this script.
+
 ### Running the R unit tests
 
 ```r

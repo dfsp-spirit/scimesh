@@ -73,6 +73,15 @@ Current WIP
   selects the output format and overrides `--format`; names without an extension
   still get the extension of `--format` appended, and the "Wrote <file>" message
   now reports the path that was actually written.
+- DEV: C++ code coverage can now be measured: `cpp_tests` configured with
+  `-DSCIMESH_COVERAGE=ON` (clang) instruments the tests and the library, and
+  `dev_tools/coverage_cpp.sh` builds, runs the tests and writes a report (text
+  summary, HTML, lcov trace file) to `coverage/`.  Test code, the Catch2
+  amalgamation and `src/third_party/` are excluded from the report.  This is a
+  local tool only: no upload, no badge, no coverage gates.  First baseline for
+  src/core: 71.8 % lines, 66.1 % branches - with `ply_io.cpp` at 0 % and
+  `obj_io.cpp`/`transforms.cpp` not even linked into the test binary (no C++
+  test references them).
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------

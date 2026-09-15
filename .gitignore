@@ -47,6 +47,9 @@ build/
 Build/
 build-*/
 
+# Coverage reports (dev_tools/coverage_cpp.sh)
+/coverage/
+
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt
@@ -87,5 +90,11 @@ dev_tools/rgl_interoperability/**/*.png
 test_*.ppm
 test_*.bmp
 scimesh.Rcheck/
+
+# Test by-products written by the C++ tests when run from a build directory
+test_output*.tga
+test_read_roundtrip.*
+/reference_images/
+
 examples/cpp/all_primitives/build_manual/
 docs
