@@ -18,8 +18,11 @@ A new mesh descriptor list with transformed vertices.
 }
 \description{
 Transforms all vertex positions in a mesh by a 4x4 homogeneous
-matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
-normals are untouched.
+matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors are
+kept as they are; vertex normals (if the mesh has any) are
+transformed by the inverse transpose of \code{M}, so that shading
+stays correct for shearing and non-uniform scaling.  Use
+\code{compute_vertex_normals()} if the mesh has no normals yet.
 }
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))

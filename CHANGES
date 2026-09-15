@@ -88,6 +88,40 @@ Current WIP
   could go unnoticed.  New `coverage.yml` workflow (manual dispatch or push to
   develop) runs the coverage script and stores the HTML report as a build
   artifact.
+- FIX: the mesh transforms `scale_mesh()`, `rotate_mesh()` and
+  `transform_mesh()` now update per-vertex normals (C++ and R).  They used to
+  move the vertices and leave the normals untouched, which is only correct for
+  translations: after `scale_mesh(mesh, c(1, 1, 4))` or any rotation the normals
+  no longer matched the surface, so shading was visibly wrong (users had to pass
+  `invert_normals = TRUE` or recompute the normals by hand).  Normals are now
+  transformed with the inverse transpose of the matrix and renormalized, which is
+  the correct rule for non-uniform scaling, shearing and mirroring; a singular
+  matrix (e.g. a scale of 0) falls back to the plain 3x3 transform.  Meshes
+  without normals are unaffected, `translate_mesh()` still leaves normals alone
+  (as it must), and the C++ header and R docs now state all of this.
+- FIX: `mesh_from_fs()` with `detect_transparency = TRUE` could never mark
+  anything as transparent, so FreeSurfer brain surfaces were rendered with an
+  opaque white medial wall.  Vertices whose per-vertex value is `NaN` (that is
+  FreeSurfer's "no data" marker) were always turned into opaque white, so no
+  vertex ever had an alpha < 1; on top of that, the loop looking for such
+  vertices was guarded by `has_colors()`, so it could be skipped entirely.  Such
+  vertices now get alpha 0, which makes the renderer blend them (and set
+  `has_transparency`), so a medial wall can be seen through.
+- FIX: screen-space ambient occlusion (`ssao_enabled = TRUE`) had no visible
+  effect at all, for three independent reasons: (1) `Rasterizer::apply_ssao()`
+  treated depth buffer values as if they were in [0, 1] when they are in
+  [-1, 1], so the depth inversion was wrong for both projections.  The exact
+  inversion for both projections now lives in one shared helper
+  (`view_distance_from_ndc()`, which `Rasterizer::fog_depth_from_ndc()` also
+  uses), so SSAO and world-space fog can no longer disagree about the depth
+  range; (2) `ssao_radius` is documented (and now handled) in
+  pixels, but was used as a world/screen-space factor, and is now rounded and
+  clamped to at least one pixel; (3) the hemisphere test that decides whether a
+  sample may occlude mixed normalized device depth with pixel units and had the
+  wrong sign, so it rejected every valid occluder - the sample offset is now
+  built from the world-unit depth difference.  Dead code (`depth_C/D/E`,
+  `radius_scale`) was removed, and the new tests (C++ and R) assert that SSAO
+  actually changes pixels for a perspective and for an orthographic render.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------

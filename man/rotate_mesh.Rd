@@ -17,7 +17,7 @@ rotate_mesh(mesh, angle_rad, axis = c(0, 0, 1))
 A new mesh descriptor list with rotated vertices.
 }
 \description{
-Rotate a mesh around an axis
+Vertex normals (if the mesh has any) are rotated with the mesh.
 }
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))

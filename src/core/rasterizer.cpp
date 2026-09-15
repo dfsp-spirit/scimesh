@@ -17,10 +17,17 @@ void Rasterizer::clear(float clear_depth) {
     std::fill(normal_buffer.begin(), normal_buffer.end(), Vec3(0.0f));
 }
 
-float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
-    const float n = z_near;
-    const float f = z_far;
-    if (!(f > n) || n <= 0.0f) {
+// ---- depth buffer <-> world units ------------------------------------------
+//
+// The rasterizer stores the normalized device depth of a fragment (the z of the
+// clip-space position after the perspective divide, i.e. values in [-1, 1] with
+// -1 at the near and +1 at the far plane) - see ndc_to_screen().  World-space
+// fog and SSAO both need the distance from the camera in world units, so the
+// inverse of the projection is applied here: linear for an orthographic
+// projection, hyperbolic for a perspective one.
+static float view_distance_from_ndc(float z_ndc, float z_near, float z_far,
+                                    bool orthographic) {
+    if (!(z_far > z_near) || z_near <= 0.0f) {
         // Degenerate/behind-the-camera projection: no meaningful mapping.
         return 0.0f;
     }
@@ -28,15 +35,19 @@ float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
         // glm::ortho maps view z in [-n, -f] linearly onto [-1, 1]:
         //   z_ndc = -2/(f-n) * z_view - (f+n)/(f-n)
         // => distance from camera = -z_view = (z_ndc*(f-n) + f+n) / 2
-        return (z_ndc * (f - n) + (f + n)) * 0.5f;
+        return (z_ndc * (z_far - z_near) + (z_far + z_near)) * 0.5f;
     }
-    // glm::perspective maps 1/w linearly onto z_ndc, so inverting it gives
-    // the exact view-space distance of the fragment:
+    // glm::perspective maps 1/w linearly onto z_ndc, so inverting it gives the
+    // exact view-space distance of the fragment:
     //   z_ndc = (f+n)/(f-n) - 2*n*f/((f-n) * d)
     // => d = 2*n*f / (f + n - z_ndc*(f-n))
-    const float denom = (f + n) - z_ndc * (f - n);
-    if (std::abs(denom) < 1e-12f) return f;
-    return (2.0f * n * f) / denom;
+    const float denom = (z_far + z_near) - z_ndc * (z_far - z_near);
+    if (std::abs(denom) < 1e-12f) return z_far;
+    return (2.0f * z_near * z_far) / denom;
+}
+
+float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
+    return view_distance_from_ndc(z_ndc, z_near, z_far, orthographic);
 }
 
 void Rasterizer::shade_and_write(int x, int y, float depth,
@@ -236,19 +247,18 @@ void Rasterizer::rasterize_point(float screen_x, float screen_y, float depth,
 }
 
 
-// You'll need to pass your camera's near and far clipping planes (e.g., 0.1f and 100.0f)
+// Screen-space ambient occlusion.  The depth buffer holds NDC z in [-1, 1]
+// (see view_distance_from_ndc() above); pass the camera's near and far clipping
+// planes, and set `orthographic` for a parallel projection.
 void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
     if (!ssao_enabled || width < 2 || height < 2) return;
 
-    // --- TUNABLE PARAMETERS (Now in linear world-units, e.g., meters) ---
+    // --- TUNABLE PARAMETERS (in linear world units, e.g. meters) ---
     // How far a sample must jut out to cast a shadow (fixes ground plane acne)
     const float depth_bias = 0.05f;
 
     // Max distance before we assume it's a different object (fixes skybox/cow halo)
     const float max_occlusion_distance = 1.5f;
-
-    // Multiplier to convert world-radius to screen pixels
-    const float radius_scale = 10.0f;
 
     // Fixed normalized sample directions (8 samples on a spiral)
     const int ns = 8;
@@ -257,15 +267,11 @@ void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
         {-0.309f, -0.951f}, { 0.588f,  0.809f}, {-0.588f,  0.809f}, {-1.000f, -0.000f},
     };
 
-    // Precalculate linearization constants outside the loop to save CPU cycles
-    const float depth_C = 2.0f * z_near * z_far;
-    const float depth_D = z_far + z_near;
-    const float depth_E = z_far - z_near;
-
-    // Fast inline lambda for depth linearization
+    // Fast inline lambda for depth linearization.  The depth buffer holds NDC z
+    // ([-1, 1]); view_distance_from_ndc() inverts the projection (perspective or
+    // orthographic) to world units.
     auto linearize = [&](float raw_z) {
-        float z_ndc = 2.0f * raw_z - 1.0f;
-        return depth_C / (depth_D - z_ndc * depth_E);
+        return view_distance_from_ndc(raw_z, z_near, z_far, orthographic);
     };
 
     for (int y = 0; y < height; ++y) {
@@ -284,8 +290,8 @@ void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
 
             center_normal = glm::normalize(center_normal);
 
-            // Scale the sampling radius based on distance (closer = bigger radius)
-            int screen_radius = static_cast<int>((ssao_radius * radius_scale) / center_depth);
+            // `ssao_radius` is documented as a screen-space radius in pixels.
+            int screen_radius = static_cast<int>(std::lround(ssao_radius));
             screen_radius = std::max(1, std::min(screen_radius, 100)); // Clamp to sane bounds
 
             float occlusion = 0.0f;
@@ -312,12 +318,16 @@ void Rasterizer::apply_ssao(Image &output, float z_near, float z_far) {
 
                     // Only add occlusion if it's within the max distance
                     if (range_falloff > 0.0f) {
-                        // 3. Hemisphere check: only count occlusion from above the surface
-                        float depth_ndc_delta = center_depth_raw - sample_depth_raw;
+                        // 3. Hemisphere check: only count samples that lie on the
+                        // side of the surface the normal points to.  The offset
+                        // is built in a common scale: x/y as screen pixels, z from
+                        // the world-unit depth difference (a closer sample has a
+                        // positive delta, i.e. it sits on the camera side).  The
+                        // normal comes from the normal buffer and is in view space.
                         Vec3 offset_dir(
                             dirs[s][0] * screen_radius,
                             -dirs[s][1] * screen_radius,
-                            -depth_ndc_delta * (width + height) * 0.1f);
+                            depth_delta * (width + height) * 0.1f);
                         offset_dir = glm::normalize(offset_dir);
                         float hem = glm::dot(center_normal, offset_dir);
                         if (hem > 0.0f) {

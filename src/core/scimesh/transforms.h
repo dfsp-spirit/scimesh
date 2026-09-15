@@ -29,6 +29,9 @@ void translate_mesh(Mesh &mesh, const Vec3 &translation);
 /// @brief Scale a mesh non-uniformly along each axis.
 ///
 /// Multiplies each vertex position component-wise by `scale`.
+/// Per-vertex normals (if any) are updated as well, using the inverse
+/// transpose of the scaling matrix, so that shading stays correct for
+/// non-uniform scales.
 ///
 /// @param[in,out] mesh  The mesh to modify.
 /// @param         scale Scale factors per axis (e.g., {2,1,1} doubles width).
@@ -43,7 +46,9 @@ void scale_mesh(Mesh &mesh, const Vec3 &scale);
 
 /// @brief Scale a mesh uniformly in all directions.
 ///
-/// Multiplies every vertex position by `uniform_scale`.
+/// Multiplies every vertex position by `uniform_scale`.  Per-vertex normals
+/// (if any) are updated as well; a uniform scale does not change their
+/// direction.
 ///
 /// @param[in,out] mesh          The mesh to modify.
 /// @param         uniform_scale Scale factor (1.0 = unchanged, 2.0 = double size).
@@ -59,7 +64,8 @@ void scale_mesh(Mesh &mesh, float uniform_scale);
 /// @brief Rotate a mesh around an arbitrary axis.
 ///
 /// Uses the right-hand rule: positive angle = counter-clockwise when
-/// looking along the axis toward the origin.
+/// looking along the axis toward the origin.  Per-vertex normals (if any)
+/// are rotated with the mesh.
 ///
 /// @param[in,out] mesh          The mesh to modify.
 /// @param         angle_radians Rotation angle in **radians**.
@@ -80,6 +86,11 @@ void rotate_mesh(Mesh &mesh, float angle_radians, const Vec3 &axis);
 /// transform function — you can combine translation, rotation, and scale
 /// into a single matrix using GLM functions like `glm::translate()`,
 /// `glm::rotate()`, and `glm::scale()`.
+///
+/// Per-vertex normals (if any) are transformed as well, by the inverse
+/// transpose of the upper-left 3×3 block, so that shading stays correct for
+/// shearing and non-uniform scaling.  Meshes without normals are unaffected,
+/// and `compute_vertex_normals()` can be used to generate them.
 ///
 /// @param[in,out] mesh   The mesh to modify.
 /// @param         matrix A 4×4 transformation matrix (column-major, GLM style).

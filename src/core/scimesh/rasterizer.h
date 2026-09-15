@@ -272,8 +272,22 @@ struct Rasterizer {
     /// Must be called after all triangles have been rasterized.
     ///
     /// @param[in,out] output  The image to modify.
-    /// @param z_near          Near plane distance.
-    /// @param z_far           Far plane distance.
+    /// @brief Apply screen-space ambient occlusion to the output image.
+    ///
+    /// Uses the depth and normal buffers filled by rasterize_triangle() to
+    /// darken creases and contact areas.  Requires `ssao_enabled`.
+    ///
+    /// The depth buffer holds normalized device depth (`[-1, 1]`, see
+    /// ndc_to_screen()); the matching camera planes have to be passed here so
+    /// that distances in world units can be recovered (the same inversion that
+    /// world-space fog uses).  Set `orthographic` when the scene was rendered
+    /// with a parallel projection.
+    ///
+    /// @param[in,out] output  The rendered image to darken.
+    /// @param z_near          Near plane distance of the camera.
+    /// @param z_far           Far plane distance of the camera.
+    ///
+    /// @see fog_depth_from_ndc(), ssao_enabled
     void apply_ssao(Image &output, float z_near, float z_far);
 
     /// @brief Optional texture image for textured meshes.

@@ -15,7 +15,8 @@ translate_mesh(mesh, translation)
 A new mesh descriptor list with translated vertices.
 }
 \description{
-Translate a mesh
+Vertex colors and normals are untouched: a translation does not change
+the orientation of a surface.
 }
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))

@@ -1,8 +1,11 @@
 #' Apply a 4x4 transformation matrix to a mesh
 #'
 #' Transforms all vertex positions in a mesh by a 4x4 homogeneous
-#' matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
-#' normals are untouched.
+#' matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors are
+#' kept as they are; vertex normals (if the mesh has any) are
+#' transformed by the inverse transpose of \code{M}, so that shading
+#' stays correct for shearing and non-uniform scaling.  Use
+#' \code{compute_vertex_normals()} if the mesh has no normals yet.
 #'
 #' @param mesh A mesh descriptor list with \code{vertices} and
 #'   \code{triangles}, as returned by \code{render_mesh()} or built
@@ -27,6 +30,9 @@ transform_mesh <- function(mesh, matrix) {
 
 #' Translate a mesh
 #'
+#' Vertex colors and normals are untouched: a translation does not change
+#' the orientation of a surface.
+#'
 #' @param mesh A mesh descriptor list.
 #' @param translation Length-3 numeric vector (x, y, z).
 #' @return A new mesh descriptor list with translated vertices.
@@ -45,6 +51,11 @@ translate_mesh <- function(mesh, translation) {
 }
 
 #' Scale a mesh uniformly or per-axis
+#'
+#' Per-vertex normals (if the mesh has any) are scaled as well, using the
+#' inverse transpose of the scaling matrix: a non-uniform scale would
+#' otherwise leave normals pointing in a direction that no longer matches
+#' the surface, which shows up as wrong shading.
 #'
 #' @param mesh A mesh descriptor list.
 #' @param scale A single numeric scale factor (uniform) or a
@@ -70,6 +81,8 @@ scale_mesh <- function(mesh, scale) {
 }
 
 #' Rotate a mesh around an axis
+#'
+#' Vertex normals (if the mesh has any) are rotated with the mesh.
 #'
 #' @param mesh A mesh descriptor list.
 #' @param angle_rad Rotation angle in radians.
