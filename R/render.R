@@ -7,6 +7,16 @@
 #' \code{vb}/\code{it} components).  rgl meshes are transparently
 #' converted via \code{\link{mesh_from_rgl}()}.
 #'
+#' @section Transparency:
+#' The fourth column of \code{colors} (and of \code{face_colors}) is the
+#' alpha value: values \code{< 1} make the mesh translucent, and the renderer
+#' blends it with whatever is behind it automatically - there is no flag to
+#' set.  Per-vertex alpha is interpolated across each triangle, so a smooth
+#' fade is possible, and \code{alpha = 0} makes geometry invisible (holes).
+#' Translucent triangles are drawn back-to-front after the opaque geometry,
+#' so they are correctly hidden by opaque meshes in front of them.  Use
+#' \code{\link{set_mesh_alpha}()} to set one alpha value for a whole mesh.
+#'
 #' @param vertices Either an Nx3 numeric matrix of vertex positions,
 #'   or a scimesh mesh descriptor list (with \code{vertices} and
 #'   \code{triangles} components), or an rgl-style list (with
@@ -14,6 +24,8 @@
 #' @param triangles Mx3 integer matrix of triangle indices (1-based).
 #'   Ignored when \code{vertices} is a list.
 #' @param colors Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
+#'   The fourth column is the alpha value; alpha < 1 renders the mesh
+#'   translucently (see the Transparency section below).
 #'   Use \code{face_colors} (Mx4) for per-triangle colours instead.
 #' @param face_colors Optional Mx4 numeric matrix of per-face RGBA colors,
 #'   one row per triangle.  When present, all three vertices of a triangle

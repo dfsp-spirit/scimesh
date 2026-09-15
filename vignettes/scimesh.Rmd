@@ -391,9 +391,20 @@ Both modes can be mixed in the same `clip_planes` list.
 
 ### Semi-Transparent Overlays
 
-scimesh supports proper alpha blending with depth-sorted back-to-front
-rendering.  This is useful for visualising nested surfaces (e.g., white
-matter and pial surface in neuroimaging), or for glass-brain effects.
+scimesh blends meshes whose colors are not fully opaque.  The fourth column of
+`colors` (or of `face_colors`, or the alpha of `color` for the generated
+meshes) is the alpha value, and there is nothing to switch on: a mesh with
+alpha < 1 takes part in the blended pass automatically.  The renderer
+
+* interpolates per-vertex alpha across each triangle, so smooth fades work,
+* draws the translucent triangles back-to-front, after the opaque geometry,
+* depth-tests them against the opaque geometry, so translucent geometry behind
+  an opaque mesh stays hidden and does not wash it out,
+* treats alpha 0 as fully invisible (`holes`), e.g. for the medial wall.
+
+`set_mesh_alpha(mesh, alpha)` is the shortcut for a uniform alpha
+(`set_mesh_alpha(mesh, 0.1)` for the 10 % brain shell used as a spatial
+reference).
 
 **R example:**
 ```{r, eval=FALSE}
@@ -425,7 +436,51 @@ write_png(img, temp_file)
 printf("Transparent render written to: %s\n", temp_file)
 ```
 
+**Recipe: a half-transparent medial wall** (in this case with the cortex colored
+by sulcal depth, so the inside of the hemisphere stays visible):
+
+```{r, eval=FALSE}
+surface <- freesurferformats::read.fs.surface("sub-01/surf/lh.white")
+sulc    <- freesurferformats::read.fs.morph("sub-01/surf/lh.sulc")
+cortex  <- freesurferformats::read.fs.label("sub-01/label/lh.cortex.label")
+
+nv <- nrow(surface$vertices)
+medial_wall <- !(seq_len(nv) %in% cortex)
+sulc[medial_wall] <- NA                        # no data on the medial wall
+
+colors <- apply_colormap(sulc, colormap = viridis_colormap(256L),
+    nan_color = c(1, 1, 1, 1), winsor_percentiles = c(2, 98))
+if (ncol(colors) == 3) colors <- cbind(colors, 1)
+colors[medial_wall, 4] <- 0.5                  # 50 % transparent
+
+brain <- list(vertices = surface$vertices, triangles = surface$faces,
+              colors = colors)
+img <- render_scene(list(brain), camera_auto(brain, direction = c(1, 0, 0)),
+    render_options(background_color = c(1, 1, 1, 1)))
+```
+
+Per-vertex alpha can vary freely, which makes gradients possible:
+
+```{r, eval=FALSE}
+quads <- generate_plane(color = c(0.8, 0.2, 0.2, 1))
+quads$colors[, 4] <- rep(c(0, 1), each = nrow(quads$colors) / 2)
+```
+
+**File formats:** PLY vertex colors are read with their alpha (8-bit or float),
+including RGBA files whose alpha is stored with a different type than the RGB
+channels.  OBJ and STL do not carry transparency, and the FreeSurfer converters
+take it from the data: `mesh_from_fs(..., detect_transparency = TRUE)` (C++)
+turns vertices without data into holes, and
+`convert_fs_mesh(fs_mesh, morph, rgb, nan_alpha = 0.5f)` makes them
+half-transparent instead.
+
 **C++ example:** See `examples/cpp/transparency/` in the repository.
+
+**Known limitations:** transparency is resolved per triangle (painter's
+algorithm), so *intersecting*, *coplanar* or very large translucent triangles can
+blend in the wrong order, and a translucent surface never occludes anything (it
+writes no depth).  Point rendering (`render_points()`) does not blend at all;
+use `render_spheres()` (which renders meshes) for translucent spheres.
 
 ### Background and Transparency
 

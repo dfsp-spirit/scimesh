@@ -101,6 +101,57 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
     scimesh_rotate_mesh(mesh, angle_rad, axis)
 }
 
+#' Set the transparency of a whole mesh
+#'
+#' Returns a copy of the mesh in which every vertex (and every face, if
+#' per-face colors are used) has the given alpha value.  The renderer blends
+#' meshes whose colors are not fully opaque automatically, so this is all that
+#' is needed to draw a mesh translucently - for example a brain surface at
+#' 10 percent opacity for spatial reference.
+#'
+#' A mesh without colors gets uniform colors first (its \code{default_color}
+#' if it has one, light gray otherwise), so the mesh keeps its appearance and
+#' only becomes see-through.  Use \code{alpha = 0} for completely invisible
+#' geometry and \code{alpha = 1} to make a mesh opaque again.
+#'
+#' @param mesh A mesh descriptor list (see \code{as_scimesh_mesh}), e.g. as
+#'   returned by \code{generate_sphere()} or \code{read_ply()}.
+#' @param alpha Alpha value in \code{[0, 1]}: 0 = fully transparent,
+#'   1 = fully opaque.
+#' @return A mesh descriptor list with the alpha applied.
+#'
+#' @examples
+#' sphere <- generate_sphere(c(0, 0, 0), 1)
+#' ghost  <- set_mesh_alpha(sphere, 0.2)
+#'
+#' # Per-vertex alpha (here: every other vertex transparent) can be set
+#' # directly on the color matrix:
+#' cols <- sphere$colors
+#' cols[, 4] <- rep(c(0, 1), length.out = nrow(cols))
+#' sphere$colors <- cols
+#'
+#' @seealso \code{\link{render_mesh}}, \code{\link{scene}}
+#' @export
+set_mesh_alpha <- function(mesh, alpha) {
+    mesh <- as_scimesh_mesh(mesh)
+    if (!is.numeric(alpha) || length(alpha) != 1L || !is.finite(alpha) ||
+        alpha < 0 || alpha > 1) {
+        stop("alpha must be a single number in [0, 1]")
+    }
+    nv <- nrow(mesh$vertices)
+    if (is.null(mesh$colors)) {
+        base <- mesh$default_color
+        if (is.null(base)) base <- c(0.7, 0.7, 0.7, 1)
+        if (length(base) < 4L) base <- c(base[1:3], 1)
+        mesh$colors <- matrix(rep(base[1:4], each = nv), nrow = nv)
+    }
+    mesh$colors[, 4] <- alpha
+    if (!is.null(mesh$face_colors)) {
+        mesh$face_colors[, 4] <- alpha
+    }
+    mesh
+}
+
 #' Render multiple spheres from point data
 #'
 #' Generates a merged sphere mesh from a set of center points,
