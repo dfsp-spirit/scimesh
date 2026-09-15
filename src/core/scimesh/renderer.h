@@ -127,6 +127,8 @@ public:
     /// (in screen-space pixels).  Points are depth-tested against each other
     /// and against previously drawn geometry.
     ///
+    /// Note: `options.clip_planes` are not applied to point clouds.
+    ///
     /// @param positions Point positions in world space.
     /// @param colors    Per-point colors (same size as `positions`).
     /// @param radius    Screen-space radius of each point in pixels.

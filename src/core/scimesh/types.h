@@ -201,37 +201,113 @@ struct Light {
 };
 
 // ---------------------------------------------------------------------------
-//  ClipPlane
+//  PlaneSpace / ClipPlane
 // ---------------------------------------------------------------------------
+
+/// @brief Coordinate space in which a ClipPlane is defined.
+///
+/// @see ClipPlane::space, ClipPlane
+enum class PlaneSpace {
+    /// World (scene) space: the plane is fixed in the scene, so it does not
+    /// move when the camera moves.  This is the **default**, and matches the
+    /// convention of rgl (`clipplanes3d`), VTK/PyVista, ParaView and three.js.
+    WORLD,
+
+    /// Eye (view/camera) space: the plane is anchored to the camera and
+    /// therefore travels and rotates with it.  This matches the classic
+    /// OpenGL `glClipPlane` behaviour and is handy for camera-attached
+    /// cutaways (e.g. "always cut away everything close to the viewer").
+    EYE
+};
 
 /// @brief A clipping plane that can hide parts of the scene.
 ///
-/// A clip plane is defined by a normal vector and an offset.  Anything on
-/// the "negative" side of the plane (where
-/// `dot(point, normal) + offset < 0`) is discarded during rendering.
+/// Geometry on the "negative" side of the plane is discarded, i.e. a point
+/// `p` is *kept* when `dot(p, normal) + offset >= 0`.  Which space `p` lives
+/// in is selected by ClipPlane::space:
+///
+/// - `PlaneSpace::WORLD` (**default**): `p` is the world-space position, so
+///   the plane is a fixed feature of the scene.  Cutting the midsagittal
+///   plane of a brain mesh (`normal = (-1,0,0)`, `offset = 0`) keeps cutting
+///   the same place while the camera orbits.
+/// - `PlaneSpace::EYE`: `p` is the view-space (eye-space) position, i.e.
+///   `p = view * p_world`.  The plane moves with the camera.
+///
+/// The `normal` is normalized internally, and `offset` is always a signed
+/// distance in world units along the (normalized) normal — scaling the
+/// normal does not change the plane.  A zero-length normal neutralizes the
+/// plane (it clips nothing) instead of discarding the whole scene.
 ///
 /// Clip planes are useful for cross-section views (e.g., slicing through a
-/// brain mesh to show internal structures).
+/// brain mesh to show internal structures).  Multiple planes are combined
+/// with a logical AND: only geometry kept by *all* planes is rendered.
 ///
-/// @par Example: clip everything behind Z=0
+/// @par Example: world-space cross-section (default)
 /// @code{.cpp}
 /// RenderOptions opts;
-/// opts.clip_planes.push_back(ClipPlane{Vec3(0, 0, -1), 0.0f});
-/// // negates everything with Z < 0
+/// // Keep the half of the scene with world x <= 0.  The cut stays at
+/// // x = 0 no matter where the camera is placed.
+/// opts.clip_planes.push_back(ClipPlane{Vec3(-1, 0, 0), 0.0f});
 /// @endcode
 ///
-/// @see RenderOptions, RenderOptions::clip_planes
+/// @par Example: eye-space (camera-attached) cutaway
+/// @code{.cpp}
+/// // Keep only geometry at least 2 world units in front of the camera,
+/// // so the camera always "sees inside" the scene.
+/// opts.clip_planes.push_back(
+///     ClipPlane{Vec3(0, 0, -1), -2.0f, PlaneSpace::EYE});
+/// @endcode
+///
+/// @see RenderOptions, RenderOptions::clip_planes, PlaneSpace,
+///      clip_plane_to_view_space()
 struct ClipPlane {
-    /// @brief The plane normal vector (should be unit-length).
+    /// @brief The plane normal vector.
     ///
-    /// Points toward the "keep" side of the plane.
-    /// Default: (0, 0, -1), i.e., removing things behind Z=0.
+    /// Points toward the "keep" side of the plane.  It does not have to be
+    /// unit-length: it is normalized internally, and ClipPlane::offset is
+    /// always interpreted as a distance in world units.
+    ///
+    /// Default: (0, 0, -1).
     Vec3 normal = Vec3(0.0f, 0.0f, -1.0f);
 
-    /// @brief Offset along the normal.
+    /// @brief Signed distance of the plane from the origin along `normal`.
     ///
-    /// A point `p` is kept when `dot(p, normal) + offset >= 0`.
+    /// A point `p` is kept when `dot(p, normal) + offset >= 0` in the space
+    /// given by ClipPlane::space, so `offset = -d` puts the plane at
+    /// distance `d` from the origin when the normal is unit-length.
+    ///
+    /// Default: 0 (the plane passes through the origin).
     float offset = 0.0f;
+
+    /// @brief The space ClipPlane::normal and ClipPlane::offset refer to.
+    ///
+    /// Default: `PlaneSpace::WORLD`.
+    /// @see PlaneSpace
+    PlaneSpace space = PlaneSpace::WORLD;
+};
+
+// ---------------------------------------------------------------------------
+//  FogSpace
+// ---------------------------------------------------------------------------
+
+/// @brief Coordinate space (and hence the unit) of the fog distances
+///        RenderOptions::fog_start and RenderOptions::fog_end.
+///
+/// @see RenderOptions::fog_space, RenderOptions::fog_start
+enum class FogSpace {
+    /// World units: distance from the camera, measured along the camera's
+    /// viewing direction.  `fog_start = 10` means "fog begins 10 world units
+    /// in front of the camera".  This is the **default**; it is independent
+    /// of the near/far plane settings and of the projection type, and does
+    /// not change when the camera is moved within the scene.
+    WORLD,
+
+    /// Normalized device depth: the raw values of the depth buffer, in
+    /// `[-1, 1]`, where `-1` is the near plane, `0` the middle of the depth
+    /// range and `+1` the far plane.  This is the legacy behaviour; it
+    /// depends on RenderOptions::near_plane / RenderOptions::far_plane and
+    /// (for perspective projections) is strongly non-linear in world units.
+    NDC
 };
 
 } // namespace scimesh

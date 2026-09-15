@@ -211,8 +211,23 @@ struct RenderOptions {
 
     /// @brief Optional clip planes for cross-section views.
     ///
-    /// Each plane removes geometry on its negative side.
-    /// @see ClipPlane
+    /// Each plane removes the geometry on its negative side; planes are
+    /// combined with a logical AND.  By default a plane is defined in
+    /// **world space** (see ClipPlane::space), so the cut is a fixed feature
+    /// of the scene and does not move when the camera moves.  Pass
+    /// `PlaneSpace::EYE` for the legacy camera-relative behaviour.
+    ///
+    /// @par Example
+    /// @code{.cpp}
+    /// RenderOptions opts;
+    /// // World-space slice at x = 0 (keeps x <= 0).
+    /// opts.clip_planes.push_back(ClipPlane{Vec3(-1, 0, 0), 0.0f});
+    /// // Additionally drop everything closer than 3 units to the camera.
+    /// opts.clip_planes.push_back(
+    ///     ClipPlane{Vec3(0, 0, -1), -3.0f, PlaneSpace::EYE});
+    /// @endcode
+    ///
+    /// @see ClipPlane, PlaneSpace
     std::vector<ClipPlane> clip_planes;
 
     /// @}
@@ -222,18 +237,52 @@ struct RenderOptions {
 
     /// @brief Enable depth fog (default: false).
     ///
-    /// When enabled, objects fade toward `fog_color` based on their distance
-    /// from the camera.
+    /// When enabled, objects fade toward `fog_color` with their distance
+    /// from the camera, between `fog_start` and `fog_end`.
     bool fog_enabled = false;
 
-    /// @brief Distance at which fog begins (in world units).
+    /// @brief Distance at which fog begins (default: 0).
+    ///
+    /// Interpreted according to `fog_space`: world units from the camera by
+    /// default, or raw normalized device depth when
+    /// `fog_space == FogSpace::NDC`.
+    ///
+    /// @see FogSpace, RenderOptions::fog_space
     float fog_start = 0.0f;
 
-    /// @brief Distance at which fog is fully opaque (in world units).
+    /// @brief Distance at which fog is fully opaque (default: 1).
+    ///
+    /// Must be greater than `fog_start`.  Same space/unit as `fog_start`.
+    ///
+    /// @see FogSpace, RenderOptions::fog_space
     float fog_end = 1.0f;
 
     /// @brief The color that distant objects fade into.
     Color fog_color = TRANSPARENT_BLACK;
+
+    /// @brief The space and unit in which `fog_start` / `fog_end` are given.
+    ///
+    /// Default: `FogSpace::WORLD`, i.e. the fog distances are distances in
+    /// world units from the camera.  Use `FogSpace::NDC` for the legacy
+    /// normalized-device-depth interpretation.
+    ///
+    /// @par Example: world units (default)
+    /// @code{.cpp}
+    /// opts.fog_enabled = true;
+    /// opts.fog_start   = 20.0f;   // 20 world units in front of the camera
+    /// opts.fog_end     = 60.0f;   // fully fogged 60 units away
+    /// @endcode
+    ///
+    /// @par Example: legacy normalized device depth
+    /// @code{.cpp}
+    /// opts.fog_enabled = true;
+    /// opts.fog_space   = FogSpace::NDC;
+    /// opts.fog_start   = 0.5f;    // half way into the depth range
+    /// opts.fog_end     = 1.0f;    // at the far plane
+    /// @endcode
+    ///
+    /// @see FogSpace
+    FogSpace fog_space = FogSpace::WORLD;
 
     /// @}
 

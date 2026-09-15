@@ -22,6 +22,14 @@ inline const char* str_shading(ShadingMode s) {
     return s == ShadingMode::FLAT ? "flat" : "smooth";
 }
 
+inline const char* str_plane_space(PlaneSpace s) {
+    return s == PlaneSpace::EYE ? "eye" : "world";
+}
+
+inline const char* str_fog_space(FogSpace s) {
+    return s == FogSpace::NDC ? "ndc" : "world";
+}
+
 inline const char* str_merge(MergeDirection d) {
     switch (d) {
         case MergeDirection::LEFT:   return "left";
@@ -110,7 +118,8 @@ inline std::ostream& operator<<(std::ostream &os, const Light &l) {
 }
 
 inline std::ostream& operator<<(std::ostream &os, const ClipPlane &cp) {
-    os << "ClipPlane(n=" << cp.normal << ", off=" << cp.offset << ")";
+    os << "ClipPlane(n=" << cp.normal << ", off=" << cp.offset
+       << ", " << str_plane_space(cp.space) << ")";
     return os;
 }
 
@@ -170,7 +179,8 @@ inline std::ostream& operator<<(std::ostream &os, const RenderOptions &opts) {
        << ", amb=" << opts.ambient
        << ", aa=" << opts.aa_samples;
     if (opts.wireframe)    os << ", wire";
-    if (opts.fog_enabled)  os << ", fog";
+    if (opts.fog_enabled)  os << ", fog(" << str_fog_space(opts.fog_space)
+                              << ":" << opts.fog_start << "-" << opts.fog_end << ")";
     if (opts.ssao_enabled) os << ", ssao(r=" << opts.ssao_radius
                               << ", I=" << opts.ssao_intensity << ")";
     if (opts.threads > 0)  os << ", threads=" << opts.threads;

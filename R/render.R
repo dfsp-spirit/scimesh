@@ -215,18 +215,39 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #'   darker darks and lighter highlights (S-curve).  Formula:
 #'   \code{(value - 0.5) * contrast + 0.5}, clamped to \code{[0, 1]}.
 #' @param fog_enabled Enable depth cueing (fog).  Default \code{FALSE}.
-#' @param fog_start Z-depth where fog begins (0 = near plane, 1 = far
-#'   plane).  Default 0.
-#' @param fog_end Z-depth where fog is fully opaque.  Default 1.
+#' @param fog_start Distance where fog begins, i.e. where objects start
+#'   fading toward \code{fog_color}.  Default 0.
+#' @param fog_end Distance where fog is fully opaque.  Must be larger
+#'   than \code{fog_start}.  Default 1.
 #' @param fog_color RGBA fog colour (0-1 scale).  Defaults to
 #'   \code{background_color}.
+#' @param fog_space Character, either \code{"world"} (default) or
+#'   \code{"ndc"}: the space (and therefore the unit) of
+#'   \code{fog_start} and \code{fog_end}.
+#'   \describe{
+#'     \item{\code{"world"}}{Distances in world units from the camera,
+#'       measured along the viewing direction.  \code{fog_start = 20} means
+#'       "fog starts 20 world units in front of the camera".  This is
+#'       independent of \code{near_plane}/\code{far_plane} and of the
+#'       projection type.}
+#'     \item{\code{"ndc"}}{Normalized device depth, i.e. the raw depth-buffer
+#'       values in \code{[-1, 1]}, where \code{-1} is the near plane,
+#'       \code{0} the middle of the depth range and \code{+1} the far plane.
+#'       This is the legacy behaviour; it depends on the near/far plane
+#'       settings and is strongly non-linear for perspective cameras.}
+#'   }
 #' @param threads Number of render threads.  0 = auto-detect (use all
 #'   cores), 1 = single-threaded (deterministic).  Default 0.
 #'   Requires OpenMP at compile time.
-#' @param clip_planes A list of clip plane descriptors, each a list
-#'   with \code{normal} (length-3 vector) and \code{offset} (numeric).
-#'   Points satisfying \code{dot(normal, position) + offset >= 0} are
-#'   kept.  Default \code{NULL} (no clipping).
+#' @param clip_planes A list of clip planes (see \code{\link{clip_plane}}),
+#'   or \code{NULL} (default) for no clipping.  Each plane removes the
+#'   geometry on its negative side, i.e. a point \code{p} is kept when
+#'   \code{dot(normal, p) + offset >= 0}; several planes are combined with a
+#'   logical AND.  By default \code{p} is the world-space position, so the cut
+#'   is fixed in the scene and does not move when the camera moves; use
+#'   \code{clip_plane(..., space = "eye")} for a camera-relative cut.
+#'   Note that clip planes only apply to mesh and triangle rendering;
+#'   \code{render_points()} and \code{render_spheres()} ignore them.
 #' @param ssao_enabled Enable screen-space ambient occlusion.
 #'   Default \code{FALSE}.
 #' @param ssao_radius Screen-space sample radius in pixels.  Default 16.
@@ -236,6 +257,12 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #'   \code{height * aa_samples}, then downsamples to the requested
 #'   size via box averaging.  Default \code{1} (no AA), \code{2} for
 #'   2x2 SSAA, \code{4} for 4x4.
+#' @param near_plane Distance of the near clipping plane (default 0.1).
+#'   Geometry closer to the camera is clipped away.  Also defines the
+#'   depth range together with \code{far_plane}, which matters when
+#'   \code{fog_space = "ndc"}.
+#' @param far_plane Distance of the far clipping plane (default 10000).
+#'   Must be larger than \code{near_plane}.
 #' @return A render options list for use with \code{render_mesh()} or
 #'   \code{render_scene()}.
 #'
@@ -253,6 +280,26 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #' opts <- render_options(wireframe = TRUE,
 #'     wireframe_color = c(0, 0, 0, 1),
 #'     background_color = c(0, 0, 0, 0))
+#'
+#' # World-space clip plane: keep the half of the scene with x <= 0.
+#' # The cut stays at x = 0, whatever the camera does.
+#' opts <- render_options(clip_planes = list(
+#'     clip_plane(normal = c(-1, 0, 0), offset = 0)))
+#'
+#' # Eye-space clip plane: additionally remove everything closer than 2 units
+#' # to the camera (camera-attached cutaway).
+#' opts <- render_options(clip_planes = list(
+#'     clip_plane(normal = c(-1, 0, 0), offset = 0),
+#'     clip_plane(normal = c(0, 0, -1), offset = -2, space = "eye")))
+#'
+#' # Fog in world units (default): fade from 20 to 60 units away from the
+#' # camera
+#' opts <- render_options(fog_enabled = TRUE, fog_start = 20, fog_end = 60,
+#'     fog_color = c(0.9, 0.95, 1, 1))
+#'
+#' # Legacy normalized-device-depth fog, for backwards compatibility
+#' opts <- render_options(fog_enabled = TRUE, fog_space = "ndc",
+#'     fog_start = 0.5, fog_end = 1)
 #'
 #' @export
 render_options <- function(width = 800L, height = 600L,
@@ -273,13 +320,20 @@ render_options <- function(width = 800L, height = 600L,
                            fog_start = 0,
                            fog_end = 1,
                            fog_color = c(0, 0, 0, 0),
+                           fog_space = c("world", "ndc"),
                            threads = 0L,
                            clip_planes = NULL,
                            ssao_enabled = FALSE,
                            ssao_radius = 16,
                            ssao_intensity = 0.8,
-                           aa_samples = 1L) {
+                           aa_samples = 1L,
+                           near_plane = 0.1,
+                           far_plane = 10000) {
     shading <- match.arg(shading)
+    fog_space <- match.arg(fog_space)
+    check_fog_options(fog_start, fog_end)
+    clip_planes <- check_clip_planes(clip_planes)
+    check_planes_near_far(near_plane, far_plane)
     structure(list(
         width = as.integer(width),
         height = as.integer(height),
@@ -300,12 +354,15 @@ render_options <- function(width = 800L, height = 600L,
         fog_start = as.numeric(fog_start),
         fog_end = as.numeric(fog_end),
         fog_color = as.numeric(fog_color),
+        fog_space = fog_space,
         threads = as.integer(threads),
         clip_planes = clip_planes,
         ssao_enabled = isTRUE(ssao_enabled),
         ssao_radius = as.numeric(ssao_radius),
         ssao_intensity = as.numeric(ssao_intensity),
-        aa_samples = as.integer(aa_samples)
+        aa_samples = as.integer(aa_samples),
+        near_plane = as.numeric(near_plane),
+        far_plane = as.numeric(far_plane)
     ), class = "scimesh_options")
 }
 

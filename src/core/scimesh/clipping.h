@@ -9,6 +9,7 @@
 #pragma once
 
 #include <scimesh/types.h>
+#include <scimesh/math_utils.h>
 #include <vector>
 
 namespace scimesh {
@@ -45,9 +46,74 @@ int clip_triangle_near_plane(
     std::vector<ClipVertex> &output_vertices,
     std::vector<Triangle> &output_triangles);
 
+/// @brief Convert a ClipPlane to view (eye) space, ready for clipping.
+///
+/// Clipping always happens in view space, so user clip planes have to be
+/// converted first.  The conversion is a no-op for `PlaneSpace::EYE` planes
+/// (apart from normalizing the normal); for `PlaneSpace::WORLD` planes (the
+/// default) the plane constant is shifted so that the plane stays fixed in
+/// world space instead of travelling with the camera:
+///
+/// @code
+/// world: dot(n, p_world) + offset >= 0
+///        with p_world = R^T * p_view + eye  (view is rigid)
+///     => dot(R * n, p_view) + (dot(n, eye) + offset) >= 0
+/// @endcode
+///
+/// The returned plane has a unit-length normal, and its `offset` is a signed
+/// distance in world units; `space` is copied from the input plane.
+///
+/// A plane with a zero-length normal is neutralized (it is turned into a
+/// plane that keeps everything) so that a malformed plane can never blank
+/// out a render silently.
+///
+/// @param plane The clip plane, in world or eye space (see ClipPlane::space).
+/// @param eye   The camera position in world space (Camera::eye).
+/// @param view  The world-to-view matrix (Camera::get_view_matrix()).
+/// @return The same plane expressed in view space.
+///
+/// @par Example
+/// @code{.cpp}
+/// Camera cam;
+/// Mat4 view = cam.get_view_matrix();
+/// // World-space cut at x = 0; still cuts at x = 0 in view space.
+/// ClipPlane world_plane{Vec3(-1, 0, 0), 0.0f};
+/// ClipPlane view_plane = clip_plane_to_view_space(world_plane, cam.eye, view);
+/// @endcode
+///
+/// @see ClipPlane, PlaneSpace, clip_triangle_view_plane()
+inline ClipPlane clip_plane_to_view_space(const ClipPlane &plane,
+                                          const Vec3 &eye,
+                                          const Mat4 &view) {
+    ClipPlane out;
+    out.space = plane.space;
+
+    float len = glm::length(plane.normal);
+    if (len < 1e-12f) {
+        // Degenerate normal: keep everything (no clipping) instead of
+        // discarding the whole scene.
+        out.normal = Vec3(0.0f, 0.0f, 0.0f);
+        out.offset = 0.0f;
+        return out;
+    }
+
+    Vec3 n = plane.normal / len;
+    out.normal = transform_direction(view, n);
+    if (plane.space == PlaneSpace::WORLD) {
+        // Shift the plane constant so that the cut stays at its world
+        // position (see the derivation above).
+        out.offset = glm::dot(n, eye) + plane.offset;
+    } else {
+        out.offset = plane.offset;
+    }
+    return out;
+}
+
 /// @brief Clip a triangle against an arbitrary plane in view space.
 ///
-/// This is used for user-specified clip planes (see ClipPlane).
+/// This is used for user-specified clip planes (see ClipPlane).  The plane
+/// must already be in view space — use clip_plane_to_view_space() to convert
+/// world-space planes first.
 /// A vertex is considered "inside" (kept) when:
 /// `dot(view_pos, plane.normal) + plane.offset >= 0`.
 ///
@@ -61,7 +127,8 @@ int clip_triangle_near_plane(
 /// @param[out] output_triangles  Resulting triangle indices.
 /// @return Number of output triangles (0, 1, or 2).
 ///
-/// @see clip_triangle_near_plane(), ClipPlane, RenderOptions::clip_planes
+/// @see clip_plane_to_view_space(), clip_triangle_near_plane(), ClipPlane,
+///      RenderOptions::clip_planes
 int clip_triangle_view_plane(
     const Vec3 &v0, const Vec3 &v1, const Vec3 &v2,
     const Vec3 &n0, const Vec3 &n1, const Vec3 &n2,

@@ -127,11 +127,35 @@ struct Rasterizer {
     /// @brief Enable depth fog (default: false).
     bool fog_enabled = false;
 
-    /// @brief Distance where fog begins.
+    /// @brief Distance where fog begins (default: 0).
+    ///
+    /// Interpreted in the space given by `fog_space`.
     float fog_start = 0.0f;
 
-    /// @brief Distance where fog is fully opaque.
+    /// @brief Distance where fog is fully opaque (default: 1).
+    ///
+    /// Interpreted in the space given by `fog_space`.
     float fog_end = 1.0f;
+
+    /// @brief The space (and unit) of `fog_start` / `fog_end` (default: `FogSpace::WORLD`).
+    /// If `FogSpace::WORLD`, the values are converted from the depth buffer
+    /// using `z_near`, `z_far` and `orthographic`.
+    /// @see FogSpace
+    FogSpace fog_space = FogSpace::WORLD;
+
+    /// @brief Near plane distance of the current projection (default: 0.1).
+    /// Only used to convert depth-buffer values to world units for
+    /// world-space fog.
+    float z_near = 0.1f;
+
+    /// @brief Far plane distance of the current projection (default: 10000.0).
+    /// Only used to convert depth-buffer values to world units for
+    /// world-space fog.
+    float z_far = 10000.0f;
+
+    /// @brief Whether the current projection is orthographic (default: false).
+    /// Affects the depth-buffer -> world-units conversion for world-space fog.
+    bool orthographic = false;
 
     /// @brief The fog color (what distant objects blend into).
     Color fog_color = TRANSPARENT_BLACK;
@@ -166,6 +190,26 @@ struct Rasterizer {
     ///
     /// @param clear_depth Initial depth value (default: 1.0 = farthest).
     void clear(float clear_depth = 1.0f);
+
+    /// @brief Convert a depth-buffer value to a distance in world units.
+    ///
+    /// Used for world-space fog (`FogSpace::WORLD`): the rasterizer only has
+    /// the normalized device depth of a fragment, so the corresponding
+    /// distance from the camera is recovered with the inverse of the
+    /// projection (perspective or orthographic, selected by `orthographic`):
+    ///
+    /// - perspective:    `d = (2*n*f) / (f + n - z_ndc * (f - n))`
+    /// - orthographic:   `d = (z_ndc * (f - n) + f + n) / 2`
+    ///
+    /// where `n = z_near` and `f = z_far`.  Both formulas are exact, because
+    /// the depth buffer stores `z_ndc` for both projection types.
+    ///
+    /// @param z_ndc Depth-buffer value (normalized device depth, `[-1, 1]`;
+    ///              `-1` = near plane, `+1` = far plane).
+    /// @return Distance from the camera in world units, measured along the
+    ///         viewing direction.
+    /// @see FogSpace, fog_space
+    float fog_depth_from_ndc(float z_ndc) const;
 
     /// @brief Enable or disable alpha blending.
     ///

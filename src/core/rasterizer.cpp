@@ -17,6 +17,28 @@ void Rasterizer::clear(float clear_depth) {
     std::fill(normal_buffer.begin(), normal_buffer.end(), Vec3(0.0f));
 }
 
+float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
+    const float n = z_near;
+    const float f = z_far;
+    if (!(f > n) || n <= 0.0f) {
+        // Degenerate/behind-the-camera projection: no meaningful mapping.
+        return 0.0f;
+    }
+    if (orthographic) {
+        // glm::ortho maps view z in [-n, -f] linearly onto [-1, 1]:
+        //   z_ndc = -2/(f-n) * z_view - (f+n)/(f-n)
+        // => distance from camera = -z_view = (z_ndc*(f-n) + f+n) / 2
+        return (z_ndc * (f - n) + (f + n)) * 0.5f;
+    }
+    // glm::perspective maps 1/w linearly onto z_ndc, so inverting it gives
+    // the exact view-space distance of the fragment:
+    //   z_ndc = (f+n)/(f-n) - 2*n*f/((f-n) * d)
+    // => d = 2*n*f / (f + n - z_ndc*(f-n))
+    const float denom = (f + n) - z_ndc * (f - n);
+    if (std::abs(denom) < 1e-12f) return f;
+    return (2.0f * n * f) / denom;
+}
+
 void Rasterizer::shade_and_write(int x, int y, float depth,
                                  const Color &color, const Vec3 &normal,
                                  const Vec3 &light_direction, Image &output) {
@@ -49,7 +71,19 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
         uint8_t a = static_cast<uint8_t>(std::clamp(shaded.a, 0.0f, 1.0f) * 255.0f);
 
         if (fog_enabled) {
-            float fog_fac = (depth - fog_start) / (fog_end - fog_start);
+            // World-space fog needs the fragment distance in world units;
+            // NDC fog uses the raw depth-buffer value (legacy behaviour).
+            float fog_depth = (fog_space == FogSpace::WORLD)
+                                  ? fog_depth_from_ndc(depth)
+                                  : depth;
+            float span = fog_end - fog_start;
+            float fog_fac;
+            if (std::abs(span) < 1e-12f) {
+                // Empty/degenerate range: hard step instead of dividing by 0.
+                fog_fac = (fog_depth >= fog_start) ? 1.0f : 0.0f;
+            } else {
+                fog_fac = (fog_depth - fog_start) / span;
+            }
             fog_fac = std::max(0.0f, std::min(1.0f, fog_fac));
             r = static_cast<uint8_t>(r * (1.0f - fog_fac) + fog_color.r * 255.0f * fog_fac);
             g = static_cast<uint8_t>(g * (1.0f - fog_fac) + fog_color.g * 255.0f * fog_fac);

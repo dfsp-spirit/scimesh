@@ -105,6 +105,10 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.fog_space = options.fog_space;
+    rasterizer.z_near = options.near_plane;
+    rasterizer.z_far = options.far_plane;
+    rasterizer.orthographic = (options.projection == ProjectionType::ORTHOGRAPHIC);
     rasterizer.ssao_enabled = options.ssao_enabled;
     rasterizer.ssao_radius = options.ssao_radius;
     rasterizer.ssao_intensity = options.ssao_intensity;
@@ -174,6 +178,10 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.fog_space = options.fog_space;
+    rasterizer.z_near = options.near_plane;
+    rasterizer.z_far = options.far_plane;
+    rasterizer.orthographic = (options.projection == ProjectionType::ORTHOGRAPHIC);
     rasterizer.ssao_enabled = options.ssao_enabled;
     rasterizer.ssao_radius = options.ssao_radius;
     rasterizer.ssao_intensity = options.ssao_intensity;
@@ -193,9 +201,13 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
     Mat4 projection = proj_cam.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
 
-    std::vector<ClipPlane> view_clip_planes = options.clip_planes;
-    for (auto &cp : view_clip_planes) {
-        cp.normal = glm::normalize(transform_direction(view, cp.normal));
+    // User clip planes default to world space; clipping itself happens in
+    // view space, so convert them here (see ClipPlane::space).
+    std::vector<ClipPlane> view_clip_planes;
+    view_clip_planes.reserve(options.clip_planes.size());
+    for (const auto &cp : options.clip_planes) {
+        view_clip_planes.push_back(
+            clip_plane_to_view_space(cp, camera.eye, view));
     }
 
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);

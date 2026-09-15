@@ -41,6 +41,16 @@ scimesh::ProjectionType parse_projection(const std::string &s) {
     return scimesh::ProjectionType::PERSPECTIVE;
 }
 
+scimesh::PlaneSpace parse_plane_space(const std::string &s) {
+    if (s == "eye") return scimesh::PlaneSpace::EYE;
+    return scimesh::PlaneSpace::WORLD;
+}
+
+scimesh::FogSpace parse_fog_space(const std::string &s) {
+    if (s == "ndc") return scimesh::FogSpace::NDC;
+    return scimesh::FogSpace::WORLD;
+}
+
 scimesh::Mesh build_mesh_from_r(List mesh_desc) {
     scimesh::Mesh mesh;
 
@@ -212,6 +222,14 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["aa_samples"])) {
         opts.aa_samples = as<int>(opt_desc["aa_samples"]);
     }
+    if (opt_desc.containsElementNamed("near_plane") &&
+        !Rf_isNull(opt_desc["near_plane"])) {
+        opts.near_plane = as<float>(opt_desc["near_plane"]);
+    }
+    if (opt_desc.containsElementNamed("far_plane") &&
+        !Rf_isNull(opt_desc["far_plane"])) {
+        opts.far_plane = as<float>(opt_desc["far_plane"]);
+    }
     if (opt_desc.containsElementNamed("specular_color") &&
         !Rf_isNull(opt_desc["specular_color"])) {
         opts.specular_color = color_from_r(opt_desc["specular_color"]);
@@ -275,6 +293,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["fog_color"])) {
         opts.fog_color = color_from_r(opt_desc["fog_color"]);
     }
+    if (opt_desc.containsElementNamed("fog_space") &&
+        !Rf_isNull(opt_desc["fog_space"])) {
+        opts.fog_space = parse_fog_space(as<std::string>(opt_desc["fog_space"]));
+    }
 
     if (opt_desc.containsElementNamed("threads") &&
         !Rf_isNull(opt_desc["threads"])) {
@@ -307,6 +329,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
             if (cp.containsElementNamed("offset") &&
                 !Rf_isNull(cp["offset"])) {
                 plane.offset = as<float>(cp["offset"]);
+            }
+            if (cp.containsElementNamed("space") &&
+                !Rf_isNull(cp["space"])) {
+                plane.space = parse_plane_space(as<std::string>(cp["space"]));
             }
             opts.clip_planes.push_back(plane);
         }

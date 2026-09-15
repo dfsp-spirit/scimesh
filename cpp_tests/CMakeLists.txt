@@ -20,6 +20,8 @@ add_executable(scimesh_tests
     test_camera.cpp
     test_normals.cpp
     test_clipping.cpp
+    test_clip_planes.cpp
+    test_fog.cpp
     test_rasterizer.cpp
     test_integration.cpp
     test_visual_validation.cpp

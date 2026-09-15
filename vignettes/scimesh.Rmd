@@ -99,15 +99,17 @@ are available:
 | `contrast` | numeric | 1.0 | S-curve contrast multiplier |
 | `lights` | list or `NULL` | `NULL` | Custom light list (auto-default if `NULL`) |
 | `fog_enabled` | logical | `FALSE` | Enable depth fog |
-| `fog_start` | numeric | 0 | Near-plane fog start |
-| `fog_end` | numeric | 1 | Far-plane fog end |
+| `fog_start` | numeric | 0 | Distance where the fog fade begins |
+| `fog_end` | numeric | 1 | Distance where fog is fully opaque |
+| `fog_space` | `"world"` / `"ndc"` | `"world"` | Unit of `fog_start`/`fog_end` |
 | `fog_color` | RGBA vector | `c(0,0,0,0)` | Fog color |
 | `aa_samples` | integer (1, 2, or 4) | 1 | Ordered-grid supersampling factor |
 | `ssao_enabled` | logical | `FALSE` | Enable screen-space ambient occlusion |
 | `ssao_radius` | numeric | 16 | SSAO sample radius in pixels |
 | `ssao_intensity` | numeric | 0.8 | SSAO occlusion strength (0–1) |
 | `threads` | integer | 0 | Number of CPU threads (0 = auto) |
-| `clip_planes` | list or `NULL` | `NULL` | Custom clipping planes |
+| `clip_planes` | list or `NULL` | `NULL` | Clip planes (see [Clip Planes](#clip-planes)) |
+| `near_plane`, `far_plane` | numeric | 0.1, 10000 | Depth range of the camera |
 
 The following sections cover the most important options in detail.
 
@@ -326,18 +328,66 @@ extensively in the C++ examples.
 ### Depth Fog
 
 Atmospheric depth fog fades distant geometry toward a background color,
-useful for emphasising foreground objects or creating stylised renders:
+useful for emphasising foreground objects or creating stylised renders.
+By default the fog distances are given in **world units** (distance from
+the camera), so a scene looks the same no matter where the camera is
+placed:
 
 ```r
 render_options(
     fog_enabled = TRUE,
-    fog_start = 0.6,              # begin fade at 60 % depth
-    fog_end = 1.0,                # fully fogged at far plane
-    fog_color = c(0.9, 0.95, 1, 1))  # pale blue fog
+    fog_start = 20,                   # start fading 20 world units away
+    fog_end = 60,                     # fully fogged 60 world units away
+    fog_color = c(0.9, 0.95, 1, 1))   # pale blue fog
 ```
 
-Fog is applied linearly between `fog_start` and `fog_end` in
-normalised device coordinates.
+The fade is applied linearly between `fog_start` and `fog_end`, measured
+along the viewing direction. This is independent of the near/far clipping
+planes (`near_plane`, `far_plane`) and of the projection type.
+
+For backwards compatibility, the pre-0.3.5 behaviour of specifying fog
+in **normalized device depth** (the raw depth buffer, `-1` = near plane,
+`+1` = far plane) is still available, but has to be requested explicitly:
+
+```r
+render_options(
+    fog_enabled = TRUE,
+    fog_space = "ndc",
+    fog_start = 0.5,                  # half way into the depth range
+    fog_end = 1.0)
+```
+
+### Clip Planes
+
+Clip planes remove the geometry on one side of a plane, which is useful
+for cross-sections, cutaways, and "half-brain" style figures. A plane is
+built with `clip_plane()` and passed to `render_options(clip_planes = ...)`;
+several planes are combined with a logical AND. A point `p` is kept when
+`dot(normal, p) + offset >= 0`, i.e. `normal` points toward the part that
+stays visible.
+
+By default the plane is defined in **world space**, so the cut is a fixed
+feature of the scene and does not move when the camera is moved — which is
+what makes it usable for orbit videos and multi-view figures:
+
+```r
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(-1, 0, 0), offset = 0)))  # keep world x <= 0
+```
+
+The same scene rendered from any camera position always shows the same cut.
+
+Pass `space = "eye"` for a plane that is defined **relative to the camera**
+and therefore travels with it (the classic OpenGL `glClipPlane` behaviour).
+This is handy for camera-attached cutaways, e.g. removing everything closer
+than 2 units to the viewer so that the camera always sees inside the mesh:
+
+```r
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(0, 0, -1), offset = -2, space = "eye")))
+```
+
+Both modes can be mixed in the same `clip_planes` list.
 
 ### Semi-Transparent Overlays
 

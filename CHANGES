@@ -1,10 +1,54 @@
 scimesh Changes
 ===============
 
+Current WIP
+------------
+
+- BRK: clip planes are now defined in **world space** by default.  In 0.3.4 and
+  earlier the `normal` and `offset` were interpreted in eye (camera) space, so
+  the cut travelled with the camera and had to be re-tuned for every viewpoint.
+  For the old behaviour, pass `PlaneSpace::EYE` (C++) or
+  `clip_plane(..., space = "eye")` (R).  Note that the old behaviour was also
+  documented incorrectly: the docs described a world-space plane.  See
+  ClipPlane::space and ?clip_plane.
+- BRK: fog distances (`fog_start`/`fog_end`) are now given in **world units**
+  (distance from the camera) by default, and are therefore independent of the
+  near/far planes and of the projection type.  The legacy interpretation as raw
+  normalized device depth is still available via `FogSpace::NDC` (C++) or
+  `fog_space = "ndc"` (R).  Previously the C++ docs claimed world units (which
+  they were not) and the R docs claimed normalized depth in [0, 1] (the values
+  were actually raw depth buffer values in [-1, 1]).
+- NEW: R function `clip_plane()` creates and validates clip plane descriptors,
+  with an explicit `space` argument ("world" or "eye"), plus examples for both.
+- NEW: `render_options()` validates `clip_planes` (normal must be a finite,
+  non-zero length-3 vector; `offset` a finite number; `space` valid) and the
+  fog settings (finite, `fog_end > fog_start`).  Previously malformed clip
+  planes were silently replaced by defaults in the C++ binding.
+- NEW: `render_options()` exposes `near_plane` and `far_plane` (defaults 0.1 and
+  10000, matching the C++ defaults), which define the depth range that NDC fog
+  and mode "ndc" refer to.
+- NEW: C++ `clip_plane_to_view_space()` converts a ClipPlane into the view space
+  in which clipping happens (world planes are shifted by `dot(normal, eye)`).
+  A zero-length normal now neutralizes its plane (clips nothing) instead of
+  discarding the whole scene, and the normal is normalized without rescaling
+  `offset`, so non-unit normals no longer move the plane.
+- NEW: C++ `Rasterizer::fog_depth_from_ndc()` inverts the depth mapping of both
+  perspective and orthographic projections, so world-space fog works for both.
+- FIX: fog no longer divides by zero when `fog_start == fog_end`.
+- DOC: document the coordinate space and unit of clip planes and fog in the C++
+  headers, the R docs and the vignette, with worked examples for world and
+  eye/NDC mode; document that multiple clip planes are ANDed and that point
+  rendering ignores clip planes.
+- DEV: add C++ tests (cpp_tests/test_clip_planes.cpp, cpp_tests/test_fog.cpp) and
+  R tests (tests/testthat/test-clip-planes.R, tests/testthat/test-fog.R) for the
+  coordinate spaces, camera invariance, plane combination and input validation.
+  `RenderOptions::clip_planes` and the fog space had no test coverage at all
+  before this release.
+
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------
 - FIX: adapt link in docs to prevent winbuilder warning
--
+
 
 Version 0.3.3 -- Scene transforms, scene object, glTF export
 ------------------------------------------------------------
