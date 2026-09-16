@@ -30,7 +30,7 @@ render_options(
   ssao_enabled = FALSE,
   ssao_radius = 16,
   ssao_intensity = 0.8,
-  aa_samples = 1L,
+  aa_samples = NULL,
   near_plane = 0.1,
   far_plane = 10000
 )
@@ -135,8 +135,14 @@ Default \code{FALSE}.}
 \item{aa_samples}{Anti-aliasing supersampling factor.  Renders
 internally at \code{width * aa_samples} x
 \code{height * aa_samples}, then downsamples to the requested
-size via box averaging.  Default \code{1} (no AA), \code{2} for
-2x2 SSAA, \code{4} for 4x4.}
+size via box averaging.  Use \code{1} (the default) for no AA,
+\code{2} for 2x2 SSAA, \code{4} for 4x4.  If \code{NULL}, the
+global option \code{scimesh.aa_samples} is used (which defaults
+to \code{1}).  Set that option once per session to enable AA for
+all render calls, e.g. \code{options(scimesh.aa_samples = 2)}.
+Note that AA increases render time and memory roughly with
+\code{aa_samples^2}, and that thin lines and points get smoother
+edges from it.}
 
 \item{near_plane}{Distance of the near clipping plane (default 0.1).
 Geometry closer to the camera is clipped away.  Also defines the
@@ -187,5 +193,12 @@ opts <- render_options(fog_enabled = TRUE, fog_start = 20, fog_end = 60,
 # Legacy normalized-device-depth fog, for backwards compatibility
 opts <- render_options(fog_enabled = TRUE, fog_space = "ndc",
     fog_start = 0.5, fog_end = 1)
+
+# Enable 2x2 anti-aliasing for this session: affects all subsequent
+# render calls that do not pass \code{aa_samples} explicitly.
+old <- options(scimesh.aa_samples = 2L)
+opts <- render_options()
+opts$aa_samples
+options(old)
 
 }

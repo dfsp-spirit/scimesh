@@ -274,8 +274,14 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
-#'   size via box averaging.  Default \code{1} (no AA), \code{2} for
-#'   2x2 SSAA, \code{4} for 4x4.
+#'   size via box averaging.  Use \code{1} (the default) for no AA,
+#'   \code{2} for 2x2 SSAA, \code{4} for 4x4.  If \code{NULL}, the
+#'   global option \code{scimesh.aa_samples} is used (which defaults
+#'   to \code{1}).  Set that option once per session to enable AA for
+#'   all render calls, e.g. \code{options(scimesh.aa_samples = 2)}.
+#'   Note that AA increases render time and memory roughly with
+#'   \code{aa_samples^2}, and that thin lines and points get smoother
+#'   edges from it.
 #' @param near_plane Distance of the near clipping plane (default 0.1).
 #'   Geometry closer to the camera is clipped away.  Also defines the
 #'   depth range together with \code{far_plane}, which matters when
@@ -320,6 +326,13 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #' opts <- render_options(fog_enabled = TRUE, fog_space = "ndc",
 #'     fog_start = 0.5, fog_end = 1)
 #'
+#' # Enable 2x2 anti-aliasing for this session: affects all subsequent
+#' # render calls that do not pass \code{aa_samples} explicitly.
+#' old <- options(scimesh.aa_samples = 2L)
+#' opts <- render_options()
+#' opts$aa_samples
+#' options(old)
+#'
 #' @export
 render_options <- function(width = 800L, height = 600L,
                            shading = c("smooth", "flat"),
@@ -345,11 +358,12 @@ render_options <- function(width = 800L, height = 600L,
                            ssao_enabled = FALSE,
                            ssao_radius = 16,
                            ssao_intensity = 0.8,
-                           aa_samples = 1L,
+                           aa_samples = NULL,
                            near_plane = 0.1,
                            far_plane = 10000) {
     shading <- match.arg(shading)
     fog_space <- match.arg(fog_space)
+    aa_samples <- resolve_aa_samples(aa_samples)
     check_fog_options(fog_start, fog_end)
     clip_planes <- check_clip_planes(clip_planes)
     check_planes_near_far(near_plane, far_plane)
@@ -383,6 +397,33 @@ render_options <- function(width = 800L, height = 600L,
         near_plane = as.numeric(near_plane),
         far_plane = as.numeric(far_plane)
     ), class = "scimesh_options")
+}
+
+#' Resolve the anti-aliasing supersampling factor
+#'
+#' Internal helper used by \code{\link{render_options}}.  A value of
+#' \code{NULL} means "not specified by the caller", in which case the global
+#' option \code{scimesh.aa_samples} is used.  This allows switching on
+#' anti-aliasing for a whole session with
+#' \code{options(scimesh.aa_samples = 2)}, without touching any render call.
+#'
+#' @param aa_samples \code{NULL}, or a single positive integer.
+#' @return A single positive integer.
+#' @keywords internal
+#' @noRd
+resolve_aa_samples <- function(aa_samples) {
+    if (is.null(aa_samples)) {
+        aa_samples <- getOption("scimesh.aa_samples", 1L)
+        if (is.null(aa_samples)) {
+            aa_samples <- 1L
+        }
+    }
+    if (!is.numeric(aa_samples) || length(aa_samples) != 1L ||
+        is.na(aa_samples) || !is.finite(aa_samples) || aa_samples < 1 ||
+        abs(aa_samples - round(aa_samples)) > 1e-8) {
+        stop("aa_samples must be a single positive integer, or NULL to use the global option 'scimesh.aa_samples'.")
+    }
+    as.integer(round(aa_samples))
 }
 
 #' Render raw triangles without index buffer

@@ -39,6 +39,16 @@ Version 0.4.0 -- Batch primitives, tubes and line layers
 - FIX: `Rasterizer::rasterize_line()` qualified the shadowed `width`/`height`
   members in its pixel bounds check (the `width` parameter of the function
   shadowed `Rasterizer::width`), which made the line invisible.
+- NEW: global anti-aliasing default.  `render_options()` now takes
+  `aa_samples = NULL` and resolves that `NULL` from the global option
+  `scimesh.aa_samples` (default 1, i.e. no AA).  Setting
+  `options(scimesh.aa_samples = 2)` therefore switches on 2x2 supersampling for
+  every render call that does not pass `aa_samples` explicitly (2 for 2x2, 4 for
+  4x4 SSAA).  This is mainly interesting for screen-space lines and points,
+  whose hard edges become smooth boundaries under supersampling; the cost is
+  proportional to `aa_samples^2` in render time and memory.  Passing a number
+  explicitly still overrides the option, and invalid values (including an
+  invalid global option) are reported as errors instead of being ignored.
 
 Breaking changes
 ----------------

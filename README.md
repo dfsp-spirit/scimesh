@@ -75,6 +75,25 @@ The R layer gives access to all C++ layer features, and adds on top:
 If you need colorbars in C++, have a look at [scibar](https://github.com/dfsp-spirit/scibar).
 
 
+### Global render defaults (R)
+
+Anti-aliasing can be switched on for a whole session instead of per render call.
+`render_options()` resolves `aa_samples` from the global option
+`scimesh.aa_samples` (default `1`, i.e. no AA) unless you pass it explicitly:
+
+```r
+options(scimesh.aa_samples = 2)      # 2x2 supersampling, 4 for 4x4
+img <- render_scene(scene(mesh))     # anti-aliased, no extra arguments needed
+options(scimesh.aa_samples = NULL)   # back to no AA
+```
+
+This is most noticeable on screen-space lines and points (e.g. connectome edges,
+see `line_layer()` and `render_segments()`), which get smooth edges instead of a
+hard staircase pattern.  The cost grows with `aa_samples^2`, both in render time
+and in memory (the internal framebuffer is `width * aa_samples` by
+`height * aa_samples`).
+
+
 ## What scimesh is not
 
 - Not a plotting framework — use ggplot2, lattice, or plotly for

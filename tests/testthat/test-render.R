@@ -208,3 +208,80 @@ test_that("render_triangles renders raw triangle data", {
     expect_equal(img$width, 64)
     expect_equal(length(img$pixels), 64 * 64 * 4)
 })
+
+# Anti-aliasing defaults (global option scimesh.aa_samples) ----------------
+
+test_that("render_options honors the global scimesh.aa_samples option", {
+    old <- options(scimesh.aa_samples = 2L)
+    on.exit(options(old), add = TRUE)
+
+    expect_equal(render_options()$aa_samples, 2L)
+
+    # An explicit argument always wins over the global option.
+    expect_equal(render_options(aa_samples = 1L)$aa_samples, 1L)
+    expect_equal(render_options(aa_samples = 4L)$aa_samples, 4L)
+
+    # A double is accepted and coerced to integer.
+    expect_equal(render_options(aa_samples = 2)$aa_samples, 2L)
+
+    # Without the option there is no AA.
+    options(scimesh.aa_samples = NULL)
+    expect_equal(render_options()$aa_samples, 1L)
+})
+
+test_that("render_options validates aa_samples", {
+    old <- options(scimesh.aa_samples = 2L)
+    on.exit(options(old), add = TRUE)
+
+    expect_error(render_options(aa_samples = 0), "positive integer")
+    expect_error(render_options(aa_samples = -1), "positive integer")
+    expect_error(render_options(aa_samples = 1.5), "positive integer")
+    expect_error(render_options(aa_samples = NA), "positive integer")
+    expect_error(render_options(aa_samples = Inf), "positive integer")
+    expect_error(render_options(aa_samples = c(1, 2)), "positive integer")
+    expect_error(render_options(aa_samples = "2"), "positive integer")
+
+    # An invalid *global option* must be reported as well, not ignored.
+    options(scimesh.aa_samples = 0)
+    expect_error(render_options(), "positive integer")
+})
+
+test_that("aa_samples supersamples single-pixel lines (smoother edges)", {
+    from <- matrix(c(-0.7, -0.7, 0), ncol = 3, byrow = TRUE)
+    to <- matrix(c(0.7, 0.7, 0), ncol = 3, byrow = TRUE)
+    cam <- camera(eye = c(0, 0, 4), center = c(0, 0, 0), up = c(0, 1, 0))
+
+    # Number of pixels that are neither pure background nor pure line color,
+    # i.e. the anti-aliased boundary pixels of a diagonal line.
+    boundary_pixels <- function(aa) {
+        img <- render_segments(from, to, colors = c(0, 0, 0, 1), width = 1,
+            camera = cam,
+            options = render_options(width = 120L, height = 120L,
+                aa_samples = aa))
+        lum <- matrix(as.integer(img$pixels), ncol = 4L, byrow = TRUE)[, 1]
+        sum(lum > 3L & lum < 252L)
+    }
+
+    # Without AA the rasterized line has a hard edge: every pixel is either
+    # background or ink.  With AA the boundary is a gradient.
+    expect_equal(boundary_pixels(1L), 0L)
+    expect_gt(boundary_pixels(2L), 0L)
+    expect_gt(boundary_pixels(4L), boundary_pixels(2L))
+})
+
+test_that("the global AA option applies to render calls that use defaults", {
+    from <- matrix(c(-0.7, -0.7, 0), ncol = 3, byrow = TRUE)
+    to <- matrix(c(0.7, 0.7, 0), ncol = 3, byrow = TRUE)
+    cam <- camera(eye = c(0, 0, 4), center = c(0, 0, 0), up = c(0, 1, 0))
+
+    # render_segments() builds its options via render_options(), which must
+    # pick up the option even though the caller never mentions aa_samples.
+    old <- options(scimesh.aa_samples = 4L)
+    on.exit(options(old), add = TRUE)
+
+    img <- render_segments(from, to, colors = c(0, 0, 0, 1), width = 1,
+        camera = cam,
+        options = render_options(width = 120L, height = 120L))
+    lum <- matrix(as.integer(img$pixels), ncol = 4L, byrow = TRUE)[, 1]
+    expect_gt(sum(lum > 3L & lum < 252L), 0L)
+})
