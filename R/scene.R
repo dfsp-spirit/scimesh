@@ -25,9 +25,15 @@
 #'   \code{NULL} entries to mean identity.
 #' @param names Optional character vector, one per mesh, overriding any
 #'   embedded \code{name}.
+#' @param lines \code{NULL}, a line layer (see \code{\link{line_layer}}), or a
+#'   list of them.  Line layers are drawn after the meshes with a width
+#'   measured in pixels and without creating any geometry, which makes them the
+#'   cheap way to draw many thin lines (wireframes, graph or connectome edges).
+#'   They share the depth buffer with the meshes and are ignored by the scene
+#'   bounding box, so they never change the camera framing.
 #' @return A scene descriptor list with S3 class \code{"scimesh_scene"},
-#'   with components \code{meshes} (list of scene nodes), \code{camera},
-#'   and \code{options}.
+#'   with components \code{meshes} (list of scene nodes), \code{lines} (list
+#'   of line layers, possibly empty), \code{camera}, and \code{options}.
 #'
 #' @examples
 #' cube1 <- generate_cuboid(c(0, 0, 0), c(0.5, 0.5, 0.5), c(1, 0, 0, 1))
@@ -38,12 +44,19 @@
 #'             camera = camera_auto(list(cube1, cube2), direction = c(1, 1, 1)))
 #' img <- render_scene(sc)
 #'
+#' # add a line layer drawn on top of the meshes:
+#' sc2 <- scene(list(cube1),
+#'              lines = line_layer(matrix(c(0, 0, 1), ncol = 3),
+#'                                 matrix(c(1, 1, 1), ncol = 3), width = 3))
+#'
+#' @seealso \code{\link{line_layer}}
 #' @export
 scene <- function(meshes, camera = NULL, options = NULL,
-                  transforms = NULL, names = NULL) {
+                  transforms = NULL, names = NULL, lines = NULL) {
     if (!is.list(meshes)) {
         stop("meshes must be a list of mesh descriptors or scene nodes")
     }
+    lines <- normalize_line_layers(lines)
     nodes <- lapply(meshes, as_scimesh_scene_node)
 
     if (!is.null(transforms)) {
@@ -63,8 +76,44 @@ scene <- function(meshes, camera = NULL, options = NULL,
         }
     }
 
-    structure(list(meshes = nodes, camera = camera, options = options),
+    structure(list(meshes = nodes, lines = lines, camera = camera,
+                   options = options),
               class = "scimesh_scene")
+}
+
+#' Normalize the \code{lines} argument of scene()
+#'
+#' Accepts \code{NULL}, a single line layer, or a list of line layers and
+#' returns a (possibly empty) list of line layers.  Layers may also be wrapped
+#' into a scene node (\code{list(lines = <layer>, transform = ...)}).
+#'
+#' @param lines \code{NULL}, a line layer, or a list of line layers / nodes.
+#' @return A list of line layers (or line layer nodes).
+#' @keywords internal
+normalize_line_layers <- function(lines) {
+    if (is.null(lines)) {
+        return(list())
+    }
+    if (inherits(lines, "scimesh_lines")) {
+        return(list(lines))
+    }
+    if (!is.list(lines)) {
+        stop("lines must be NULL, a line layer (see lines()), or a list of them")
+    }
+    for (i in seq_along(lines)) {
+        entry <- lines[[i]]
+        layer <- if (inherits(entry, "scimesh_lines")) {
+            entry
+        } else if (is.list(entry)) {
+            entry$lines
+        } else {
+            NULL
+        }
+        if (!inherits(layer, "scimesh_lines")) {
+            stop(sprintf("lines[[%d]] is not a line layer, see line_layer()", i))
+        }
+    }
+    return(lines)
 }
 
 #' Normalize one scene entry into a scene node
@@ -92,7 +141,10 @@ as_scimesh_scene_node <- function(x) {
 
 #' @export
 print.scimesh_scene <- function(x, ...) {
-    cat("scimesh scene with ", length(x$meshes), " mesh(es)\n", sep = "")
+    cat("scimesh scene with ", length(x$meshes), " mesh(es)",
+        if (length(x$lines) > 0L) sprintf(" and %d line layer(s)",
+                                          length(x$lines)) else "",
+        "\n", sep = "")
     for (i in seq_along(x$meshes)) {
         node <- x$meshes[[i]]
         m <- node$mesh

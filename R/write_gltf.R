@@ -34,9 +34,11 @@
 #' @export
 write_gltf <- function(meshes, path, camera = NULL,
                        format = c("gltf", "glb")) {
+    scene_lines <- NULL
     if (inherits(meshes, "scimesh_scene")) {
         sc <- meshes
         meshes <- sc$meshes
+        scene_lines <- sc$lines
         if (is.null(camera)) {
             camera <- sc$camera
         }
@@ -47,6 +49,11 @@ write_gltf <- function(meshes, path, camera = NULL,
     }
     format <- match.arg(format)
     scene_data <- lapply(meshes, as_scimesh_scene_node)
+    # Line layers cannot be represented in glTF: forward them so that the
+    # writer can report that they are skipped.
+    if (length(scene_lines) > 0L) {
+        scene_data <- c(scene_data, normalize_line_layers(scene_lines))
+    }
     scimesh_write_gltf(scene_data, path, camera, format)
     invisible(NULL)
 }

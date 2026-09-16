@@ -37,8 +37,16 @@ scimesh_generate_multi_spheres <- function(centers, radii, colors, segments = 16
     .Call(`_scimesh_scimesh_generate_multi_spheres`, centers, radii, colors, segments)
 }
 
-scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segments = 12L) {
-    .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments)
+scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segments = 12L, caps = TRUE) {
+    .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments, caps)
+}
+
+scimesh_generate_tube <- function(path, radius, segments, color, cap_start = TRUE, cap_end = TRUE) {
+    .Call(`_scimesh_scimesh_generate_tube`, path, radius, segments, color, cap_start, cap_end)
+}
+
+scimesh_generate_multi_tubes <- function(paths, radii, colors, segments = 12L, caps = FALSE) {
+    .Call(`_scimesh_scimesh_generate_multi_tubes`, paths, radii, colors, segments, caps)
 }
 
 scimesh_generate_cone <- function(base, tip, radius, segments, color) {
@@ -55,6 +63,10 @@ scimesh_render_triangles_raw <- function(positions, colors, camera_data, options
 
 scimesh_render_points_raw <- function(positions, colors, radius, camera_data, options_data) {
     .Call(`_scimesh_scimesh_render_points_raw`, positions, colors, radius, camera_data, options_data)
+}
+
+scimesh_render_lines_raw <- function(from, to, colors, width, camera_data, options_data, lit = FALSE) {
+    .Call(`_scimesh_scimesh_render_lines_raw`, from, to, colors, width, camera_data, options_data, lit)
 }
 
 scimesh_generate_cuboid <- function(center, half_extents, color) {

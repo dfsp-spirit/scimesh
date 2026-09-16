@@ -16,6 +16,61 @@ static inline void make_basis(const Vec3 &dir, Vec3 &u, Vec3 &v) {
     v = glm::cross(dir, u);
 }
 
+/// @brief Radius of the i-th primitive of a batched generator.
+///
+/// The `radii` array may be shorter than the number of primitives; missing
+/// entries are recycled from the first one.  A completely empty array means
+/// that no radii were given at all, in which case 1.0 is used.  This keeps the
+/// batched generators well-defined for any input length instead of reading out
+/// of bounds.
+static inline float batch_radius(const std::vector<float> &radii, size_t i) {
+    if (radii.empty()) {
+        return 1.0f;
+    }
+    return (i < radii.size()) ? radii[i] : radii[0];
+}
+
+/// @brief Color of the i-th primitive of a batched generator.
+///
+/// Same recycling rules as batch_radius(); an empty array means white.
+static inline Color batch_color(const std::vector<Color> &colors, size_t i) {
+    if (colors.empty()) {
+        return Color(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    return (i < colors.size()) ? colors[i] : colors[0];
+}
+
+/// @brief Vertex and triangle counts of the mesh returned by
+///        generate_sphere(center, radius, segments, color).
+///
+/// Used by generate_multi_spheres() to reserve the exact amount of memory
+/// before merging, which avoids repeated reallocation of the growing arrays.
+/// The unit tests in cpp_tests/test_primitives.cpp assert that these counts
+/// match the actual generator output, so the formulas cannot silently drift
+/// out of sync with the generators.
+static inline void sphere_geometry_counts(int segments, size_t &num_verts,
+                                          size_t &num_tris) {
+    const size_t s = static_cast<size_t>(std::max(3, segments));
+    // North pole + (s - 1) body rings of s vertices + south pole.
+    num_verts = s * (s - 1u) + 2u;
+    // North cap (s) + (s - 2) body rings (2 * s each) + south cap (s).
+    num_tris = 2u * s + (s - 2u) * 2u * s;
+}
+
+/// @brief Vertex and triangle counts of the mesh returned by
+///        generate_cylinder(start, end, radius, segments, color, caps).
+///
+/// Used by generate_multi_cylinders() to reserve the exact amount of memory
+/// before merging (see sphere_geometry_counts()).  Each end cap is a triangle
+/// fan with a center vertex and a dedicated ring of `segments` vertices.
+static inline void cylinder_geometry_counts(int segments, bool caps,
+                                            size_t &num_verts,
+                                            size_t &num_tris) {
+    const size_t s = static_cast<size_t>(std::max(3, segments));
+    num_verts = 2u * s + (caps ? 2u * (s + 1u) : 0u);
+    num_tris = 2u * s + (caps ? 2u * s : 0u);
+}
+
 
 Mesh generate_sphere(const Vec3 &center, float radius, int segments,
                      const Color &color) {
@@ -93,9 +148,16 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments,
 
 
 Mesh generate_cylinder(const Vec3 &start, const Vec3 &end, float radius,
-                       int segments, const Color &color) {
+                       int segments, const Color &color, bool caps) {
     segments = std::max(3, segments);
     Mesh m;
+
+    size_t expected_verts = 0, expected_tris = 0;
+    cylinder_geometry_counts(segments, caps, expected_verts, expected_tris);
+    m.vertices.reserve(expected_verts);
+    m.normals.reserve(expected_verts);
+    m.colors.reserve(expected_verts);
+    m.triangles.reserve(expected_tris);
 
     Vec3 dir = glm::normalize(end - start);
     Vec3 uu, vv;
@@ -137,52 +199,54 @@ Mesh generate_cylinder(const Vec3 &start, const Vec3 &end, float radius,
         m.triangles.push_back({a, c, d});
     }
 
-    // --- 2. BOTTOM CAP (Flat shading, normal = -dir) ---
-    uint32_t bottom_cap_offset = static_cast<uint32_t>(m.vertices.size());
+    if (caps) {
+        // --- 2. BOTTOM CAP (Flat shading, normal = -dir) ---
+        uint32_t bottom_cap_offset = static_cast<uint32_t>(m.vertices.size());
 
-    // Add the bottom center vertex
-    m.vertices.push_back(start);
-    m.normals.push_back(-dir);
-    m.colors.push_back(color);
-
-    // Add dedicated edge vertices for the bottom cap
-    for (int i = 0; i < segments; ++i) {
-        m.vertices.push_back(bottom_ring[i]);
-        m.normals.push_back(-dir); // Shared flat normal
+        // Add the bottom center vertex
+        m.vertices.push_back(start);
+        m.normals.push_back(-dir);
         m.colors.push_back(color);
-    }
 
-    for (int i = 0; i < segments; ++i) {
-        uint32_t center_idx = bottom_cap_offset;
-        uint32_t edge_idx = bottom_cap_offset + 1 + i;
-        uint32_t next_edge_idx = bottom_cap_offset + 1 + ((i + 1) % segments);
+        // Add dedicated edge vertices for the bottom cap
+        for (int i = 0; i < segments; ++i) {
+            m.vertices.push_back(bottom_ring[i]);
+            m.normals.push_back(-dir); // Shared flat normal
+            m.colors.push_back(color);
+        }
 
-        // Reversed CCW winding to face outward from the bottom
-        m.triangles.push_back({center_idx, next_edge_idx, edge_idx});
-    }
+        for (int i = 0; i < segments; ++i) {
+            uint32_t center_idx = bottom_cap_offset;
+            uint32_t edge_idx = bottom_cap_offset + 1 + i;
+            uint32_t next_edge_idx = bottom_cap_offset + 1 + ((i + 1) % segments);
 
-    // --- 3. TOP CAP (Flat shading, normal = +dir) ---
-    uint32_t top_cap_offset = static_cast<uint32_t>(m.vertices.size());
+            // Reversed CCW winding to face outward from the bottom
+            m.triangles.push_back({center_idx, next_edge_idx, edge_idx});
+        }
 
-    // Add the top center vertex
-    m.vertices.push_back(end);
-    m.normals.push_back(dir);
-    m.colors.push_back(color);
+        // --- 3. TOP CAP (Flat shading, normal = +dir) ---
+        uint32_t top_cap_offset = static_cast<uint32_t>(m.vertices.size());
 
-    // Add dedicated edge vertices for the top cap
-    for (int i = 0; i < segments; ++i) {
-        m.vertices.push_back(top_ring[i]);
-        m.normals.push_back(dir); // Shared flat normal
+        // Add the top center vertex
+        m.vertices.push_back(end);
+        m.normals.push_back(dir);
         m.colors.push_back(color);
-    }
 
-    for (int i = 0; i < segments; ++i) {
-        uint32_t center_idx = top_cap_offset;
-        uint32_t edge_idx = top_cap_offset + 1 + i;
-        uint32_t next_edge_idx = top_cap_offset + 1 + ((i + 1) % segments);
+        // Add dedicated edge vertices for the top cap
+        for (int i = 0; i < segments; ++i) {
+            m.vertices.push_back(top_ring[i]);
+            m.normals.push_back(dir); // Shared flat normal
+            m.colors.push_back(color);
+        }
 
-        // Standard CCW winding to face outward from the top
-        m.triangles.push_back({center_idx, edge_idx, next_edge_idx});
+        for (int i = 0; i < segments; ++i) {
+            uint32_t center_idx = top_cap_offset;
+            uint32_t edge_idx = top_cap_offset + 1 + i;
+            uint32_t next_edge_idx = top_cap_offset + 1 + ((i + 1) % segments);
+
+            // Standard CCW winding to face outward from the top
+            m.triangles.push_back({center_idx, edge_idx, next_edge_idx});
+        }
     }
 
     return m;
@@ -303,10 +367,23 @@ Mesh generate_multi_spheres(const std::vector<Vec3> &centers,
                             const std::vector<Color> &colors,
                             int segments) {
     Mesh result;
-    size_t n = centers.size();
+    const size_t n = centers.size();
+    if (n == 0) {
+        return result;
+    }
+
+    // Reserve the exact final size up front: every sphere has the same
+    // geometry (same `segments`), so the total is n times the per-sphere count.
+    size_t verts_per_sphere = 0, tris_per_sphere = 0;
+    sphere_geometry_counts(segments, verts_per_sphere, tris_per_sphere);
+    result.vertices.reserve(n * verts_per_sphere);
+    result.normals.reserve(n * verts_per_sphere);
+    result.colors.reserve(n * verts_per_sphere);
+    result.triangles.reserve(n * tris_per_sphere);
+
     for (size_t i = 0; i < n; ++i) {
-        float r = (i < radii.size()) ? radii[i] : radii[0];
-        Color c = (i < colors.size()) ? colors[i] : colors[0];
+        float r = batch_radius(radii, i);
+        Color c = batch_color(colors, i);
         Mesh sphere = generate_sphere(centers[i], r, segments, c);
         merge_mesh(result, sphere);
     }
@@ -317,14 +394,286 @@ Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
                               const std::vector<Vec3> &ends,
                               const std::vector<float> &radii,
                               const std::vector<Color> &colors,
-                              int segments) {
+                              int segments, bool caps) {
     Mesh result;
-    size_t n = starts.size();
+    const size_t n = starts.size();
+    if (n == 0) {
+        return result;
+    }
+
+    // Reserve the exact final size up front: every cylinder has the same
+    // geometry (same `segments`, same `caps`), so the total is n times the
+    // per-cylinder count.
+    size_t verts_per_cyl = 0, tris_per_cyl = 0;
+    cylinder_geometry_counts(segments, caps, verts_per_cyl, tris_per_cyl);
+    result.vertices.reserve(n * verts_per_cyl);
+    result.normals.reserve(n * verts_per_cyl);
+    result.colors.reserve(n * verts_per_cyl);
+    result.triangles.reserve(n * tris_per_cyl);
+
     for (size_t i = 0; i < n; ++i) {
-        float r = (i < radii.size()) ? radii[i] : radii[0];
-        Color c = (i < colors.size()) ? colors[i] : colors[0];
-        Mesh cyl = generate_cylinder(starts[i], ends[i], r, segments, c);
+        float r = batch_radius(radii, i);
+        Color c = batch_color(colors, i);
+        Mesh cyl = generate_cylinder(starts[i], ends[i], r, segments, c, caps);
         merge_mesh(result, cyl);
+    }
+    return result;
+}
+
+/// @brief Vertex and triangle counts of the mesh returned by
+///        generate_tube(path, radius, segments, color, cap_start, cap_end).
+///
+/// `num_path_points` must be the length of the *cleaned* path (see
+/// clean_tube_path()), i.e. after removing consecutive duplicates.
+static inline void tube_geometry_counts(size_t num_path_points, int segments,
+                                        bool cap_start, bool cap_end,
+                                        size_t &num_verts, size_t &num_tris) {
+    const size_t s = static_cast<size_t>(std::max(3, segments));
+    if (num_path_points < 2u) {
+        num_verts = 0u;
+        num_tris = 0u;
+        return;
+    }
+    const size_t rings = num_path_points;
+    const size_t sides = rings - 1u;
+    num_verts = rings * s;
+    num_tris = sides * 2u * s;
+    if (cap_start) {
+        num_verts += 1u + s;
+        num_tris += s;
+    }
+    if (cap_end) {
+        num_verts += 1u + s;
+        num_tris += s;
+    }
+}
+
+/// @brief Remove consecutive duplicate points from a tube path.
+///
+/// Points that coincide with their predecessor (within a small epsilon) carry
+/// no direction and would make the frame construction degenerate, so they are
+/// dropped.  The result has at least the first point and every point whose
+/// distance to the previously kept point exceeds the epsilon.
+static std::vector<Vec3> clean_tube_path(const std::vector<Vec3> &path,
+                                         float epsilon = 1e-6f) {
+    std::vector<Vec3> cleaned;
+    cleaned.reserve(path.size());
+    for (const Vec3 &p : path) {
+        if (cleaned.empty() || glm::length(p - cleaned.back()) > epsilon) {
+            cleaned.push_back(p);
+        }
+    }
+    return cleaned;
+}
+
+/// @brief Rotate `v` by the minimal rotation that maps `from_dir` onto `to_dir`.
+///
+/// Both directions must be unit length.  Used to transport the tube frame from
+/// one path point to the next (parallel transport / rotation-minimizing frame),
+/// which keeps the tube from twisting around its own axis.
+static inline Vec3 rotate_between(const Vec3 &v, const Vec3 &from_dir,
+                                  const Vec3 &to_dir) {
+    const Vec3 axis = glm::cross(from_dir, to_dir);
+    const float axis_len = glm::length(axis);
+    const float cos_angle = glm::dot(from_dir, to_dir);
+
+    if (axis_len < 1e-6f) {
+        if (cos_angle > 0.0f) {
+            return v;   // parallel: nothing to do.
+        }
+        // Anti-parallel (180 degrees).  The rotation axis is arbitrary but has
+        // to be perpendicular to the direction; Rodrigues reduces to a mirror.
+        const Vec3 helper = (std::abs(from_dir.x) < 0.9f) ? Vec3(1.0f, 0.0f, 0.0f)
+                                                         : Vec3(0.0f, 1.0f, 0.0f);
+        const Vec3 perp = glm::normalize(glm::cross(from_dir, helper));
+        return -v + 2.0f * glm::dot(v, perp) * perp;
+    }
+
+    // Rodrigues' rotation formula, with sin = |cross| and cos = dot for unit
+    // input vectors.
+    const Vec3 k = axis / axis_len;
+    return v * cos_angle + glm::cross(k, v) * axis_len +
+           k * (glm::dot(k, v) * (1.0f - cos_angle));
+}
+
+/// @brief Compute the unit tangent at every point of a cleaned tube path.
+///
+/// Interior points use the direction of the neighbouring points (a mitered
+/// joint), the first and last point use the adjacent segment direction.
+static std::vector<Vec3> tube_path_tangents(const std::vector<Vec3> &pts) {
+    const size_t n = pts.size();
+    std::vector<Vec3> tangents(n);
+    for (size_t i = 0; i < n; ++i) {
+        Vec3 dir;
+        if (i == 0) {
+            dir = pts[1] - pts[0];
+        } else if (i + 1 == n) {
+            dir = pts[n - 1] - pts[n - 2];
+        } else {
+            dir = pts[i + 1] - pts[i - 1];
+        }
+        const float len = glm::length(dir);
+        // Note: glm::normalize() rather than dir / len, so that the geometry of
+        // a 2-point tube is bit-identical to the one of generate_cylinder().
+        tangents[i] = (len > 1e-8f) ? glm::normalize(dir) : tangents[i - 1];
+    }
+    return tangents;
+}
+
+Mesh generate_tube(const std::vector<Vec3> &path, float radius, int segments,
+                   const Color &color, bool cap_start, bool cap_end) {
+    segments = std::max(3, segments);
+    Mesh m;
+
+    const std::vector<Vec3> pts = clean_tube_path(path);
+    if (pts.size() < 2u) {
+        return m;   // a single point (or none) has no direction to sweep along.
+    }
+
+    const size_t num_rings = pts.size();
+    const size_t s = static_cast<size_t>(segments);
+
+    size_t expected_verts = 0, expected_tris = 0;
+    tube_geometry_counts(num_rings, segments, cap_start, cap_end,
+                         expected_verts, expected_tris);
+    m.vertices.reserve(expected_verts);
+    m.normals.reserve(expected_verts);
+    m.colors.reserve(expected_verts);
+    m.triangles.reserve(expected_tris);
+
+    const std::vector<Vec3> tangents = tube_path_tangents(pts);
+    const float step = glm::two_pi<float>() / static_cast<float>(segments);
+
+    // Build one ring per path point.  The first frame comes from an arbitrary
+    // but stable basis; all following frames are transported from the previous
+    // one, which avoids the twisting that a per-point basis would introduce.
+    Vec3 u, v;
+    make_basis(tangents[0], u, v);
+
+    std::vector<Vec3> ring_basis_u(num_rings), ring_basis_v(num_rings);
+    ring_basis_u[0] = u;
+    ring_basis_v[0] = v;
+    for (size_t i = 1; i < num_rings; ++i) {
+        Vec3 transported = rotate_between(ring_basis_u[i - 1], tangents[i - 1],
+                                          tangents[i]);
+        // Re-orthogonalize against the new tangent to fight float drift.
+        transported = transported - glm::dot(transported, tangents[i]) * tangents[i];
+        const float len = glm::length(transported);
+        if (len < 1e-6f) {
+            // The transported vector collapsed (can happen for very sharp
+            // turns).  Fall back to a fresh basis for this ring.
+            make_basis(tangents[i], ring_basis_u[i], ring_basis_v[i]);
+            continue;
+        }
+        ring_basis_u[i] = transported / len;
+        ring_basis_v[i] = glm::cross(tangents[i], ring_basis_u[i]);
+    }
+
+    for (size_t i = 0; i < num_rings; ++i) {
+        for (int j = 0; j < segments; ++j) {
+            const float a = step * static_cast<float>(j);
+            const Vec3 radial = std::cos(a) * ring_basis_u[i] +
+                                std::sin(a) * ring_basis_v[i];
+            m.vertices.push_back(pts[i] + radius * radial);
+            m.normals.push_back(radial);
+            m.colors.push_back(color);
+        }
+    }
+
+    // Side quads (same winding as the cylinder body of generate_cylinder()).
+    for (size_t i = 0; i + 1u < num_rings; ++i) {
+        for (int j = 0; j < segments; ++j) {
+            const uint32_t a = static_cast<uint32_t>(i * s + static_cast<size_t>(j));
+            const uint32_t b = static_cast<uint32_t>(i * s + static_cast<size_t>((j + 1) % segments));
+            const uint32_t c = static_cast<uint32_t>((i + 1u) * s + static_cast<size_t>((j + 1) % segments));
+            const uint32_t d = static_cast<uint32_t>((i + 1u) * s + static_cast<size_t>(j));
+            m.triangles.push_back({a, b, c});
+            m.triangles.push_back({a, c, d});
+        }
+    }
+
+    // Start cap: outward-facing normal is -tangent of the first ring.
+    if (cap_start) {
+        const uint32_t cap_offset = static_cast<uint32_t>(m.vertices.size());
+        const Vec3 cap_normal = -tangents[0];
+        m.vertices.push_back(pts[0]);
+        m.normals.push_back(cap_normal);
+        m.colors.push_back(color);
+        for (int j = 0; j < segments; ++j) {
+            const float a = step * static_cast<float>(j);
+            const Vec3 radial = std::cos(a) * ring_basis_u[0] +
+                                std::sin(a) * ring_basis_v[0];
+            m.vertices.push_back(pts[0] + radius * radial);
+            m.normals.push_back(cap_normal);
+            m.colors.push_back(color);
+        }
+        for (int j = 0; j < segments; ++j) {
+            const uint32_t center_idx = cap_offset;
+            const uint32_t edge_idx = cap_offset + 1u + static_cast<uint32_t>(j);
+            const uint32_t next_edge_idx =
+                cap_offset + 1u + static_cast<uint32_t>((j + 1) % segments);
+            m.triangles.push_back({center_idx, next_edge_idx, edge_idx});
+        }
+    }
+
+    // End cap: outward-facing normal is +tangent of the last ring.
+    if (cap_end) {
+        const size_t last = num_rings - 1u;
+        const uint32_t cap_offset = static_cast<uint32_t>(m.vertices.size());
+        const Vec3 cap_normal = tangents[last];
+        m.vertices.push_back(pts[last]);
+        m.normals.push_back(cap_normal);
+        m.colors.push_back(color);
+        for (int j = 0; j < segments; ++j) {
+            const float a = step * static_cast<float>(j);
+            const Vec3 radial = std::cos(a) * ring_basis_u[last] +
+                                std::sin(a) * ring_basis_v[last];
+            m.vertices.push_back(pts[last] + radius * radial);
+            m.normals.push_back(cap_normal);
+            m.colors.push_back(color);
+        }
+        for (int j = 0; j < segments; ++j) {
+            const uint32_t center_idx = cap_offset;
+            const uint32_t edge_idx = cap_offset + 1u + static_cast<uint32_t>(j);
+            const uint32_t next_edge_idx =
+                cap_offset + 1u + static_cast<uint32_t>((j + 1) % segments);
+            m.triangles.push_back({center_idx, edge_idx, next_edge_idx});
+        }
+    }
+
+    return m;
+}
+
+Mesh generate_multi_tubes(const std::vector<std::vector<Vec3>> &paths,
+                          const std::vector<float> &radii,
+                          const std::vector<Color> &colors,
+                          int segments, bool caps) {
+    Mesh result;
+    const size_t n = paths.size();
+    if (n == 0) {
+        return result;
+    }
+
+    // Unlike spheres/cylinders, tubes can differ in length, so the exact total
+    // has to be summed over the paths.  Cleaning the paths here duplicates a
+    // little work in generate_tube(), but keeps the reservation exact.
+    size_t total_verts = 0, total_tris = 0;
+    for (const auto &path : paths) {
+        size_t path_verts = 0, path_tris = 0;
+        tube_geometry_counts(clean_tube_path(path).size(), segments, caps, caps,
+                             path_verts, path_tris);
+        total_verts += path_verts;
+        total_tris += path_tris;
+    }
+    result.vertices.reserve(total_verts);
+    result.normals.reserve(total_verts);
+    result.colors.reserve(total_verts);
+    result.triangles.reserve(total_tris);
+
+    for (size_t i = 0; i < n; ++i) {
+        const float r = batch_radius(radii, i);
+        const Color c = batch_color(colors, i);
+        merge_mesh(result, generate_tube(paths[i], r, segments, c, caps, caps));
     }
     return result;
 }

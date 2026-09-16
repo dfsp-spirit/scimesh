@@ -128,8 +128,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // scimesh_generate_multi_cylinders
-List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends, NumericVector radii, NumericMatrix colors, int segments);
-RcppExport SEXP _scimesh_scimesh_generate_multi_cylinders(SEXP startsSEXP, SEXP endsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP) {
+List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends, NumericVector radii, NumericMatrix colors, int segments, bool caps);
+RcppExport SEXP _scimesh_scimesh_generate_multi_cylinders(SEXP startsSEXP, SEXP endsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP, SEXP capsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -138,7 +138,39 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
     Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
-    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_cylinders(starts, ends, radii, colors, segments));
+    Rcpp::traits::input_parameter< bool >::type caps(capsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_cylinders(starts, ends, radii, colors, segments, caps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_tube
+List scimesh_generate_tube(NumericMatrix path, double radius, int segments, NumericVector color, bool cap_start, bool cap_end);
+RcppExport SEXP _scimesh_scimesh_generate_tube(SEXP pathSEXP, SEXP radiusSEXP, SEXP segmentsSEXP, SEXP colorSEXP, SEXP cap_startSEXP, SEXP cap_endSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< double >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    Rcpp::traits::input_parameter< bool >::type cap_start(cap_startSEXP);
+    Rcpp::traits::input_parameter< bool >::type cap_end(cap_endSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_tube(path, radius, segments, color, cap_start, cap_end));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_multi_tubes
+List scimesh_generate_multi_tubes(List paths, NumericVector radii, NumericMatrix colors, int segments, bool caps);
+RcppExport SEXP _scimesh_scimesh_generate_multi_tubes(SEXP pathsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP, SEXP capsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type paths(pathsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< bool >::type caps(capsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_tubes(paths, radii, colors, segments, caps));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -200,6 +232,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
     Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
     rcpp_result_gen = Rcpp::wrap(scimesh_render_points_raw(positions, colors, radius, camera_data, options_data));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_render_lines_raw
+List scimesh_render_lines_raw(NumericMatrix from, NumericMatrix to, NumericMatrix colors, double width, List camera_data, List options_data, bool lit);
+RcppExport SEXP _scimesh_scimesh_render_lines_raw(SEXP fromSEXP, SEXP toSEXP, SEXP colorsSEXP, SEXP widthSEXP, SEXP camera_dataSEXP, SEXP options_dataSEXP, SEXP litSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type to(toSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< double >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    Rcpp::traits::input_parameter< bool >::type lit(litSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_render_lines_raw(from, to, colors, width, camera_data, options_data, lit));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -550,11 +599,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_scale_mesh_nonuniform", (DL_FUNC) &_scimesh_scimesh_scale_mesh_nonuniform, 2},
     {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
-    {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
+    {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 6},
+    {"_scimesh_scimesh_generate_tube", (DL_FUNC) &_scimesh_scimesh_generate_tube, 6},
+    {"_scimesh_scimesh_generate_multi_tubes", (DL_FUNC) &_scimesh_scimesh_generate_multi_tubes, 5},
     {"_scimesh_scimesh_generate_cone", (DL_FUNC) &_scimesh_scimesh_generate_cone, 5},
     {"_scimesh_scimesh_generate_arrow", (DL_FUNC) &_scimesh_scimesh_generate_arrow, 7},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {"_scimesh_scimesh_render_points_raw", (DL_FUNC) &_scimesh_scimesh_render_points_raw, 5},
+    {"_scimesh_scimesh_render_lines_raw", (DL_FUNC) &_scimesh_scimesh_render_lines_raw, 7},
     {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},
     {"_scimesh_scimesh_generate_pyramid", (DL_FUNC) &_scimesh_scimesh_generate_pyramid, 4},
     {"_scimesh_scimesh_generate_tetrahedron", (DL_FUNC) &_scimesh_scimesh_generate_tetrahedron, 5},

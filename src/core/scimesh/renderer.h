@@ -150,12 +150,50 @@ public:
                             const Camera &camera,
                             const RenderOptions &options);
 
+    /// @brief Render line segments with a screen-space width to an image.
+    ///
+    /// Each (from, to) pair is drawn as a line of `width` pixels, optionally
+    /// shaded (usually not: lines are drawn flat, like hardware lines).  Lines
+    /// are depth-tested against each other and against previously drawn
+    /// geometry, and they are clipped against the near plane and the user
+    /// clip planes of `options`.
+    ///
+    /// This is the raw counterpart of adding a LineLayer to a Scene: use it for
+    /// standalone line/edge images, and Scene::add_lines() to combine lines
+    /// with meshes.
+    ///
+    /// @param from      Segment start points in world space.
+    /// @param to        Segment end points in world space (same size as `from`).
+    /// @param colors    Per-segment colors (same size as `from`).
+    /// @param width     Line width in output pixels.
+    /// @param camera    The camera.
+    /// @param options   Rendering settings (size, background, clip planes, ...).
+    /// @return The rendered image.
+    ///
+    /// @par Example
+    /// @code{.cpp}
+    /// std::vector<Vec3> from = {{-1,0,0}, {0,-1,0}};
+    /// std::vector<Vec3> to   = {{1,0,0},  {0,1,0}};
+    /// std::vector<Color> cols = {Color(1,0,0), Color(0,0,1)};
+    /// Image result = renderer.render_lines_raw(from, to, cols, 2.0f, cam, opts);
+    /// @endcode
+    ///
+    /// @see render_points_raw(), Scene::add_lines(), LineLayer
+    Image render_lines_raw(const std::vector<Vec3> &from,
+                           const std::vector<Vec3> &to,
+                           const std::vector<Color> &colors,
+                           float width,
+                           const Camera &camera,
+                           const RenderOptions &options);
+
 private:
     /// @brief Internal pipeline: transforms, clips, and rasterizes meshes.
     ///
     /// Each node's placement transform is applied as a model matrix before
-    /// the view transform.
+    /// the view transform.  Line layers (`line_nodes`) are drawn in the same
+    /// pass, after the meshes and against the same depth buffer.
     void render_pipeline(const std::vector<SceneNodeRef> &nodes,
+                         const std::vector<LineNodeRef> &line_nodes,
                          const Camera &camera,
                          const RenderOptions &options,
                          Image &output);

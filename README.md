@@ -52,6 +52,9 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
 - Depth cueing (fog)
 - Clip planes
 - Procedural geometry: spheres, cylinders, cuboids, pyramids, tetrahedra, tori, planes
+- Batched primitives: thousands of spheres/cylinders as a single mesh
+- Polyline tubes with rotation-minimizing frames (curved edges, streamlines)
+- Scene line layers: pixel-wide lines without geometry (wireframes, graph edges)
 - Mesh I/O: STL (binary/ASCII), Wavefront OBJ, Stanford PLY
 - Image I/O: PNG, PPM, BMP
 - Automatic camera framing (`camera_fit_mesh`, `camera_fit_scene`)

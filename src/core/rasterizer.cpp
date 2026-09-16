@@ -52,7 +52,8 @@ float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
 
 void Rasterizer::shade_and_write(int x, int y, float depth,
                                  const Color &color, const Vec3 &normal,
-                                 const Vec3 &light_direction, Image &output) {
+                                 const Vec3 &light_direction, Image &output,
+                                 bool lit) {
     if (x < 0 || x >= width || y < 0 || y >= height)
         return;
 
@@ -65,7 +66,10 @@ void Rasterizer::shade_and_write(int x, int y, float depth,
     // back-to-front sort in Renderer::render_pipeline().
     if (depth < z_buffer[idx]) {
         Color shaded;
-        if (lights.empty()) {
+        if (!lit) {
+            // Flat color, e.g. for line layers: skip the lighting calculation.
+            shaded = color;
+        } else if (lights.empty()) {
             shaded = shade_pixel(color, normal, light_direction,
                                  specular_color, shininess);
         } else {
@@ -248,6 +252,63 @@ void Rasterizer::rasterize_point(float screen_x, float screen_y, float depth,
             if (px < 0 || px >= width) continue;
             if (static_cast<float>(dx*dx + dy*dy) > r_sq) continue;
             shade_and_write(px, py, depth, color, normal, light_direction, output);
+        }
+    }
+}
+
+void Rasterizer::rasterize_line(const Vec3 &screen_v0, const Color &color0,
+                                const Vec3 &screen_v1, const Color &color1,
+                                float width, bool lit, const Vec3 &normal,
+                                const Vec3 &light_direction, Image &output) {
+    const float dx = screen_v1.x - screen_v0.x;
+    const float dy = screen_v1.y - screen_v0.y;
+
+    // NOTE: the parameter `width` (line width in pixels) shadows the
+    // Rasterizer::width member (image width), so the members have to be
+    // qualified explicitly in the bounds checks below.
+    const int img_width = this->width;
+    const int img_height = this->height;
+
+    // Walk along the dominant screen axis, one sample per device pixel, so that
+    // the stamps of consecutive samples overlap without gaps.
+    const float span = std::max(std::abs(dx), std::abs(dy));
+    const int steps = std::max(1, static_cast<int>(std::ceil(span)));
+
+    // The stamp is a disc, like rasterize_point().  `half_extent` is how many
+    // whole pixels the stamp reaches from the sample point, `r_sq` is the
+    // squared stamp radius used for the coverage test.
+    const float stamp_radius = std::max(0.5f, width * 0.5f);
+    const int half_extent = static_cast<int>(std::ceil(stamp_radius - 0.5f));
+    const float r_sq = stamp_radius * stamp_radius;
+
+    for (int i = 0; i <= steps; ++i) {
+        const float t = static_cast<float>(i) / static_cast<float>(steps);
+        const float sx = screen_v0.x + t * dx;
+        const float sy = screen_v0.y + t * dy;
+        const float depth = screen_v0.z + t * (screen_v1.z - screen_v0.z);
+        const Color c(color0.r + t * (color1.r - color0.r),
+                      color0.g + t * (color1.g - color0.g),
+                      color0.b + t * (color1.b - color0.b),
+                      color0.a + t * (color1.a - color0.a));
+        const int cx = static_cast<int>(std::lround(sx));
+        const int cy = static_cast<int>(std::lround(sy));
+
+        for (int py = cy - half_extent; py <= cy + half_extent; ++py) {
+            if (py < 0 || py >= img_height) {
+                continue;
+            }
+            for (int px = cx - half_extent; px <= cx + half_extent; ++px) {
+                if (px < 0 || px >= img_width) {
+                    continue;
+                }
+                const float ox = static_cast<float>(px - cx);
+                const float oy = static_cast<float>(py - cy);
+                if (ox * ox + oy * oy > r_sq) {
+                    continue;
+                }
+                shade_and_write(px, py, depth, c, normal, light_direction,
+                                output, lit);
+            }
         }
     }
 }

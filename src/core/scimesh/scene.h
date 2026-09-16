@@ -4,6 +4,7 @@
 #pragma once
 
 #include <scimesh/mesh.h>
+#include <scimesh/lines.h>
 #include <scimesh/math_utils.h>
 #include <string>
 
@@ -65,6 +66,21 @@ struct Scene {
 
     /// @brief Optional per-mesh node names, parallel to `meshes`.
     std::vector<std::string> names;
+
+    /// @brief Line layers drawn together with the meshes, after them.
+    ///
+    /// Line layers use a screen-space width and create no geometry, see
+    /// LineLayer.  They are ignored by compute_bounding_box() and by the mesh
+    /// exporters.
+    std::vector<LineLayer> lines;
+
+    /// @brief Per-layer placement transforms, parallel to `lines`.
+    ///
+    /// May be shorter than `lines`; missing entries default to identity.
+    std::vector<Mat4> line_transforms;
+
+    /// @brief Optional per-layer names, parallel to `lines`.
+    std::vector<std::string> line_names;
 
     /// @brief Add a mesh to the scene with an optional placement transform and name.
     ///
@@ -144,9 +160,75 @@ struct Scene {
         return out;
     }
 
+    /// @brief Add a line layer to the scene with an optional placement
+    ///        transform and name.
+    ///
+    /// Line layers are drawn after the meshes and use a screen-space width
+    /// (see LineLayer).  They do not contribute to the bounding box, so they
+    /// never change the camera framing.
+    ///
+    /// @param layer     The line layer to add (copied into the scene).
+    /// @param transform Model matrix placing the lines in world space
+    ///                  (default: identity).
+    /// @param name      Optional node name (used by exporters / debugging).
+    void add_lines(const LineLayer &layer, const Mat4 &transform = Mat4(1.0f),
+                   const std::string &name = "") {
+        lines.push_back(layer);
+        line_transforms.push_back(transform);
+        line_names.push_back(name);
+    }
+
+    /// @brief Set the placement transform of the line layer at `index`.
+    void set_line_transform(size_t index, const Mat4 &transform) {
+        if (index >= lines.size())
+            return;
+        while (line_transforms.size() <= index)
+            line_transforms.push_back(Mat4(1.0f));
+        line_transforms[index] = transform;
+    }
+
+    /// @brief The placement transform of the line layer at `index`
+    ///        (identity when unset).
+    const Mat4 &line_transform(size_t index) const {
+        static const Mat4 kIdentity(1.0f);
+        if (index >= line_transforms.size())
+            return kIdentity;
+        return line_transforms[index];
+    }
+
+    /// @brief The name of the line layer at `index` (empty when unset).
+    const std::string &line_name(size_t index) const {
+        static const std::string kEmpty;
+        if (index >= line_names.size())
+            return kEmpty;
+        return line_names[index];
+    }
+
+    /// @brief Number of line layers in the scene.
+    size_t line_count() const { return lines.size(); }
+
+    /// @brief A non-owning reference to the line layer at `index`.
+    ///
+    /// @pre `index < lines.size()`
+    LineNodeRef line_node(size_t index) const {
+        LineNodeRef r;
+        r.layer = &lines[index];
+        r.transform = line_transform(index);
+        r.name = line_name(index);
+        return r;
+    }
+
+    /// @brief Non-owning references to all line layers, in draw order.
+    std::vector<LineNodeRef> line_nodes() const {
+        std::vector<LineNodeRef> out;
+        out.reserve(lines.size());
+        for (size_t i = 0; i < lines.size(); ++i)
+            out.push_back(line_node(i));
+        return out;
+    }
+
     /// @brief Compute the combined axis-aligned bounding box of all meshes,
     ///        after applying each mesh's placement transform.
-    ///
     /// Iterates over all meshes, transforms the 8 corners of each mesh's
     /// bounding box, and computes the union.  Empty meshes are skipped.
     ///

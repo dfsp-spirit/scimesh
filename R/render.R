@@ -161,9 +161,11 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'
 #' @export
 render_scene <- function(meshes, camera = NULL, options = NULL) {
+    scene_lines <- NULL
     if (inherits(meshes, "scimesh_scene")) {
         sc <- meshes
         meshes <- sc$meshes
+        scene_lines <- sc$lines
         if (is.null(camera)) {
             camera <- sc$camera
         }
@@ -186,6 +188,11 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
         if (!is.list(m) || is.null(m$vertices) || is.null(m$triangles)) {
             stop("each mesh must be a list with 'vertices' and 'triangles'")
         }
+    }
+    # Line layers are appended to the scene so that the renderer draws them
+    # together with the meshes (same camera, same depth buffer).
+    if (length(scene_lines) > 0L) {
+        scene_data <- c(scene_data, normalize_line_layers(scene_lines))
     }
 
     scimesh_render_scene(scene_data, camera, options)

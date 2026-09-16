@@ -266,6 +266,32 @@ struct Rasterizer {
                          const Vec3 &normal, const Vec3 &light_direction,
                          Image &output);
 
+    /// @brief Rasterize a line segment with a screen-space width.
+    ///
+    /// The segment is drawn as a series of stamps along its dominant screen
+    /// axis (DDA), with linearly interpolated color and depth.  This is the
+    /// counterpart of rasterize_point() for line layers and is used by the
+    /// renderer for LineLayer geometry, which has no world-space thickness.
+    ///
+    /// Depth testing, fog, contrast and alpha blending behave exactly like for
+    /// triangles and points, so lines can be occluded by meshes and vice versa.
+    /// Zero-length segments degenerate to a single stamp (a dot).
+    ///
+    /// @param screen_v0, screen_v1  Screen-space endpoints (x, y, depth).
+    /// @param color0, color1        Colors at the two endpoints.
+    /// @param width                 Line width in *device* pixels (the caller
+    ///                              scales by the supersampling factor, exactly
+    ///                              like the radius of rasterize_point()).
+    /// @param lit                   Whether to shade the line; false draws the
+    ///                              flat color (the default for lines).
+    /// @param normal                Surface normal, used only when `lit` is true.
+    /// @param light_direction       Light direction, used only when `lit` is true.
+    /// @param[in,out] output        The output image.
+    void rasterize_line(const Vec3 &screen_v0, const Color &color0,
+                        const Vec3 &screen_v1, const Color &color1,
+                        float width, bool lit, const Vec3 &normal,
+                        const Vec3 &light_direction, Image &output);
+
     /// @brief Apply screen-space ambient occlusion to the output image.
     ///
     /// Uses the depth and normal buffers to darken crevices and corners.
@@ -299,9 +325,14 @@ struct Rasterizer {
 
 private:
     /// @brief Compute final pixel color with lighting, then write to output.
+    ///
+    /// @param lit When false, the color is written without any lighting
+    ///        calculation (used for flat, hardware-like line rendering).  Fog,
+    ///        contrast, depth testing and blending still apply.
     void shade_and_write(int x, int y, float depth,
                          const Color &color, const Vec3 &normal,
-                         const Vec3 &light_direction, Image &output);
+                         const Vec3 &light_direction, Image &output,
+                         bool lit = true);
 };
 
 } // namespace scimesh

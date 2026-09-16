@@ -1,9 +1,47 @@
 scimesh Changes
 ===============
 
-Current WIP
-------------
+Version 0.4.0 -- Batch primitives, tubes and line layers
+-------------------------------------------------------
 
+- NEW: polyline tubes.  `generate_tube()` sweeps a circular cross-section
+  along a path of points, and `generate_multi_tubes()` batches many such paths
+  into a single mesh.  The cross-section frames are computed by parallel
+  transport (rotation-minimizing frames), so tubes do not twist around their own
+  axis, and mitered joints keep the segments watertight.  R: `generate_tube()`
+  and `generate_tubes()`.  Useful for curved edges, streamlines and any shape
+  that is not a straight cylinder.
+- NEW: line layers — screen-space lines as first-class scene primitives.  A
+  `LineLayer` stores segments, per-segment colors and a width **in pixels** and
+  creates no geometry, which makes it the cheap way to draw thousands of thin
+  lines (wireframes, graph or connectome edges, trajectories).  Line layers are
+  drawn by `Renderer::render_scene()` in the same pass as the meshes (same
+  camera, same depth buffer, back-to-front blending for translucent lines), they
+  are ignored by `Scene::compute_bounding_box()`, and the mesh exporters skip
+  them (`scimesh_write_gltf()` warns).  R: `line_layer()`, the `lines` argument
+  of `scene()`, and `render_segments()` for free-standing lines.
+- NEW: `Renderer::render_lines_raw()` renders line segments directly, and
+  `Rasterizer::rasterize_line()` rasterizes a segment with a screen-space width
+  (flat/unlit by default, like hardware line rendering).
+- NEW: R functions `generate_multi_spheres()` and `generate_multi_cylinders()`
+  expose the batched primitive generators (one mesh for thousands of spheres or
+  cylinders), which previously existed only in C++.
+- NEW: `caps` argument for `generate_cylinder()` and `generate_multi_cylinders()`
+  (R and C++).  Open cylinders/tubes use about half the vertices and triangles,
+  which matters for large edge bundles whose ends are hidden inside node
+  spheres.  The default is unchanged (`caps = TRUE`).
+- PERF: the batched generators (`generate_multi_spheres()`,
+  `generate_multi_cylinders()`, `generate_multi_tubes()`) reserve the exact
+  final size before merging, instead of growing the arrays incrementally.
+- FIX: the batched generators no longer read out of bounds when the `radii` or
+  `colors` array is empty (missing entries are recycled from the first entry;
+  an empty array now means "use the default", i.e. radius 1.0 and white).
+- FIX: `Rasterizer::rasterize_line()` qualified the shadowed `width`/`height`
+  members in its pixel bounds check (the `width` parameter of the function
+  shadowed `Rasterizer::width`), which made the line invisible.
+
+Breaking changes
+----------------
 - BRK: clip planes are now defined in **world space** by default.  In 0.3.4 and
   earlier the `normal` and `offset` were interpreted in eye (camera) space, so
   the cut travelled with the camera and had to be re-tuned for every viewpoint.

@@ -45,6 +45,7 @@ add_executable(scimesh_tests
     test_to_string.cpp
     test_render_features.cpp
     test_rasterizer.cpp
+    test_lines.cpp
     test_integration.cpp
     test_visual_validation.cpp
     test_brain_mesh.cpp
