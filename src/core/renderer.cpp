@@ -3,6 +3,7 @@
 #include <scimesh/normals.h>
 #include <scimesh/clipping.h>
 #include <scimesh/rasterizer.h>
+#include <scimesh/text.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
@@ -118,7 +119,7 @@ Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const Render
     Image internal(options.width * aa, options.height * aa);
     std::vector<SceneNodeRef> nodes;
     nodes.push_back({&mesh, Mat4(1.0f), ""});
-    render_pipeline(nodes, {}, camera, options, internal);
+    render_pipeline(nodes, {}, {}, camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -129,7 +130,7 @@ Image Renderer::render_scene(const Scene &scene, const Camera &camera, const Ren
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
     std::vector<SceneNodeRef> nodes = scene.nodes();
-    render_pipeline(nodes, scene.line_nodes(), camera, options, internal);
+    render_pipeline(nodes, scene.line_nodes(), scene.text_nodes(), camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -256,12 +257,13 @@ Image Renderer::render_lines_raw(const std::vector<Vec3> &from,
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
     std::vector<SceneNodeRef> no_meshes;
-    render_pipeline(no_meshes, scene.line_nodes(), camera, options, internal);
+    render_pipeline(no_meshes, scene.line_nodes(), {}, camera, options, internal);
     return internal.downsample_box(aa);
 }
 
 void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
                                const std::vector<LineNodeRef> &line_nodes,
+                               const std::vector<TextNodeRef> &text_nodes,
                                const Camera &camera,
                                const RenderOptions &options,
                                Image &output) {
@@ -636,6 +638,23 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
         }
 
         rasterizer.set_blend_mode(false);
+    }
+
+    // ---- Text layers -------------------------------------------------------
+    // Text layers are drawn last, so labels end up on top of the geometry and
+    // of the lines.  They are drawn before the image is downsampled, so glyphs
+    // get the same anti-aliasing as everything else; the depth buffer is handed
+    // to the text renderer so that labels whose anchor is hidden behind a
+    // surface can be skipped (see TextLayer::depth_test).  Screen-space offsets
+    // (font size, pixel offsets, halo width) are scaled by the same factor as
+    // the supersampled image.
+    if (!text_nodes.empty()) {
+        const float pixel_scale =
+            static_cast<float>(output.width) /
+            static_cast<float>(std::max(1, options.width));
+        detail::render_text_layers(text_nodes, output, view_projection,
+                                   pixel_scale, rasterizer.z_buffer,
+                                   options.default_color);
     }
 }
 

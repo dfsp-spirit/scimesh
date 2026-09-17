@@ -31,9 +31,15 @@
 #'   cheap way to draw many thin lines (wireframes, graph or connectome edges).
 #'   They share the depth buffer with the meshes and are ignored by the scene
 #'   bounding box, so they never change the camera framing.
+#' @param texts \code{NULL}, a text layer (see \code{\link{text_layer}}), or a
+#'   list of them.  Text layers are drawn after the meshes and the lines as
+#'   billboards and create no geometry either, so they are the way to annotate a
+#'   figure (region names, atom labels, panel tags).  Like line layers they are
+#'   ignored by the scene bounding box.
 #' @return A scene descriptor list with S3 class \code{"scimesh_scene"},
 #'   with components \code{meshes} (list of scene nodes), \code{lines} (list
-#'   of line layers, possibly empty), \code{camera}, and \code{options}.
+#'   of line layers, possibly empty), \code{texts} (list of text layers,
+#'   possibly empty), \code{camera}, and \code{options}.
 #'
 #' @examples
 #' cube1 <- generate_cuboid(c(0, 0, 0), c(0.5, 0.5, 0.5), c(1, 0, 0, 1))
@@ -49,14 +55,21 @@
 #'              lines = line_layer(matrix(c(0, 0, 1), ncol = 3),
 #'                                 matrix(c(1, 1, 1), ncol = 3), width = 3))
 #'
-#' @seealso \code{\link{line_layer}}
+#' # add a label anchored above the cube:
+#' sc3 <- scene(list(cube1),
+#'              texts = text_layer(matrix(c(0, 1, 0), ncol = 3), "cube",
+#'                                 size = 18, adj = c(0.5, 0)))
+#'
+#' @seealso \code{\link{line_layer}}, \code{\link{text_layer}}
 #' @export
 scene <- function(meshes, camera = NULL, options = NULL,
-                  transforms = NULL, names = NULL, lines = NULL) {
+                  transforms = NULL, names = NULL, lines = NULL,
+                  texts = NULL) {
     if (!is.list(meshes)) {
         stop("meshes must be a list of mesh descriptors or scene nodes")
     }
     lines <- normalize_line_layers(lines)
+    texts <- normalize_text_layers(texts)
     nodes <- lapply(meshes, as_scimesh_scene_node)
 
     if (!is.null(transforms)) {
@@ -76,8 +89,8 @@ scene <- function(meshes, camera = NULL, options = NULL,
         }
     }
 
-    structure(list(meshes = nodes, lines = lines, camera = camera,
-                   options = options),
+    structure(list(meshes = nodes, lines = lines, texts = texts,
+                   camera = camera, options = options),
               class = "scimesh_scene")
 }
 
@@ -116,6 +129,42 @@ normalize_line_layers <- function(lines) {
     return(lines)
 }
 
+#' Normalize the \code{texts} argument of scene()
+#'
+#' Accepts \code{NULL}, a single text layer, or a list of text layers and
+#' returns a (possibly empty) list of text layers.  Layers may also be wrapped
+#' into a scene node (\code{list(text = <layer>, transform = ...)}), which
+#' allows moving a group of world-space labels with one transform.
+#'
+#' @param texts \code{NULL}, a text layer, or a list of text layers / nodes.
+#' @return A list of text layers (or text layer nodes).
+#' @keywords internal
+normalize_text_layers <- function(texts) {
+    if (is.null(texts)) {
+        return(list())
+    }
+    if (inherits(texts, "scimesh_text")) {
+        return(list(texts))
+    }
+    if (!is.list(texts)) {
+        stop("texts must be NULL, a text layer (see text_layer()), or a list of them")
+    }
+    for (i in seq_along(texts)) {
+        entry <- texts[[i]]
+        layer <- if (inherits(entry, "scimesh_text")) {
+            entry
+        } else if (is.list(entry)) {
+            entry$text
+        } else {
+            NULL
+        }
+        if (!inherits(layer, "scimesh_text")) {
+            stop(sprintf("texts[[%d]] is not a text layer, see text_layer()", i))
+        }
+    }
+    return(texts)
+}
+
 #' Normalize one scene entry into a scene node
 #'
 #' Accepts either a bare mesh descriptor (scimesh or rgl format) or an
@@ -144,6 +193,8 @@ print.scimesh_scene <- function(x, ...) {
     cat("scimesh scene with ", length(x$meshes), " mesh(es)",
         if (length(x$lines) > 0L) sprintf(" and %d line layer(s)",
                                           length(x$lines)) else "",
+        if (length(x$texts) > 0L) sprintf(" and %d text layer(s)",
+                                          length(x$texts)) else "",
         "\n", sep = "")
     for (i in seq_along(x$meshes)) {
         node <- x$meshes[[i]]

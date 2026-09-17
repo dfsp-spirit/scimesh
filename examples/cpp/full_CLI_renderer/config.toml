@@ -57,3 +57,20 @@ color   = [0.5, 0.5, 0.5]   # fog color
 [post]
 crop_to_content = false       # trim transparent/background border after render
 grow_px         = 0           # add padding in pixels after cropping
+
+[text]
+# Text labels drawn on top of the meshes.  Each entry of "string" is paired with
+# the entry of "at" at the same index.  Labels are billboards: they always face
+# the camera and keep their pixel size, so they stay readable from any view.
+string     = []               # one or more labels; use \n for line breaks
+at         = []               # positions: [[x, y, z], ...] (world coords, or
+                              # output pixels when space = "screen")
+size       = 18.0             # text height in output pixels
+color      = [0.0, 0.0, 0.0]  # R, G, B (and optional A) in [0, 1]
+halo_color = [1.0, 1.0, 1.0, 0.0]  # outline color; alpha 0 disables the halo
+halo_width = 1.5              # halo thickness in pixels
+font       = ""               # path to a .ttf file (empty = bundled Inter font)
+space      = "world"          # "world" (3D anchored) or "screen" (pixels)
+depth_test = true             # hide labels anchored behind the geometry
+adj        = [0.5, 0.5]       # where the position sits on the text box, 0-1
+offset     = [0.0, 0.0]       # extra label offset in pixels

@@ -55,6 +55,9 @@ software rasterizer using smooth shading, no anti-aliasing. Render time 1.8 seco
 - Batched primitives: thousands of spheres/cylinders as a single mesh
 - Polyline tubes with rotation-minimizing frames (curved edges, streamlines)
 - Scene line layers: pixel-wide lines without geometry (wireframes, graph edges)
+- Text labels: anti-aliased TrueType glyphs anchored in world space (labels that
+  follow the camera and can be hidden by the geometry) or in screen space
+  (titles, panel tags, captions), with optional halos, in a bundled font
 - Mesh I/O: STL (binary/ASCII), Wavefront OBJ, Stanford PLY
 - Image I/O: PNG, PPM, BMP
 - Automatic camera framing (`camera_fit_mesh`, `camera_fit_scene`)
@@ -92,6 +95,40 @@ see `line_layer()` and `render_segments()`), which get smooth edges instead of a
 hard staircase pattern.  The cost grows with `aa_samples^2`, both in render time
 and in memory (the internal framebuffer is `width * aa_samples` by
 `height * aa_samples`).
+
+
+### Text labels (R)
+
+`text_layer()` annotates a figure.  Labels are billboards: they always face the
+camera and keep their size in pixels, and the font ships with the package, so no
+system font is needed.  Positions are either world space (the label sticks to the
+3D location it annotates, and is hidden when geometry is in front of it) or
+screen space (`space = "screen"`, pixels from the top left corner):
+
+```r
+surf <- generate_sphere(c(0, 0, 0), radius = 1)
+cam  <- camera_auto(list(surf), direction = c(0, 0, 1))
+
+sc <- scene(list(surf), camera = cam,
+            options = render_options(background_color = c(1, 1, 1, 1)),
+            texts = list(
+                # a label that belongs to the scene, anchored above the sphere
+                text_layer(matrix(c(0, 1.3, 0), ncol = 3), "superior",
+                           size = 20, adj = c(0.5, 0)),
+                # a direction annotation that must stay readable: no depth test
+                text_layer(matrix(c(1.4, 0, 0), ncol = 3), "anterior",
+                           size = 18, adj = c(0, 0.5),
+                           colors = c(0.8, 0.1, 0.1, 1), depth_test = FALSE),
+                # a panel tag, positioned in output pixels
+                text_layer(c(12, 10), "A", space = "screen", adj = c(0, 1),
+                           size = 28, halo_color = c(1, 1, 1, 0.9))))
+img <- render_scene(sc)
+```
+
+Labels can also be measured (`text_extent()`), projected from 3D to image pixels
+(`world_to_screen()`), and used without any mesh (`render_text()`).  Use
+`font_file = "path/to/font.ttf"` or the `SCIMESH_FONT` environment variable to
+replace the bundled Inter font.
 
 
 ## What scimesh is not

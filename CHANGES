@@ -1,8 +1,8 @@
 scimesh Changes
 ===============
 
-Version 0.4.0 -- Batch primitives, tubes and line layers
--------------------------------------------------------
+Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
+-------------------------------------------------------------------
 
 - NEW: polyline tubes.  `generate_tube()` sweeps a circular cross-section
   along a path of points, and `generate_multi_tubes()` batches many such paths
@@ -49,6 +49,35 @@ Version 0.4.0 -- Batch primitives, tubes and line layers
   proportional to `aa_samples^2` in render time and memory.  Passing a number
   explicitly still overrides the option, and invalid values (including an
   invalid global option) are reported as errors instead of being ignored.
+- NEW: text labels — annotations for figures, without any geometry.  A
+  `TextLayer` stores strings with anchor positions, a font size **in pixels**,
+  colors and optional halos, and is drawn by `Renderer::render_scene()` after
+  the meshes and the lines, so labels end up on top of the geometry.  Positions
+  are either **world space** (projected with the scene camera, so a label sticks
+  to the brain region or atom it annotates) or **screen space** (output pixels,
+  which is what titles, panel tags and captions need).  Labels are billboards:
+  they always face the camera and keep their pixel size, and they are hidden by
+  geometry in front of their anchor unless `depth_test = FALSE`, so a world-space
+  label behaves like an annotation *of* a surface instead of shining through the
+  model.  `adj` places the anchor on the text box (as in `rgl`), pixel offsets
+  nudge a label next to its anchor, multi-line labels are supported, and halos
+  keep text readable on dark or busy geometry.  Glyphs are rasterized with
+  `stb_truetype` (vendored, public domain) from the bundled
+  `inst/extdata/Inter-Regular.ttf` (SIL OFL 1.1), which can be replaced per
+  label or by setting the `SCIMESH_FONT` environment variable.  R:
+  `text_layer()`, the `texts` argument of `scene()` and `render_text()` for
+  free-standing labels; `text_extent()` measures labels for layout.
+- NEW: the low-level font API in C++ — `Font` (load a `.ttf`, metrics, glyph
+  coverage bitmaps, text measurement), `draw_text()` to draw text into any
+  `Image`, and `measure_text()` for layout decisions.  `Font::decode_utf8()`
+  means UTF-8 labels ("°C", accented names) work.
+- NEW: `world_to_screen()` (C++ and R) projects world coordinates to the pixels
+  of a rendered image using the same matrices as the renderer, which is what
+  screen-space annotations and callout lines need.
+- NEW: CLI text options — `--text`, `--text-at`, `--text-size`, `--text-color`,
+  `--text-halo`, `--text-halo-width`, `--text-font`, `--text-screen`,
+  `--text-no-depth`, `--text-adj` and `--text-offset`, plus a `[text]` section
+  in `config.toml`, so figures can be annotated without writing any code.
 
 Breaking changes
 ----------------

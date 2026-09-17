@@ -5,6 +5,7 @@
 
 #include <scimesh/mesh.h>
 #include <scimesh/lines.h>
+#include <scimesh/text.h>
 #include <scimesh/math_utils.h>
 #include <string>
 
@@ -29,6 +30,12 @@ struct SceneNodeRef {
 /// and names.  When rendered, meshes are drawn in order — later meshes appear
 /// on top of earlier ones.  Each mesh's placement transform is applied as a
 /// model matrix at render time (meshes themselves are never modified).
+///
+/// Next to meshes a scene can hold two kinds of screen-oriented decorations,
+/// which create no geometry and are drawn after the meshes:
+/// LineLayer objects (see `lines` / add_lines()) and text labels
+/// (see `texts` / add_texts()).  Both are ignored by the bounding box and by
+/// the mesh exporters.
 ///
 /// ## Construction
 ///
@@ -81,6 +88,24 @@ struct Scene {
 
     /// @brief Optional per-layer names, parallel to `lines`.
     std::vector<std::string> line_names;
+
+    /// @brief Text layers drawn together with the meshes, after them.
+    ///
+    /// Text layers hold strings with world-space or screen-space positions and
+    /// are drawn as billboards (see TextLayer).  Like line layers, they create
+    /// no geometry and are ignored by compute_bounding_box() and by the mesh
+    /// exporters, so adding labels never changes the camera framing.
+    std::vector<TextLayer> texts;
+
+    /// @brief Per-layer placement transforms, parallel to `texts`.
+    ///
+    /// May be shorter than `texts`; missing entries default to identity.  The
+    /// transform is applied to the anchor positions and ignored for
+    /// screen-space layers.
+    std::vector<Mat4> text_transforms;
+
+    /// @brief Optional per-layer names, parallel to `texts`.
+    std::vector<std::string> text_names;
 
     /// @brief Add a mesh to the scene with an optional placement transform and name.
     ///
@@ -224,6 +249,73 @@ struct Scene {
         out.reserve(lines.size());
         for (size_t i = 0; i < lines.size(); ++i)
             out.push_back(line_node(i));
+        return out;
+    }
+
+    /// @brief Add a text layer to the scene with an optional placement
+    ///        transform and name.
+    ///
+    /// Text layers are drawn after the meshes and the line layers (see
+    /// TextLayer).  They do not contribute to the bounding box, so they never
+    /// change the camera framing.
+    ///
+    /// @param layer     The text layer to add (copied into the scene).
+    /// @param transform Model matrix applied to the anchor positions of the
+    ///                  layer (default: identity).
+    /// @param name      Optional node name (used for debugging).
+    void add_texts(const TextLayer &layer, const Mat4 &transform = Mat4(1.0f),
+                   const std::string &name = "") {
+        texts.push_back(layer);
+        text_transforms.push_back(transform);
+        text_names.push_back(name);
+    }
+
+    /// @brief Set the placement transform of the text layer at `index`.
+    void set_text_transform(size_t index, const Mat4 &transform) {
+        if (index >= texts.size())
+            return;
+        while (text_transforms.size() <= index)
+            text_transforms.push_back(Mat4(1.0f));
+        text_transforms[index] = transform;
+    }
+
+    /// @brief The placement transform of the text layer at `index`
+    ///        (identity when unset).
+    const Mat4 &text_transform(size_t index) const {
+        static const Mat4 kIdentity(1.0f);
+        if (index >= text_transforms.size())
+            return kIdentity;
+        return text_transforms[index];
+    }
+
+    /// @brief The name of the text layer at `index` (empty when unset).
+    const std::string &text_name(size_t index) const {
+        static const std::string kEmpty;
+        if (index >= text_names.size())
+            return kEmpty;
+        return text_names[index];
+    }
+
+    /// @brief Number of text layers in the scene.
+    size_t text_count() const { return texts.size(); }
+
+    /// @brief A non-owning reference to the text layer at `index`.
+    ///
+    /// @pre `index < texts.size()`
+    TextNodeRef text_node(size_t index) const {
+        TextNodeRef r;
+        r.layer = &texts[index];
+        r.transform = text_transform(index);
+        r.name = text_name(index);
+        return r;
+    }
+
+    /// @brief Non-owning references to all text layers, in draw order.
+    std::vector<TextNodeRef> text_nodes() const {
+        std::vector<TextNodeRef> out;
+        out.reserve(texts.size());
+        for (size_t i = 0; i < texts.size(); ++i)
+            out.push_back(text_node(i));
         return out;
     }
 

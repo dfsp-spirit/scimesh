@@ -252,6 +252,57 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_text_extent
+NumericMatrix scimesh_text_extent(CharacterVector text, double size, std::string font_file, double line_spacing);
+RcppExport SEXP _scimesh_scimesh_text_extent(SEXP textSEXP, SEXP sizeSEXP, SEXP font_fileSEXP, SEXP line_spacingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type text(textSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type font_file(font_fileSEXP);
+    Rcpp::traits::input_parameter< double >::type line_spacing(line_spacingSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_text_extent(text, size, font_file, line_spacing));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_default_font_path
+std::string scimesh_default_font_path();
+RcppExport SEXP _scimesh_scimesh_default_font_path() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(scimesh_default_font_path());
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_font_info
+List scimesh_font_info(std::string font_file, double size);
+RcppExport SEXP _scimesh_scimesh_font_info(SEXP font_fileSEXP, SEXP sizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type font_file(font_fileSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_font_info(font_file, size));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_world_to_screen
+DataFrame scimesh_world_to_screen(NumericMatrix points, List camera_data, int width, int height, List options_data);
+RcppExport SEXP _scimesh_scimesh_world_to_screen(SEXP pointsSEXP, SEXP camera_dataSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP options_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< int >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< int >::type height(heightSEXP);
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_world_to_screen(points, camera_data, width, height, options_data));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_generate_cuboid
 List scimesh_generate_cuboid(NumericVector center, NumericVector half_extents, NumericVector color);
 RcppExport SEXP _scimesh_scimesh_generate_cuboid(SEXP centerSEXP, SEXP half_extentsSEXP, SEXP colorSEXP) {
@@ -607,6 +658,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {"_scimesh_scimesh_render_points_raw", (DL_FUNC) &_scimesh_scimesh_render_points_raw, 5},
     {"_scimesh_scimesh_render_lines_raw", (DL_FUNC) &_scimesh_scimesh_render_lines_raw, 7},
+    {"_scimesh_scimesh_text_extent", (DL_FUNC) &_scimesh_scimesh_text_extent, 4},
+    {"_scimesh_scimesh_default_font_path", (DL_FUNC) &_scimesh_scimesh_default_font_path, 0},
+    {"_scimesh_scimesh_font_info", (DL_FUNC) &_scimesh_scimesh_font_info, 2},
+    {"_scimesh_scimesh_world_to_screen", (DL_FUNC) &_scimesh_scimesh_world_to_screen, 5},
     {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},
     {"_scimesh_scimesh_generate_pyramid", (DL_FUNC) &_scimesh_scimesh_generate_pyramid, 4},
     {"_scimesh_scimesh_generate_tetrahedron", (DL_FUNC) &_scimesh_scimesh_generate_tetrahedron, 5},

@@ -25,6 +25,7 @@ declare -a EXAMPLES=(
     whole_brain_sulc
     video_frames_orbit
     colormaps
+    text_labels
 )
 
 PASSED=()

@@ -69,6 +69,22 @@ scimesh_render_lines_raw <- function(from, to, colors, width, camera_data, optio
     .Call(`_scimesh_scimesh_render_lines_raw`, from, to, colors, width, camera_data, options_data, lit)
 }
 
+scimesh_text_extent <- function(text, size, font_file = "", line_spacing = 1.2) {
+    .Call(`_scimesh_scimesh_text_extent`, text, size, font_file, line_spacing)
+}
+
+scimesh_default_font_path <- function() {
+    .Call(`_scimesh_scimesh_default_font_path`)
+}
+
+scimesh_font_info <- function(font_file, size) {
+    .Call(`_scimesh_scimesh_font_info`, font_file, size)
+}
+
+scimesh_world_to_screen <- function(points, camera_data, width, height, options_data) {
+    .Call(`_scimesh_scimesh_world_to_screen`, points, camera_data, width, height, options_data)
+}
+
 scimesh_generate_cuboid <- function(center, half_extents, color) {
     .Call(`_scimesh_scimesh_generate_cuboid`, center, half_extents, color)
 }

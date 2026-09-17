@@ -134,6 +134,9 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'   and optionally \code{colors}, \code{face_colors}, \code{normals}, and
 #'   \code{default_color}.  Elements may also be rgl-style lists (with
 #'   \code{vb} and \code{it}), which are converted automatically.
+#'   A \code{scimesh_scene} may hold line layers and text layers, which are
+#'   drawn together with the meshes (see \code{\link{line_layer}} and
+#'   \code{\link{text_layer}}).
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #'   Ignored (falls back to the scene's camera) when \code{meshes} is a
 #'   \code{scimesh_scene} and \code{camera} is \code{NULL}.
@@ -162,10 +165,12 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #' @export
 render_scene <- function(meshes, camera = NULL, options = NULL) {
     scene_lines <- NULL
+    scene_texts <- NULL
     if (inherits(meshes, "scimesh_scene")) {
         sc <- meshes
         meshes <- sc$meshes
         scene_lines <- sc$lines
+        scene_texts <- sc$texts
         if (is.null(camera)) {
             camera <- sc$camera
         }
@@ -193,6 +198,10 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
     # together with the meshes (same camera, same depth buffer).
     if (length(scene_lines) > 0L) {
         scene_data <- c(scene_data, normalize_line_layers(scene_lines))
+    }
+    # Text layers are appended after the lines (they are drawn last).
+    if (length(scene_texts) > 0L) {
+        scene_data <- c(scene_data, normalize_text_layers(scene_texts))
     }
 
     scimesh_render_scene(scene_data, camera, options)

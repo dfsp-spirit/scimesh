@@ -53,6 +53,14 @@ as part of the library.
 - **License:** Public Domain or MIT
 - **Usage:** Image writing (PNG, BMP output)
 
+### stb_truetype.h
+
+- **Project:** [nothings/stb](https://github.com/nothings/stb)
+- **Author:** Sean Barrett
+- **License:** Public Domain or MIT
+- **Usage:** TrueType (`.ttf`) font parsing, glyph metrics and glyph
+  rasterization for text labels
+
 
 
 ## Full license texts for all software packages listed above
@@ -224,7 +232,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 
-### stb_image.h and stb_image_write.h
+### stb_image.h, stb_image_write.h and stb_truetype.h
 
 ```
 This software is available under 2 licenses -- choose whichever you prefer.

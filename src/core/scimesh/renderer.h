@@ -85,7 +85,9 @@ public:
     /// @brief Render a scene (collection of meshes) to an image.
     ///
     /// All meshes are drawn into the same image in the order they appear
-    /// in the scene.  Later meshes are drawn on top of earlier ones.
+    /// in the scene.  Later meshes are drawn on top of earlier ones.  Line
+    /// layers (Scene::add_lines()) and text layers (Scene::add_texts()) of the
+    /// scene are drawn after the meshes, in that order.
     ///
     /// @param scene   The scene containing one or more meshes.
     /// @param camera  The camera.
@@ -191,9 +193,12 @@ private:
     ///
     /// Each node's placement transform is applied as a model matrix before
     /// the view transform.  Line layers (`line_nodes`) are drawn in the same
-    /// pass, after the meshes and against the same depth buffer.
+    /// pass, after the meshes and against the same depth buffer, followed by
+    /// the text layers (`text_nodes`), which optionally use that depth buffer
+    /// to hide labels sitting behind the rendered geometry.
     void render_pipeline(const std::vector<SceneNodeRef> &nodes,
                          const std::vector<LineNodeRef> &line_nodes,
+                         const std::vector<TextNodeRef> &text_nodes,
                          const Camera &camera,
                          const RenderOptions &options,
                          Image &output);

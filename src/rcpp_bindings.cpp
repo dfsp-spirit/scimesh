@@ -10,6 +10,8 @@
 #include <scimesh/obj_io.h>
 #include <scimesh/ply_io.h>
 #include <scimesh/gltf_io.h>
+#include <scimesh/font.h>
+#include <scimesh/text.h>
 
 using namespace Rcpp;
 
@@ -506,13 +508,120 @@ scimesh::LineLayer build_line_layer_from_r(List layer) {
     return out;
 }
 
+/// Build a scimesh TextLayer from an R text layer descriptor.
+///
+/// The descriptor is a list with components `strings` (character vector),
+/// `positions` (Nx3 or Nx2 numeric matrix; Nx2 is screen space), optional
+/// `colors` (Nx4 or a single RGBA vector), `size` (text height in pixels),
+/// `font_file` (path to a .ttf, "" = bundled font), `space` ("world" or
+/// "screen"), `adj` (length 2), `offset` (length 2), `line_spacing`,
+/// `depth_test`, `halo_color` (length 3 or 4) and `halo_width`.  Use
+/// text_layer() on the R side to create one.
+scimesh::TextLayer build_text_layer_from_r(List layer) {
+    scimesh::TextLayer out;
+
+    CharacterVector strings = layer["strings"];
+    out.strings.reserve(strings.size());
+    for (int i = 0; i < strings.size(); i++) {
+        out.strings.push_back(as<std::string>(strings[i]));
+    }
+
+    NumericMatrix positions = layer["positions"];
+    out.positions.reserve(positions.nrow());
+    for (int i = 0; i < positions.nrow(); i++) {
+        out.positions.push_back(scimesh::Vec3(
+            static_cast<float>(positions(i, 0)),
+            static_cast<float>(positions(i, 1)),
+            positions.ncol() > 2 ? static_cast<float>(positions(i, 2)) : 0.0f));
+    }
+
+    if (layer.containsElementNamed("colors")) {
+        SEXP cs = layer["colors"];
+        if (cs != R_NilValue) {
+            NumericMatrix colors(cs);
+            out.colors.reserve(colors.nrow());
+            for (int i = 0; i < colors.nrow(); i++) {
+                out.colors.push_back(scimesh::Color(
+                    static_cast<float>(colors(i, 0)),
+                    static_cast<float>(colors(i, 1)),
+                    static_cast<float>(colors(i, 2)),
+                    static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+            }
+        }
+    }
+
+    if (layer.containsElementNamed("size")) {
+        SEXP s = layer["size"];
+        if (s != R_NilValue) out.size = static_cast<float>(as<double>(s));
+    }
+    if (layer.containsElementNamed("font_file")) {
+        SEXP f = layer["font_file"];
+        if (f != R_NilValue) out.font_file = as<std::string>(f);
+    }
+    if (layer.containsElementNamed("space")) {
+        SEXP sp = layer["space"];
+        if (sp != R_NilValue) {
+            out.space = (as<std::string>(sp) == "screen")
+                            ? scimesh::TextSpace::SCREEN
+                            : scimesh::TextSpace::WORLD;
+        }
+    }
+    if (layer.containsElementNamed("adj")) {
+        SEXP a = layer["adj"];
+        if (a != R_NilValue) {
+            NumericVector adj(a);
+            if (adj.size() >= 2) {
+                out.adj = scimesh::Vec2(static_cast<float>(adj[0]),
+                                        static_cast<float>(adj[1]));
+            }
+        }
+    }
+    if (layer.containsElementNamed("offset")) {
+        SEXP o = layer["offset"];
+        if (o != R_NilValue) {
+            NumericVector offset(o);
+            if (offset.size() >= 2) {
+                out.offset = scimesh::Vec2(static_cast<float>(offset[0]),
+                                           static_cast<float>(offset[1]));
+            }
+        }
+    }
+    if (layer.containsElementNamed("line_spacing")) {
+        SEXP ls = layer["line_spacing"];
+        if (ls != R_NilValue) out.line_spacing = static_cast<float>(as<double>(ls));
+    }
+    if (layer.containsElementNamed("depth_test")) {
+        SEXP d = layer["depth_test"];
+        if (d != R_NilValue) out.depth_test = as<bool>(d);
+    }
+    if (layer.containsElementNamed("halo_color")) {
+        SEXP h = layer["halo_color"];
+        if (h != R_NilValue) {
+            NumericVector halo(h);
+            if (halo.size() >= 3) {
+                out.halo_color = scimesh::Color(
+                    static_cast<float>(halo[0]), static_cast<float>(halo[1]),
+                    static_cast<float>(halo[2]),
+                    static_cast<float>(halo.size() > 3 ? halo[3] : 1.0f));
+            }
+        }
+    }
+    if (layer.containsElementNamed("halo_width")) {
+        SEXP hw = layer["halo_width"];
+        if (hw != R_NilValue) out.halo_width = static_cast<float>(as<double>(hw));
+    }
+
+    return out;
+}
+
 /// Build a scimesh Scene from an R list of mesh descriptors or scene nodes.
 ///
 /// Each entry may be a bare mesh descriptor (scimesh or rgl format, via
 /// build_mesh_from_r), a scene node list with components `mesh` (a mesh
 /// descriptor), optional `transform` (4x4 NumericMatrix), and optional
-/// `name` (string), or a line layer (class `scimesh_lines`, created by
-/// lines()), optionally wrapped into a scene node with a `transform`.
+/// `name` (string), a line layer (class `scimesh_lines`, created by lines()),
+/// or a text layer (class `scimesh_text`, created by text_layer()).  Line and
+/// text layers may be wrapped into a scene node with a `transform`.
 scimesh::Scene build_scene_from_r(List scene_data) {
     scimesh::Scene scene;
     for (int i = 0; i < scene_data.size(); i++) {
@@ -544,6 +653,33 @@ scimesh::Scene build_scene_from_r(List scene_data) {
         }
         if (layer_sexp != R_NilValue) {
             scene.add_lines(build_line_layer_from_r(List(layer_sexp)), t, name);
+            continue;
+        }
+
+        // Text layer, possibly wrapped into a scene node (with a transform).
+        SEXP text_sexp = R_NilValue;
+        if (Rf_inherits(entry, "scimesh_text")) {
+            text_sexp = entry;
+        } else if (entry.containsElementNamed("text")) {
+            SEXP inner = entry["text"];
+            if (inner != R_NilValue && Rf_inherits(inner, "scimesh_text")) {
+                text_sexp = inner;
+                if (entry.containsElementNamed("transform")) {
+                    SEXP tr = entry["transform"];
+                    if (tr != R_NilValue) {
+                        t = mat4_from_r(NumericMatrix(tr));
+                    }
+                }
+                if (entry.containsElementNamed("name")) {
+                    SEXP nm = entry["name"];
+                    if (nm != R_NilValue) {
+                        name = as<std::string>(nm);
+                    }
+                }
+            }
+        }
+        if (text_sexp != R_NilValue) {
+            scene.add_texts(build_text_layer_from_r(List(text_sexp)), t, name);
             continue;
         }
 
@@ -914,6 +1050,72 @@ List scimesh_render_lines_raw(NumericMatrix from, NumericMatrix to,
                                            static_cast<float>(width), cam, opts);
     }
     return image_to_r_list(result);
+}
+
+// ---- Text labels ------------------------------------------------------------
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_text_extent(CharacterVector text, double size,
+                                  std::string font_file = "",
+                                  double line_spacing = 1.2) {
+    const int n = text.size();
+    NumericMatrix out(n, 5);
+    CharacterVector colnames = CharacterVector::create(
+        "width", "height", "ascent", "descent", "lines");
+    out.attr("dimnames") = List::create(R_NilValue, colnames);
+    for (int i = 0; i < n; i++) {
+        const scimesh::TextExtent ext = scimesh::measure_text(
+            as<std::string>(text[i]), static_cast<float>(size), font_file,
+            static_cast<float>(line_spacing));
+        out(i, 0) = ext.width;
+        out(i, 1) = ext.height;
+        out(i, 2) = ext.ascent;
+        out(i, 3) = ext.descent;
+        out(i, 4) = static_cast<double>(ext.line_count);
+    }
+    return out;
+}
+
+// [[Rcpp::export]]
+std::string scimesh_default_font_path() {
+    return scimesh::default_font_path();
+}
+
+// [[Rcpp::export]]
+List scimesh_font_info(std::string font_file, double size) {
+    const scimesh::Font font = scimesh::cached_font(font_file, static_cast<float>(size));
+    const scimesh::FontMetrics m = font.metrics();
+    return List::create(
+        _["family"] = font.family_name(),
+        _["path"] = font.source_path(),
+        _["size"] = font.pixel_size(),
+        _["ascent"] = m.ascent,
+        _["descent"] = m.descent,
+        _["line_gap"] = m.line_gap);
+}
+
+// [[Rcpp::export]]
+DataFrame scimesh_world_to_screen(NumericMatrix points, List camera_data,
+                                 int width, int height, List options_data) {
+    scimesh::Camera cam = build_camera_from_r(camera_data);
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+
+    const int n = points.nrow();
+    NumericVector x(n), y(n), depth(n);
+    LogicalVector in_front(n);
+    for (int i = 0; i < n; i++) {
+        const scimesh::ProjectedPoint p = scimesh::world_to_screen(
+            cam, scimesh::Vec3(static_cast<float>(points(i, 0)),
+                               static_cast<float>(points(i, 1)),
+                               static_cast<float>(points(i, 2))),
+            width, height, opts.projection, opts.near_plane, opts.far_plane);
+        x[i] = p.pixel.x;
+        y[i] = p.pixel.y;
+        depth[i] = p.depth;
+        in_front[i] = p.in_front;
+    }
+    return DataFrame::create(_["x"] = x, _["y"] = y, _["depth"] = depth,
+                             _["in_front"] = in_front);
 }
 
 // ---- Procedural geometry ----------------------------------------------------

@@ -29,6 +29,7 @@
 #include <scimesh/stl_io.h>
 #include <scimesh/fs_mesh_converter.h>
 #include <scimesh/normals.h>
+#include <scimesh/text.h>
 #include "toml.hpp"
 
 #include <string>
@@ -40,7 +41,9 @@
 #include <cmath>
 
 using scimesh::Vec3;
+using scimesh::Vec2;
 using scimesh::Color;
+using scimesh::Mat4;
 using scimesh::Mesh;
 using scimesh::Scene;
 using scimesh::Camera;
@@ -50,6 +53,8 @@ using scimesh::Renderer;
 using scimesh::Image;
 using scimesh::CropContentDirection;
 using scimesh::FitMode;
+using scimesh::TextLayer;
+using scimesh::TextSpace;
 using scimesh::grid_arrange;
 
 // =========================================================================
@@ -88,6 +93,19 @@ struct AppConfig {
     std::string shadingMode     = "smooth";
     bool backfaceCulling        = true;
     bool invertNormals          = false;
+
+    // [text] (labels; see TextLayer)
+    std::vector<std::string> textStrings;  // one per label (--text, repeatable)
+    std::vector<Vec3> textPositions;       // parallel to textStrings (--text-at)
+    float textSize = 18.0f;                // height in output pixels
+    Color textColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
+    Color textHaloColor = Color(1.0f, 1.0f, 1.0f, 0.0f);  // alpha 0 = no halo
+    float textHaloWidth = 1.5f;
+    std::string textFont;      // empty = bundled Inter-Regular.ttf
+    bool textScreenSpace = false;  // positions are output pixels (--text-screen)
+    bool textDepthTest = true;     // --text-no-depth disables the depth test
+    Vec2 textAdj = Vec2(0.5f, 0.5f);      // where the position sits on the text box
+    Vec2 textOffset = Vec2(0.0f, 0.0f);   // extra pixel offset
 
     // [wireframe]
     bool  wireframe      = false;
@@ -192,6 +210,22 @@ static void printHelp(const char* prog) {
         "  --rotate DEG        Rotate output 0/90/180/270 degrees CW (default: 0)\n"
         "  -h, --help          Show this help and exit\n"
         "\n"
+        "Text labels (optional, drawn on top of the meshes):\n"
+        "  --text STRING       Label text (repeatable; use \\n for line breaks)\n"
+        "  --text-at X,Y,Z     Position of the matching --text label. In world\n"
+        "                      space (default) or in output pixels with\n"
+        "                      --text-screen (origin: top left).\n"
+        "  --text-size N       Text height in pixels (default: 18)\n"
+        "  --text-color R,G,B[,A]  Text color, 0-1 (default: 0,0,0)\n"
+        "  --text-halo R,G,B[,A]   Halo (outline) color, alpha 0 = off\n"
+        "  --text-halo-width N Halo thickness in pixels (default: 1.5)\n"
+        "  --text-font FILE    .ttf file to use (default: bundled Inter font)\n"
+        "  --text-screen       Positions are output pixels instead of world coords\n"
+        "  --text-no-depth     Always draw labels, even behind the geometry\n"
+        "  --text-adj X,Y      Where the position sits on the text box, 0-1\n"
+        "                      (default: 0.5,0.5 = centred)\n"
+        "  --text-offset DX,DY Extra label offset in pixels (default: 0,0)\n"
+        "\n"
         "Composite mode (image layout, no rendering):\n"
         "  --composite         Enter composite mode; remaining non-flag arguments\n"
         "                      are image files to arrange into a grid.\n"
@@ -214,16 +248,23 @@ static void printHelp(const char* prog) {
         "  %s --mesh model.ply --shading flat --wireframe --bg-color 0.9,0.95,1.0\n"
         "  %s --composite view1.png view2.png --cols 2 --output grid.png\n"
         "\n"
+        "Text label workflow:\n"
+        "  %s --mesh brain.ply --text anterior --text-at 3,0,0 --text-size 22\n"
+        "  %s --mesh atom.ply --text C --text-at 0,0,0 --text-halo 1,1,1,0.9\n"
+        "  %s --mesh brain.ply --text 'my figure' --text-at 20,20,0 --text-screen --text-adj 0,1\n"
+        "\n"
         "Composite workflow (render multiple views + combine):\n"
         "  %s --mesh brain.ply --view-dir 0,0,1 --output lat\n"
         "  %s --mesh brain.ply --view-dir 0,1,0 --output med\n"
         "  %s --composite lat.png med.png colorbar.png --cols 3 --output final\n",
-        prog, prog, prog, prog, prog, prog, prog, prog);
+        prog, prog, prog, prog, prog, prog, prog, prog, prog, prog, prog);
 }
 
 // =========================================================================
 // TOML config loading
 // =========================================================================
+
+static std::string lowerCase(const std::string& s);  // defined below
 
 static AppConfig loadTOMLConfig(const std::string& path) {
     AppConfig cfg;
@@ -292,6 +333,67 @@ static AppConfig loadTOMLConfig(const std::string& path) {
             cfg.shadingMode      = (*sh)["mode"].value_or("smooth");
             cfg.backfaceCulling  = (*sh)["backface_culling"].value_or(true);
             cfg.invertNormals    = (*sh)["invert_normals"].value_or(false);
+        }
+
+        // [text]
+        if (auto* tx = tbl["text"].as_table()) {
+            // Support both a single label (string) and multiple ones (array).
+            if (auto* arr = (*tx)["string"].as_array()) {
+                for (const auto& s : *arr) {
+                    if (auto v = s.value<std::string>()) cfg.textStrings.push_back(*v);
+                }
+            } else if (auto s = (*tx)["string"].value<std::string>()) {
+                if (!s->empty()) cfg.textStrings.push_back(*s);
+            }
+            // Positions: one [x, y, z] per label.
+            if (auto* arr = (*tx)["at"].as_array()) {
+                for (const auto& p : *arr) {
+                    if (auto* pos = p.as_array()) {
+                        if (pos->size() >= 3) {
+                            cfg.textPositions.push_back(Vec3(
+                                static_cast<float>((*pos)[0].value_or(0.0)),
+                                static_cast<float>((*pos)[1].value_or(0.0)),
+                                static_cast<float>((*pos)[2].value_or(0.0))));
+                        }
+                    }
+                }
+            }
+            cfg.textSize = static_cast<float>((*tx)["size"].value_or(18.0));
+            if (auto* col = (*tx)["color"].as_array()) {
+                if (col->size() >= 3) {
+                    cfg.textColor = Color(static_cast<float>((*col)[0].value_or(0.0)),
+                                          static_cast<float>((*col)[1].value_or(0.0)),
+                                          static_cast<float>((*col)[2].value_or(0.0)),
+                                          static_cast<float>(col->size() > 3
+                                              ? (*col)[3].value_or(1.0) : 1.0));
+                }
+            }
+            if (auto* col = (*tx)["halo_color"].as_array()) {
+                if (col->size() >= 3) {
+                    cfg.textHaloColor = Color(static_cast<float>((*col)[0].value_or(1.0)),
+                                              static_cast<float>((*col)[1].value_or(1.0)),
+                                              static_cast<float>((*col)[2].value_or(1.0)),
+                                              static_cast<float>(col->size() > 3
+                                                  ? (*col)[3].value_or(0.0) : 0.0));
+                }
+            }
+            cfg.textHaloWidth = static_cast<float>((*tx)["halo_width"].value_or(1.5));
+            cfg.textFont      = (*tx)["font"].value_or("");
+            const std::string space = lowerCase((*tx)["space"].value_or("world"));
+            cfg.textScreenSpace = (space == "screen");
+            cfg.textDepthTest   = (*tx)["depth_test"].value_or(true);
+            if (auto* adj = (*tx)["adj"].as_array()) {
+                if (adj->size() >= 2) {
+                    cfg.textAdj = Vec2(static_cast<float>((*adj)[0].value_or(0.5)),
+                                       static_cast<float>((*adj)[1].value_or(0.5)));
+                }
+            }
+            if (auto* off = (*tx)["offset"].as_array()) {
+                if (off->size() >= 2) {
+                    cfg.textOffset = Vec2(static_cast<float>((*off)[0].value_or(0.0)),
+                                          static_cast<float>((*off)[1].value_or(0.0)));
+                }
+            }
         }
 
         // [wireframe]
@@ -380,6 +482,57 @@ static bool parseVec3(const std::string& s, float& r, float& g, float& b) {
 }
 
 // =========================================================================
+// Helper: parse "X,Y" into two floats
+// =========================================================================
+
+static bool parseVec2(const std::string& s, float& x, float& y) {
+    std::istringstream ss(s);
+    std::string token;
+    float vals[2];
+    int i = 0;
+    while (std::getline(ss, token, ',') && i < 2) {
+        vals[i++] = static_cast<float>(std::atof(token.c_str()));
+    }
+    if (i != 2) return false;
+    x = vals[0]; y = vals[1];
+    return true;
+}
+
+// =========================================================================
+// Helper: parse "R,G,B" or "R,G,B,A" (values 0-1) into a Color
+// =========================================================================
+
+static bool parseColor(const std::string& s, Color& color) {
+    std::istringstream ss(s);
+    std::string token;
+    float vals[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    int i = 0;
+    while (std::getline(ss, token, ',') && i < 4) {
+        vals[i++] = static_cast<float>(std::atof(token.c_str()));
+    }
+    if (i < 3) return false;
+    color = Color(vals[0], vals[1], vals[2], vals[3]);
+    return true;
+}
+
+// =========================================================================
+// Helper: turn the two-character sequence "\n" into a real newline
+// =========================================================================
+
+static std::string unescapeNewlines(const std::string& s) {
+    std::string out;
+    out.reserve(s.size());
+    for (size_t i = 0; i < s.size(); ++i) {
+        if (s[i] == '\\' && i + 1 < s.size()) {
+            if (s[i + 1] == 'n') { out.push_back('\n'); ++i; continue; }
+            if (s[i + 1] == '\\') { out.push_back('\\'); ++i; continue; }
+        }
+        out.push_back(s[i]);
+    }
+    return out;
+}
+
+// =========================================================================
 // CLI argument parsing
 // =========================================================================
 
@@ -426,6 +579,52 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             std::string val = nextStr();
             if (!parseVec3(val, cfg.meshColorR, cfg.meshColorG, cfg.meshColorB)) {
                 fprintf(stderr, "Warning: invalid value for --mesh-color '%s', ignored.\n", val.c_str());
+            }
+        } else if (arg == "--text") {
+            cfg.textStrings.push_back(unescapeNewlines(nextStr()));
+        } else if (arg == "--text-at") {
+            std::string val = nextStr();
+            float x = 0.0f, y = 0.0f, z = 0.0f;
+            if (parseVec3(val, x, y, z)) {
+                cfg.textPositions.push_back(Vec3(x, y, z));
+            } else {
+                fprintf(stderr, "Warning: invalid value for --text-at '%s', ignored.\n", val.c_str());
+            }
+        } else if (arg == "--text-size") {
+            cfg.textSize = nextFloat();
+        } else if (arg == "--text-color") {
+            std::string val = nextStr();
+            if (!parseColor(val, cfg.textColor)) {
+                fprintf(stderr, "Warning: invalid value for --text-color '%s', ignored.\n", val.c_str());
+            }
+        } else if (arg == "--text-halo") {
+            std::string val = nextStr();
+            if (!parseColor(val, cfg.textHaloColor)) {
+                fprintf(stderr, "Warning: invalid value for --text-halo '%s', ignored.\n", val.c_str());
+            }
+        } else if (arg == "--text-halo-width") {
+            cfg.textHaloWidth = nextFloat();
+        } else if (arg == "--text-font") {
+            cfg.textFont = nextStr();
+        } else if (arg == "--text-screen") {
+            cfg.textScreenSpace = true;
+        } else if (arg == "--text-no-depth") {
+            cfg.textDepthTest = false;
+        } else if (arg == "--text-adj") {
+            std::string val = nextStr();
+            float x = 0.5f, y = 0.5f;
+            if (parseVec2(val, x, y)) {
+                cfg.textAdj = Vec2(x, y);
+            } else {
+                fprintf(stderr, "Warning: invalid value for --text-adj '%s', ignored.\n", val.c_str());
+            }
+        } else if (arg == "--text-offset") {
+            std::string val = nextStr();
+            float x = 0.0f, y = 0.0f;
+            if (parseVec2(val, x, y)) {
+                cfg.textOffset = Vec2(x, y);
+            } else {
+                fprintf(stderr, "Warning: invalid value for --text-offset '%s', ignored.\n", val.c_str());
             }
         } else if (arg == "--no-normals") {
             cfg.computeNormals = false;
@@ -803,8 +1002,9 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    // 4. Require at least one mesh file
-    if (cfg.meshFiles.empty()) {
+    // 4. Require at least one mesh file (text labels alone are allowed and are
+    //    useful in screen space, e.g. to title a rendered or composed image)
+    if (cfg.meshFiles.empty() && cfg.textStrings.empty()) {
         fprintf(stderr, "Error: no mesh file specified.\n");
         fprintf(stderr, "Set 'file' in [mesh] section of config.toml"
                         " or use --mesh <path>.\n");
@@ -847,10 +1047,16 @@ int main(int argc, char** argv) {
     Vec3 up(cfg.upX, cfg.upY, cfg.upZ);
 
     std::cout << "Setting up camera..." << std::endl;
-    Camera cam = scimesh::camera_fit_scene(scene, view_dir, up, cfg.fov, cfg.margin);
-
-    if (cfg.projection == "orthographic") {
-        cam.projection = scimesh::ProjectionType::ORTHOGRAPHIC;
+    Camera cam;
+    if (scene.meshes.empty()) {
+        // Nothing to frame: only screen-space labels are meaningful here, and
+        // those do not use the camera at all.
+        std::cout << "  no meshes given, keeping the default camera" << std::endl;
+    } else {
+        cam = scimesh::camera_fit_scene(scene, view_dir, up, cfg.fov, cfg.margin);
+        if (cfg.projection == "orthographic") {
+            cam.projection = scimesh::ProjectionType::ORTHOGRAPHIC;
+        }
     }
 
     std::cout << "  eye    = (" << cam.eye.x << ", " << cam.eye.y << ", "
@@ -862,6 +1068,41 @@ int main(int argc, char** argv) {
 
     // 8. Build render options
     RenderOptions opts = buildRenderOptions(cfg, cam);
+
+    // 8b. Text labels (optional).  Positions are paired with the labels by
+    //     index, so the n-th --text uses the n-th --text-at.
+    if (!cfg.textStrings.empty()) {
+        TextLayer layer;
+        layer.strings = cfg.textStrings;
+        layer.positions.reserve(cfg.textStrings.size());
+        for (size_t i = 0; i < cfg.textStrings.size(); ++i) {
+            if (i < cfg.textPositions.size()) {
+                layer.positions.push_back(cfg.textPositions[i]);
+            } else {
+                if (cfg.textPositions.size() != cfg.textStrings.size()) {
+                    fprintf(stderr, "Warning: no --text-at for text %zu, using (0,0,0).\n",
+                            i + 1);
+                }
+                layer.positions.push_back(Vec3(0.0f, 0.0f, 0.0f));
+            }
+        }
+        layer.colors.assign(cfg.textStrings.size(), cfg.textColor);
+        layer.size = cfg.textSize;
+        layer.font_file = cfg.textFont;
+        layer.space = cfg.textScreenSpace ? TextSpace::SCREEN : TextSpace::WORLD;
+        layer.adj = cfg.textAdj;
+        layer.offset = cfg.textOffset;
+        layer.depth_test = cfg.textDepthTest;
+        layer.halo_color = cfg.textHaloColor;
+        layer.halo_width = cfg.textHaloWidth;
+        scene.add_texts(layer, Mat4(1.0f), "cli-text");
+
+        std::cout << "Text: " << layer.strings.size() << " label(s), "
+                  << layer.size << " px, "
+                  << (cfg.textScreenSpace ? "screen" : "world") << " space"
+                  << (cfg.textDepthTest ? "" : ", depth test off")
+                  << (layer.halo_color.a > 0.0f ? ", halo" : "") << std::endl;
+    }
 
     // 9. Render
     std::cout << "Rendering at " << opts.width << "×" << opts.height;

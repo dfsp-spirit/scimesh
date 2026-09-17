@@ -126,6 +126,64 @@ struct Camera {
 };
 
 // ---------------------------------------------------------------------------
+//  Projection of world points into the image
+// ---------------------------------------------------------------------------
+
+/// @brief A world-space point projected into the rendered image.
+///
+/// @see world_to_screen()
+struct ProjectedPoint {
+    /// @brief Pixel coordinates, origin at the **top left**, y growing down.
+    Vec2 pixel = Vec2(0.0f);
+
+    /// @brief Depth in normalized device coordinates, in `[-1, 1]`; smaller
+    ///        values are closer to the camera.
+    ///
+    /// Comparable with Rasterizer::z_buffer, which uses the same units.
+    float depth = 1.0f;
+
+    /// @brief Whether the point is in front of the camera.
+    ///
+    /// False for points at or behind the camera plane, where `pixel` is not
+    /// meaningful and the point cannot be visible.
+    bool in_front = false;
+};
+
+/// @brief Project a world-space point to the pixel coordinates of a rendered image.
+///
+/// Uses exactly the same view and projection matrices as the renderer, so the
+/// result matches the rendered image (of size `width` x `height`).  This is what
+/// makes it possible to anchor 2D annotations to locations in the 3D scene — for
+/// example a TextLayer in TextSpace::SCREEN placed next to a rendered object,
+/// or a callout line drawn with a LineLayer.
+///
+/// @param camera     The camera the render used.
+/// @param world      The point to project, in world space.
+/// @param width      Width of the rendered image in pixels.
+/// @param height     Height of the rendered image in pixels.
+/// @param projection Projection type the render used.  Note that this is
+///                   RenderOptions::projection, which the renderer applies
+///                   instead of Camera::projection.
+/// @param near_plane Near clipping plane distance of the render.
+/// @param far_plane  Far clipping plane distance of the render.
+/// @return The projected point, see ProjectedPoint.
+/// @throws std::invalid_argument If `width` or `height` is not positive.
+///
+/// @par Example
+/// @code{.cpp}
+/// ProjectedPoint p = world_to_screen(cam, Vec3(0, 0, 0), 800, 600,
+///                              ProjectionType::PERSPECTIVE, 0.1f, 100.0f);
+/// if (p.in_front) {
+///     std::printf("origin at (%.1f, %.1f), depth %.3f\n", p.pixel.x, p.pixel.y, p.depth);
+/// }
+/// @endcode
+///
+/// @see ProjectedPoint, TextLayer, Camera::get_view_matrix()
+ProjectedPoint world_to_screen(const Camera &camera, const Vec3 &world, int width,
+                               int height, ProjectionType projection,
+                               float near_plane, float far_plane);
+
+// ---------------------------------------------------------------------------
 //  Camera helper functions
 // ---------------------------------------------------------------------------
 

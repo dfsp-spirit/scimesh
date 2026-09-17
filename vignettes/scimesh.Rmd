@@ -482,6 +482,94 @@ blend in the wrong order, and a translucent surface never occludes anything (it
 writes no depth).  Point rendering (`render_points()`) does not blend at all;
 use `render_spheres()` (which renders meshes) for translucent spheres.
 
+### Text Labels
+
+`text_layer()` adds text to a scene, which is what figures need to name a region,
+an atom or a panel.  Labels are **billboards**: they always face the camera and
+keep the size given in `size` (in output pixels), so they stay readable from every
+viewpoint — unlike text that is converted into 3D geometry, which skews as the
+camera moves.  Labels create no geometry, they are drawn after the meshes and
+lines (so they appear on top of the model), and the font ships with the package
+(Inter, SIL OFL 1.1), so no system font is required.
+
+Positions are either **world space** (the default) or **screen space**
+(`space = "screen"`, measured in output pixels from the top-left corner):
+
+```{r, eval=FALSE}
+surf <- generate_sphere(c(0, 0, 0), radius = 1)
+cam  <- camera_auto(list(surf), direction = c(0, 0, 1))
+opts <- render_options(width = 500, height = 400,
+                       background_color = c(1, 1, 1, 1))
+
+sc <- scene(list(surf), camera = cam, options = opts,
+            texts = list(
+                # world space: anchored above the sphere, follows the camera
+                text_layer(matrix(c(0, 1.3, 0), ncol = 3), "superior",
+                           size = 20, adj = c(0.5, 0)),
+                # a direction label that must stay readable: no depth test
+                text_layer(matrix(c(1.4, 0, 0), ncol = 3), "anterior",
+                           size = 18, adj = c(0, 0.5),
+                           colors = c(0.75, 0.15, 0.15, 1), depth_test = FALSE),
+                # screen space: a panel tag in the top-left corner
+                text_layer(c(12, 10), "A", space = "screen", adj = c(0, 1),
+                           size = 28, halo_color = c(1, 1, 1, 0.9))))
+img <- render_scene(sc)
+```
+
+Labelling a brain surface works exactly the same way: the labels carry world
+coordinates of the region they name, and are hidden when the surface is in front
+of them (unless `depth_test = FALSE`).
+
+```{r, eval=FALSE}
+surface <- freesurferformats::read.fs.surface("sub-01/surf/lh.white")
+sulc    <- freesurferformats::read.fs.morph("sub-01/surf/lh.sulc")
+colors  <- apply_colormap(sulc, colormap = viridis_colormap(256L),
+                          winsor_percentiles = c(2, 98))
+if (ncol(colors) == 3) colors <- cbind(colors, 1)
+
+brain <- list(vertices = surface$vertices, triangles = surface$faces,
+              colors = colors)
+cam <- camera_auto(brain, direction = c(1, 0, 0))   # lateral view
+
+# The free surface is roughly 100 mm wide, so the labels sit at x = +-55 mm.
+sc <- scene(list(brain), camera = cam,
+            options = render_options(width = 600, height = 500,
+                                     background_color = c(1, 1, 1, 1)),
+            texts = list(
+                text_layer(matrix(c(-55, 0, 0), ncol = 3), "posterior",
+                           size = 22, adj = c(1, 0.5), depth_test = FALSE),
+                text_layer(matrix(c(55, 0, 0), ncol = 3), "anterior",
+                           size = 22, adj = c(0, 0.5), depth_test = FALSE)))
+img <- render_scene(sc)
+```
+
+Things worth knowing:
+
+- `adj` places the anchor on the text box, exactly like `adj` in base R
+  graphics: `c(0, 0)` is the bottom-left corner, `c(1, 1)` the top-right one, and
+  `c(0.5, 0.5)` (default) centres the text on the position.
+- `offset` shifts the label by a number of pixels after anchoring, which is the
+  easy way to put an atom label *next to* an atom instead of onto it.
+- `depth_test` (default `TRUE`) hides a world-space label when geometry is in
+  front of its anchor.  Use `FALSE` for annotations that must always be readable,
+  and for labels anchored on a surface.
+- `halo_color` (with `halo_width`) draws an outline behind the glyphs, which
+  keeps labels readable on dark or busy geometry.
+- `colors` sets per-label colours, `"\n"` starts a new line, and `text_extent()`
+  measures a label so you can right-align a caption or keep two labels from
+  overlapping.
+- `world_to_screen()` converts world coordinates into the pixels of a rendered
+  image, which is what you need to place a screen-space label next to a location
+  in the scene (or to draw a callout line with `line_layer()`).
+- No mesh at all is needed for screen-space labels: `render_text()` draws labels
+  onto the background described by the render options.
+- Replace the typeface with `font_file = "path/to/font.ttf"`, or for the whole
+  session by setting the `SCIMESH_FONT` environment variable.
+
+The same feature is available in the C++ API (`TextLayer`, `Scene::add_texts()`,
+`draw_text()`, see `examples/cpp/text_labels/`) and in the CLI renderer
+(`--text`, `--text-at`, `--text-size`, `--text-screen`, ...).
+
 ### Background and Transparency
 
 By default, scimesh renders with a transparent background
