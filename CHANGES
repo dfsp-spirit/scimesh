@@ -17,9 +17,29 @@ Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
   lines (wireframes, graph or connectome edges, trajectories).  Line layers are
   drawn by `Renderer::render_scene()` in the same pass as the meshes (same
   camera, same depth buffer, back-to-front blending for translucent lines), they
-  are ignored by `Scene::compute_bounding_box()`, and the mesh exporters skip
-  them (`scimesh_write_gltf()` warns).  R: `line_layer()`, the `lines` argument
-  of `scene()`, and `render_segments()` for free-standing lines.
+  contribute to `Scene::compute_bounding_box()` unless their `affects_bounds`
+  flag is false (see below), and the mesh exporters skip them
+  (`scimesh_write_gltf()` warns).  R: `line_layer()`, the `lines` argument of
+  `scene()`, and `render_segments()` for free-standing lines.
+- NEW: line layers are content by default, i.e. they define the bounding box of
+  their scene exactly like a mesh does, and the camera fitted to the scene
+  covers them.  This is what makes a scene that contains only lines drawable at
+  all: a tractogram or a connectome without a brain surface used to have no
+  geometry to derive a camera from.  Lines that are decoration rather than
+  content (a leader line pointing at a label, an axis cross, a scale bar drawn
+  as segments) can opt out with `LineLayer::affects_bounds = false` (R:
+  `line_layer(..., affects_bounds = FALSE)`, and
+  `scene_set_line_affects_bounds(scene, index/name, affects_bounds)` for a layer
+  that is already part of a scene), so that adding such a layer can never push
+  the camera away from the data.  A scene without meshes is framed by its lines
+  even if they all opted out, since there is nothing else to fit.  Note that
+  text layers are still ignored by the bounding box, because the extent of a
+  label depends on the font and the output size rather than on world space.
+- NEW: R function `camera_fit_scene()` fits a camera to a whole scene, i.e. to
+  its meshes together with the line layers that affect the bounds.  It is the
+  scene counterpart of `camera_auto()` (which takes meshes), and the two share
+  the same framing convention (bounding box center, distance from the extent).
+  `camera_auto()` now also documents that it does not consider scene contents.
 - NEW: `Renderer::render_lines_raw()` renders line segments directly, and
   `Rasterizer::rasterize_line()` rasterizes a segment with a screen-space width
   (flat/unlit by default, like hardware line rendering).

@@ -20,8 +20,17 @@
 #' against the same depth buffer, so opaque meshes can hide lines and opaque
 #' lines can hide meshes.  Segments whose colors have an alpha value below 1
 #' are drawn in the blended pass, back to front, exactly like translucent
-#' triangles.  Line layers do not contribute to the bounding box of a scene, so
-#' adding them never changes the camera framing.
+#' triangles.
+#'
+#' Lines usually *are* the content of a figure (graph or connectome edges,
+#' streamlines, trajectories), so by default a layer contributes to the bounding
+#' box of its scene, exactly like a mesh does: it defines the extent that the
+#' camera has to cover.  Set \code{affects_bounds = FALSE} for a layer that is
+#' decoration rather than content (a leader line to a label, an axis cross, a
+#' scale bar drawn as segments), so that it can never push the camera away from
+#' the data.  A scene that contains no mesh at all is framed by its line layers
+#' even when they all opted out, since there would otherwise be no geometry to
+#' derive a camera from.
 #'
 #' @param from Nx3 numeric matrix of segment start points (or a length-3
 #'   vector for a single segment).
@@ -36,6 +45,11 @@
 #'   everything, which is only useful for opaque lines.
 #' @param lit Whether to apply lighting to the lines (default \code{FALSE},
 #'   i.e. a flat colour, like hardware-rendered lines).
+#' @param affects_bounds Whether this layer contributes to the bounding box of
+#'   the scene, and thus to the camera fitted to it (default \code{TRUE}, see
+#'   the description).  Set to \code{FALSE} for decorational lines.  The flag of
+#'   a layer that is already part of a scene can be changed with
+#'   \code{\link{scene_set_line_affects_bounds}}.
 #' @return A line layer object (a list with class \code{scimesh_lines}) for use
 #'   in \code{\link{scene}()} or \code{\link{render_segments}}.
 #'
@@ -48,7 +62,7 @@
 #' @seealso \code{\link{render_segments}}, \code{\link{generate_tubes}}
 #' @export
 line_layer <- function(from, to, colors = NULL, width = 1, depth_test = TRUE,
-                       lit = FALSE) {
+                       lit = FALSE, affects_bounds = TRUE) {
     from <- check_points_matrix(from, "from")
     to <- check_points_matrix(to, "to")
     if (nrow(from) != nrow(to)) {
@@ -62,15 +76,17 @@ line_layer <- function(from, to, colors = NULL, width = 1, depth_test = TRUE,
                    colors = recycle_colors(colors, nrow(from)),
                    width = as.double(width),
                    depth_test = isTRUE(depth_test),
-                   lit = isTRUE(lit)),
+                   lit = isTRUE(lit),
+                   affects_bounds = isTRUE(affects_bounds)),
               class = "scimesh_lines")
 }
 
 #' @export
 print.scimesh_lines <- function(x, ...) {
-    cat(sprintf("scimesh line layer with %d segment(s), width %g px%s\n",
+    cat(sprintf("scimesh line layer with %d segment(s), width %g px%s%s\n",
                 nrow(x$from), x$width,
-                if (isTRUE(x$lit)) ", lit" else ""))
+                if (isTRUE(x$lit)) ", lit" else "",
+                if (isFALSE(x$affects_bounds)) ", decoration (does not affect the scene bounds)" else ""))
     invisible(x)
 }
 

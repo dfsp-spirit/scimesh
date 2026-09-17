@@ -38,14 +38,16 @@ embedded \code{name}.}
 list of them.  Line layers are drawn after the meshes with a width
 measured in pixels and without creating any geometry, which makes them the
 cheap way to draw many thin lines (wireframes, graph or connectome edges).
-They share the depth buffer with the meshes and are ignored by the scene
-bounding box, so they never change the camera framing.}
+They share the depth buffer with the meshes and contribute to the scene
+bounding box (and thus to the camera framing), unless the layer sets
+\code{affects_bounds = FALSE}, see \code{\link{line_layer}}.}
 
 \item{texts}{\code{NULL}, a text layer (see \code{\link{text_layer}}), or a
 list of them.  Text layers are drawn after the meshes and the lines as
 billboards and create no geometry either, so they are the way to annotate a
-figure (region names, atom labels, panel tags).  Like line layers they are
-ignored by the scene bounding box.}
+figure (region names, atom labels, panel tags).  Unlike line layers they are
+ignored by the scene bounding box, since their extent depends on the font
+and the output size.}
 }
 \value{
 A scene descriptor list with S3 class \code{"scimesh_scene"},

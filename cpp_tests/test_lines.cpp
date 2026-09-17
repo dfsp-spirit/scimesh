@@ -414,7 +414,8 @@ TEST_CASE("user clip planes clip line layers", "[lines][scene][clipping]") {
     REQUIRE(right_half > 10 * left_half);
 }
 
-TEST_CASE("line layers do not change the scene bounding box", "[lines][scene]") {
+TEST_CASE("line layers contribute to the scene bounding box by default",
+          "[lines][scene]") {
     Scene scene;
     Mesh cube = make_unit_cube();
     scene.add(cube);
@@ -426,17 +427,139 @@ TEST_CASE("line layers do not change the scene bounding box", "[lines][scene]") 
     far_away.from = {Vec3(-100, -100, -100)};
     far_away.to = {Vec3(100, 100, 100)};
     far_away.colors = {kRed};
+    REQUIRE(far_away.affects_bounds);      // the default
     scene.add_lines(far_away);
 
     Vec3 min_b, max_b;
     scene.compute_bounding_box(min_b, max_b);
 
+    // The lines are content, so the box grows to cover them.
+    REQUIRE(min_b.x == Approx(-100.0f));
+    REQUIRE(min_b.y == Approx(-100.0f));
+    REQUIRE(min_b.z == Approx(-100.0f));
+    REQUIRE(max_b.x == Approx(100.0f));
+    REQUIRE(max_b.y == Approx(100.0f));
+    REQUIRE(max_b.z == Approx(100.0f));
+    REQUIRE(min_a.x > min_b.x);
+}
+
+TEST_CASE("line layers can opt out of the scene bounding box", "[lines][scene]") {
+    Scene scene;
+    Mesh cube = make_unit_cube();
+    scene.add(cube);
+
+    Vec3 min_a, max_a;
+    scene.compute_bounding_box(min_a, max_a);
+
+    LineLayer far_away;                    // a leader line, an axis cross, ...
+    far_away.from = {Vec3(-100, -100, -100)};
+    far_away.to = {Vec3(100, 100, 100)};
+    far_away.colors = {kRed};
+    far_away.affects_bounds = false;
+    scene.add_lines(far_away);
+
+    Vec3 min_b, max_b;
+    scene.compute_bounding_box(min_b, max_b);
+
+    // Decorational lines never move the camera away from the data.
     REQUIRE(min_b.x == Approx(min_a.x));
     REQUIRE(min_b.y == Approx(min_a.y));
     REQUIRE(min_b.z == Approx(min_a.z));
     REQUIRE(max_b.x == Approx(max_a.x));
     REQUIRE(max_b.y == Approx(max_a.y));
     REQUIRE(max_b.z == Approx(max_a.z));
+}
+
+TEST_CASE("a scene without meshes is framed by its line layers", "[lines][scene]") {
+    LineLayer layer;
+    layer.from = {Vec3(-1, 0, 0), Vec3(0, -2, 0)};
+    layer.to = {Vec3(1, 0, 0), Vec3(0, 2, 0)};
+    layer.colors = {kRed, kBlue};
+    layer.affects_bounds = false;          // even a decorational layer is used here
+
+    Scene scene;
+    scene.add_lines(layer);
+
+    Vec3 min_b, max_b;
+    scene.compute_bounding_box(min_b, max_b);
+
+    REQUIRE(min_b.x == Approx(-1.0f));
+    REQUIRE(min_b.y == Approx(-2.0f));
+    REQUIRE(min_b.z == Approx(0.0f));
+    REQUIRE(max_b.x == Approx(1.0f));
+    REQUIRE(max_b.y == Approx(2.0f));
+    REQUIRE(max_b.z == Approx(0.0f));
+}
+
+TEST_CASE("line layer bounds respect the placement transform", "[lines][scene]") {
+    LineLayer layer;
+    layer.from = {Vec3(0, 0, 0)};
+    layer.to = {Vec3(1, 0, 0)};
+    layer.colors = {kRed};
+
+    Mat4 t(1.0f);
+    t[3][0] = 10.0f;                       // translate by +10 along x
+    t[3][1] = 20.0f;                       // ... and +20 along y
+
+    Scene empty_scene;                     // no meshes: the lines define the box
+    empty_scene.add_lines(layer, t);
+
+    Vec3 min_b, max_b;
+    empty_scene.compute_bounding_box(min_b, max_b);
+    REQUIRE(min_b.x == Approx(10.0f));
+    REQUIRE(max_b.x == Approx(11.0f));
+    REQUIRE(min_b.y == Approx(20.0f));
+    REQUIRE(max_b.y == Approx(20.0f));
+}
+
+TEST_CASE("set_line_affects_bounds updates the bounds of a scene", "[lines][scene]") {
+    Mesh cube = make_unit_cube();
+
+    LineLayer far_away;
+    far_away.from = {Vec3(-100, -100, -100)};
+    far_away.to = {Vec3(100, 100, 100)};
+    far_away.colors = {kRed};
+
+    Scene scene;
+    scene.add(cube);
+    scene.add_lines(far_away, Mat4(1.0f), "leader");
+
+    REQUIRE(scene.line_affects_bounds(0));
+    Vec3 min_b, max_b;
+    scene.compute_bounding_box(min_b, max_b);
+    REQUIRE(min_b.x == Approx(-100.0f));
+
+    // By name, and by index (out of range indices are ignored).
+    REQUIRE(scene.set_line_affects_bounds(std::string("leader"), false));
+    REQUIRE_FALSE(scene.line_affects_bounds(0));
+    scene.compute_bounding_box(min_b, max_b);
+    REQUIRE(min_b.x == Approx(-1.0f));      // the unit cube, see make_unit_cube()
+
+    scene.set_line_affects_bounds(0, true);
+    REQUIRE(scene.line_affects_bounds(0));
+    scene.set_line_affects_bounds(5, true);         // no effect
+    REQUIRE(scene.line_count() == 1);
+    REQUIRE_FALSE(scene.set_line_affects_bounds(std::string("nope"), false));
+    REQUIRE(scene.line_affects_bounds(0));
+    REQUIRE_FALSE(scene.line_affects_bounds(7));
+}
+
+TEST_CASE("LineLayer compute_bounding_box covers both endpoints", "[lines][scene]") {
+    LineLayer layer;
+    layer.from = {Vec3(0, 0, 0), Vec3(5, 0, 0)};
+    layer.to = {Vec3(1, 2, 3), Vec3(-1, 0, 0)};
+
+    Vec3 min_b, max_b;
+    REQUIRE(layer.compute_bounding_box(min_b, max_b));
+    REQUIRE(min_b.x == Approx(-1.0f));
+    REQUIRE(max_b.x == Approx(5.0f));
+    REQUIRE(min_b.y == Approx(0.0f));
+    REQUIRE(max_b.y == Approx(2.0f));
+    REQUIRE(min_b.z == Approx(0.0f));
+    REQUIRE(max_b.z == Approx(3.0f));
+
+    LineLayer empty_layer;
+    REQUIRE_FALSE(empty_layer.compute_bounding_box(min_b, max_b));
 }
 
 TEST_CASE("line layer transforms and names are stored", "[lines][scene]") {

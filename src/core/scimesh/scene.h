@@ -34,7 +34,11 @@ struct SceneNodeRef {
 /// Next to meshes a scene can hold two kinds of screen-oriented decorations,
 /// which create no geometry and are drawn after the meshes:
 /// LineLayer objects (see `lines` / add_lines()) and text labels
-/// (see `texts` / add_texts()).  Both are ignored by the bounding box and by
+/// (see `texts` / add_texts()).  Line layers contribute to the bounding box of
+/// the scene (and thus to the camera fitted to it) unless their
+/// affects_bounds flag is set to false, because lines usually are the content
+/// of a figure; text labels are ignored by the bounding box, since their
+/// extent depends on the font and the output size.  Both kinds are skipped by
 /// the mesh exporters.
 ///
 /// ## Construction
@@ -77,7 +81,8 @@ struct Scene {
     /// @brief Line layers drawn together with the meshes, after them.
     ///
     /// Line layers use a screen-space width and create no geometry, see
-    /// LineLayer.  They are ignored by compute_bounding_box() and by the mesh
+    /// LineLayer.  A layer contributes to compute_bounding_box() unless its
+    /// affects_bounds flag is false, and all of them are skipped by the mesh
     /// exporters.
     std::vector<LineLayer> lines;
 
@@ -232,6 +237,41 @@ struct Scene {
     /// @brief Number of line layers in the scene.
     size_t line_count() const { return lines.size(); }
 
+    /// @brief Set whether the line layer at `index` contributes to the scene
+    ///        bounds, see LineLayer::affects_bounds.
+    ///
+    /// Does nothing when `index` is out of range (like set_line_transform()).
+    void set_line_affects_bounds(size_t index, bool affects_bounds) {
+        if (index >= lines.size())
+            return;
+        lines[index].affects_bounds = affects_bounds;
+    }
+
+    /// @brief Set whether the line layer called `name` contributes to the
+    ///        scene bounds, see LineLayer::affects_bounds.
+    ///
+    /// The first layer with that name is updated, see line_name().
+    ///
+    /// @return true if a layer with that name exists, false otherwise.
+    bool set_line_affects_bounds(const std::string &name, bool affects_bounds) {
+        for (size_t i = 0; i < lines.size(); ++i) {
+            if (line_name(i) == name) {
+                lines[i].affects_bounds = affects_bounds;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// @brief Whether the line layer at `index` contributes to the scene bounds.
+    ///
+    /// @return false when `index` is out of range.
+    bool line_affects_bounds(size_t index) const {
+        if (index >= lines.size())
+            return false;
+        return lines[index].affects_bounds;
+    }
+
     /// @brief A non-owning reference to the line layer at `index`.
     ///
     /// @pre `index < lines.size()`
@@ -330,18 +370,14 @@ struct Scene {
     /// @see Mesh::compute_bounding_box()
     void compute_bounding_box(Vec3 &min_bound, Vec3 &max_bound) const {
         bool first = true;
-        for (size_t i = 0; i < meshes.size(); ++i) {
-            const Mesh &mesh = meshes[i];
-            if (mesh.vertices.empty())
-                continue;
-            Vec3 mesh_min, mesh_max;
-            mesh.compute_bounding_box(mesh_min, mesh_max);
-            const Mat4 &m = transform(i);
+
+        // Add the 8 transformed corners of a box to the bounds.
+        auto add_box = [&](const Vec3 &box_min, const Vec3 &box_max, const Mat4 &m) {
             for (int c = 0; c < 8; ++c) {
                 Vec3 corner(
-                    (c & 1) ? mesh_max.x : mesh_min.x,
-                    (c & 2) ? mesh_max.y : mesh_min.y,
-                    (c & 4) ? mesh_max.z : mesh_min.z);
+                    (c & 1) ? box_max.x : box_min.x,
+                    (c & 2) ? box_max.y : box_min.y,
+                    (c & 4) ? box_max.z : box_min.z);
                 Vec3 t = transform_point(m, corner);
                 if (first) {
                     min_bound = t;
@@ -352,7 +388,40 @@ struct Scene {
                     max_bound = glm::max(max_bound, t);
                 }
             }
+        };
+
+        for (size_t i = 0; i < meshes.size(); ++i) {
+            const Mesh &mesh = meshes[i];
+            if (mesh.vertices.empty())
+                continue;
+            Vec3 mesh_min, mesh_max;
+            mesh.compute_bounding_box(mesh_min, mesh_max);
+            add_box(mesh_min, mesh_max, transform(i));
         }
+
+        // Line layers are content unless they opted out, see
+        // LineLayer::affects_bounds.
+        const bool framed_by_meshes = !first;
+        for (size_t i = 0; i < lines.size(); ++i) {
+            if (!lines[i].affects_bounds)
+                continue;
+            Vec3 line_min, line_max;
+            if (lines[i].compute_bounding_box(line_min, line_max))
+                add_box(line_min, line_max, line_transform(i));
+        }
+
+        // A scene without meshes and without any layer that claims to define the
+        // extent: frame it with the lines anyway (they can only be decoration
+        // if there is nothing else), because otherwise the scene would have no
+        // geometry to derive a camera from.
+        if (!framed_by_meshes && first) {
+            for (size_t i = 0; i < lines.size(); ++i) {
+                Vec3 line_min, line_max;
+                if (lines[i].compute_bounding_box(line_min, line_max))
+                    add_box(line_min, line_max, line_transform(i));
+            }
+        }
+
         if (first) {  // scene empty or all meshes empty
             min_bound = Vec3(0.0f);
             max_bound = Vec3(0.0f);

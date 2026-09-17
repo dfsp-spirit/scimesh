@@ -29,8 +29,10 @@ namespace scimesh {
 ///
 /// Line layers are deliberately **not** meshes:
 ///
-/// - `Scene::compute_bounding_box()` ignores them, so adding lines never
-///   changes the camera framing (edges usually live *inside* the meshes).
+/// - They contribute to the bounding box of their scene (see
+///   LineLayer::affects_bounds), which is what makes a scene that consists only
+///   of lines renderable, but a layer can opt out of it when it is decoration
+///   rather than content, e.g. a leader line to a label or an axis cross.
 /// - The mesh exporters (write_gltf(), write_stl(), ...) skip them.
 ///
 /// @par Example
@@ -75,6 +77,53 @@ struct LineLayer {
     /// true, the shading uses a fixed surface normal of (0, 0, 1) in view
     /// space, which is rarely what you want for thin lines.
     bool lit = false;
+
+    /// @brief Whether this layer contributes to the bounding box of its scene
+    ///        (default: true).
+    ///
+    /// Line layers usually *are* the content of a figure (graph or connectome
+    /// edges, streamlines, tracts), so they define the extent that the camera
+    /// has to cover, exactly like the meshes of the scene do.  Set this to
+    /// false for a layer that is decoration, e.g. a leader line pointing at a
+    /// label outside the anatomy, or an axis cross: such a layer is then
+    /// ignored by Scene::compute_bounding_box() and can never push the camera
+    /// away from the data.
+    ///
+    /// Note that a scene without any mesh is framed by its line layers even if
+    /// they all opted out, because there would otherwise be no geometry to
+    /// derive a camera from, see Scene::compute_bounding_box().
+    ///
+    /// @see Scene::set_line_affects_bounds()
+    bool affects_bounds = true;
+
+    /// @brief Compute the bounding box of all segment endpoints.
+    ///
+    /// Both the `from` and the `to` points are considered, the width of the
+    /// segments is a screen-space property and does not affect the box.
+    ///
+    /// @param[out] min_bound Lower corner of the box (unchanged when empty).
+    /// @param[out] max_bound Upper corner of the box (unchanged when empty).
+    /// @return true if the layer contains at least one point, false otherwise.
+    ///
+    /// @see Scene::compute_bounding_box()
+    bool compute_bounding_box(Vec3 &min_bound, Vec3 &max_bound) const {
+        bool first = true;
+        auto add = [&](const Vec3 &p) {
+            if (first) {
+                min_bound = p;
+                max_bound = p;
+                first = false;
+            } else {
+                min_bound = glm::min(min_bound, p);
+                max_bound = glm::max(max_bound, p);
+            }
+        };
+        for (const Vec3 &p : from)
+            add(p);
+        for (const Vec3 &p : to)
+            add(p);
+        return !first;
+    }
 
     /// @brief Number of segments in this layer.
     ///

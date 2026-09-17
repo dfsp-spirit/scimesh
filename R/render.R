@@ -169,19 +169,21 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'
 #' @export
 render_scene <- function(meshes, camera = NULL, options = NULL) {
-    scene_lines <- NULL
-    scene_texts <- NULL
     if (inherits(meshes, "scimesh_scene")) {
         sc <- meshes
-        meshes <- sc$meshes
-        scene_lines <- sc$lines
-        scene_texts <- sc$texts
         if (is.null(camera)) {
             camera <- sc$camera
         }
         if (is.null(options)) {
             options <- sc$options
         }
+        if (is.null(options)) {
+            options <- render_options()
+        }
+        if (is.null(camera)) {
+            stop("camera must be provided (or set in the scene)")
+        }
+        return(scimesh_render_scene(scene_data_from_scene(sc), camera, options))
     }
     if (!is.list(meshes)) {
         stop("meshes must be a list of mesh descriptors or scene nodes")
@@ -199,17 +201,41 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
             stop("each mesh must be a list with 'vertices' and 'triangles'")
         }
     }
-    # Line layers are appended to the scene so that the renderer draws them
-    # together with the meshes (same camera, same depth buffer).
-    if (length(scene_lines) > 0L) {
-        scene_data <- c(scene_data, normalize_line_layers(scene_lines))
-    }
-    # Text layers are appended after the lines (they are drawn last).
-    if (length(scene_texts) > 0L) {
-        scene_data <- c(scene_data, normalize_text_layers(scene_texts))
-    }
 
     scimesh_render_scene(scene_data, camera, options)
+}
+
+#' Assemble the scene data passed to the C++ layer
+#'
+#' Turns a scene descriptor (see \code{\link{scene}()}) into the flat list of
+#' scene nodes that the C++ layer builds a \code{scimesh::Scene} from: the
+#' meshes first, then the line layers, then the text layers, in the order in
+#' which they are drawn.
+#'
+#' @param sc A scene descriptor list, see \code{\link{scene}()}.
+#' @return A list of scene nodes.
+#' @noRd
+scene_data_from_scene <- function(sc) {
+    if (!inherits(sc, "scimesh_scene")) {
+        stop("sc must be a scene descriptor, see scene()")
+    }
+    nodes <- lapply(sc$meshes, as_scimesh_scene_node)
+    for (i in seq_along(nodes)) {
+        m <- nodes[[i]]$mesh
+        if (!is.list(m) || is.null(m$vertices) || is.null(m$triangles)) {
+            stop("each mesh must be a list with 'vertices' and 'triangles'")
+        }
+    }
+    # Line layers are appended to the scene so that the renderer draws them
+    # together with the meshes (same camera, same depth buffer).
+    if (length(sc$lines) > 0L) {
+        nodes <- c(nodes, normalize_line_layers(sc$lines))
+    }
+    # Text layers are appended after the lines (they are drawn last).
+    if (length(sc$texts) > 0L) {
+        nodes <- c(nodes, normalize_text_layers(sc$texts))
+    }
+    return(nodes)
 }
 
 #' Create render options

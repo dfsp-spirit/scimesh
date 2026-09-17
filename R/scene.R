@@ -29,13 +29,15 @@
 #'   list of them.  Line layers are drawn after the meshes with a width
 #'   measured in pixels and without creating any geometry, which makes them the
 #'   cheap way to draw many thin lines (wireframes, graph or connectome edges).
-#'   They share the depth buffer with the meshes and are ignored by the scene
-#'   bounding box, so they never change the camera framing.
+#'   They share the depth buffer with the meshes and contribute to the scene
+#'   bounding box (and thus to the camera framing), unless the layer sets
+#'   \code{affects_bounds = FALSE}, see \code{\link{line_layer}}.
 #' @param texts \code{NULL}, a text layer (see \code{\link{text_layer}}), or a
 #'   list of them.  Text layers are drawn after the meshes and the lines as
 #'   billboards and create no geometry either, so they are the way to annotate a
-#'   figure (region names, atom labels, panel tags).  Like line layers they are
-#'   ignored by the scene bounding box.
+#'   figure (region names, atom labels, panel tags).  Unlike line layers they are
+#'   ignored by the scene bounding box, since their extent depends on the font
+#'   and the output size.
 #' @return A scene descriptor list with S3 class \code{"scimesh_scene"},
 #'   with components \code{meshes} (list of scene nodes), \code{lines} (list
 #'   of line layers, possibly empty), \code{texts} (list of text layers,
@@ -219,4 +221,98 @@ print.scimesh_scene <- function(x, ...) {
         cat("  options: set\n")
     }
     invisible(x)
+}
+
+
+#' Change whether line layers of a scene contribute to its bounds
+#'
+#' Sets the \code{affects_bounds} flag of one or more line layers of a scene, see
+#' \code{\link{line_layer}}.  A layer with the flag set contributes to the
+#' bounding box of the scene, and thus to the extent that a camera fitted to the
+#' scene (\code{\link{camera_auto}}) has to cover; a layer without it is ignored
+#' when the bounds are computed, which is what you want for decorational lines.
+#'
+#' The layers can be selected by position (\code{index}) or by name
+#' (\code{name}, for layers that were added as scene nodes with a
+#' \code{name}).  Exactly one of the two has to be given.  A scene that contains
+#' no mesh at all is framed by its line layers even when they all opted out,
+#' since there would otherwise be no geometry to derive a camera from.
+#'
+#' @param scene A scene descriptor list, see \code{\link{scene}()}.
+#' @param index Integer vector, the positions (1-based) of the layers to update,
+#'   or \code{NULL} to select them by \code{name}.
+#' @param name Character vector, the names of the layers to update, or
+#'   \code{NULL} to select them by \code{index}.  Bare line layers (which are not
+#'   wrapped into a scene node) have no name.
+#' @param affects_bounds Whether the selected layers contribute to the scene
+#'   bounds (default \code{TRUE}), see \code{\link{line_layer}}.
+#'
+#' @return The scene with the updated layers, invisibly.  Since a scene is a
+#'   plain list, the update has to be assigned to take effect, e.g.
+#'   \code{sc <- scene_set_line_affects_bounds(sc, name = "leader",
+#'   affects_bounds = FALSE)}.
+#'
+#' @seealso \code{\link{line_layer}}, \code{\link{camera_auto}}
+#' @examples
+#' from <- matrix(c(-1, 0, 0, 5, 0, 0), ncol = 3, byrow = TRUE)
+#' to   <- matrix(c(1, 0, 0, 6, 0, 0), ncol = 3, byrow = TRUE)
+#' # The second segment is a decorational leader line pointing away from the data.
+#' sc <- scene(list(generate_cuboid(c(0, 0, 0), c(0.5, 0.5, 0.5))),
+#'             lines = list(list(lines = line_layer(from, to), name = "edges")))
+#' sc <- scene_set_line_affects_bounds(sc, index = 1, affects_bounds = TRUE)
+#' @export
+scene_set_line_affects_bounds <- function(scene, index = NULL, name = NULL,
+                                          affects_bounds = TRUE) {
+    if (!inherits(scene, "scimesh_scene")) {
+        stop("scene must be a scene descriptor, see scene()")
+    }
+    if (is.null(index) == is.null(name)) {
+        stop("exactly one of index and name must be given")
+    }
+    if (!is.logical(affects_bounds) || length(affects_bounds) != 1L ||
+        is.na(affects_bounds)) {
+        stop("affects_bounds must be a single TRUE or FALSE")
+    }
+    if (length(scene$lines) == 0L) {
+        stop("the scene contains no line layer")
+    }
+
+    if (!is.null(index)) {
+        if (!is.numeric(index) || length(index) == 0L || anyNA(index) ||
+            any(index < 1) || any(index > length(scene$lines))) {
+            stop(sprintf("index must be in 1..%d", length(scene$lines)))
+        }
+        selected <- as.integer(index)
+    } else {
+        if (!is.character(name) || length(name) == 0L || anyNA(name)) {
+            stop("name must be a character vector")
+        }
+        layer_names <- vapply(scene$lines, function(entry) {
+            if (is.list(entry) && !inherits(entry, "scimesh_lines") &&
+                !is.null(entry$name)) {
+                return(as.character(entry$name))
+            }
+            return("")
+        }, character(1L))
+        selected <- which(layer_names %in% name)
+        if (length(selected) == 0L) {
+            stop(sprintf("no line layer with name in %s; the named layers are: %s",
+                         paste(sprintf("'%s'", name), collapse = ", "),
+                         if (any(nzchar(layer_names)))
+                             paste(sprintf("'%s'", layer_names[nzchar(layer_names)]), collapse = ", ")
+                         else "none"))
+        }
+    }
+
+    for (i in selected) {
+        entry <- scene$lines[[i]]
+        if (inherits(entry, "scimesh_lines")) {
+            entry$affects_bounds <- affects_bounds
+        } else {
+            entry$lines$affects_bounds <- affects_bounds
+        }
+        scene$lines[[i]] <- entry
+    }
+
+    return(invisible(scene))
 }

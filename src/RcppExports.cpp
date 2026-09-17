@@ -52,6 +52,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_camera_fit_scene
+List scimesh_camera_fit_scene(List scene_data, NumericVector direction, NumericVector up, double fov_degrees, double margin, CharacterVector projection);
+RcppExport SEXP _scimesh_scimesh_camera_fit_scene(SEXP scene_dataSEXP, SEXP directionSEXP, SEXP upSEXP, SEXP fov_degreesSEXP, SEXP marginSEXP, SEXP projectionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type scene_data(scene_dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type direction(directionSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type up(upSEXP);
+    Rcpp::traits::input_parameter< double >::type fov_degrees(fov_degreesSEXP);
+    Rcpp::traits::input_parameter< double >::type margin(marginSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type projection(projectionSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_camera_fit_scene(scene_data, direction, up, fov_degrees, margin, projection));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_transform_mesh
 List scimesh_transform_mesh(List mesh_data, NumericMatrix matrix_4x4);
 RcppExport SEXP _scimesh_scimesh_transform_mesh(SEXP mesh_dataSEXP, SEXP matrix_4x4SEXP) {
@@ -644,6 +660,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
     {"_scimesh_scimesh_render_scene", (DL_FUNC) &_scimesh_scimesh_render_scene, 3},
     {"_scimesh_scimesh_camera_fit_mesh", (DL_FUNC) &_scimesh_scimesh_camera_fit_mesh, 6},
+    {"_scimesh_scimesh_camera_fit_scene", (DL_FUNC) &_scimesh_scimesh_camera_fit_scene, 6},
     {"_scimesh_scimesh_transform_mesh", (DL_FUNC) &_scimesh_scimesh_transform_mesh, 2},
     {"_scimesh_scimesh_translate_mesh", (DL_FUNC) &_scimesh_scimesh_translate_mesh, 2},
     {"_scimesh_scimesh_scale_mesh", (DL_FUNC) &_scimesh_scimesh_scale_mesh, 2},

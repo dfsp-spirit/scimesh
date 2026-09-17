@@ -4,7 +4,15 @@
 \alias{line_layer}
 \title{Create a line layer (screen-space lines, no geometry)}
 \usage{
-line_layer(from, to, colors = NULL, width = 1, depth_test = TRUE, lit = FALSE)
+line_layer(
+  from,
+  to,
+  colors = NULL,
+  width = 1,
+  depth_test = TRUE,
+  lit = FALSE,
+  affects_bounds = TRUE
+)
 }
 \arguments{
 \item{from}{Nx3 numeric matrix of segment start points (or a length-3
@@ -25,6 +33,12 @@ everything, which is only useful for opaque lines.}
 
 \item{lit}{Whether to apply lighting to the lines (default \code{FALSE},
 i.e. a flat colour, like hardware-rendered lines).}
+
+\item{affects_bounds}{Whether this layer contributes to the bounding box of
+the scene, and thus to the camera fitted to it (default \code{TRUE}, see
+the description).  Set to \code{FALSE} for decorational lines.  The flag of
+a layer that is already part of a scene can be changed with
+\code{\link{scene_set_line_affects_bounds}}.}
 }
 \value{
 A line layer object (a list with class \code{scimesh_lines}) for use
@@ -45,8 +59,17 @@ Line layers are drawn together with the meshes of the scene, after them and
 against the same depth buffer, so opaque meshes can hide lines and opaque
 lines can hide meshes.  Segments whose colors have an alpha value below 1
 are drawn in the blended pass, back to front, exactly like translucent
-triangles.  Line layers do not contribute to the bounding box of a scene, so
-adding them never changes the camera framing.
+triangles.
+
+Lines usually *are* the content of a figure (graph or connectome edges,
+streamlines, trajectories), so by default a layer contributes to the bounding
+box of its scene, exactly like a mesh does: it defines the extent that the
+camera has to cover.  Set \code{affects_bounds = FALSE} for a layer that is
+decoration rather than content (a leader line to a label, an axis cross, a
+scale bar drawn as segments), so that it can never push the camera away from
+the data.  A scene that contains no mesh at all is framed by its line layers
+even when they all opted out, since there would otherwise be no geometry to
+derive a camera from.
 }
 \examples{
 from <- matrix(c(-1, 0, 0, 0, -1, 0), ncol = 3, byrow = TRUE)

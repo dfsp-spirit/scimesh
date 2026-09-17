@@ -504,6 +504,12 @@ scimesh::LineLayer build_line_layer_from_r(List layer) {
             out.lit = as<bool>(l);
         }
     }
+    if (layer.containsElementNamed("affects_bounds")) {
+        SEXP a = layer["affects_bounds"];
+        if (a != R_NilValue) {
+            out.affects_bounds = as<bool>(a);
+        }
+    }
 
     return out;
 }
@@ -745,6 +751,22 @@ List scimesh_render_scene(List scene_data, List camera_data, List options_data) 
 }
 
 
+// ---- Cameras -----------------------------------------------------------------
+
+/// Convert a camera to the R representation used by camera()/camera_auto().
+List camera_to_r_list(const scimesh::Camera &cam) {
+    List out = List::create(
+        Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),
+        Named("center") = NumericVector::create(
+            cam.center.x, cam.center.y, cam.center.z),
+        Named("up") = NumericVector::create(cam.up.x, cam.up.y, cam.up.z),
+        Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
+            ? "orthographic" : "perspective"),
+        Named("fov") = cam.fov_degrees);
+    out.attr("class") = "scimesh_camera";
+    return out;
+}
+
 // [[Rcpp::export]]
 List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
                               NumericVector up, double fov_degrees = 45.0,
@@ -764,16 +786,29 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
         static_cast<float>(margin),
         proj);
 
-    List out = List::create(
-        Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),
-        Named("center") = NumericVector::create(
-            cam.center.x, cam.center.y, cam.center.z),
-        Named("up") = NumericVector::create(cam.up.x, cam.up.y, cam.up.z),
-        Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
-            ? "orthographic" : "perspective"),
-        Named("fov") = cam.fov_degrees);
-    out.attr("class") = "scimesh_camera";
-    return out;
+    return camera_to_r_list(cam);
+}
+
+// [[Rcpp::export]]
+List scimesh_camera_fit_scene(List scene_data, NumericVector direction,
+                               NumericVector up, double fov_degrees = 45.0,
+                               double margin = 1.1,
+                               CharacterVector projection = "perspective") {
+    scimesh::Scene scene = build_scene_from_r(scene_data);
+    scimesh::Vec3 dir = vec3_from_r(direction);
+    scimesh::Vec3 up_vec = vec3_from_r(up);
+
+    std::string proj_str = as<std::string>(projection);
+    scimesh::ProjectionType proj = scimesh::ProjectionType::PERSPECTIVE;
+    if (proj_str == "orthographic") proj = scimesh::ProjectionType::ORTHOGRAPHIC;
+
+    scimesh::Camera cam = scimesh::camera_fit_scene(
+        scene, dir, up_vec,
+        static_cast<float>(fov_degrees),
+        static_cast<float>(margin),
+        proj);
+
+    return camera_to_r_list(cam);
 }
 
 // ---- Mesh transforms -------------------------------------------------------

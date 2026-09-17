@@ -173,3 +173,107 @@ test_that("glTF export skips line layers with a warning", {
     sc <- scene(list(generate_cuboid(c(0, 0, 0), c(1, 1, 1))), lines = layer)
     expect_warning(write_gltf(sc, tmp), "line layer")
 })
+
+test_that("line_layer stores whether the layer affects the scene bounds", {
+    from <- matrix(c(0, 0, 0), ncol = 3)
+    to <- matrix(c(1, 0, 0), ncol = 3)
+
+    expect_true(line_layer(from, to)$affects_bounds)                 # the default
+    expect_false(line_layer(from, to, affects_bounds = FALSE)$affects_bounds)
+
+    # The print method marks decorational layers.
+    decor_text <- paste(capture.output(print(line_layer(from, to, affects_bounds = FALSE))),
+                        collapse = " ")
+    content_text <- paste(capture.output(print(line_layer(from, to))), collapse = " ")
+    expect_match(decor_text, "decoration")
+    expect_false(grepl("decoration", content_text))
+})
+
+test_that("camera_fit_scene frames line layers and respects the flag", {
+    cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.5, 0.5, 0.5, 1))
+    mesh_only <- camera_fit_scene(scene(list(cube)))
+
+    # A scene without meshes is framed by its line layers.
+    line <- line_layer(matrix(c(-1, 0, 0), ncol = 3), matrix(c(1, 0, 0), ncol = 3))
+    cam_lines <- camera_fit_scene(scene(list(), lines = line))
+    expect_equal(cam_lines$center, c(0, 0, 0), tolerance = 1e-6)
+    expect_gt(abs(cam_lines$eye[3]), 0)
+
+    # Larger lines give a larger camera distance.
+    big_line <- line_layer(matrix(c(-10, 0, 0), ncol = 3), matrix(c(10, 0, 0), ncol = 3))
+    cam_big <- camera_fit_scene(scene(list(), lines = big_line))
+    expect_gt(abs(cam_big$eye[3]), abs(cam_lines$eye[3]))
+
+    # Content lines count, even next to a mesh: the camera is pulled towards them.
+    content <- line_layer(matrix(c(100, 0, 0), ncol = 3), matrix(c(101, 0, 0), ncol = 3))
+    with_content <- camera_fit_scene(scene(list(cube), lines = content))
+    expect_gt(with_content$center[1], 40)
+
+    # Decorational lines are ignored ...
+    leader <- line_layer(matrix(c(100, 0, 0), ncol = 3), matrix(c(101, 0, 0), ncol = 3),
+                         affects_bounds = FALSE)
+    with_leader <- camera_fit_scene(scene(list(cube), lines = leader))
+    expect_equal(with_leader$eye, mesh_only$eye, tolerance = 1e-6)
+    expect_equal(with_leader$center, mesh_only$center, tolerance = 1e-6)
+
+    # ... unless they are the only content of the scene, which is framed by them
+    # anyway (there is nothing else to fit).
+    leader_only <- camera_fit_scene(scene(list(), lines = leader))
+    expect_gt(leader_only$center[1], 90)
+
+    expect_error(camera_fit_scene("nope"), "scene must be a scene descriptor")
+})
+
+test_that("scene_set_line_affects_bounds updates layers by index and by name", {
+    cube <- generate_cuboid(c(0, 0, 0), c(1, 1, 1), c(0.5, 0.5, 0.5, 1))
+    far <- line_layer(matrix(c(100, 0, 0), ncol = 3), matrix(c(101, 0, 0), ncol = 3))
+    sc <- scene(list(cube), lines = list(list(lines = far, name = "leader")))
+    expect_true(sc$lines[[1]]$lines$affects_bounds)
+
+    # By name: the returned scene is updated, the original one is not.
+    sc_named <- scene_set_line_affects_bounds(sc, name = "leader", affects_bounds = FALSE)
+    expect_false(sc_named$lines[[1]]$lines$affects_bounds)
+    expect_true(sc$lines[[1]]$lines$affects_bounds)
+
+    # The flag changes the framing of the scene.
+    expect_gt(camera_fit_scene(sc)$center[1], camera_fit_scene(sc_named)$center[1])
+
+    # By index, on a bare (not node-wrapped) layer.
+    sc_bare <- scene(list(cube), lines = far)
+    sc_index <- scene_set_line_affects_bounds(sc_bare, index = 1, affects_bounds = FALSE)
+    expect_false(sc_index$lines[[1]]$affects_bounds)
+    sc_back <- scene_set_line_affects_bounds(sc_index, index = 1, affects_bounds = TRUE)
+    expect_true(sc_back$lines[[1]]$affects_bounds)
+
+    expect_error(scene_set_line_affects_bounds(sc), "exactly one of index and name")
+    expect_error(scene_set_line_affects_bounds(sc, index = 1, name = "leader"),
+                 "exactly one of index and name")
+    expect_error(scene_set_line_affects_bounds(sc, index = 3), "index must be in 1")
+    expect_error(scene_set_line_affects_bounds(sc, name = "nope"), "no line layer with name")
+    expect_error(scene_set_line_affects_bounds(sc, index = 1, affects_bounds = NA),
+                 "affects_bounds must be")
+    expect_error(scene_set_line_affects_bounds(scene(list(cube)), index = 1),
+                 "contains no line layer")
+    expect_error(scene_set_line_affects_bounds("nope", index = 1),
+                 "scene must be a scene descriptor")
+})
+
+test_that("decorational lines do not push the camera away from the data", {
+    near <- line_layer(matrix(c(-0.5, 0, 0), ncol = 3), matrix(c(0.5, 0, 0), ncol = 3),
+                       colors = c(1, 0, 0, 1), width = 3)
+    far <- line_layer(matrix(c(1000, 0, 0), ncol = 3), matrix(c(1001, 0, 0), ncol = 3),
+                      colors = c(0, 1, 0, 1), width = 3, affects_bounds = FALSE)
+    opts <- render_options(width = 64, height = 64, background_color = c(1, 1, 1, 1))
+
+    sc <- scene(list(), lines = list(near, far))
+    img <- render_scene(sc, camera_fit_scene(sc), opts)
+    visible_decoration <- count_color(img, c(255, 0, 0))
+    expect_gt(visible_decoration, 20)                  # the data is visible
+    expect_equal(count_color(img, c(0, 255, 0)), 0)    # the decoration is way outside the frame
+
+    # The same scene with the far line as content zooms out until the near line
+    # is too small to be visible: this is what the flag protects against.
+    sc_content <- scene_set_line_affects_bounds(sc, index = 2, affects_bounds = TRUE)
+    img_content <- render_scene(sc_content, camera_fit_scene(sc_content), opts)
+    expect_lt(count_color(img_content, c(255, 0, 0)), visible_decoration / 3)
+})

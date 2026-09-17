@@ -56,6 +56,12 @@ is computed from the \emph{bounding sphere} of the mesh (the
 half-diagonal of the axis-aligned bounding box), reproducing the
 formula \code{distance = sphere_radius / sin(FOV/2)} used by rgl.
 }
+\note{
+This function frames a mesh (or a set of vertices).  It does not know
+  about scene contents such as line layers or text labels; use
+  \code{\link{camera_fit_scene}} to fit a camera to a whole scene, including
+  the line layers that contribute to the scene bounds.
+}
 \examples{
 verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
                    -1,-1, 1, 1,-1, 1, 1,1, 1, -1,1, 1), ncol = 3, byrow = TRUE)
