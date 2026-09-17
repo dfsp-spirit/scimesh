@@ -36,10 +36,15 @@ use the same colour.  Takes precedence over vertex \code{colors}.}
 
 \item{normals}{Optional Nx3 numeric matrix of vertex normals.}
 
-\item{uv}{Optional Nx2 numeric matrix of texture coordinates (0-1).}
+\item{uv}{Optional Nx2 numeric matrix of texture coordinates (0-1).  scimesh
+uses image-space UVs: \code{v = 0} is the \emph{top} edge of the texture
+image, so \code{c(0, 0)} addresses its top-left pixel.  UVs from OBJ/PLY
+files, rgl or Blender use the opposite convention and must be converted
+with \code{\link{flip_uvs}()} first.}
 
 \item{texture}{Optional texture image as a 3D array (H x W x 3 or 4)
-with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.}
+with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.  Row 1 of
+the array is the top row of the image, matching the UV convention above.}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
 

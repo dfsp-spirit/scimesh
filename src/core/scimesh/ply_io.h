@@ -35,6 +35,10 @@ namespace ply_io {
 /// If the PLY file contains per-vertex RGB colors, they are automatically
 /// loaded into `Mesh::colors`.  Use `mesh.has_colors()` to check.
 ///
+/// @par Unsupported
+/// - Texture coordinates — PLY files with texture coordinates lose them; assign
+///   `Mesh::uvs` yourself if you need textured rendering.
+///
 /// @see read_obj(), read_stl(), Mesh::has_colors()
 Mesh read_ply(const std::string &path);
 

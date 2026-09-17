@@ -156,13 +156,12 @@ struct Image {
     /// @param v Vertical texture coordinate   (0.0–1.0, 0 = top).
     /// @return The interpolated Color.
     ///
-    /// @note `u`/`v` are indices into the pixel buffer, not the OpenGL texture
-    ///       convention: `v = 0` samples the **first** row of the buffer (the top
-    ///       of the image), while OpenGL-style texture coordinates put v = 0 at
-    ///       the bottom.  UVs are passed through as they are read from a file
-    ///       (see Mesh::uvs), so assets authored for OpenGL are sampled with
-    ///       their texture flipped vertically — flip the UVs (`v = 1 - v`)
-    ///       before rendering if you need the OpenGL convention.
+    /// @note `u`/`v` are image-space coordinates: `v = 0` samples the **first**
+    ///       row of the pixel buffer, i.e. the top of the image (the same row
+    ///       order as read_image() and write_png()).  Mesh texture coordinates
+    ///       (Mesh::uvs) use this same convention, so the renderer can pass them
+    ///       through; UVs coming from files or other tools usually do not, see
+    ///       flip_uvs().
     ///
     /// @par Example
     /// @code{.cpp}

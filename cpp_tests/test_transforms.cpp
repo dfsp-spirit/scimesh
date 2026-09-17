@@ -301,3 +301,38 @@ TEST_CASE("mesh_from_fs marks NaN data as transparent on request",
     Mesh no_values = mesh_from_fs(vertices, faces, {}, rgb, true);
     REQUIRE_FALSE(no_values.has_transparency);
 }
+
+TEST_CASE("flip_uvs converts bottom-left-origin UVs to scimesh's image space",
+          "[transforms][texture]") {
+    Mesh mesh = make_unit_cube();
+    const std::vector<Vec3> vertices_before = mesh.vertices;
+    const std::vector<Color> colors_before = mesh.colors;
+
+    // A mesh without UVs is returned unchanged (safe to call unconditionally).
+    REQUIRE(mesh.uvs.empty());
+    flip_uvs(mesh);
+    REQUIRE(mesh.uvs.empty());
+
+    // v is mirrored, u and everything else are untouched.
+    mesh.uvs = {Vec2(0.0f, 0.0f), Vec2(0.25f, 0.25f), Vec2(0.5f, 0.75f),
+                Vec2(1.0f, 1.0f)};
+    flip_uvs(mesh);
+    REQUIRE(mesh.uvs[0].x == Approx(0.0f));
+    REQUIRE(mesh.uvs[0].y == Approx(1.0f));
+    REQUIRE(mesh.uvs[1].x == Approx(0.25f));
+    REQUIRE(mesh.uvs[1].y == Approx(0.75f));
+    REQUIRE(mesh.uvs[2].x == Approx(0.5f));
+    REQUIRE(mesh.uvs[2].y == Approx(0.25f));
+    REQUIRE(mesh.uvs[3].y == Approx(0.0f));
+
+    // Flipping twice restores the original coordinates.
+    flip_uvs(mesh);
+    REQUIRE(mesh.uvs[2].y == Approx(0.75f));
+
+    // Geometry, colors and normals are not touched.
+    REQUIRE(mesh.vertices.size() == vertices_before.size());
+    for (size_t i = 0; i < mesh.vertices.size(); ++i) {
+        REQUIRE(mesh.vertices[i] == vertices_before[i]);
+    }
+    REQUIRE(mesh.colors.size() == colors_before.size());
+}

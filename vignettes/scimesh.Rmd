@@ -680,22 +680,42 @@ When `face_colors` is provided, it takes precedence over vertex
 
 ### Texture Mapping
 
-Load a texture image and assign UV coordinates to render textured
-meshes:
+Load a texture image, give the mesh UV coordinates and render it:
 
 ```r
 # Requires the 'png' package
 library(png)
-tex <- readPNG("texture.png")
+tex <- readPNG("texture.png")   # H x W x C array, row 1 = top of the image
 
-# UV coordinates (Nx2, values 0-1) must match vertex order
-mesh <- read_obj("textured.obj")  # OBJ reader extracts UVs
+# UV coordinates (Nx2, values 0-1) must match the vertex order of the mesh.
+# scimesh UVs are image-space: c(0, 0) is the TOP LEFT pixel of the texture.
+uv <- cbind(c(0, 1, 1, 0), c(0, 0, 1, 1))   # e.g. a quad
 
 img <- render_mesh(mesh$vertices, mesh$triangles,
-    uv = mesh$uv, texture = tex)
+    uv = uv, texture = tex)
 ```
 
-Bilinear texture sampling is used for smooth results.
+Bilinear texture sampling is used for smooth results, and the texel is
+multiplied with the vertex color (so use white vertices to show the texture
+unchanged).
+
+UVs are read from files by **no** scimesh reader: `read_obj()` and `read_ply()`
+return geometry (and colors/normals where available), but drop texture
+coordinates, so you have to supply `uv` yourself.  Note also that OBJ files,
+rgl, OpenGL and tools like Blender store UVs with the *opposite* origin
+(`v = 0` at the bottom of the image); convert such coordinates once with
+`flip_uvs()`:
+
+```r
+# UVs taken from an OBJ file / another 3D tool: v = 0 is the bottom
+uv_obj <- rbind(c(0, 1), c(1, 1), c(1, 0), c(0, 0))
+mesh <- flip_uvs(list(vertices = mesh$vertices, triangles = mesh$triangles,
+                      uv = uv_obj))
+img <- render_mesh(mesh$vertices, mesh$triangles, uv = mesh$uv, texture = tex)
+```
+
+**C++ example:** `examples/cpp/spot_cow/` renders Keenan Crane's textured cow
+from an OBJ file plus a PNG texture, including the UV conversion.
 
 ### Mesh Utilities
 

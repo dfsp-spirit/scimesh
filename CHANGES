@@ -85,6 +85,24 @@ Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
   `--text-no-depth`, `--text-adj`, `--text-offset` and `--text-rotation`, plus
   a `[text]` section in `config.toml`, so figures can be annotated without
   writing any code.
+- NEW: `flip_uvs()` (C++ and R) mirrors the `v` texture coordinate of a mesh
+  (`v -> 1 - v`), converting UVs that use the bottom-left origin to scimesh's
+  image-space UVs.  This is the documented one-liner for UVs that come from OBJ,
+  PLY, rgl, OpenGL or Blender; `examples/cpp/spot_cow/` uses it.
+- DOC: the texture-mapping documentation now states the UV convention instead of
+  leaving it to be discovered.  scimesh UVs (`Mesh::uvs`, the R `uv` argument)
+  are **image space**, like every other coordinate in the package: `v = 0` is
+  the *top* row of the texture image, matching `Image::sample_bilinear()`, which
+  the renderer calls with the UVs unchanged.  UVs from file formats and other
+  tools (v = 0 at the bottom) have to be converted with `flip_uvs()`; the vignette
+  and the `uv`/`texture` documentation say so, and a renderer test pins the
+  orientation so it cannot drift silently.
+- DOC/FIX: the vignette claimed that `read_obj()` extracts UVs and showed a
+  textured-OBJ recipe on that basis.  No scimesh reader returns texture
+  coordinates (`obj_io::read_obj()` and `ply_io::read_ply()` drop them), so the
+  vignette, the `read_obj()`/`read_ply()` and `render_mesh()` documentation now
+  say what actually happens and how to supply UVs yourself.  `obj_io.h` also
+  promised `vn`/`vt` in its summary while listing them as unsupported.
 
 Breaking changes
 ----------------

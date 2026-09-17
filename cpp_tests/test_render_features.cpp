@@ -153,6 +153,95 @@ TEST_CASE("Renderer maps a texture onto a mesh with UV coordinates",
     REQUIRE(front.g > front.b);
 }
 
+TEST_CASE("Renderer samples mesh UVs in image space (v = 0 is the top)",
+          "[render][texture]") {
+    Renderer renderer;
+
+    // A big quad facing the camera, with a white base color so that the texture
+    // shows through (the renderer modulates the vertex color with the texel).
+    Mesh quad;
+    quad.vertices = {{-1, -1, 0}, {1, -1, 0}, {1, 1, 0}, {-1, 1, 0}};
+    quad.triangles = {{0, 1, 2}, {0, 2, 3}};
+    quad.normals.assign(4, Vec3(0, 0, 1));
+    quad.colors.assign(4, Color(1, 1, 1, 1));
+
+    // A 1x2 texture: row 0 is red, row 1 is blue.  Row 0 is the *first* row of
+    // the pixel buffer, i.e. the top row of the image.
+    Image texture(1, 2);
+    texture.set_pixel(0, 0, 255, 0, 0, 255);  // top of the image    -> red
+    texture.set_pixel(0, 1, 0, 0, 255, 255);  // bottom of the image -> blue
+    quad.texture = texture;
+
+    // scimesh UVs are image-space: v = 0 addresses the first (top) row of the
+    // texture.  The quad's lower vertices therefore get v = 1 (the blue row)
+    // and its upper vertices v = 0 (the red row), so the rendered quad shows
+    // red on top — the opposite of what the OBJ/OpenGL convention would do.
+    quad.uvs = {Vec2(0.0f, 1.0f), Vec2(1.0f, 1.0f),   // lower left, lower right
+                Vec2(1.0f, 0.0f), Vec2(0.0f, 0.0f)};  // upper right, upper left
+
+    const auto mean_top_bottom = [&](const Image &img) {
+        // Mean red/blue of the top and the bottom fifth of the drawn geometry.
+        double top_r = 0, top_b = 0, bottom_r = 0, bottom_b = 0;
+        int top_n = 0, bottom_n = 0;
+        int min_y = img.height, max_y = -1;
+        for (int y = 0; y < img.height; ++y) {
+            for (int x = 0; x < img.width; ++x) {
+                const Color c = pixel(img, x, y);
+                if (c.r + c.g + c.b > 0.05f) {
+                    min_y = std::min(min_y, y);
+                    max_y = std::max(max_y, y);
+                }
+            }
+        }
+        REQUIRE(max_y >= 0);
+        const int band = std::max(1, (max_y - min_y + 1) / 5);
+        for (int y = min_y; y <= min_y + band && y < img.height; ++y) {
+            for (int x = 0; x < img.width; ++x) {
+                const Color c = pixel(img, x, y);
+                if (c.r + c.g + c.b > 0.05f) {
+                    top_r += c.r;
+                    top_b += c.b;
+                    ++top_n;
+                }
+            }
+        }
+        for (int y = std::max(min_y, max_y - band); y <= max_y; ++y) {
+            for (int x = 0; x < img.width; ++x) {
+                const Color c = pixel(img, x, y);
+                if (c.r + c.g + c.b > 0.05f) {
+                    bottom_r += c.r;
+                    bottom_b += c.b;
+                    ++bottom_n;
+                }
+            }
+        }
+        REQUIRE(top_n > 0);
+        REQUIRE(bottom_n > 0);
+        return std::vector<double>{top_r / top_n, top_b / top_n,
+                                   bottom_r / bottom_n, bottom_b / bottom_n};
+    };
+
+    const Image rendered =
+        renderer.render_mesh(quad, front_camera(4.0f), base_options(96));
+    const std::vector<double> bands = mean_top_bottom(rendered);
+    REQUIRE(bands[0] > bands[1]);  // top of the quad is red
+    REQUIRE(bands[3] > bands[2]);  // bottom of the quad is blue
+
+    // flip_uvs() exists for UVs that use the bottom-left origin (OBJ, PLY,
+    // OpenGL, rgl, Blender): it converts them to the image space used above, so
+    // flipping the quad's UVs mirrors the texture on the quad.
+    Mesh mirrored = quad;
+    flip_uvs(mirrored);
+    REQUIRE(mirrored.uvs[0] == Vec2(0.0f, 0.0f));
+    REQUIRE(mirrored.uvs[2] == Vec2(1.0f, 1.0f));
+
+    const Image flipped_image =
+        renderer.render_mesh(mirrored, front_camera(4.0f), base_options(96));
+    const std::vector<double> flipped_bands = mean_top_bottom(flipped_image);
+    REQUIRE(flipped_bands[1] > flipped_bands[0]);  // top of the quad is blue
+    REQUIRE(flipped_bands[2] > flipped_bands[3]);  // bottom of the quad is red
+}
+
 TEST_CASE("Renderer wireframe mode draws edges instead of fills",
           "[render][wireframe]") {
     Renderer renderer;

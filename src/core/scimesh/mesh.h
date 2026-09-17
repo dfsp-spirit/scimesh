@@ -127,14 +127,24 @@ struct Mesh {
     /// @brief Per-vertex texture coordinates (UVs).
     ///
     /// If non-empty, must have exactly `vertices.size()` elements.
-    /// UV coordinates range from (0,0) to (1,1) and are used as they are:
-    /// (0,0) addresses the first column and first row of the texture image
-    /// (its **top left** pixel) and (1,1) the last one, see
-    /// Image::sample_bilinear() for the exact sampling rule and for the
-    /// difference to the OpenGL texture convention.
-    /// Only used when a `texture` image is also set.
     ///
-    /// @see Vec2, has_uvs(), texture
+    /// UVs are **image-space** coordinates, following the same rule as every
+    /// other coordinate in scimesh: `u = 0` is the left edge of the texture
+    /// image and `v = 0` its **top** edge, so `(0, 0)` addresses the top-left
+    /// pixel of the texture and `(1, 1)` the bottom-right one.  That is exactly
+    /// what Image::sample_bilinear() expects, so the renderer passes the UVs
+    /// through unchanged.
+    ///
+    /// Note that OBJ and PLY files, OpenGL, rgl and tools like Blender and
+    /// MeshLab store UVs with the opposite convention (v = 0 at the *bottom*),
+    /// so those coordinates have to be converted once after loading — either by
+    /// calling flip_uvs() or by subtracting from 1 while copying them (as
+    /// `examples/cpp/spot_cow/` does).
+    ///
+    /// Only used when a `texture` image is also set; the renderer samples it
+    /// with bilinear interpolation and multiplies it with the vertex color.
+    ///
+    /// @see Vec2, has_uvs(), texture, flip_uvs(), Image::sample_bilinear()
     std::vector<Vec2> uvs;
 
     /// @}

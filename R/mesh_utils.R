@@ -152,6 +152,50 @@ set_mesh_alpha <- function(mesh, alpha) {
     mesh
 }
 
+#' Flip the texture coordinates of a mesh vertically
+#'
+#' scimesh stores texture coordinates in \strong{image space}, with \code{v = 0}
+#' at the \emph{top} edge of the texture image — the same rule as every other
+#' coordinate in scimesh (\code{c(0, 0)} addresses the top-left pixel of the
+#' texture image, \code{c(1, 1)} the bottom-right one).  OBJ and PLY files,
+#' OpenGL, rgl and tools like Blender and MeshLab use the opposite convention
+#' (\code{v = 0} at the bottom), so UVs taken from those sources have to be
+#' converted once; this function does that, instead of you having to rewrite the
+#' second column by hand.
+#'
+#' Geometry, colors and normals are untouched.  A mesh without texture
+#' coordinates is returned unchanged, so calling this is safe either way.
+#'
+#' @param mesh A mesh descriptor (scimesh or rgl format, see
+#'   \code{\link{as_scimesh_mesh}()}).
+#' @return The mesh with flipped UVs.
+#'
+#' @examples
+#' quad <- list(vertices = matrix(c(-1, -1, 0, 1, -1, 0, 1, 1, 0,
+#'                                  -1, -1, 0, 1, 1, 0, -1, 1, 0),
+#'                                ncol = 3, byrow = TRUE),
+#'              triangles = matrix(c(1, 2, 3, 1, 3, 4), ncol = 3, byrow = TRUE),
+#'              # UVs with v = 0 at the bottom (OBJ/OpenGL convention)
+#'              uv = matrix(c(0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0),
+#'                          ncol = 2, byrow = TRUE))
+#' flipped <- flip_uvs(quad)
+#' flipped$uv[, 2]  # v is now measured from the top of the texture
+#'
+#' @seealso \code{\link{render_mesh}} (the \code{uv} and \code{texture}
+#'   arguments)
+#' @export
+flip_uvs <- function(mesh) {
+    mesh <- as_scimesh_mesh(mesh)
+    if (is.null(mesh$uv) || length(mesh$uv) == 0L) {
+        return(mesh)
+    }
+    if (!is.matrix(mesh$uv) || ncol(mesh$uv) != 2L) {
+        stop("mesh$uv must be an Nx2 numeric matrix")
+    }
+    mesh$uv[, 2L] <- 1 - mesh$uv[, 2L]
+    mesh
+}
+
 #' Render multiple spheres from point data
 #'
 #' Generates a merged sphere mesh from a set of center points,
@@ -910,12 +954,15 @@ write_stl <- function(mesh, path, format = c("binary", "ascii")) {
 
 #' Read a Wavefront OBJ file
 #'
-#' Reads a Wavefront OBJ file (with optional UV coordinates and normals)
-#' and returns a scimesh mesh descriptor list with \code{vertices},
-#' \code{triangles}, and optionally \code{uv} and \code{normals}.
+#' Reads the geometry (vertices and triangles) of a Wavefront OBJ file and
+#' returns a scimesh mesh descriptor list with \code{vertices} and
+#' \code{triangles}.  Normals and texture coordinates in the file are ignored:
+#' call \code{\link{compute_vertex_normals}()} if you need normals, and assign
+#' \code{uv} yourself (see \code{\link{render_mesh}}) if you want to render the
+#' mesh with a texture.
 #'
 #' @param path Path to the OBJ file.
-#' @return A mesh descriptor list.
+#' @return A mesh descriptor list with \code{vertices} and \code{triangles}.
 #'
 #' @examples
 #' \dontrun{
@@ -932,7 +979,8 @@ read_obj <- function(path) {
 #'
 #' Reads a PLY file (ASCII or binary) with optional per-vertex colors
 #' and returns a scimesh mesh descriptor list with \code{vertices},
-#' \code{triangles}, and optionally \code{colors}.
+#' \code{triangles}, and optionally \code{colors}.  Texture coordinates in the
+#' file are ignored.
 #'
 #' @param path Path to the PLY file.
 #' @return A mesh descriptor list.

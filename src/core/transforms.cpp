@@ -131,4 +131,10 @@ Mesh mesh_from_fs(const std::vector<float> &fs_vertices,
     return out;
 }
 
+void flip_uvs(Mesh &mesh) {
+    for (Vec2 &uv : mesh.uvs) {
+        uv.y = 1.0f - uv.y;
+    }
+}
+
 } // namespace scimesh

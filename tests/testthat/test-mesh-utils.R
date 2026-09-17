@@ -268,3 +268,35 @@ test_that("batched primitives and tubes can be rendered", {
     expect_equal(img$height, 64)
     expect_equal(length(img$pixels), 64 * 64 * 4)
 })
+
+test_that("flip_uvs converts bottom-left-origin UVs to scimesh's image space", {
+    quad <- list(vertices = matrix(c(-1, -1, 0, 1, -1, 0, 1, 1, 0,
+                                     -1, -1, 0, 1, 1, 0, -1, 1, 0),
+                                   ncol = 3, byrow = TRUE),
+                 triangles = matrix(c(1, 2, 3, 1, 3, 4), ncol = 3, byrow = TRUE),
+                 # OBJ/OpenGL style: v = 0 at the bottom of the texture
+                 uv = matrix(c(0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0),
+                             ncol = 2, byrow = TRUE))
+
+    uv_before <- quad$uv
+    flipped <- flip_uvs(quad)
+    expect_equal(flipped$uv[, 1], quad$uv[, 1])          # u unchanged
+    expect_equal(flipped$uv[, 2], 1 - uv_before[, 2])    # v mirrored
+    # The original mesh is not modified (R semantics) and geometry is untouched.
+    expect_equal(quad$uv, uv_before)
+    expect_equal(flipped$vertices, quad$vertices)
+    expect_equal(flipped$triangles, quad$triangles)
+
+    # Flipping twice restores the input.
+    expect_equal(flip_uvs(flipped)$uv, quad$uv)
+
+    # A mesh without UVs, and an rgl-style mesh, pass through unchanged.
+    no_uv <- quad
+    no_uv$uv <- NULL
+    expect_null(flip_uvs(no_uv)$uv)
+
+    # Only proper Nx2 matrices are accepted.
+    bad <- quad
+    bad$uv <- matrix(1:3, ncol = 1)
+    expect_error(flip_uvs(bad), "Nx2 numeric matrix")
+})

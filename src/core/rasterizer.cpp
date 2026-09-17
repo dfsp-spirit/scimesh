@@ -309,6 +309,12 @@ void Rasterizer::rasterize_triangle(
                 Vec2 interp_uv = smooth_shading
                     ? w0 * uv0 + w1 * uv1 + w2 * uv2
                     : uv0;
+                // Mesh UVs are image-space coordinates (v = 0 is the first row
+                // of the texture image, i.e. its top edge), exactly like the
+                // arguments of sample_bilinear(): there is no flip here.  UVs
+                // from OBJ/PLY/rgl files use the opposite, bottom-left origin,
+                // so they have to be converted once with flip_uvs() (see
+                // Mesh::uvs and examples/cpp/spot_cow).
                 Color tex = active_texture->sample_bilinear(interp_uv.x, interp_uv.y);
                 base_color = Color(base_color.r * tex.r, base_color.g * tex.g,
                                    base_color.b * tex.b, base_color.a * tex.a);

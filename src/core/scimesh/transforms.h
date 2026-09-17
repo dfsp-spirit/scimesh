@@ -106,6 +106,30 @@ void rotate_mesh(Mesh &mesh, float angle_radians, const Vec3 &axis);
 /// @see translate_mesh(), rotate_mesh(), scale_mesh()
 void transform_mesh(Mesh &mesh, const Mat4 &matrix);
 
+/// @brief Flip the texture coordinates of a mesh vertically (v → 1 − v).
+///
+/// scimesh stores UVs in **image space**, with v = 0 at the *top* edge of the
+/// texture image (see Mesh::uvs).  OBJ and PLY files, OpenGL, rgl and tools
+/// such as Blender and MeshLab use the opposite convention, with v = 0 at the
+/// bottom.  Call this once on a mesh whose UVs come from such a source, instead
+/// of rewriting the coordinates by hand (this is exactly what the
+/// `examples/cpp/spot_cow/` example needs for its OBJ texture coordinates).
+///
+/// Mesh geometry, colors and normals are untouched.  Meshes without UVs are
+/// left as they are, so this is safe to call unconditionally.
+///
+/// @param mesh The mesh whose UVs to flip (modified in place).
+///
+/// @par Example
+/// @code{.cpp}
+/// Mesh model = obj_io::read_obj("model.obj");
+/// model.uvs = uvs_from_obj;   // bottom-left origin, e.g. from libfs
+/// flip_uvs(model);            // now v = 0 is the top of the texture
+/// @endcode
+///
+/// @see Mesh::uvs, transform_mesh()
+void flip_uvs(Mesh &mesh);
+
 /// @brief Convert a FreeSurfer-format mesh (flat vertex/face arrays) to a
 ///        scimesh Mesh.
 ///

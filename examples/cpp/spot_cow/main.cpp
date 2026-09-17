@@ -19,6 +19,7 @@
 #include <scimesh/image.h>
 #include <scimesh/primitives.h>
 #include <scimesh/scene.h>
+#include <scimesh/transforms.h>
 
 #include <string>
 #include <iostream>
@@ -73,14 +74,17 @@ static Mesh load_spot_cow(const char *obj_path, const char *tex_path) {
             fs_mesh.vertices[i * 3 + 2]));
     }
 
-    // Copy texture coordinates (flip V: OBJ origin bottom-left → top-left).
+    // Copy the texture coordinates and convert them to scimesh's UV space.
+    // OBJ files store UVs with v = 0 at the *bottom* of the texture image,
+    // while scimesh uses image-space UVs (v = 0 = top row), so one vertical
+    // flip is needed — exactly what flip_uvs() does.
     mesh.uvs.reserve(nv);
     if (has_tex) {
         for (size_t i = 0; i < nv; i++) {
-            mesh.uvs.push_back(Vec2(
-                fs_mesh.vertex_texcoords[i * 2],
-                1.0f - fs_mesh.vertex_texcoords[i * 2 + 1]));
+            mesh.uvs.push_back(Vec2(fs_mesh.vertex_texcoords[i * 2],
+                                    fs_mesh.vertex_texcoords[i * 2 + 1]));
         }
+        flip_uvs(mesh);
     }
 
     // Fill per-vertex colors (white — texture provides the color).
