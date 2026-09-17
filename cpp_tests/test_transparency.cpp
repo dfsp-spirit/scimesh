@@ -12,6 +12,7 @@
 #include <scimesh/mesh.h>
 #include <scimesh/image.h>
 #include <scimesh/ply_io.h>
+#include <scimesh/primitives.h>
 #include <scimesh/fs_mesh_converter.h>
 #include "libfs.h"
 #include <cmath>
@@ -173,6 +174,64 @@ TEST_CASE("Translucent meshes blend without a manual flag", "[render][transparen
     const Color center = center_pixel(blended);
     REQUIRE(center.b > center_pixel(opaque).b);   // blue shows through
     REQUIRE(center.r > 0.1f);                     // red is still there
+}
+
+TEST_CASE("A double-sided opaque plane is shaded uniformly",
+          "[render][transparency]") {
+    // generate_plane() builds a front *and* a back face at exactly the same
+    // depth, so the depth test cannot decide between them: which one wins is a
+    // floating point tie, and it is broken differently from pixel to pixel and
+    // from platform to platform.  Both faces must therefore be shaded the same
+    // way.  Shading the back face with its own (away pointing) normal used to
+    // leave it ambient-lit, which speckled the plane with dark pixels.
+    Renderer renderer;
+    Mesh plane = generate_plane(Vec3(0, 0, 0), Vec3(0, 0, 1), 2, 2, kRed);
+
+    Scene scene;
+    scene.add(plane);
+    const Image img = renderer.render_scene(scene, front_camera(), white_options());
+
+    int covered = 0;
+    for (int y = 0; y < img.height; ++y) {
+        for (int x = 0; x < img.width; ++x) {
+            const Color c = pixel(img, x, y);
+            if (c.g > 0.5f && c.b > 0.5f) continue;  // white background
+            ++covered;
+            REQUIRE(c.r > 0.9f);                     // never the 0.3 ambient term
+        }
+    }
+    REQUIRE(covered > 1000);
+}
+
+TEST_CASE("A translucent double-sided plane blends uniformly",
+          "[render][transparency]") {
+    // The same double-sided plane, but translucent: each of its two coplanar
+    // faces contributes one blended layer, and each face consists of two
+    // triangles that share a diagonal.  A pixel sitting exactly on such a
+    // diagonal must be rasterized by exactly one of the two triangles -
+    // otherwise it is blended twice (a dark seam) or not at all (a crack),
+    // depending on the rounding of the platform (see the fill rule in
+    // Rasterizer::rasterize_triangle()).  So the plane must attenuate the
+    // background by exactly 0.7^2 everywhere, on every pixel.
+    Renderer renderer;
+    Mesh plane = generate_plane(Vec3(0, 0, 0), Vec3(0, 0, 1), 2, 2,
+                                Color(1, 0, 0, 0.3f));
+
+    Scene scene;
+    scene.add(plane);
+    const Image img = renderer.render_scene(scene, front_camera(), white_options());
+
+    const float expected_green = 0.7f * 0.7f;
+    int covered = 0;
+    for (int y = 0; y < img.height; ++y) {
+        for (int x = 0; x < img.width; ++x) {
+            const Color c = pixel(img, x, y);
+            if (c.g > 0.9f) continue;                // white background
+            ++covered;
+            REQUIRE(std::abs(c.g - expected_green) < 0.02f);
+        }
+    }
+    REQUIRE(covered > 1000);
 }
 
 TEST_CASE("Translucent geometry behind an opaque mesh stays hidden",

@@ -228,9 +228,16 @@ struct Rasterizer {
     /// - Per-pixel shading (or flat shading if `smooth_shading` is false)
     /// - Wireframe edge drawing (if enabled)
     ///
+    /// Triangles are shaded two-sided: a fragment whose back side is visible
+    /// (positive screen-space area) and whose normal points away from the camera
+    /// (`normal.z < 0`, i.e. the normals are expected in view space) is lit with
+    /// the normal flipped towards the viewer.  Coincident front/back face pairs
+    /// therefore shade identically, independently of which of the two wins the
+    /// depth test.
+    ///
     /// @param screen_v0, screen_v1, screen_v2  Screen-space vertex positions.
     /// @param color0, color1, color2           Per-vertex colors.
-    /// @param normal0, normal1, normal2         Per-vertex normals.
+    /// @param normal0, normal1, normal2         Per-vertex normals (view space).
     /// @param uv0, uv1, uv2                    Per-vertex texture coordinates.
     /// @param backface_culling                 Whether to cull backfaces.
     /// @param smooth_shading                   Whether to interpolate normals.

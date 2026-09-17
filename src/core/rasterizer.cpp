@@ -50,6 +50,35 @@ float Rasterizer::fog_depth_from_ndc(float z_ndc) const {
     return view_distance_from_ndc(z_ndc, z_near, z_far, orthographic);
 }
 
+/// @brief Put the endpoints of a triangle edge into a canonical order, in place.
+///
+/// Two triangles that share an edge walk along it in opposite directions, so the
+/// edge function of the *shared* edge is evaluated with the endpoints swapped.
+/// The two evaluations are mathematically the negation of each other, but in
+/// floating point they can differ in their last bits.  A pixel center that lies
+/// exactly on the shared edge can then be rasterized by both triangles (double
+/// covering, which blends translucency twice along the seam) or by neither (a
+/// crack), and which of the two happens depends on the rounding of the platform -
+/// the very same scene then renders differently on different CPUs/compilers.
+///
+/// Evaluating every edge function in a canonical endpoint order fixes that: all
+/// triangles sharing the edge compute the *identical* value and only differ by
+/// the sign that undoes the swap, which is exact.  The sign of the shared edge's
+/// barycentric weight is therefore exactly opposite in the two triangles, so at
+/// most one of them can contain a pixel that lies on the edge; the remaining tie
+/// (weight exactly 0) is broken by that same sign, which turns it into the
+/// "top-left" style fill rule applied in rasterize_triangle().
+///
+/// @param a, b Endpoints of the edge; swapped when they are out of order.
+/// @param in_canonical_order True while (a, b) is in canonical order; toggled
+///        on every swap.
+static void canonical_edge_endpoints(Vec3 &a, Vec3 &b, bool &in_canonical_order) {
+    if (b.x < a.x || (b.x == a.x && b.y < a.y)) {
+        std::swap(a, b);
+        in_canonical_order = !in_canonical_order;
+    }
+}
+
 void Rasterizer::shade_and_write(int x, int y, float depth,
                                  const Color &color, const Vec3 &normal,
                                  const Vec3 &light_direction, Image &output,
@@ -152,6 +181,20 @@ void Rasterizer::rasterize_triangle(
 
     float abs_area = std::abs(area);
 
+    // Two-sided lighting.  The sign of the screen-space area is the winding
+    // order, i.e. it tells which side of the triangle faces the viewer (a
+    // positive area is the back-facing case that `backface_culling` drops
+    // above).  A fragment whose back side is visible AND whose stored normal
+    // points away from the viewer is shaded with that normal flipped towards the
+    // camera, instead of falling back to the ambient term only (a dark, unlit
+    // patch).  This matters for double-sided geometry - like generate_plane(),
+    // whose front and back faces are exactly coplanar, so *which* of the two
+    // wins the depth test is a floating point tie - and for open surfaces seen
+    // from their back side.  Only the orientation of the *normal* is corrected:
+    // a mesh whose normals disagree with its winding is left alone, so
+    // RenderOptions::invert_normals keeps its effect.
+    const bool back_facing = area > 0.0f;
+
     float min_x = std::min({screen_v0.x, screen_v1.x, screen_v2.x});
     float max_x = std::max({screen_v0.x, screen_v1.x, screen_v2.x});
     float min_y = std::min({screen_v0.y, screen_v1.y, screen_v2.y});
@@ -163,6 +206,21 @@ void Rasterizer::rasterize_triangle(
     int y_end   = std::min(height - 1, static_cast<int>(std::ceil(max_y)));
 
     float inv_area = 1.0f / area;
+
+    // The three edge functions, evaluated in a canonical endpoint order (see
+    // canonical_edge_endpoints()).  `own<i>` states whether the triangle walks
+    // along the edge opposite vertex <i> in the canonical direction: it undoes
+    // the canonicalization in the barycentric weight (`k<i>`), and it decides
+    // the fill rule for a pixel that lies exactly on that edge.
+    Vec3 e0_a = screen_v1, e0_b = screen_v2; bool own0 = true;
+    Vec3 e1_a = screen_v2, e1_b = screen_v0; bool own1 = true;
+    Vec3 e2_a = screen_v0, e2_b = screen_v1; bool own2 = true;
+    canonical_edge_endpoints(e0_a, e0_b, own0);
+    canonical_edge_endpoints(e1_a, e1_b, own1);
+    canonical_edge_endpoints(e2_a, e2_b, own2);
+    const float k0 = own0 ? inv_area : -inv_area;
+    const float k1 = own1 ? inv_area : -inv_area;
+    const float k2 = own2 ? inv_area : -inv_area;
 
     float wire_thresh = 0.0f;
     if (wireframe) {
@@ -178,13 +236,32 @@ void Rasterizer::rasterize_triangle(
             float px = static_cast<float>(x) + 0.5f;
             float py = static_cast<float>(y) + 0.5f;
 
-            float w0 = ((screen_v1.x - px) * (screen_v2.y - py) -
-                        (screen_v2.x - px) * (screen_v1.y - py)) * inv_area;
-            float w1 = ((screen_v2.x - px) * (screen_v0.y - py) -
-                        (screen_v0.x - px) * (screen_v2.y - py)) * inv_area;
-            float w2 = 1.0f - w0 - w1;
+            // Barycentric weights, one per vertex: w0 belongs to screen_v0 and
+            // is the normalized edge function of the opposite edge (v1 -> v2),
+            // and so on.  Each weight is derived from its own edge function (and
+            // not as 1 - w0 - w1), because only an edge function gives two
+            // triangles that share the edge the same value - and hence exactly
+            // opposite signs, see canonical_edge_endpoints().  The weights
+            // therefore sum to 1 only up to a few ULP, which is irrelevant for
+            // the interpolation.
+            float w0 = k0 * ((e0_a.x - px) * (e0_b.y - py) -
+                             (e0_b.x - px) * (e0_a.y - py));
+            float w1 = k1 * ((e1_a.x - px) * (e1_b.y - py) -
+                             (e1_b.x - px) * (e1_a.y - py));
+            float w2 = k2 * ((e2_a.x - px) * (e2_b.y - py) -
+                             (e2_b.x - px) * (e2_a.y - py));
 
             if (w0 < 0.0f || w1 < 0.0f || w2 < 0.0f)
+                continue;
+
+            // Fill rule: a pixel lying exactly on an edge is rasterized by the
+            // triangle that walks along that edge in the canonical direction, so
+            // that exactly one of the triangles sharing the edge covers it.
+            if (w0 == 0.0f && !own0)
+                continue;
+            if (w1 == 0.0f && !own1)
+                continue;
+            if (w2 == 0.0f && !own2)
                 continue;
 
             if (wireframe) {
@@ -200,6 +277,7 @@ void Rasterizer::rasterize_triangle(
                 if (!blend_mode) {
                     z_buffer[pidx] = depth;
                     Vec3 wf_normal = w0 * normal0 + w1 * normal1 + w2 * normal2;
+                    if (back_facing && wf_normal.z < 0.0f) wf_normal = -wf_normal;
                     normal_buffer[pidx] = wf_normal;
                 }
                 continue;
@@ -219,6 +297,12 @@ void Rasterizer::rasterize_triangle(
             } else {
                 base_color = color0;
                 interp_normal = normal0;
+            }
+
+            // Shading normal of a visible back side (see the two-sided lighting
+            // note above the pixel loop).
+            if (back_facing && interp_normal.z < 0.0f) {
+                interp_normal = -interp_normal;
             }
 
             if (active_texture) {

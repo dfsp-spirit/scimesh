@@ -232,6 +232,29 @@ Breaking changes
   (tests/testthat/test-transparency.R) cover detection, blending, the depth-test
   and ordering fixes, per-vertex alpha interpolation, alpha 0 holes, PLY alpha
   round-trips and the FreeSurfer `nan_alpha` option.
+- FIX: rendering a double-sided mesh was platform dependent and produced visible
+  artifacts, because two floating point ties were resolved by the rounding of
+  the platform.  (1) `generate_plane()` (and other manually built meshes)
+  contain a front and a back face at exactly the same depth, so *which* of the
+  two wins the depth test is a tie: on some builds the back face won on about a
+  quarter of the pixels and, being shaded with its own (away pointing) normal,
+  came out ambient-lit - an opaque plane was speckled with dark pixels (940 of
+  4096 at 64x64 on x86-64, with plain `-O2` *and* `-O3`).  `Rasterizer::
+  rasterize_triangle()` now shades such fragments two-sided, i.e. a visible back
+  side whose normal points away from the viewer is lit with the normal flipped
+  towards the camera, so both faces of the pair look the same and the tie no
+  longer matters.  A mesh whose normals disagree with its winding is left alone,
+  so `RenderOptions::invert_normals` keeps its effect.  (2) The two triangles
+  that make up a quad share a diagonal, and a pixel center lying exactly on it
+  was covered by both of them (blended twice) or by neither (a crack), again
+  depending on the rounding: a translucent plane had a seam of double-attenuated
+  pixels (0.7^4 instead of 0.7^2 of the background).  Edge functions are now
+  evaluated in a canonical endpoint order, which makes the value bit-identical
+  in all triangles sharing an edge, and a new edge fill rule (analogous to the
+  "top-left" rule of hardware rasterizers) gives a pixel sitting exactly on an
+  edge to exactly one of them.  Coverage and blending no longer depend on the
+  platform; regression tests in cpp_tests/test_rasterizer.cpp and
+  cpp_tests/test_transparency.cpp pin both invariants.
 
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------

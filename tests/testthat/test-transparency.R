@@ -140,8 +140,12 @@ test_that("color alpha < 1 is honoured for generated meshes", {
     # 30% red over the white background leaves a pinkish pixel.  Note that
     # generate_plane() creates a double-sided plane (front *and* back face, both
     # coplanar), so the background is attenuated by two 30% layers: 0.7 * 0.7.
-    # Which of the two faces is blended first is a tie in the depth sort, so
-    # only the (order-independent) channel values are checked exactly.
+    # Each of the two faces consists of two triangles sharing a diagonal, and a
+    # pixel sitting exactly on such a diagonal is rasterized by exactly one of
+    # them (the edge fill rule of the rasterizer), so every pixel gets exactly
+    # those two layers.  Which of the two faces is blended first is a tie in the
+    # depth sort, so only the (order-independent) channel values are checked
+    # exactly.
     expect_equal(ghost_px[2], 0.7^2, tolerance = 0.03)
     expect_gt(ghost_px[1], 0.5)          # still dominated by the red surface
     expect_lt(opaque_px[2], 0.1)
