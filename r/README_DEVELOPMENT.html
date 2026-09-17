@@ -29,7 +29,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>NA</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dfsp-spirit/scimesh/blob/v0.3.4/README_DEVELOPMENT.md" class="external-link"><code>README_DEVELOPMENT.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dfsp-spirit/scimesh/blob/main/README_DEVELOPMENT.md" class="external-link"><code>README_DEVELOPMENT.md</code></a></small>
     </div>
 
 <div class="section level2">
@@ -58,7 +58,7 @@
 <div class="section level3">
 <h3 id="running-the-r-unit-tests">Running the R unit tests<a class="anchor" aria-label="anchor" href="#running-the-r-unit-tests"></a></h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Or via R CMD check:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>R CMD build . <span class="sc">&amp;&amp;</span> R CMD check scimesh_<span class="sc">*</span>.tar.gz</span></code></pre></div>
 </div>
@@ -87,12 +87,12 @@ doxygen Doxyfile</code></pre>
 <li>
 <code>Doxyfile</code> — the <code>PROJECT_NUMBER</code> field (version shown in published C++ API docs)</li>
 </ul></li>
-<li><p>make sure new additions have proper doc strings and tests, then build/refresh all docs. In R, run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> to re-generate docs.</p></li>
+<li><p>make sure new additions have proper doc strings and tests, then build/refresh all docs. In R, run <code>devtools::document()</code> to re-generate docs.</p></li>
 <li><p><strong>REQUIRED:</strong> Re-run Doxygen so the published C++ API docs pick up the new version in <code>PROJECT_NUMBER</code>: <code>doxygen Doxyfile</code> Do not skip this step — the online API documentation at <code>https://dfsp-spirit.github.io/scimesh/</code> will show a stale or empty version otherwise.</p></li>
 <li>
 <p>run all tests and make sure they are green:</p>
 <p>C++ unit tests: <code>cd cpp_tests &amp;&amp; cmake -B build &amp;&amp; cmake --build build &amp;&amp; ./build/scimesh_tests</code></p>
-<p>R unit tests: <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code></p>
+<p>R unit tests: <code>devtools::test()</code></p>
 </li>
 <li><p>make sure to run all examples: <code>./examples/cpp/run_all_cpp.sh   ./examples/R/run_all_R.sh</code></p></li>
 <li><p>run <code>R CMD build .</code> to build new package version</p></li>

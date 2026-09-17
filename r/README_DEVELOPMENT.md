@@ -96,9 +96,8 @@ It is built and deployed automatically via GitHub Actions
     C++ API docs)
 
 - make sure new additions have proper doc strings and tests, then
-  build/refresh all docs. In R, run
-  [`devtools::document()`](https://devtools.r-lib.org/reference/document.html)
-  to re-generate docs.
+  build/refresh all docs. In R, run `devtools::document()` to
+  re-generate docs.
 
 - **REQUIRED:** Re-run Doxygen so the published C++ API docs pick up the
   new version in `PROJECT_NUMBER`: `doxygen Doxyfile` Do not skip this
@@ -111,8 +110,7 @@ It is built and deployed automatically via GitHub Actions
   C++ unit tests:
   `cd cpp_tests && cmake -B build && cmake --build build && ./build/scimesh_tests`
 
-  R unit tests:
-  [`devtools::test()`](https://devtools.r-lib.org/reference/test.html)
+  R unit tests: `devtools::test()`
 
 - make sure to run all examples:
   `./examples/cpp/run_all_cpp.sh ./examples/R/run_all_R.sh`
