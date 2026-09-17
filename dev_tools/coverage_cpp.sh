@@ -38,7 +38,7 @@ CXX="${CXX:-clang++}"
 CC="${CC:-clang}"
 
 # Paths to drop from the report: test code, the Catch2 amalgamation and all
-# vendored third-party code (glm/stb/libfs/tinyobj/tinyply are header-only, so
+# vendored third-party code (glm/stb/libfs/tinyply are header-only, so
 # their instantiations show up in the library's translation units).
 IGNORE_FILES='(/cpp_tests/|/src/third_party/|catch_amalgamated|rcpp_bindings)'
 

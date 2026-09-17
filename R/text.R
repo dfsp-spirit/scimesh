@@ -55,6 +55,11 @@
 #'   push an atom label next to the atom instead of onto it.
 #' @param line_spacing Distance between two lines of a multi-line label, as a
 #'   multiple of the font's glyph box height (default 1.2).
+#' @param rotation Rotation of the label in degrees, counter-clockwise, about
+#'   the anchor position (default 0).  Use 90 to write along a vertical axis
+#'   (the usual orientation of a y-axis label), 180 for an upside-down label,
+#'   or any other angle to follow an annotation line.  The anchor stays fixed
+#'   while the text turns around it.
 #' @param depth_test Whether a label is hidden by geometry in front of its
 #'   anchor (default \code{TRUE}).  Set to \code{FALSE} to always draw the
 #'   labels on top of everything, which is the right choice for direction
@@ -91,7 +96,7 @@ text_layer <- function(positions, text, colors = NULL, size = 18,
                        font_file = NULL, space = c("world", "screen"),
                        adj = c(0.5, 0.5), offset = c(0, 0),
                        line_spacing = 1.2, depth_test = TRUE,
-                       halo_color = NULL, halo_width = 1.5) {
+                       halo_color = NULL, halo_width = 1.5, rotation = 0) {
     space <- match.arg(space)
     positions <- check_text_positions(positions, space)
 
@@ -128,6 +133,10 @@ text_layer <- function(positions, text, colors = NULL, size = 18,
         is.na(halo_width) || halo_width < 0) {
         stop("halo_width must be a single non-negative number")
     }
+    if (!is.numeric(rotation) || length(rotation) != 1L ||
+        is.na(rotation) || !is.finite(rotation)) {
+        stop("rotation must be a single finite number (degrees)")
+    }
 
     structure(list(strings = text,
                    positions = positions,
@@ -140,17 +149,19 @@ text_layer <- function(positions, text, colors = NULL, size = 18,
                    line_spacing = as.double(line_spacing),
                    depth_test = isTRUE(depth_test),
                    halo_color = halo_color,
-                   halo_width = as.double(halo_width)),
+                   halo_width = as.double(halo_width),
+                   rotation = as.double(rotation)),
               class = "scimesh_text")
 }
 
 #' @export
 print.scimesh_text <- function(x, ...) {
     n <- nrow(x$positions)
-    cat(sprintf("scimesh text layer with %d label(s), %g px, %s space%s%s\n",
+    cat(sprintf("scimesh text layer with %d label(s), %g px, %s space%s%s%s\n",
                 n, x$size, x$space,
                 if (isTRUE(x$depth_test)) "" else ", depth test off",
-                if (is.null(x$halo_color)) "" else ", halo"))
+                if (is.null(x$halo_color)) "" else ", halo",
+                if (abs(x$rotation) > 1e-6) sprintf(", rotated %g deg", x$rotation) else ""))
     labels <- x$strings[seq_len(min(3L, length(x$strings)))]
     labels <- gsub("\n", " / ", labels, fixed = TRUE)
     if (nchar(labels[1]) > 40L) {

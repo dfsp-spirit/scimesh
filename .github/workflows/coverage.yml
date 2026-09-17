@@ -5,7 +5,7 @@ name: Coverage (C++)
 #   * no upload to a coverage service and no badge (the report is attached as a
 #     build artifact and printed to the job log instead),
 #   * no coverage thresholds - the numerous vendored third-party headers
-#     (glm, stb, libfs, tinyply, tinyobj) would break any gate,
+#     (glm, stb, libfs, tinyply) would break any gate,
 #   * nothing here is meant to block a pull request.
 #
 # Runs on manual dispatch and on pushes to develop, rather than on every PR,

@@ -515,8 +515,8 @@ scimesh::LineLayer build_line_layer_from_r(List layer) {
 /// `colors` (Nx4 or a single RGBA vector), `size` (text height in pixels),
 /// `font_file` (path to a .ttf, "" = bundled font), `space` ("world" or
 /// "screen"), `adj` (length 2), `offset` (length 2), `line_spacing`,
-/// `depth_test`, `halo_color` (length 3 or 4) and `halo_width`.  Use
-/// text_layer() on the R side to create one.
+/// `rotation` (degrees), `depth_test`, `halo_color` (length 3 or 4) and
+/// `halo_width`.  Use text_layer() on the R side to create one.
 scimesh::TextLayer build_text_layer_from_r(List layer) {
     scimesh::TextLayer out;
 
@@ -589,6 +589,10 @@ scimesh::TextLayer build_text_layer_from_r(List layer) {
     if (layer.containsElementNamed("line_spacing")) {
         SEXP ls = layer["line_spacing"];
         if (ls != R_NilValue) out.line_spacing = static_cast<float>(as<double>(ls));
+    }
+    if (layer.containsElementNamed("rotation")) {
+        SEXP r = layer["rotation"];
+        if (r != R_NilValue) out.rotation = static_cast<float>(as<double>(r));
     }
     if (layer.containsElementNamed("depth_test")) {
         SEXP d = layer["depth_test"];

@@ -106,6 +106,7 @@ struct AppConfig {
     bool textDepthTest = true;     // --text-no-depth disables the depth test
     Vec2 textAdj = Vec2(0.5f, 0.5f);      // where the position sits on the text box
     Vec2 textOffset = Vec2(0.0f, 0.0f);   // extra pixel offset
+    float textRotation = 0.0f;  // degrees, counter-clockwise about the anchor
 
     // [wireframe]
     bool  wireframe      = false;
@@ -225,6 +226,8 @@ static void printHelp(const char* prog) {
         "  --text-adj X,Y      Where the position sits on the text box, 0-1\n"
         "                      (default: 0.5,0.5 = centred)\n"
         "  --text-offset DX,DY Extra label offset in pixels (default: 0,0)\n"
+        "  --text-rotation DEG Rotation in degrees, counter-clockwise about the\n"
+        "                      anchor position (90 = reads bottom to top)\n"
         "\n"
         "Composite mode (image layout, no rendering):\n"
         "  --composite         Enter composite mode; remaining non-flag arguments\n"
@@ -394,6 +397,7 @@ static AppConfig loadTOMLConfig(const std::string& path) {
                                           static_cast<float>((*off)[1].value_or(0.0)));
                 }
             }
+            cfg.textRotation = static_cast<float>((*tx)["rotation"].value_or(0.0));
         }
 
         // [wireframe]
@@ -626,6 +630,8 @@ static void applyCLIArgs(int argc, char** argv, AppConfig& cfg) {
             } else {
                 fprintf(stderr, "Warning: invalid value for --text-offset '%s', ignored.\n", val.c_str());
             }
+        } else if (arg == "--text-rotation") {
+            cfg.textRotation = nextFloat();
         } else if (arg == "--no-normals") {
             cfg.computeNormals = false;
         } else if (arg == "--projection") {
@@ -1095,13 +1101,15 @@ int main(int argc, char** argv) {
         layer.depth_test = cfg.textDepthTest;
         layer.halo_color = cfg.textHaloColor;
         layer.halo_width = cfg.textHaloWidth;
+        layer.rotation = cfg.textRotation;
         scene.add_texts(layer, Mat4(1.0f), "cli-text");
 
         std::cout << "Text: " << layer.strings.size() << " label(s), "
                   << layer.size << " px, "
                   << (cfg.textScreenSpace ? "screen" : "world") << " space"
                   << (cfg.textDepthTest ? "" : ", depth test off")
-                  << (layer.halo_color.a > 0.0f ? ", halo" : "") << std::endl;
+                  << (layer.halo_color.a > 0.0f ? ", halo" : "")
+                  << (cfg.textRotation != 0.0f ? ", rotated" : "") << std::endl;
     }
 
     // 9. Render

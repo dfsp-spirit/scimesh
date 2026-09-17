@@ -437,8 +437,159 @@ TEST_CASE("draw_text: clipping at the image border is safe", "[text]") {
     draw_text(img, "clipped", font, -200.0f, -200.0f, style);
     REQUIRE(ink(img).count >= 0);
 
+    // The same, rotated: the rotated path loops over the rotated bounding box
+    // and must clip just as safely.
+    TextDrawStyle rotated = style;
+    rotated.rotation = 90.0f;
+    draw_text(img, "clipped", font, -20.0f, 10.0f, rotated);
+    draw_text(img, "clipped", font, 60.0f, 60.0f, rotated);
+    draw_text(img, "clipped", font, -200.0f, -200.0f, rotated);
+    REQUIRE(ink(img).count >= 0);
+
     REQUIRE_THROWS_AS(draw_text(img, "x", Font(), 0.0f, 0.0f, style),
                       std::invalid_argument);
+}
+
+TEST_CASE("draw_text: rotation turns the text about the pen origin",
+          "[text][rotation]") {
+    const Font font = test_font(24.0f);
+    const float pen_x = 60.0f;
+    const float baseline = 160.0f;
+
+    TextDrawStyle style;
+    style.color = Color(0.0f, 0.0f, 0.0f, 1.0f);
+
+    // Unrotated, a word is wider than it is tall.
+    Image flat = white_image(240);
+    draw_text(flat, "anterior", font, pen_x, baseline, style);
+    const InkStats flat_stats = ink(flat);
+    REQUIRE_FALSE(flat_stats.empty());
+    REQUIRE(flat_stats.width() > flat_stats.height());
+
+    // Rotating by 90 degrees turns it counter-clockwise: it reads bottom to top
+    // and becomes taller than it is wide, while the pen origin stays put.
+    TextDrawStyle turned_style = style;
+    turned_style.rotation = 90.0f;
+    Image turned = white_image(240);
+    draw_text(turned, "anterior", font, pen_x, baseline, turned_style);
+    const InkStats turned_stats = ink(turned);
+    REQUIRE_FALSE(turned_stats.empty());
+    REQUIRE(turned_stats.height() > turned_stats.width());
+    REQUIRE(turned_stats.max_y <= static_cast<int>(baseline) + 1);   // above the pivot
+    REQUIRE(turned_stats.min_y < static_cast<int>(baseline) - 20);
+    REQUIRE(turned_stats.max_x <= static_cast<int>(pen_x) + 4);      // at the pen origin
+    REQUIRE(turned_stats.min_x < static_cast<int>(pen_x) - 10);
+    // Rotation must not lose (or invent) glyphs: roughly the same amount of ink.
+    REQUIRE(turned_stats.count > flat_stats.count / 2);
+    REQUIRE(turned_stats.count < 2 * flat_stats.count);
+
+    // 270 degrees reads top to bottom: the text extends below the baseline.
+    TextDrawStyle down_style = style;
+    down_style.rotation = 270.0f;
+    Image down = white_image(240);
+    draw_text(down, "anterior", font, pen_x, 80.0f, down_style);
+    const InkStats down_stats = ink(down);
+    REQUIRE_FALSE(down_stats.empty());
+    REQUIRE(down_stats.height() > down_stats.width());
+    REQUIRE(down_stats.min_y >= 70);        // started at the baseline, went down
+    REQUIRE(down_stats.max_y > 150);
+
+    // 180 degrees is an upside-down label: it extends to the left of the pivot
+    // and below it.
+    TextDrawStyle flip_style = style;
+    flip_style.rotation = 180.0f;
+    Image flipped = white_image(240);
+    draw_text(flipped, "anterior", font, 200.0f, 100.0f, flip_style);
+    const InkStats flip_stats = ink(flipped);
+    REQUIRE_FALSE(flip_stats.empty());
+    REQUIRE(flip_stats.max_x <= 201);
+    REQUIRE(flip_stats.min_x < 200 - 50);   // extends to the left of the pivot
+    REQUIRE(flip_stats.min_y >= 99);        // ...and below it
+}
+
+TEST_CASE("draw_text: a rotation of zero keeps the exact unrotated output",
+          "[text][rotation]") {
+    const Font font = test_font(24.0f);
+    TextDrawStyle plain;
+    plain.color = Color(0.0f, 0.0f, 0.0f, 1.0f);
+    TextDrawStyle zero = plain;
+    zero.rotation = 0.0f;
+
+    Image a = white_image(200);
+    Image b = white_image(200);
+    draw_text(a, "anterior", font, 30.0f, 100.0f, plain);
+    draw_text(b, "anterior", font, 30.0f, 100.0f, zero);
+
+    // No resampling must happen for unrotated text.
+    REQUIRE(pixel_differences(a, b) == 0);
+}
+
+TEST_CASE("draw_text: the halo rotates with the glyphs", "[text][rotation]") {
+    const Font font = test_font(30.0f);
+    TextDrawStyle style;
+    style.color = Color(0.0f, 0.0f, 0.0f, 1.0f);
+    style.rotation = 45.0f;
+
+    Image plain = white_image(200);
+    draw_text(plain, "H", font, 100.0f, 100.0f, style);
+    const InkStats without_halo = ink(plain);
+    REQUIRE_FALSE(without_halo.empty());
+    // 45 degrees: the glyph is diagonal, so it is wider and taller than the
+    // unrotated box would suggest, and it is not axis aligned.
+    REQUIRE(without_halo.width() > 10);
+
+    TextDrawStyle haloed_style = style;
+    haloed_style.halo_color = Color(1.0f, 0.0f, 0.0f, 1.0f);
+    haloed_style.halo_width = 2.0f;
+    Image haloed = white_image(200);
+    draw_text(haloed, "H", font, 100.0f, 100.0f, haloed_style);
+    const InkStats with_halo = ink(haloed);
+    REQUIRE(with_halo.count > without_halo.count);
+    REQUIRE(count_color(haloed, Color(1.0f, 0.0f, 0.0f, 1.0f), 60) > 0);
+}
+
+TEST_CASE("TextLayer: rotated labels keep their anchor and stay readable",
+          "[text][rotation]") {
+    Renderer renderer;
+    const Camera cam = front_camera();
+    const RenderOptions opts = text_options(200, 200);
+
+    // A vertical (bottom-to-top) label anchored above the sphere, as in a
+    // brain figure's y-axis label.
+    TextLayer vertical = screen_label("anterior", 100.0f, 100.0f, 24.0f,
+                                      Vec2(0.5f, 0.5f));
+    vertical.rotation = 90.0f;
+    Scene scene;
+    scene.add_texts(vertical);
+    const InkStats turned = ink(renderer.render_scene(scene, cam, opts));
+    REQUIRE_FALSE(turned.empty());
+    REQUIRE(turned.height() > turned.width());
+    // The anchor (the centre of the text box) is still where it was asked to be.
+    REQUIRE(std::abs(turned.mean_x() - 100.0) < 12.0);
+    REQUIRE(std::abs(turned.mean_y() - 100.0) < 12.0);
+
+    // Without rotation the same label is horizontal, so the images differ.
+    TextLayer horizontal = screen_label("anterior", 100.0f, 100.0f, 24.0f,
+                                        Vec2(0.5f, 0.5f));
+    Scene flat_scene;
+    flat_scene.add_texts(horizontal);
+    const Image flat = renderer.render_scene(flat_scene, cam, opts);
+    REQUIRE(pixel_differences(renderer.render_scene(scene, cam, opts), flat) > 50);
+
+    // Rotation also works for world-space labels (it happens in the image
+    // plane, which is all a billboard can do).
+    TextLayer world;
+    world.strings = {"anterior"};
+    world.positions = {Vec3(0.0f, 0.0f, 0.0f)};
+    world.size = 24.0f;
+    world.adj = Vec2(0.5f, 0.5f);
+    world.colors = {Color(0.0f, 0.0f, 0.0f, 1.0f)};
+    world.rotation = 90.0f;
+    Scene world_scene;
+    world_scene.add_texts(world);
+    const InkStats world_stats = ink(renderer.render_scene(world_scene, cam, opts));
+    REQUIRE_FALSE(world_stats.empty());
+    REQUIRE(world_stats.height() > world_stats.width());
 }
 
 // ---------------------------------------------------------------------------

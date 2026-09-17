@@ -74,3 +74,5 @@ space      = "world"          # "world" (3D anchored) or "screen" (pixels)
 depth_test = true             # hide labels anchored behind the geometry
 adj        = [0.5, 0.5]       # where the position sits on the text box, 0-1
 offset     = [0.0, 0.0]       # extra label offset in pixels
+rotation   = 0.0              # degrees, counter-clockwise about the anchor (90 =
+                              # reads bottom to top, e.g. for an axis label)

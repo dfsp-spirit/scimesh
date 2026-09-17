@@ -16,7 +16,8 @@ text_layer(
   line_spacing = 1.2,
   depth_test = TRUE,
   halo_color = NULL,
-  halo_width = 1.5
+  halo_width = 1.5,
+  rotation = 0
 )
 }
 \arguments{
@@ -63,6 +64,12 @@ which keeps labels readable on dark or busy geometry.  \code{NULL} (the
 default) draws no halo.}
 
 \item{halo_width}{Halo thickness in pixels (default 1.5).}
+
+\item{rotation}{Rotation of the label in degrees, counter-clockwise, about
+the anchor position (default 0).  Use 90 to write along a vertical axis
+(the usual orientation of a y-axis label), 180 for an upside-down label,
+or any other angle to follow an annotation line.  The anchor stays fixed
+while the text turns around it.}
 }
 \value{
 A text layer object (a list with class \code{scimesh_text}) for use

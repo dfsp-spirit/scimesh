@@ -11,8 +11,6 @@ Authors@R: c(
            comment = "Author of GLM - OpenGL Mathematics (src/third_party/glm/)"),
     person("Dimitri", "Diakopoulos", role = "ctb",
            comment = "Author of tinyply (src/third_party/tinyply.{h,cpp})"),
-    person("Syoyo", "Fujita", role = "ctb",
-           comment = "Author of tinyobjloader (src/third_party/tiny_obj_loader.h)"),
     person("Tim", "Sch\u00e4fer", role = "ctb",
            comment = "Author of libfs (src/third_party/libfs.h)"),
     person("Sebastian", "Reiter", role = "ctb",

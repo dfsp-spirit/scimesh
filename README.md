@@ -126,7 +126,8 @@ img <- render_scene(sc)
 ```
 
 Labels can also be measured (`text_extent()`), projected from 3D to image pixels
-(`world_to_screen()`), and used without any mesh (`render_text()`).  Use
+(`world_to_screen()`), rotated (`rotation = 90` reads bottom to top, for a
+vertical axis label), and used without any mesh (`render_text()`).  Use
 `font_file = "path/to/font.ttf"` or the `SCIMESH_FONT` environment variable to
 replace the bundled Inter font.
 

@@ -83,6 +83,15 @@ struct TextDrawStyle {
     /// @brief Distance between two lines of a multi-line string, as a multiple
     ///        of the height of the font's glyph box (default: 1.2).
     float line_spacing = 1.2f;
+
+    /// @brief Rotation of the text in degrees, counter-clockwise, about the
+    ///        point (`x`, `baseline_y`) passed to draw_text() (default: 0).
+    ///
+    /// Useful values are 90 (reads bottom to top, the usual orientation of a
+    /// y-axis label), -90 or 270 (reads top to bottom) and 180 (upside down).
+    /// Arbitrary angles work as well; glyphs are resampled with bilinear
+    /// interpolation.
+    float rotation = 0.0f;
 };
 
 /// @brief Size of a (possibly multi-line) piece of text.
@@ -153,6 +162,11 @@ TextExtent measure_text(const std::string &text, float size,
 /// @code{.cpp}
 /// Font font = cached_font("", 20.0f);
 /// draw_text(img, "anterior", font, 20.0f, 40.0f, TextDrawStyle());
+///
+/// // A y-axis style label, reading bottom to top:
+/// TextDrawStyle rotated;
+/// rotated.rotation = 90.0f;
+/// draw_text(img, "intensity", font, 20.0f, 40.0f, rotated);
 /// @endcode
 ///
 /// @param[in,out] image  The image to draw into.
@@ -160,7 +174,7 @@ TextExtent measure_text(const std::string &text, float size,
 /// @param font           A loaded font (see cached_font()).
 /// @param x              X position of the left edge of the text, in pixels.
 /// @param baseline_y     Y position of the first baseline, in pixels.
-/// @param style          Colors, halo and line spacing.
+/// @param style          Colors, halo, line spacing and rotation.
 ///
 /// @see TextLayer, Font, TextDrawStyle
 void draw_text(Image &image, const std::string &text, const Font &font, float x,
@@ -236,6 +250,18 @@ struct TextLayer {
     /// @brief Distance between two lines of a multi-line string, as a multiple
     ///        of the height of the font's glyph box (default: 1.2).
     float line_spacing = 1.2f;
+
+    /// @brief Rotation of the label in degrees, counter-clockwise, about the
+    ///        anchor position (default: 0).
+    ///
+    /// The anchor is the position after `adj` and `offset` have been applied,
+    /// so a rotated label keeps that point fixed.  The rotation happens in the
+    /// image plane (in screen space) for world-space labels as well, which is
+    /// all a billboard can do.  Use 90 to write along a vertical axis (the
+    /// usual orientation of a y-axis label), 180 for an upside-down label, or
+    /// any other angle to follow an annotation line; glyphs are resampled with
+    /// bilinear interpolation.
+    float rotation = 0.0f;
 
     /// @brief Whether the label is hidden by geometry in front of its anchor
     ///        (default: true).

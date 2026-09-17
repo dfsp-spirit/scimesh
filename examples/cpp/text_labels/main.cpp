@@ -10,7 +10,8 @@
 ///   3. **Screen-space labels** for everything that belongs to the figure
 ///      layout rather than to the 3D scene: titles, panel tags, captions.
 ///   4. **Halos** (outlines), which keep labels readable on dark or busy
-///      geometry.
+//      geometry, and **rotation**, which turns a label into a vertical axis
+//      label or makes it follow an annotation line.
 ///
 /// Labels are billboards: they always face the camera and keep their physical
 /// size, so they stay readable from every viewpoint — unlike 3D text geometry,
@@ -301,6 +302,19 @@ int demo_screen_space() {
     right_aligned.adj = Vec2(1.0f, 0.0f);  // anchor at the bottom right
     right_aligned.depth_test = false;
     scene.add_texts(right_aligned);
+
+    // Rotation turns a label around its anchor: 90 degrees reads bottom to top,
+    // which is the usual orientation of a y-axis label.
+    TextLayer vertical;
+    vertical.space = TextSpace::SCREEN;
+    vertical.strings = {"rotated 90 degrees (reads bottom to top)"};
+    vertical.positions = {Vec3(26.0f, 258.0f, 0.0f)};
+    vertical.colors = {Color(0.82f, 0.83f, 0.86f, 1.0f)};
+    vertical.size = 15.0f;
+    vertical.adj = Vec2(0.0f, 0.5f);  // anchor at the start of the text
+    vertical.rotation = 90.0f;
+    vertical.depth_test = false;
+    scene.add_texts(vertical);
 
     const Camera cam = scimesh::camera_fit_scene(scene, Vec3(0.0f, 0.0f, 1.0f),
                                                 Vec3(0.0f, 1.0f, 0.0f), 45.0f, 1.15f);

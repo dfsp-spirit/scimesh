@@ -9,8 +9,9 @@
 #   2. text_labels_atoms.png   element labels next to atoms, with a side-by-side
 #                              comparison of depth_test = TRUE/FALSE
 #   3. text_labels_screen.png  screen-space labels: title, panel tag, caption,
-#                              right-aligned text, and a label placed at the
-#                              projected position of a 3D point
+#                              right-aligned text, a rotated (vertical) label,
+#                              and a label placed at the projected position of
+#                              a 3D point
 #
 # Usage:
 #   Rscript examples/R/text_labels/run.R
@@ -180,8 +181,15 @@ demo_screen <- function() {
                             offset = c(0, -4), colors = c(0.95, 0.95, 0.96, 1),
                             halo_color = dark_halo, halo_width = 1.5)
 
+    # Rotation turns a label about its anchor: 90 degrees reads bottom to top,
+    # which is the usual orientation of a y-axis label.
+    vertical <- text_layer(c(26, 258), "rotated 90 degrees (reads bottom to top)",
+                           space = "screen", adj = c(0, 0.5), size = 15,
+                           colors = c(0.82, 0.83, 0.86, 1), rotation = 90)
+
     img <- render_scene(scene(list(object), camera = cam, options = opts,
-                               texts = list(title, tag, caption, projected)))
+                               texts = list(title, tag, caption, projected,
+                                            vertical)))
     write_png(img, "text_labels_screen.png")
 
     # Screen-space labels need no mesh at all: render_text() draws them onto the

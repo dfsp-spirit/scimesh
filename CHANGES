@@ -66,18 +66,25 @@ Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
   `inst/extdata/Inter-Regular.ttf` (SIL OFL 1.1), which can be replaced per
   label or by setting the `SCIMESH_FONT` environment variable.  R:
   `text_layer()`, the `texts` argument of `scene()` and `render_text()` for
-  free-standing labels; `text_extent()` measures labels for layout.
+  free-standing labels; `text_extent()` measures labels for layout.  Labels can
+  be rotated (`rotation`, in degrees counter-clockwise about the anchor, in the
+  image plane): 90 turns a label into a vertical axis label, 180 into an
+  upside-down one, and arbitrary angles let a label follow an annotation line.
+  Unrotated labels keep the exact, integer-aligned rasterization path, so
+  existing output is unchanged.
 - NEW: the low-level font API in C++ — `Font` (load a `.ttf`, metrics, glyph
   coverage bitmaps, text measurement), `draw_text()` to draw text into any
-  `Image`, and `measure_text()` for layout decisions.  `Font::decode_utf8()`
+  `Image` (including rotated, via `TextDrawStyle::rotation`), and
+  `measure_text()` for layout decisions.  `Font::decode_utf8()`
   means UTF-8 labels ("°C", accented names) work.
 - NEW: `world_to_screen()` (C++ and R) projects world coordinates to the pixels
   of a rendered image using the same matrices as the renderer, which is what
   screen-space annotations and callout lines need.
 - NEW: CLI text options — `--text`, `--text-at`, `--text-size`, `--text-color`,
   `--text-halo`, `--text-halo-width`, `--text-font`, `--text-screen`,
-  `--text-no-depth`, `--text-adj` and `--text-offset`, plus a `[text]` section
-  in `config.toml`, so figures can be annotated without writing any code.
+  `--text-no-depth`, `--text-adj`, `--text-offset` and `--text-rotation`, plus
+  a `[text]` section in `config.toml`, so figures can be annotated without
+  writing any code.
 
 Breaking changes
 ----------------

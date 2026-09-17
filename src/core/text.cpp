@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 
@@ -58,19 +59,48 @@ std::vector<std::string> split_lines(const std::string &text) {
     return lines;
 }
 
-/// @brief Alpha-blend one glyph bitmap into the image.
+/// @brief Alpha-blend one coverage value into a single pixel of the image.
+///
+/// `coverage` is a value in [0, 1] (glyph coverage times the text alpha).  Uses
+/// the standard "source over" formula with straight (non-premultiplied) alpha,
+/// so labels composite correctly onto opaque and transparent backgrounds alike.
+void blend_pixel(Image &image, int x, int y, float coverage, const Color &color) {
+    if (coverage <= 0.0f || color.a <= 0.0f) {
+        return;
+    }
+    if (x < 0 || x >= image.width || y < 0 || y >= image.height) {
+        return;
+    }
+    const float sa = std::clamp(color.a, 0.0f, 1.0f) * coverage;
+    if (sa <= 0.0f) {
+        return;
+    }
+
+    uint8_t dr, dg, db, da;
+    image.get_pixel(x, y, dr, dg, db, da);
+    const float dst_alpha = static_cast<float>(da) / 255.0f;
+    const float out_alpha = sa + dst_alpha * (1.0f - sa);
+    if (out_alpha <= 0.0f) {
+        return;
+    }
+    const float inv_alpha = 1.0f / out_alpha;
+    const float keep = dst_alpha * (1.0f - sa);
+    const float r = (color.r * sa + (static_cast<float>(dr) / 255.0f) * keep) * inv_alpha;
+    const float g = (color.g * sa + (static_cast<float>(dg) / 255.0f) * keep) * inv_alpha;
+    const float b = (color.b * sa + (static_cast<float>(db) / 255.0f) * keep) * inv_alpha;
+    image.set_pixel(x, y, to_byte(r), to_byte(g), to_byte(b), to_byte(out_alpha));
+}
+
+/// @brief Alpha-blend one glyph bitmap into the image, unrotated.
 ///
 /// `dst_x`/`dst_y` are the position of the bitmap's top left corner, in image
-/// pixels (y growing downwards).  Uses the standard "source over" formula with
-/// straight (non-premultiplied) alpha, so labels composite correctly onto
-/// opaque and transparent backgrounds alike.
+/// pixels (y growing downwards).  This is the exact, integer-aligned path used
+/// whenever no rotation is involved.
 void blend_coverage(Image &image, const GlyphBitmap &glyph, int dst_x, int dst_y,
                     const Color &color) {
     if (glyph.empty() || color.a <= 0.0f) {
         return;
     }
-    const float src_alpha = std::clamp(color.a, 0.0f, 1.0f);
-
     for (int y = 0; y < glyph.height; ++y) {
         const int py = dst_y + y;
         if (py < 0 || py >= image.height) {
@@ -85,24 +115,104 @@ void blend_coverage(Image &image, const GlyphBitmap &glyph, int dst_x, int dst_y
             if (coverage == 0) {
                 continue;
             }
-            const float sa = src_alpha * (static_cast<float>(coverage) / 255.0f);
-            if (sa <= 0.0f) {
-                continue;
-            }
+            blend_pixel(image, px, py, static_cast<float>(coverage) / 255.0f, color);
+        }
+    }
+}
 
-            uint8_t dr, dg, db, da;
-            image.get_pixel(px, py, dr, dg, db, da);
-            const float dst_alpha = static_cast<float>(da) / 255.0f;
-            const float out_alpha = sa + dst_alpha * (1.0f - sa);
-            if (out_alpha <= 0.0f) {
+/// @brief Bilinear coverage lookup in a glyph bitmap.
+///
+/// `u`/`v` are positions in bitmap pixel space, where integer values sit on
+/// pixel corners (0.5 is the centre of the first pixel).  Samples outside the
+/// bitmap are clamped to its edge, which keeps rotated glyph edges from
+/// darkening.
+float sample_coverage(const GlyphBitmap &glyph, float u, float v) {
+    const float max_u = static_cast<float>(glyph.width - 1);
+    const float max_v = static_cast<float>(glyph.height - 1);
+    const float fu = std::clamp(u - 0.5f, 0.0f, max_u);
+    const float fv = std::clamp(v - 0.5f, 0.0f, max_v);
+    const int x0 = static_cast<int>(std::floor(fu));
+    const int y0 = static_cast<int>(std::floor(fv));
+    const int x1 = std::min(x0 + 1, glyph.width - 1);
+    const int y1 = std::min(y0 + 1, glyph.height - 1);
+    const float sx = fu - static_cast<float>(x0);
+    const float sy = fv - static_cast<float>(y0);
+    const float c00 = glyph.at(x0, y0);
+    const float c10 = glyph.at(x1, y0);
+    const float c01 = glyph.at(x0, y1);
+    const float c11 = glyph.at(x1, y1);
+    const float top = c00 * (1.0f - sx) + c10 * sx;
+    const float bottom = c01 * (1.0f - sx) + c11 * sx;
+    return (top * (1.0f - sy) + bottom * sy) / 255.0f;
+}
+
+/// @brief Alpha-blend one glyph bitmap into the image, rotated about a pivot.
+///
+/// The glyph keeps its place in the *unrotated* text layout (its top left
+/// corner in text space is at `origin_x`/`origin_y`), and the whole text is
+/// rotated about (`pivot_x`, `pivot_y`) by `rotation_degrees`
+/// (counter-clockwise on screen).  Rendering works by inverse mapping: for
+/// every destination pixel the corresponding text-space position is computed,
+/// and the glyph coverage is sampled there.
+void blend_glyph_rotated(Image &image, const GlyphBitmap &glyph, float origin_x,
+                         float origin_y, float rotation_degrees, float pivot_x,
+                         float pivot_y, const Color &color) {
+    if (glyph.empty() || color.a <= 0.0f) {
+        return;
+    }
+    const float radians = rotation_degrees * 3.14159265358979323846f / 180.0f;
+    const float c = std::cos(radians);
+    const float s = std::sin(radians);
+
+    // Destination bounding box: rotate the four corners of the glyph rect.
+    // Forward transform (text space -> image space) is a rotation by
+    // -rotation_degrees, so that positive angles turn counter-clockwise on
+    // screen (where y grows downwards).
+    const float corners_x[4] = {origin_x, origin_x + static_cast<float>(glyph.width),
+                                origin_x, origin_x + static_cast<float>(glyph.width)};
+    const float corners_y[4] = {origin_y, origin_y,
+                                origin_y + static_cast<float>(glyph.height),
+                                origin_y + static_cast<float>(glyph.height)};
+    float min_x = std::numeric_limits<float>::max();
+    float min_y = std::numeric_limits<float>::max();
+    float max_x = std::numeric_limits<float>::lowest();
+    float max_y = std::numeric_limits<float>::lowest();
+    for (int i = 0; i < 4; ++i) {
+        const float dx = corners_x[i] - pivot_x;
+        const float dy = corners_y[i] - pivot_y;
+        const float rx = pivot_x + dx * c + dy * s;
+        const float ry = pivot_y - dx * s + dy * c;
+        min_x = std::min(min_x, rx);
+        min_y = std::min(min_y, ry);
+        max_x = std::max(max_x, rx);
+        max_y = std::max(max_y, ry);
+    }
+
+    const int x_start = std::max(0, static_cast<int>(std::floor(min_x)) - 1);
+    const int x_end = std::min(image.width - 1, static_cast<int>(std::ceil(max_x)) + 1);
+    const int y_start = std::max(0, static_cast<int>(std::floor(min_y)) - 1);
+    const int y_end = std::min(image.height - 1, static_cast<int>(std::ceil(max_y)) + 1);
+
+    for (int py = y_start; py <= y_end; ++py) {
+        for (int px = x_start; px <= x_end; ++px) {
+            // Inverse transform (image space -> text space): rotate the pixel
+            // centre back by +rotation_degrees.
+            const float dx = static_cast<float>(px) + 0.5f - pivot_x;
+            const float dy = static_cast<float>(py) + 0.5f - pivot_y;
+            const float tx = pivot_x + dx * c - dy * s;
+            const float ty = pivot_y + dx * s + dy * c;
+
+            const float u = tx - origin_x;
+            const float v = ty - origin_y;
+            if (u < 0.0f || v < 0.0f || u >= static_cast<float>(glyph.width) ||
+                v >= static_cast<float>(glyph.height)) {
                 continue;
             }
-            const float inv_alpha = 1.0f / out_alpha;
-            const float keep = dst_alpha * (1.0f - sa);
-            const float r = (color.r * sa + (static_cast<float>(dr) / 255.0f) * keep) * inv_alpha;
-            const float g = (color.g * sa + (static_cast<float>(dg) / 255.0f) * keep) * inv_alpha;
-            const float b = (color.b * sa + (static_cast<float>(db) / 255.0f) * keep) * inv_alpha;
-            image.set_pixel(px, py, to_byte(r), to_byte(g), to_byte(b), to_byte(out_alpha));
+            const float coverage = sample_coverage(glyph, u, v);
+            if (coverage <= 0.002f) {
+                continue;
+            }
+            blend_pixel(image, px, py, coverage, color);
         }
     }
 }
@@ -117,9 +227,13 @@ struct PlacedGlyph {
 /// @brief Draw one line of text with the left edge at `x` and the given baseline.
 ///
 /// Halos are drawn for all glyphs of the line first and the glyphs afterwards,
-/// so that a halo can never cover a neighbouring glyph.
+/// so that a halo can never cover a neighbouring glyph.  When
+/// `style.rotation` is nonzero, everything is rotated about (`pivot_x`,
+/// `pivot_y`) in the image plane; a rotation of exactly zero uses the exact
+/// integer-aligned path (no resampling), so unrotated text is unaffected.
 void draw_line(Image &image, const std::string &line, const Font &font, float x,
-               float baseline_y, const TextDrawStyle &style) {
+               float baseline_y, const TextDrawStyle &style, float pivot_x,
+               float pivot_y) {
     const std::vector<uint32_t> codepoints = Font::decode_utf8(line);
 
     std::vector<PlacedGlyph> placed;
@@ -146,6 +260,18 @@ void draw_line(Image &image, const std::string &line, const Font &font, float x,
         have_previous = true;
     }
 
+    const bool rotated = std::abs(style.rotation) > 1.0e-4f;
+    const auto stamp = [&](const GlyphBitmap &bitmap, float glyph_x, float glyph_y,
+                           const Color &color) {
+        if (rotated) {
+            blend_glyph_rotated(image, bitmap, glyph_x, glyph_y, style.rotation,
+                                pivot_x, pivot_y, color);
+        } else {
+            blend_coverage(image, bitmap, static_cast<int>(std::lround(glyph_x)),
+                           static_cast<int>(std::lround(glyph_y)), color);
+        }
+    };
+
     if (style.halo_color.a > 0.0f && style.halo_width > 0.0f) {
         const int width = std::max(1, static_cast<int>(std::lround(style.halo_width)));
         const int limit = width * width + width;  // slightly rounded kernel
@@ -158,15 +284,16 @@ void draw_line(Image &image, const std::string &line, const Font &font, float x,
                     if (dx * dx + dy * dy > limit) {
                         continue;
                     }
-                    blend_coverage(image, *pg.bitmap, pg.x + dx, pg.y + dy,
-                                   style.halo_color);
+                    stamp(*pg.bitmap, static_cast<float>(pg.x + dx),
+                          static_cast<float>(pg.y + dy), style.halo_color);
                 }
             }
         }
     }
 
     for (const PlacedGlyph &pg : placed) {
-        blend_coverage(image, *pg.bitmap, pg.x, pg.y, style.color);
+        stamp(*pg.bitmap, static_cast<float>(pg.x), static_cast<float>(pg.y),
+              style.color);
     }
 }
 
@@ -262,11 +389,14 @@ void render_one_layer(const TextLayer &layer, Image &output,
         style.halo_color = layer.halo_color;
         style.halo_width = layer.halo_width * pixel_scale;
         style.line_spacing = layer.line_spacing;
+        style.rotation = layer.rotation;
 
         for (size_t line_index = 0; line_index < lines.size(); ++line_index) {
+            // A rotated label rotates about its anchor, so the anchor stays put
+            // while the text swings around it.
             draw_line(output, lines[line_index], font, left,
                       first_baseline + static_cast<float>(line_index) * line_step,
-                      style);
+                      style, anchor_x, anchor_y);
         }
     }
 }
@@ -281,8 +411,11 @@ void draw_text(Image &image, const std::string &text, const Font &font, float x,
     const float line_step = font.metrics().box_height() * std::max(style.line_spacing, 0.0f);
     const std::vector<std::string> lines = split_lines(text);
     for (size_t i = 0; i < lines.size(); ++i) {
+        // A rotated draw_text() rotates about the given pen origin, i.e. about
+        // the left end of the first baseline.
         draw_line(image, lines[i], font, x,
-                  baseline_y + static_cast<float>(i) * line_step, style);
+                  baseline_y + static_cast<float>(i) * line_step, style, x,
+                  baseline_y);
     }
 }
 

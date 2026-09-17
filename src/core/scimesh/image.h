@@ -3,7 +3,8 @@
 ///
 /// scimesh uses its own image class so that rendering is self-contained:
 /// no external image libraries are needed for basic operations.
-/// Pixel data is stored as raw RGBA bytes in row-major order.
+/// Pixel data is stored as raw RGBA bytes in row-major order, with row 0 at
+/// the **top** of the image (see Image for the coordinate convention).
 
 #pragma once
 
@@ -61,11 +62,15 @@ enum class FitMode {
 /// ## Overview
 ///
 /// The `Image` class stores pixels as 4 bytes per pixel (red, green, blue,
-/// alpha) in **row-major** order.  Pixel (0, 0) is the **bottom-left**
-/// corner (matching OpenGL texture convention).
+/// alpha) in **row-major** order.  Row 0 is the **top** row of the image:
+/// `set_pixel(x, 0)` writes into the first row, which is also the first row of
+/// a file written with write_png() and the first row of an image loaded with
+/// read_image().  Pixel coordinates therefore run x to the right and y
+/// **downwards from the top**, which is the same convention that
+/// ndc_to_screen() returns and that the rasterizer writes.
 ///
 /// Images are used both as render targets (the output of the renderer)
-/// and as texture sources for textured meshes.
+/// and as texture sources for textured meshes (see Mesh::texture).
 ///
 /// ## Construction
 ///
@@ -91,7 +96,7 @@ struct Image {
     /// @brief Image height in pixels.
     int height = 0;
 
-    /// @brief Raw pixel data: RGBA bytes, row-major, bottom-left origin.
+    /// @brief Raw pixel data: RGBA bytes, row-major, first row = top of the image.
     ///
     /// Size is `width * height * 4` bytes.  Pixel at (x, y) is at offset
     /// `(y * width + x) * 4`.
@@ -108,7 +113,7 @@ struct Image {
 
     /// @brief Set a single pixel's RGBA value.
     /// @param x X coordinate (0 = left).
-    /// @param y Y coordinate (0 = bottom).
+    /// @param y Y coordinate (0 = top).
     /// @param r Red channel   (0–255).
     /// @param g Green channel (0–255).
     /// @param b Blue channel  (0–255).
@@ -117,7 +122,7 @@ struct Image {
 
     /// @brief Get a single pixel's RGBA value.
     /// @param[in]  x X coordinate (0 = left).
-    /// @param[in]  y Y coordinate (0 = bottom).
+    /// @param[in]  y Y coordinate (0 = top).
     /// @param[out] r Red channel   (0–255).
     /// @param[out] g Green channel (0–255).
     /// @param[out] b Blue channel  (0–255).
@@ -148,8 +153,16 @@ struct Image {
     /// result when texture coordinates fall between pixel centers.
     ///
     /// @param u Horizontal texture coordinate (0.0–1.0, 0 = left).
-    /// @param v Vertical texture coordinate   (0.0–1.0, 0 = bottom).
+    /// @param v Vertical texture coordinate   (0.0–1.0, 0 = top).
     /// @return The interpolated Color.
+    ///
+    /// @note `u`/`v` are indices into the pixel buffer, not the OpenGL texture
+    ///       convention: `v = 0` samples the **first** row of the buffer (the top
+    ///       of the image), while OpenGL-style texture coordinates put v = 0 at
+    ///       the bottom.  UVs are passed through as they are read from a file
+    ///       (see Mesh::uvs), so assets authored for OpenGL are sampled with
+    ///       their texture flipped vertically — flip the UVs (`v = 1 - v`)
+    ///       before rendering if you need the OpenGL convention.
     ///
     /// @par Example
     /// @code{.cpp}
@@ -177,7 +190,7 @@ struct Image {
     /// The cropped region replaces the image in-place.
     ///
     /// @param x Left edge of the crop region.
-    /// @param y Bottom edge of the crop region.
+    /// @param y Top edge of the crop region.
     /// @param w Width of the crop region.
     /// @param h Height of the crop region.
     ///

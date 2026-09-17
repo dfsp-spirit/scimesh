@@ -127,7 +127,11 @@ struct Mesh {
     /// @brief Per-vertex texture coordinates (UVs).
     ///
     /// If non-empty, must have exactly `vertices.size()` elements.
-    /// UV coordinates range from (0,0) at bottom-left to (1,1) at top-right.
+    /// UV coordinates range from (0,0) to (1,1) and are used as they are:
+    /// (0,0) addresses the first column and first row of the texture image
+    /// (its **top left** pixel) and (1,1) the last one, see
+    /// Image::sample_bilinear() for the exact sampling rule and for the
+    /// difference to the OpenGL texture convention.
     /// Only used when a `texture` image is also set.
     ///
     /// @see Vec2, has_uvs(), texture

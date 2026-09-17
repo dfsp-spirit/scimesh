@@ -146,6 +146,60 @@ test_that("text_layer() validates its input", {
     expect_error(text_layer(pts, "a", line_spacing = 0), "positive")
     expect_error(text_layer(pts, "a", space = "nope"), "should be one of")
     expect_error(text_layer(pts, "a", font_file = "missing.ttf"), "not found")
+    expect_error(text_layer(pts, "a", rotation = c(0, 90)), "finite number")
+    expect_error(text_layer(pts, "a", rotation = NA_real_), "finite number")
+    expect_error(text_layer(pts, "a", rotation = "90"), "finite number")
+})
+
+test_that("rotation turns a label about its anchor", {
+    # The default is no rotation.
+    flat <- text_layer(c(60, 100), "anterior", space = "screen",
+                       adj = c(0.5, 0.5), size = 24, colors = c(0, 0, 0, 1))
+    expect_equal(flat$rotation, 0)
+    expect_output(print(flat), "1 label")
+
+    # 90 degrees reads bottom to top: the label becomes taller than it is wide,
+    # while the anchor (the centre of the text box) stays where it was asked.
+    vertical <- text_layer(c(60, 100), "anterior", space = "screen",
+                           adj = c(0.5, 0.5), size = 24, colors = c(0, 0, 0, 1),
+                           rotation = 90)
+    expect_equal(vertical$rotation, 90)
+    expect_output(print(vertical), "rotated 90")
+
+    opts <- small_options(160, 160)
+    img_flat <- render_scene(scene(list(), camera = camera(eye = c(0, 0, 10),
+                                                           center = c(0, 0, 0)),
+                                  options = opts, texts = flat))
+    img_vertical <- render_scene(scene(list(), camera = camera(eye = c(0, 0, 10),
+                                                              center = c(0, 0, 0)),
+                                      options = opts, texts = vertical))
+    expect_true(count_differences(img_flat, img_vertical) > 50)
+
+    # The ink of the unrotated label is wider than tall, the rotated one the
+    # other way around.
+    ink_bbox <- function(img) {
+        px <- image_pixels(img)
+        is_ink <- px[, 1] < 128 & px[, 2] < 128 & px[, 3] < 128
+        xs <- (which(is_ink) - 1L) %% img$width
+        ys <- (which(is_ink) - 1L) %/% img$width
+        c(width = diff(range(xs)) + 1L, height = diff(range(ys)) + 1L)
+    }
+    flat_box <- ink_bbox(img_flat)
+    vertical_box <- ink_bbox(img_vertical)
+    expect_true(flat_box["width"] > flat_box["height"])
+    expect_true(vertical_box["height"] > vertical_box["width"])
+
+    # Arbitrary angles are allowed as well (here: 45 degrees).
+    diagonal <- text_layer(c(80, 80), "anterior", space = "screen",
+                           adj = c(0.5, 0.5), size = 24, colors = c(0, 0, 0, 1),
+                           rotation = 45)
+    img_diagonal <- render_scene(scene(list(), camera = camera(eye = c(0, 0, 10),
+                                                              center = c(0, 0, 0)),
+                                      options = opts, texts = diagonal))
+    expect_true(count_differences(img_flat, img_diagonal) > 50)
+    diag_box <- ink_bbox(img_diagonal)
+    expect_true(diag_box["width"] < flat_box["width"])
+    expect_true(diag_box["height"] > flat_box["height"])
 })
 
 test_that("scene() accepts text layers", {
