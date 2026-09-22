@@ -72,6 +72,32 @@ Notes:
 in R for that.  The C++ code inside the R package is a separate build (see
 `src/Makevars`) and is not covered by this script.
 
+### Checking compatibility with the macOS toolchain
+
+A missing standard header is invisible to almost every build we have: libstdc++
+(GCC, i.e. R on Linux and Windows) and libc++ 15+ (Xcode 15+, i.e. the
+`macos-latest` CI runner) both pull headers such as `<array>` in transitively
+via `<functional>`.  The CRAN macOS builders use the clang 14 / libc++ 14
+toolchain, which does not - so such code fails there with a confusing
+`implicit instantiation of undefined template 'std::array<...>'` (this is what
+broke the CRAN installation of 0.3.4).  Compile every translation unit with
+libc++ 14 to check:
+
+```sh
+dev_tools/check_libcxx_strictness.sh                    # needs libc++ <= 14
+CXX=clang++-14 dev_tools/check_libcxx_strictness.sh     # use a specific clang
+LIBCXX_INC=/usr/lib/llvm-14/include/c++/v1 dev_tools/check_libcxx_strictness.sh
+```
+
+**Requirements (Linux):** `clang` plus the libc++ headers of version <= 14.  On
+Debian/Ubuntu: `sudo apt install clang-14 libc++-14-dev`.  The check is
+`-fsyntax-only`, so nothing is linked and R is only needed for the two Rcpp
+binding translation units (they are skipped when R or Rcpp is missing).  The
+script refuses to run with libc++ >= 15, because that standard library cannot
+reproduce the strict behaviour.  The `C++ stdlib strictness` CI workflow runs
+this on every push/PR, on the pinned `ubuntu-24.04` image (newer Ubuntu releases
+no longer ship libc++ 14).
+
 ### Examples
 
 The example programs are part of what we ship, so they are built and run:

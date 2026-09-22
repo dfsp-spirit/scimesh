@@ -5,6 +5,15 @@
 #include <glm/gtc/constants.hpp>
 #include <cmath>
 #include <algorithm>
+// <array> and <utility> must be included explicitly: this file uses
+// std::array (pyramid/tetrahedron faces) and std::swap.  libstdc++ (GCC, also
+// used by R on Windows) pulls both in transitively, but libc++ (clang on
+// macOS) does not, which made the package fail to compile there.  Note that
+// libc++ forward-declares std::array in <__tuple> (for tuple_size), so
+// omitting <array> yields the confusing error "implicit instantiation of
+// undefined template 'std::array<...>'" instead of "no member named array".
+#include <array>
+#include <utility>
 
 namespace scimesh {
 

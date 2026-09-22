@@ -92,6 +92,19 @@ Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
 - FIX: `Rasterizer::rasterize_line()` qualified the shadowed `width`/`height`
   members in its pixel bounds check (the `width` parameter of the function
   shadowed `Rasterizer::width`), which made the line invisible.
+- FIX: the C++ core now compiles with libc++ (clang on macOS).
+  `src/core/primitives.cpp` used `std::array` (pyramid and tetrahedron faces)
+  without including `<array>`, and `std::swap` without `<utility>`.  libstdc++
+  (GCC, i.e. the Linux and Windows builds) pulls both in transitively, so the
+  bug was invisible there; libc++ does not, so the package failed to install on
+  macOS with "implicit instantiation of undefined template 'std::array<...>'".
+  libc++ only forward-declares `std::array` in `<__tuple>` (for `tuple_size`
+  and `tuple_element`), which is why the message says "undefined template"
+  instead of "no member named array".  This is the installation ERROR reported
+  by the CRAN checks for 0.3.4 on r-release-macos-x86_64, r-oldrel-macos-x86_64
+  and r-oldrel-macos-arm64.  All source files are now verified to compile with
+  libc++ 14 (the toolchain used by those three flavors) and libc++ 18, as well
+  as with libstdc++.
 - NEW: global anti-aliasing default.  `render_options()` now takes
   `aa_samples = NULL` and resolves that `NULL` from the global option
   `scimesh.aa_samples` (default 1, i.e. no AA).  Setting
