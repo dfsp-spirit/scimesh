@@ -51,6 +51,7 @@ add_executable(scimesh_tests
     test_visual_validation.cpp
     test_brain_mesh.cpp
     test_primitives.cpp
+    test_spline.cpp
     test_colormap.cpp
     test_scene_transforms.cpp
 )

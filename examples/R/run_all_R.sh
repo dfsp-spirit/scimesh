@@ -20,6 +20,7 @@ FILTER="${1:-}"
 declare -a EXAMPLES=(
     transparency
     primitives
+    spline_tube
     spot_cow
     dragon
     whole_brain_sulc

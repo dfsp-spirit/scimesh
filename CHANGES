@@ -11,6 +11,39 @@ Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
   axis, and mitered joints keep the segments watertight.  R: `generate_tube()`
   and `generate_tubes()`.  Useful for curved edges, streamlines and any shape
   that is not a straight cylinder.
+- NEW: spline sampling — smooth curves through ordered 3D points.  A new
+  header-only module (`src/core/scimesh/spline.h`) turns a coarse list of
+  waypoints into a dense path, which is what the path-taking features of the
+  library need and what callers previously had to bring themselves (the
+  `generate_tube()` documentation promised "arcs, Bezier samples, streamlines"
+  without offering a way to produce one).  `catmull_rom_path()` interpolates the
+  input points and is the default choice; it is **centripetal** by default,
+  which is what keeps unevenly spaced points (the norm for measured data) from
+  producing cusps, loops and self-intersections, and `alpha = 0` recovers the
+  textbook uniform curve.  `hermite_path()` takes caller-supplied tangents
+  instead of deriving them, `bspline_path()` approximates the points (for
+  smoothing noisy input, at the cost of not passing through them) and
+  `bezier_path()` samples a control polygon with de Casteljau.  Around those,
+  `resample_by_arclength()` evens out the spacing along a path — the sweep
+  places exactly one cross-section per path point, so uniform *arc length*
+  spacing is what makes a tube look evenly subdivided — and `path_length()`,
+  `path_tangents()` and `path_curvature()` are the queries that drive it.
+  `path_curvature()` is the one worth knowing about: sweeping a tube of radius
+  `r` along a curve whose curvature reaches `kappa` folds the tube inside out,
+  so `1 / max(path_curvature(path))` is the largest radius a path can take.
+  Open curves get a reflected phantom neighbour at both ends (so they start and
+  end exactly at the first and last point, along the outer segment), closed
+  curves use their wrapped neighbours, and both `closed = true` cases end on a
+  copy of the first point, so a swept tube closes on itself; the arc-length
+  resampling of a closed path is covered in a whole number of steps so the seam
+  is a regular step instead of a leftover gap.  This is pure geometry on
+  `std::vector<Vec3>` — no mesh, no renderer, no I/O, no new dependency, and
+  not a domain-specific feature — so it composes with primitives.h, lines.h and
+  your own code alike, including camera paths.  R: `spline_path()`,
+  `bezier_path()`, `resample_path()`, `path_length()` and `path_curvature()`.
+  `examples/cpp/spline_tube/` and `examples/R/spline_tube/` render the same
+  waypoints as a faceted polyline tube and as a smooth spline tube side by side,
+  plus a closed trefoil knot.
 - NEW: line layers — screen-space lines as first-class scene primitives.  A
   `LineLayer` stores segments, per-segment colors and a width **in pixels** and
   creates no geometry, which makes it the cheap way to draw thousands of thin

@@ -19,6 +19,7 @@ declare -a EXAMPLES=(
     spot_cow:spot_cow
     transparency:transparency_demo
     protein_data_bank_pdb_file:protein_demo
+    spline_tube:spline_tube
     whole_brain_annot:whole_brain_annot
     whole_brain_sulc:whole_brain_sulc
     whole_brain_sulc_fsaverage:whole_brain_sulc_fsaverage

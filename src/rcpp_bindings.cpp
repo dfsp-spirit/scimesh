@@ -4,6 +4,7 @@
 #include <scimesh/transforms.h>
 #include <scimesh/normals.h>
 #include <scimesh/primitives.h>
+#include <scimesh/spline.h>
 #include <scimesh/colormap.h>
 #include <scimesh/to_string.h>
 #include <scimesh/stl_io.h>
@@ -31,6 +32,32 @@ scimesh::Vec3 vec3_from_r(const NumericVector &v) {
         static_cast<float>(v[0]),
         static_cast<float>(v[1]),
         static_cast<float>(v[2]));
+}
+
+// Nx3 point matrix -> path.  Rows are points, columns are x, y, z.
+std::vector<scimesh::Vec3> vec3_path_from_r(const NumericMatrix &m) {
+    std::vector<scimesh::Vec3> path;
+    path.reserve(static_cast<size_t>(m.nrow()));
+    for (int i = 0; i < m.nrow(); i++) {
+        path.push_back(scimesh::Vec3(
+            static_cast<float>(m(i, 0)),
+            static_cast<float>(m(i, 1)),
+            static_cast<float>(m(i, 2))));
+    }
+    return path;
+}
+
+// Path -> Nx3 point matrix (0 rows for an empty path, which the R layer
+// treats as "no points").
+NumericMatrix vec3_path_to_r(const std::vector<scimesh::Vec3> &path) {
+    NumericMatrix out(static_cast<int>(path.size()), 3);
+    for (size_t i = 0; i < path.size(); i++) {
+        const int row = static_cast<int>(i);
+        out(row, 0) = static_cast<double>(path[i].x);
+        out(row, 1) = static_cast<double>(path[i].y);
+        out(row, 2) = static_cast<double>(path[i].z);
+    }
+    return out;
 }
 
 scimesh::ShadingMode parse_shading(const std::string &s) {
@@ -956,6 +983,57 @@ List scimesh_generate_multi_tubes(List paths, NumericVector radii,
     }
     scimesh::Mesh mesh = scimesh::generate_multi_tubes(all_paths, r, col, segments, caps);
     return mesh_to_r_list(mesh);
+}
+
+// ---- Splines --------------------------------------------------------------
+// [[Rcpp::export]]
+NumericMatrix scimesh_catmull_rom_path(NumericMatrix points,
+                                       int samples_per_segment = 8,
+                                       bool closed = false,
+                                       double alpha = 0.5) {
+    std::vector<scimesh::Vec3> path = scimesh::catmull_rom_path(
+        vec3_path_from_r(points), samples_per_segment, closed,
+        static_cast<float>(alpha));
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_bspline_path(NumericMatrix points,
+                                   int samples_per_segment = 8,
+                                   bool closed = false) {
+    std::vector<scimesh::Vec3> path = scimesh::bspline_path(
+        vec3_path_from_r(points), samples_per_segment, closed);
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_bezier_path(NumericMatrix control_points,
+                                  int samples = 64) {
+    std::vector<scimesh::Vec3> path =
+        scimesh::bezier_path(vec3_path_from_r(control_points), samples);
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_resample_path(NumericMatrix path, double step,
+                                    bool closed = false) {
+    std::vector<scimesh::Vec3> resampled = scimesh::resample_by_arclength(
+        vec3_path_from_r(path), static_cast<float>(step), closed);
+    return vec3_path_to_r(resampled);
+}
+
+// [[Rcpp::export]]
+double scimesh_path_length(NumericMatrix path, bool closed = false) {
+    return static_cast<double>(
+        scimesh::path_length(vec3_path_from_r(path), closed));
+}
+
+// [[Rcpp::export]]
+NumericVector scimesh_path_curvature(NumericMatrix path,
+                                     bool closed = false) {
+    std::vector<float> curvature =
+        scimesh::path_curvature(vec3_path_from_r(path), closed);
+    return NumericVector(curvature.begin(), curvature.end());
 }
 
 // ---- Procedural primitives (single) -----------------------------------------

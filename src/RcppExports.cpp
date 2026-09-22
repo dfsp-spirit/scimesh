@@ -190,6 +190,82 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_catmull_rom_path
+NumericMatrix scimesh_catmull_rom_path(NumericMatrix points, int samples_per_segment, bool closed, double alpha);
+RcppExport SEXP _scimesh_scimesh_catmull_rom_path(SEXP pointsSEXP, SEXP samples_per_segmentSEXP, SEXP closedSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples_per_segment(samples_per_segmentSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_catmull_rom_path(points, samples_per_segment, closed, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_bspline_path
+NumericMatrix scimesh_bspline_path(NumericMatrix points, int samples_per_segment, bool closed);
+RcppExport SEXP _scimesh_scimesh_bspline_path(SEXP pointsSEXP, SEXP samples_per_segmentSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples_per_segment(samples_per_segmentSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_bspline_path(points, samples_per_segment, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_bezier_path
+NumericMatrix scimesh_bezier_path(NumericMatrix control_points, int samples);
+RcppExport SEXP _scimesh_scimesh_bezier_path(SEXP control_pointsSEXP, SEXP samplesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type control_points(control_pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples(samplesSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_bezier_path(control_points, samples));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_resample_path
+NumericMatrix scimesh_resample_path(NumericMatrix path, double step, bool closed);
+RcppExport SEXP _scimesh_scimesh_resample_path(SEXP pathSEXP, SEXP stepSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< double >::type step(stepSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_resample_path(path, step, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_path_length
+double scimesh_path_length(NumericMatrix path, bool closed);
+RcppExport SEXP _scimesh_scimesh_path_length(SEXP pathSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_path_length(path, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_path_curvature
+NumericVector scimesh_path_curvature(NumericMatrix path, bool closed);
+RcppExport SEXP _scimesh_scimesh_path_curvature(SEXP pathSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_path_curvature(path, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_generate_cone
 List scimesh_generate_cone(NumericVector base, NumericVector tip, double radius, int segments, NumericVector color);
 RcppExport SEXP _scimesh_scimesh_generate_cone(SEXP baseSEXP, SEXP tipSEXP, SEXP radiusSEXP, SEXP segmentsSEXP, SEXP colorSEXP) {
@@ -670,6 +746,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 6},
     {"_scimesh_scimesh_generate_tube", (DL_FUNC) &_scimesh_scimesh_generate_tube, 6},
     {"_scimesh_scimesh_generate_multi_tubes", (DL_FUNC) &_scimesh_scimesh_generate_multi_tubes, 5},
+    {"_scimesh_scimesh_catmull_rom_path", (DL_FUNC) &_scimesh_scimesh_catmull_rom_path, 4},
+    {"_scimesh_scimesh_bspline_path", (DL_FUNC) &_scimesh_scimesh_bspline_path, 3},
+    {"_scimesh_scimesh_bezier_path", (DL_FUNC) &_scimesh_scimesh_bezier_path, 2},
+    {"_scimesh_scimesh_resample_path", (DL_FUNC) &_scimesh_scimesh_resample_path, 3},
+    {"_scimesh_scimesh_path_length", (DL_FUNC) &_scimesh_scimesh_path_length, 2},
+    {"_scimesh_scimesh_path_curvature", (DL_FUNC) &_scimesh_scimesh_path_curvature, 2},
     {"_scimesh_scimesh_generate_cone", (DL_FUNC) &_scimesh_scimesh_generate_cone, 5},
     {"_scimesh_scimesh_generate_arrow", (DL_FUNC) &_scimesh_scimesh_generate_arrow, 7},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
