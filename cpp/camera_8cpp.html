@@ -97,6 +97,7 @@ $(document).ready(function(){initNavTree('camera_8cpp.html',''); initResizable()
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="camera_8h_source.html">scimesh/camera.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="math__utils_8h_source.html">scimesh/math_utils.h</a>&gt;</code><br />
 <code>#include &lt;glm/gtc/matrix_transform.hpp&gt;</code><br />
 <code>#include &lt;glm/gtc/constants.hpp&gt;</code><br />
 <code>#include &lt;cmath&gt;</code><br />
@@ -106,53 +107,74 @@ Include dependency graph for camera.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="camera_8cpp__incl.png" border="0" usemap="#asrc_2core_2camera_8cpp" alt=""/></div>
 <map name="asrc_2core_2camera_8cpp" id="asrc_2core_2camera_8cpp">
-<area shape="rect" title=" " alt="" coords="720,5,873,31"/>
-<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="451,79,593,104"/>
-<area shape="poly" title=" " alt="" coords="753,33,580,78,579,73,752,28"/>
-<area shape="rect" title=" " alt="" coords="83,299,145,324"/>
-<area shape="poly" title=" " alt="" coords="720,28,587,45,513,61,440,81,354,109,287,134,227,169,160,227,139,256,124,287,120,285,134,254,156,224,224,164,285,129,352,104,439,76,512,55,587,40,719,22"/>
-<area shape="rect" title=" " alt="" coords="589,299,807,324"/>
-<area shape="poly" title=" " alt="" coords="795,32,709,286,704,285,790,30"/>
-<area shape="rect" title=" " alt="" coords="835,79,1001,104"/>
-<area shape="poly" title=" " alt="" coords="818,28,888,69,885,74,815,33"/>
-<area shape="rect" title=" " alt="" coords="1025,79,1112,104"/>
-<area shape="poly" title=" " alt="" coords="841,28,1013,73,1011,78,840,33"/>
-<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="271,372,399,397"/>
-<area shape="poly" title=" " alt="" coords="452,101,356,117,301,132,246,152,193,178,144,211,103,251,72,300,68,312,72,322,83,332,100,341,147,356,202,366,258,374,257,379,202,372,146,361,98,346,80,336,68,326,63,312,68,298,99,248,141,206,190,173,244,147,300,127,354,112,451,96"/>
-<area shape="rect" href="scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="457,152,587,177"/>
-<area shape="poly" title=" " alt="" coords="525,104,525,138,519,138,519,104"/>
-<area shape="rect" title=" " alt="" coords="515,445,625,471"/>
-<area shape="poly" title=" " alt="" coords="374,395,520,439,518,444,372,400"/>
-<area shape="rect" title=" " alt="" coords="92,445,203,471"/>
-<area shape="poly" title=" " alt="" coords="306,400,192,443,190,438,304,395"/>
-<area shape="rect" title=" " alt="" coords="227,445,337,471"/>
-<area shape="poly" title=" " alt="" coords="329,399,301,436,297,433,324,396"/>
-<area shape="rect" title=" " alt="" coords="361,445,491,471"/>
-<area shape="poly" title=" " alt="" coords="352,395,402,434,399,439,348,399"/>
-<area shape="rect" title=" " alt="" coords="5,445,68,471"/>
-<area shape="poly" title=" " alt="" coords="285,400,82,448,81,442,284,395"/>
-<area shape="rect" title=" " alt="" coords="650,445,717,471"/>
-<area shape="poly" title=" " alt="" coords="399,395,637,442,636,448,398,400"/>
-<area shape="rect" title=" " alt="" coords="741,445,799,471"/>
-<area shape="poly" title=" " alt="" coords="400,391,546,410,727,443,726,448,545,416,399,396"/>
-<area shape="poly" title=" " alt="" coords="588,172,647,186,712,210,744,226,773,246,800,269,822,297,830,315,832,334,826,371,809,407,790,436,786,433,805,404,821,370,827,333,824,316,817,300,796,273,770,250,741,231,710,214,646,191,587,177"/>
-<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="170,225,298,251"/>
-<area shape="poly" title=" " alt="" coords="476,180,294,225,293,219,475,175"/>
-<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="441,225,603,251"/>
-<area shape="poly" title=" " alt="" coords="525,178,525,212,519,212,519,178"/>
-<area shape="poly" title=" " alt="" coords="239,250,249,284,268,323,287,344,308,362,305,366,283,348,264,325,244,286,234,252"/>
-<area shape="poly" title=" " alt="" coords="225,253,59,436,55,433,221,249"/>
-<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="322,299,455,324"/>
-<area shape="poly" title=" " alt="" coords="260,248,352,290,350,295,258,253"/>
-<area shape="poly" title=" " alt="" coords="216,253,147,294,144,289,213,248"/>
-<area shape="poly" title=" " alt="" coords="382,326,354,363,350,360,378,323"/>
-<area shape="poly" title=" " alt="" coords="365,326,203,400,82,444,80,439,201,395,363,322"/>
-<area shape="poly" title=" " alt="" coords="413,322,649,437,647,442,411,327"/>
-<area shape="poly" title=" " alt="" coords="423,322,555,370,730,438,728,443,553,374,421,327"/>
-<area shape="poly" title=" " alt="" coords="447,253,365,273,332,286,312,300,307,314,307,329,321,359,316,362,302,330,301,313,308,297,330,281,363,268,446,248"/>
-<area shape="poly" title=" " alt="" coords="551,248,657,291,655,296,549,253"/>
-<area shape="rect" title=" " alt="" coords="479,299,565,324"/>
-<area shape="poly" title=" " alt="" coords="525,251,525,285,519,285,519,251"/>
+<area shape="rect" title=" " alt="" coords="990,5,1143,31"/>
+<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="733,79,875,104"/>
+<area shape="poly" title=" " alt="" coords="1025,33,861,78,859,72,1024,28"/>
+<area shape="rect" title=" " alt="" coords="897,299,959,324"/>
+<area shape="poly" title=" " alt="" coords="1070,31,1068,71,1062,128,1046,192,1033,223,1017,252,994,276,968,294,965,290,991,272,1013,249,1029,221,1041,190,1057,127,1063,70,1064,31"/>
+<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="842,225,1003,251"/>
+<area shape="poly" title=" " alt="" coords="1060,33,1025,80,939,215,934,212,1020,77,1055,29"/>
+<area shape="rect" title=" " alt="" coords="983,299,1201,324"/>
+<area shape="poly" title=" " alt="" coords="1070,30,1092,285,1087,285,1065,31"/>
+<area shape="rect" title=" " alt="" coords="1130,79,1297,104"/>
+<area shape="poly" title=" " alt="" coords="1091,28,1178,70,1176,75,1089,33"/>
+<area shape="rect" title=" " alt="" coords="1321,79,1407,104"/>
+<area shape="poly" title=" " alt="" coords="1115,28,1308,74,1306,79,1114,33"/>
+<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="661,372,789,397"/>
+<area shape="poly" title=" " alt="" coords="806,105,798,168,781,251,761,311,739,361,734,359,756,309,776,250,793,167,800,104"/>
+<area shape="rect" href="scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="563,152,693,177"/>
+<area shape="poly" title=" " alt="" coords="777,106,671,149,669,144,775,102"/>
+<area shape="rect" title=" " alt="" coords="814,445,925,471"/>
+<area shape="poly" title=" " alt="" coords="750,395,835,437,832,441,747,400"/>
+<area shape="rect" title=" " alt="" coords="949,445,1059,471"/>
+<area shape="poly" title=" " alt="" coords="771,395,946,439,945,444,769,400"/>
+<area shape="rect" title=" " alt="" coords="526,445,637,471"/>
+<area shape="poly" title=" " alt="" coords="703,400,618,441,616,437,701,395"/>
+<area shape="rect" title=" " alt="" coords="661,445,790,471"/>
+<area shape="poly" title=" " alt="" coords="728,398,728,432,723,432,723,398"/>
+<area shape="rect" title=" " alt="" coords="302,445,365,471"/>
+<area shape="poly" title=" " alt="" coords="663,400,379,451,378,446,662,395"/>
+<area shape="rect" title=" " alt="" coords="435,445,501,471"/>
+<area shape="poly" title=" " alt="" coords="685,400,515,447,514,441,683,395"/>
+<area shape="rect" title=" " alt="" coords="5,445,64,471"/>
+<area shape="poly" title=" " alt="" coords="661,395,78,455,77,450,661,390"/>
+<area shape="poly" title=" " alt="" coords="563,177,442,195,298,222,228,239,165,258,114,278,78,301,55,330,43,365,37,401,36,432,31,432,32,400,37,364,51,327,74,297,111,274,164,253,227,234,297,217,441,189,562,172"/>
+<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="639,225,767,251"/>
+<area shape="poly" title=" " alt="" coords="642,175,682,214,679,218,638,179"/>
+<area shape="rect" href="lines_8h.html" title="Screen&#45;space line primitives — the LineLayer." alt="" coords="492,225,615,251"/>
+<area shape="poly" title=" " alt="" coords="618,179,577,218,574,214,614,175"/>
+<area shape="rect" href="text_8h.html" title="Text labels — the TextLayer." alt="" coords="330,225,449,251"/>
+<area shape="poly" title=" " alt="" coords="590,180,442,224,440,219,589,175"/>
+<area shape="poly" title=" " alt="" coords="676,175,862,219,861,225,675,180"/>
+<area shape="poly" title=" " alt="" coords="710,250,725,298,729,358,724,358,720,299,705,252"/>
+<area shape="poly" title=" " alt="" coords="697,253,669,288,630,326,565,367,497,401,379,446,377,441,495,396,562,362,626,322,666,285,693,250"/>
+<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="323,299,456,324"/>
+<area shape="poly" title=" " alt="" coords="653,253,454,298,453,293,652,248"/>
+<area shape="poly" title=" " alt="" coords="740,248,884,294,883,299,738,253"/>
+<area shape="poly" title=" " alt="" coords="444,321,658,366,657,372,443,327"/>
+<area shape="poly" title=" " alt="" coords="399,323,413,357,415,378,410,398,393,422,370,440,367,436,389,419,406,396,410,378,408,359,394,325"/>
+<area shape="poly" title=" " alt="" coords="400,323,432,371,460,431,456,433,427,373,396,326"/>
+<area shape="poly" title=" " alt="" coords="377,326,329,362,264,400,215,419,165,433,78,453,77,447,164,428,214,413,262,395,326,358,374,322"/>
+<area shape="poly" title=" " alt="" coords="570,249,630,297,704,360,700,364,626,301,567,253"/>
+<area shape="poly" title=" " alt="" coords="492,253,380,277,335,289,312,301,304,315,299,332,300,368,310,403,323,432,318,434,305,404,295,368,294,331,299,313,309,297,333,284,379,271,491,248"/>
+<area shape="rect" title=" " alt="" coords="531,299,616,324"/>
+<area shape="poly" title=" " alt="" coords="559,250,569,285,564,286,554,252"/>
+<area shape="poly" title=" " alt="" coords="405,249,454,284,520,322,589,348,656,366,655,371,587,353,518,326,451,289,402,253"/>
+<area shape="poly" title=" " alt="" coords="330,246,270,253,206,264,151,280,131,289,118,300,112,311,111,323,118,350,134,375,152,395,184,417,220,433,289,450,288,455,218,438,182,422,149,399,129,379,113,352,105,324,107,310,114,297,128,285,149,275,205,259,269,248,329,241"/>
+<area shape="poly" title=" " alt="" coords="330,248,202,267,143,282,104,301,78,330,60,366,48,402,41,432,36,431,42,400,55,364,74,327,101,297,141,277,201,262,329,243"/>
+<area shape="poly" title=" " alt="" coords="392,251,392,285,387,285,387,251"/>
+<area shape="poly" title=" " alt="" coords="420,248,531,291,529,296,418,253"/>
+<area shape="rect" href="font_8h.html" title="TrueType font loading, glyph rasterization and text measurement." alt="" coords="129,299,247,324"/>
+<area shape="poly" title=" " alt="" coords="358,253,234,297,233,291,356,248"/>
+<area shape="poly" title=" " alt="" coords="248,318,648,370,647,376,247,323"/>
+<area shape="poly" title=" " alt="" coords="181,325,161,360,158,378,164,396,189,421,221,437,256,447,289,452,288,458,255,452,219,442,186,425,159,399,153,379,156,358,176,323"/>
+<area shape="poly" title=" " alt="" coords="212,322,435,437,432,441,209,327"/>
+<area shape="poly" title=" " alt="" coords="177,326,59,438,55,434,174,323"/>
+<area shape="rect" title=" " alt="" coords="173,372,251,397"/>
+<area shape="poly" title=" " alt="" coords="194,323,206,358,201,360,189,325"/>
+<area shape="poly" title=" " alt="" coords="912,253,875,287,826,326,760,367,757,363,822,322,871,283,909,249"/>
+<area shape="poly" title=" " alt="" coords="867,253,630,301,629,296,866,248"/>
+<area shape="poly" title=" " alt="" coords="951,248,1053,291,1051,296,949,253"/>
 </map>
 </div>
 </div>
@@ -165,16 +187,19 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1f78967f2f246d98c26c02fff45c1e23" id="r_a1f78967f2f246d98c26c02fff45c1e23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a1f78967f2f246d98c26c02fff45c1e23">scimesh::camera_look_at</a> (const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;center, float radius, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;direction, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, float fov_degrees, float margin=1.1f, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
+<tr class="memitem:aeb03d24d85951af0391e81209c9e72a7" id="r_aeb03d24d85951af0391e81209c9e72a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1ProjectedPoint.html">ProjectedPoint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#aeb03d24d85951af0391e81209c9e72a7">scimesh::world_to_screen</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Camera.html">Camera</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">camera</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">world</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> <a class="el" href="renderer_8cpp.html#ae426f00e82704fa09578f5446e22d915">width</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> height, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> near_plane, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> far_plane)</td></tr>
+<tr class="memdesc:aeb03d24d85951af0391e81209c9e72a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world-space point to the pixel coordinates of a rendered image.  <br /></td></tr>
+<tr class="separator:aeb03d24d85951af0391e81209c9e72a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f78967f2f246d98c26c02fff45c1e23" id="r_a1f78967f2f246d98c26c02fff45c1e23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a1f78967f2f246d98c26c02fff45c1e23">scimesh::camera_look_at</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;center, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">radius</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">direction</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> fov_degrees, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">margin</a>=1.1<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
 <tr class="memdesc:a1f78967f2f246d98c26c02fff45c1e23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a camera that looks at a point from a given distance and direction.  <br /></td></tr>
 <tr class="separator:a1f78967f2f246d98c26c02fff45c1e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e7e30f1dd1c79560cd6d65afce7b81a" id="r_a5e7e30f1dd1c79560cd6d65afce7b81a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a5e7e30f1dd1c79560cd6d65afce7b81a">scimesh::camera_fit_scene</a> (const <a class="el" href="structscimesh_1_1Scene.html">Scene</a> &amp;scene, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;direction, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, float fov_degrees, float margin=1.1f, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
+<tr class="memitem:a5e7e30f1dd1c79560cd6d65afce7b81a" id="r_a5e7e30f1dd1c79560cd6d65afce7b81a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a5e7e30f1dd1c79560cd6d65afce7b81a">scimesh::camera_fit_scene</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Scene.html">Scene</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scene</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">direction</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> fov_degrees, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">margin</a>=1.1<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
 <tr class="memdesc:a5e7e30f1dd1c79560cd6d65afce7b81a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a camera that automatically frames an entire <a class="el" href="structscimesh_1_1Scene.html" title="A collection of Mesh objects to be rendered together.">Scene</a>.  <br /></td></tr>
 <tr class="separator:a5e7e30f1dd1c79560cd6d65afce7b81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ab0d3cb6ba1a053023f7cfc0cf70ae2" id="r_a7ab0d3cb6ba1a053023f7cfc0cf70ae2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a7ab0d3cb6ba1a053023f7cfc0cf70ae2">scimesh::camera_fit_mesh</a> (const <a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> &amp;mesh, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;direction, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, float fov_degrees, float margin=1.1f, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
+<tr class="memitem:a7ab0d3cb6ba1a053023f7cfc0cf70ae2" id="r_a7ab0d3cb6ba1a053023f7cfc0cf70ae2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a7ab0d3cb6ba1a053023f7cfc0cf70ae2">scimesh::camera_fit_mesh</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> &amp;mesh, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">direction</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;up, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> fov_degrees, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">margin</a>=1.1<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, <a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33a">ProjectionType</a> projection=<a class="el" href="namespacescimesh.html#aa56720ed4ce313623463c1f837d2f33aad46c97be63d6c4cb887419a4a3df5347">ProjectionType::PERSPECTIVE</a>)</td></tr>
 <tr class="memdesc:a7ab0d3cb6ba1a053023f7cfc0cf70ae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a camera that automatically frames a single <a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a>.  <br /></td></tr>
 <tr class="separator:a7ab0d3cb6ba1a053023f7cfc0cf70ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addc33665be1c6848c61c282408e17006" id="r_addc33665be1c6848c61c282408e17006"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#addc33665be1c6848c61c282408e17006">scimesh::camera_orbit</a> (const <a class="el" href="structscimesh_1_1Camera.html">Camera</a> &amp;camera, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;axis, float angle_degrees)</td></tr>
+<tr class="memitem:addc33665be1c6848c61c282408e17006" id="r_addc33665be1c6848c61c282408e17006"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Camera.html">Camera</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#addc33665be1c6848c61c282408e17006">scimesh::camera_orbit</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Camera.html">Camera</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">camera</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">axis</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">angle_degrees</a>)</td></tr>
 <tr class="memdesc:addc33665be1c6848c61c282408e17006"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orbit the camera around its look-at point.  <br /></td></tr>
 <tr class="separator:addc33665be1c6848c61c282408e17006"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['rasterizer_0',['Rasterizer',['../structscimesh_1_1Rasterizer.html',1,'scimesh']]],
-  ['renderer_1',['Renderer',['../classscimesh_1_1Renderer.html',1,'scimesh']]],
-  ['renderoptions_2',['RenderOptions',['../structscimesh_1_1RenderOptions.html',1,'scimesh']]]
+  ['packedmesh_0',['PackedMesh',['../structscimesh_1_1gltf__io_1_1detail_1_1PackedMesh.html',1,'scimesh::gltf_io::detail']]],
+  ['projectedpoint_1',['ProjectedPoint',['../structscimesh_1_1ProjectedPoint.html',1,'scimesh']]]
 ];

@@ -120,26 +120,27 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a375f1583e1dfd73b181a6ff57087f4c4" id="r_a375f1583e1dfd73b181a6ff57087f4c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Light.html#a375f1583e1dfd73b181a6ff57087f4c4">color</a> = <a class="el" href="structscimesh_1_1Color.html">Color</a>(1.0f, 1.0f, 1.0f, 1.0f)</td></tr>
 <tr class="memdesc:a375f1583e1dfd73b181a6ff57087f4c4"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structscimesh_1_1Color.html" title="An RGBA color with floating-point components.">Color</a> of the light (default: white).  <br /></td></tr>
 <tr class="separator:a375f1583e1dfd73b181a6ff57087f4c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af30476a5dbc0a5d0232b2c491dbfa0ef" id="r_af30476a5dbc0a5d0232b2c491dbfa0ef"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Light.html#af30476a5dbc0a5d0232b2c491dbfa0ef">intensity</a> = 1.0f</td></tr>
+<tr class="memitem:af30476a5dbc0a5d0232b2c491dbfa0ef" id="r_af30476a5dbc0a5d0232b2c491dbfa0ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Light.html#af30476a5dbc0a5d0232b2c491dbfa0ef">intensity</a> = 1.0f</td></tr>
 <tr class="memdesc:af30476a5dbc0a5d0232b2c491dbfa0ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brightness multiplier (default: 1.0).  <br /></td></tr>
 <tr class="separator:af30476a5dbc0a5d0232b2c491dbfa0ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c5dce16f2d75c18527fed6b05be50ba" id="r_a2c5dce16f2d75c18527fed6b05be50ba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Light.html#a2c5dce16f2d75c18527fed6b05be50ba">is_directional</a> = true</td></tr>
+<tr class="memitem:a2c5dce16f2d75c18527fed6b05be50ba" id="r_a2c5dce16f2d75c18527fed6b05be50ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Light.html#a2c5dce16f2d75c18527fed6b05be50ba">is_directional</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">true</a></td></tr>
 <tr class="memdesc:a2c5dce16f2d75c18527fed6b05be50ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this is a directional light (default: true).  <br /></td></tr>
 <tr class="separator:a2c5dce16f2d75c18527fed6b05be50ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A light source for the Blinn-Phong shading model. </p>
 <p>Lights illuminate meshes during rendering. A directional light (the default) shines from a direction toward the origin — its <code>position</code> is treated as a direction vector. Point lights are not yet supported.</p>
-<dl class="section user"><dt>Example: setting up two lights</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> opts;</div>
-<div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">lights</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0, 0, 1), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,1,1), 1.0f, <span class="keyword">true</span>});</div>
-<div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">lights</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(1, 0, 0), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,0,0), 0.5f, <span class="keyword">true</span>});</div>
+<dl class="section user"><dt>Example: setting up two lights</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>;</div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">lights</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0, 0, 1), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,1,1), 1.0f, <span class="keyword">true</span>});</div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.lights.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(1, 0, 0), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,0,0), 0.5f, <span class="keyword">true</span>});</div>
 <div class="line"><span class="comment">// Light 1: white from +Z, full intensity</span></div>
 <div class="line"><span class="comment">// Light 2: red from +X, half intensity</span></div>
 <div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Color_html"><div class="ttname"><a href="structscimesh_1_1Color.html">scimesh::Color</a></div><div class="ttdoc">An RGBA color with floating-point components.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00088">types.h:88</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Light_html"><div class="ttname"><a href="structscimesh_1_1Light.html">scimesh::Light</a></div><div class="ttdoc">A light source for the Blinn-Phong shading model.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00179">types.h:179</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html">scimesh::RenderOptions</a></div><div class="ttdoc">All settings that control rendering output.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00074">render_options.h:74</a></div></div>
-<div class="ttc" id="astructscimesh_1_1RenderOptions_html_a02344509b41c4ade2809002b4a9129c9"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">scimesh::RenderOptions::lights</a></div><div class="ttdeci">std::vector&lt; Light &gt; lights</div><div class="ttdoc">List of light sources.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00188">render_options.h:188</a></div></div>
+<div class="ttc" id="astructscimesh_1_1RenderOptions_html_a02344509b41c4ade2809002b4a9129c9"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">scimesh::RenderOptions::lights</a></div><div class="ttdeci">std::vector&lt; Light &gt; lights</div><div class="ttdoc">List of light sources.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00194">render_options.h:194</a></div></div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1RenderOptions.html" title="All settings that control rendering output.">RenderOptions</a>, <a class="el" href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9" title="List of light sources.">RenderOptions::lights</a>, <a class="el" href="structscimesh_1_1RenderOptions.html#a3430cffbbd9b8633a60a0dd672b28877" title="Ambient light level (default: 0.3).">RenderOptions::ambient</a> </dd>
 <dd>
@@ -173,7 +174,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Light::intensity = 1.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Light::intensity = 1.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -192,7 +193,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool scimesh::Light::is_directional = true</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> scimesh::Light::is_directional = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">true</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

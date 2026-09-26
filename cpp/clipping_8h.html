@@ -101,30 +101,38 @@ $(document).ready(function(){initNavTree('clipping_8h.html',''); initResizable()
 <p>Triangle clipping against planes (view frustum and clip planes).  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">scimesh/types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="math__utils_8h_source.html">scimesh/math_utils.h</a>&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for clipping.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="clipping_8h__incl.png" border="0" usemap="#asrc_2core_2scimesh_2clipping_8h" alt=""/></div>
 <map name="asrc_2core_2scimesh_2clipping_8h" id="asrc_2core_2scimesh_2clipping_8h">
-<area shape="rect" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="487,5,685,31"/>
-<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="471,79,599,104"/>
-<area shape="poly" title=" " alt="" coords="580,33,554,69,549,66,575,29"/>
-<area shape="rect" title=" " alt="" coords="737,152,800,177"/>
-<area shape="poly" title=" " alt="" coords="603,29,745,141,742,145,599,33"/>
-<area shape="rect" title=" " alt="" coords="5,152,116,177"/>
-<area shape="poly" title=" " alt="" coords="472,104,130,154,129,149,471,99"/>
-<area shape="rect" title=" " alt="" coords="140,152,251,177"/>
-<area shape="poly" title=" " alt="" coords="481,107,264,152,263,147,480,101"/>
-<area shape="rect" title=" " alt="" coords="275,152,385,177"/>
-<area shape="poly" title=" " alt="" coords="503,107,377,150,375,145,501,101"/>
-<area shape="rect" title=" " alt="" coords="409,152,539,177"/>
-<area shape="poly" title=" " alt="" coords="527,106,495,143,491,140,523,103"/>
-<area shape="poly" title=" " alt="" coords="574,101,725,147,724,152,572,107"/>
-<area shape="rect" title=" " alt="" coords="563,152,630,177"/>
-<area shape="poly" title=" " alt="" coords="547,103,580,140,576,143,543,106"/>
-<area shape="rect" title=" " alt="" coords="654,152,713,177"/>
-<area shape="poly" title=" " alt="" coords="560,102,648,144,646,148,558,106"/>
+<area shape="rect" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="457,5,656,31"/>
+<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="391,152,519,177"/>
+<area shape="poly" title=" " alt="" coords="551,33,473,142,469,139,546,30"/>
+<area shape="rect" title=" " alt="" coords="737,225,800,251"/>
+<area shape="poly" title=" " alt="" coords="557,31,555,60,556,98,564,140,572,159,584,175,636,194,725,221,724,226,634,199,580,179,568,161,559,141,550,99,550,60,552,31"/>
+<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="608,79,769,104"/>
+<area shape="poly" title=" " alt="" coords="579,28,656,70,654,74,577,33"/>
+<area shape="rect" title=" " alt="" coords="333,225,444,251"/>
+<area shape="poly" title=" " alt="" coords="446,179,411,217,407,213,442,176"/>
+<area shape="rect" title=" " alt="" coords="468,225,579,251"/>
+<area shape="poly" title=" " alt="" coords="468,176,505,213,501,217,465,180"/>
+<area shape="rect" title=" " alt="" coords="603,225,713,251"/>
+<area shape="poly" title=" " alt="" coords="489,175,613,218,612,223,487,180"/>
+<area shape="rect" title=" " alt="" coords="5,225,135,251"/>
+<area shape="poly" title=" " alt="" coords="394,180,146,225,145,220,393,175"/>
+<area shape="poly" title=" " alt="" coords="511,175,725,222,723,228,510,180"/>
+<area shape="rect" title=" " alt="" coords="159,225,226,251"/>
+<area shape="poly" title=" " alt="" coords="414,180,240,227,238,222,412,175"/>
+<area shape="rect" title=" " alt="" coords="250,225,309,251"/>
+<area shape="poly" title=" " alt="" coords="428,180,322,222,320,218,426,175"/>
+<area shape="poly" title=" " alt="" coords="652,107,507,151,505,145,650,101"/>
+<area shape="rect" title=" " alt="" coords="595,152,812,177"/>
+<area shape="poly" title=" " alt="" coords="694,104,701,138,696,139,688,105"/>
+<area shape="rect" title=" " alt="" coords="837,152,922,177"/>
+<area shape="poly" title=" " alt="" coords="720,102,836,144,834,149,718,107"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -155,10 +163,13 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a99d787142cbabc8aed724e28340aaea4" id="r_a99d787142cbabc8aed724e28340aaea4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a99d787142cbabc8aed724e28340aaea4">scimesh::clip_triangle_near_plane</a> (const <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v0, const <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v1, const <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v2, std::vector&lt; <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &gt; &amp;output_vertices, std::vector&lt; <a class="el" href="structscimesh_1_1Triangle.html">Triangle</a> &gt; &amp;output_triangles)</td></tr>
+<tr class="memitem:a99d787142cbabc8aed724e28340aaea4" id="r_a99d787142cbabc8aed724e28340aaea4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a99d787142cbabc8aed724e28340aaea4">scimesh::clip_triangle_near_plane</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v0, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v1, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &amp;v2, std::vector&lt; <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &gt; &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output_vertices</a>, std::vector&lt; <a class="el" href="structscimesh_1_1Triangle.html">Triangle</a> &gt; &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output_triangles</a>)</td></tr>
 <tr class="memdesc:a99d787142cbabc8aed724e28340aaea4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clip a triangle against the near clipping plane in clip space.  <br /></td></tr>
 <tr class="separator:a99d787142cbabc8aed724e28340aaea4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5946fc0d147f7fdf3e1ef1c2307a2657" id="r_a5946fc0d147f7fdf3e1ef1c2307a2657"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a5946fc0d147f7fdf3e1ef1c2307a2657">scimesh::clip_triangle_view_plane</a> (const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v0, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v1, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v2, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;n0, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;n1, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;n2, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;c0, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;c1, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;c2, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9">uv0</a>, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6">uv1</a>, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f">uv2</a>, const <a class="el" href="structscimesh_1_1ClipPlane.html">ClipPlane</a> &amp;plane, std::vector&lt; <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &gt; &amp;output_vertices, std::vector&lt; <a class="el" href="structscimesh_1_1Triangle.html">Triangle</a> &gt; &amp;output_triangles)</td></tr>
+<tr class="memitem:a7c2d872e4bead1da3ce0ee38d5120ea2" id="r_a7c2d872e4bead1da3ce0ee38d5120ea2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1ClipPlane.html">ClipPlane</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a7c2d872e4bead1da3ce0ee38d5120ea2">scimesh::clip_plane_to_view_space</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1ClipPlane.html">ClipPlane</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">plane</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;eye, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">Mat4</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">view</a>)</td></tr>
+<tr class="memdesc:a7c2d872e4bead1da3ce0ee38d5120ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="structscimesh_1_1ClipPlane.html" title="A clipping plane that can hide parts of the scene.">ClipPlane</a> to view (eye) space, ready for clipping.  <br /></td></tr>
+<tr class="separator:a7c2d872e4bead1da3ce0ee38d5120ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5946fc0d147f7fdf3e1ef1c2307a2657" id="r_a5946fc0d147f7fdf3e1ef1c2307a2657"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a5946fc0d147f7fdf3e1ef1c2307a2657">scimesh::clip_triangle_view_plane</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v0, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v1, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;v2, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">n0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">n1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">n2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">c0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">c1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">c2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9">uv0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6">uv1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f">uv2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1ClipPlane.html">ClipPlane</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">plane</a>, std::vector&lt; <a class="el" href="structscimesh_1_1ClipVertex.html">ClipVertex</a> &gt; &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output_vertices</a>, std::vector&lt; <a class="el" href="structscimesh_1_1Triangle.html">Triangle</a> &gt; &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output_triangles</a>)</td></tr>
 <tr class="memdesc:a5946fc0d147f7fdf3e1ef1c2307a2657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clip a triangle against an arbitrary plane in view space.  <br /></td></tr>
 <tr class="separator:a5946fc0d147f7fdf3e1ef1c2307a2657"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>

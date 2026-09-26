@@ -1,21 +1,13 @@
 var searchData=
 [
-  ['sample_0',['sample',['../structscimesh_1_1ColorMap.html#ad9c6f264c53ed58880ba2a0ac46ed1cb',1,'scimesh::ColorMap']]],
-  ['sample_5fbilinear_1',['sample_bilinear',['../structscimesh_1_1Image.html#af61b6175e815126e15cddb9593258123',1,'scimesh::Image']]],
-  ['scale_2',['scale',['../structscimesh_1_1Image.html#a32c8477931cc40f538a91ed0ce80d449',1,'scimesh::Image']]],
-  ['scale_5fmesh_3',['scale_mesh',['../namespacescimesh.html#acc20474edab6ad0de3ad1932f9f65301',1,'scimesh::scale_mesh(Mesh &amp;mesh, float uniform_scale)'],['../namespacescimesh.html#aa87b98fab9bce771e51225c1a196d25e',1,'scimesh::scale_mesh(Mesh &amp;mesh, const Vec3 &amp;scale)']]],
-  ['set_5fblend_5fmode_4',['set_blend_mode',['../structscimesh_1_1Rasterizer.html#a87d8ee558c345663de2253d00ea0396d',1,'scimesh::Rasterizer']]],
-  ['set_5fname_5',['set_name',['../structscimesh_1_1Scene.html#ab96e1c2d2fb824bdf68676d6b3ceb22e',1,'scimesh::Scene']]],
-  ['set_5fpixel_6',['set_pixel',['../structscimesh_1_1Image.html#a70b615c616803ac8ded12c4b5bfd29eb',1,'scimesh::Image']]],
-  ['set_5ftransform_7',['set_transform',['../structscimesh_1_1Scene.html#a054c513f5666319b6e97d4f55f10edf1',1,'scimesh::Scene']]],
-  ['shade_5fpixel_8',['shade_pixel',['../namespacescimesh.html#a64c5ad9e14b213e188950311cce03191',1,'scimesh']]],
-  ['shade_5fpixel_5fmulti_9',['shade_pixel_multi',['../namespacescimesh.html#a93443a52fde1516c87b88fb49617e067',1,'scimesh']]],
-  ['size_10',['size',['../structscimesh_1_1ColorMap.html#abd8f470f7fc21bd83aba9e1b0dceb7de',1,'scimesh::ColorMap::size()'],['../structscimesh_1_1Scene.html#a8c4e409e0531ad7f4f7b8a380d8e1c1f',1,'scimesh::Scene::size()']]],
-  ['stack_5fhorizontal_11',['stack_horizontal',['../namespacescimesh.html#aa59219f2948f5deeb649852a19c50da2',1,'scimesh']]],
-  ['stack_5fvertical_12',['stack_vertical',['../namespacescimesh.html#aacaafefc8276257c028a75e7e14c75b1',1,'scimesh']]],
-  ['stem_13',['stem',['../namespacescimesh_1_1gltf__io_1_1detail.html#af080e61f9ee901701207517d74212acf',1,'scimesh::gltf_io::detail']]],
-  ['str_5fcrop_14',['str_crop',['../namespacescimesh.html#ae4cf43f2fd9954a6526cfb78e55453db',1,'scimesh']]],
-  ['str_5fmerge_15',['str_merge',['../namespacescimesh.html#aafec19719f61270bbef5ee9f6fd09e46',1,'scimesh']]],
-  ['str_5fprojection_16',['str_projection',['../namespacescimesh.html#aab8c90717e15e28cc2c0b008914564ec',1,'scimesh']]],
-  ['str_5fshading_17',['str_shading',['../namespacescimesh.html#a837e63fb9606d63fd26540e18a6baa93',1,'scimesh']]]
+  ['pack_5fmesh_0',['pack_mesh',['../namespacescimesh_1_1gltf__io_1_1detail.html#ae0e3c56f93342fee9874586fa88311df',1,'scimesh::gltf_io::detail']]],
+  ['pad_5fbin_1',['pad_bin',['../namespacescimesh_1_1gltf__io_1_1detail.html#a9d849225042dc4d90fd0e5e94592d419',1,'scimesh::gltf_io::detail']]],
+  ['pad_5fto_5fsize_2',['pad_to_size',['../structscimesh_1_1Image.html#ad42eaeb25d7b03823d4ae3e0249e1920',1,'scimesh::Image']]],
+  ['path_5fcurvature_3',['path_curvature',['../namespacescimesh.html#a1c903cf80689b70a39d28abf781898a5',1,'scimesh']]],
+  ['path_5flength_4',['path_length',['../namespacescimesh.html#a1bd5f32e1eaf8ba0d3e60ff2ea8b0987',1,'scimesh']]],
+  ['path_5ftangents_5',['path_tangents',['../namespacescimesh.html#a111feccf59efb5f76830d6c066cee4d9',1,'scimesh']]],
+  ['perp_5fextent_5fradius_6',['perp_extent_radius',['../namespacescimesh.html#aa99535c4c3918219fa8aa191abef3660',1,'scimesh']]],
+  ['perspective_5fdivide_7',['perspective_divide',['../namespacescimesh.html#aea2620423ae7ed27cc5b9da0e8e533f6',1,'scimesh']]],
+  ['pixel_5fsize_8',['pixel_size',['../classscimesh_1_1Font.html#ac4c814f6264a4f6a7cc225007441c913',1,'scimesh::Font']]],
+  ['position_5for_9',['position_or',['../structscimesh_1_1TextLayer.html#a25625477bbb366a966c0407b5c4ca41a',1,'scimesh::TextLayer']]]
 ];

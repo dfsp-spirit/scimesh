@@ -1,9 +1,22 @@
 var searchData=
 [
-  ['transform_0',['transform',['../structscimesh_1_1Scene.html#a70eda1478dbbd76387ebc90c83881bb1',1,'scimesh::Scene']]],
-  ['transform_5fdirection_1',['transform_direction',['../namespacescimesh.html#a505d90614924a937a4e94183bc89a765',1,'scimesh']]],
-  ['transform_5fmesh_2',['transform_mesh',['../namespacescimesh.html#aba0a8bcaee3d93143864d2e39a5badba',1,'scimesh']]],
-  ['transform_5fpoint_3',['transform_point',['../namespacescimesh.html#a997efb19d4db723b7005fb2827115deb',1,'scimesh']]],
-  ['transform_5fpoint_5fhomogeneous_4',['transform_point_homogeneous',['../namespacescimesh.html#af80a35fe48d81dbfa525da3ddfc6b7b2',1,'scimesh']]],
-  ['translate_5fmesh_5',['translate_mesh',['../namespacescimesh.html#ac99d9fe7e0e7d2104e352d00125db005',1,'scimesh']]]
+  ['rasterize_5fline_0',['rasterize_line',['../structscimesh_1_1Rasterizer.html#a020d3a6d5a9d783f4fb5b6b2a72e1671',1,'scimesh::Rasterizer']]],
+  ['rasterize_5fpoint_1',['rasterize_point',['../structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e',1,'scimesh::Rasterizer']]],
+  ['rasterize_5ftriangle_2',['rasterize_triangle',['../structscimesh_1_1Rasterizer.html#ac12d54b304b8ab18bcb4c83e8221c10f',1,'scimesh::Rasterizer']]],
+  ['rasterizer_3',['Rasterizer',['../structscimesh_1_1Rasterizer.html#a42eb6381075961b6b119cedb9503796d',1,'scimesh::Rasterizer']]],
+  ['read_5fimage_4',['read_image',['../structscimesh_1_1Image.html#af8a024a163d34420bdd0ac2de4050ff8',1,'scimesh::Image']]],
+  ['read_5fobj_5',['read_obj',['../namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59',1,'scimesh::obj_io']]],
+  ['read_5fply_6',['read_ply',['../namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711',1,'scimesh::ply_io']]],
+  ['read_5fstl_7',['read_stl',['../namespacescimesh_1_1stl__io.html#a9bc8a57083ac033cb57ae9bbfc07dff1',1,'scimesh::stl_io']]],
+  ['remove_5fduplicate_5fpoints_8',['remove_duplicate_points',['../namespacescimesh.html#ae3e8db44b0ba84a52e7498ac395c1b73',1,'scimesh']]],
+  ['render_5flines_5fraw_9',['render_lines_raw',['../classscimesh_1_1Renderer.html#a35701f786a1ce1ef7e057ffff873ef59',1,'scimesh::Renderer']]],
+  ['render_5fmesh_10',['render_mesh',['../classscimesh_1_1Renderer.html#a18a87685f4ccb5b7307a846255adb8f7',1,'scimesh::Renderer']]],
+  ['render_5fpoints_5fraw_11',['render_points_raw',['../classscimesh_1_1Renderer.html#ad2a473cb525891ef95e41b382469a391',1,'scimesh::Renderer']]],
+  ['render_5fscene_12',['render_scene',['../classscimesh_1_1Renderer.html#aaaa91a8867fe20c94ee630bc584d0922',1,'scimesh::Renderer']]],
+  ['render_5ftext_5flayers_13',['render_text_layers',['../namespacescimesh_1_1detail.html#aa3a4ccde55c12b2ac8ec84659a3fcd48',1,'scimesh::detail']]],
+  ['render_5ftriangles_5fraw_14',['render_triangles_raw',['../classscimesh_1_1Renderer.html#ad896026f9b397454981ec0df33f3ab07',1,'scimesh::Renderer']]],
+  ['resample_5fby_5farclength_15',['resample_by_arclength',['../namespacescimesh.html#a22c47d35bc03d8568f27d8f7e8789b47',1,'scimesh']]],
+  ['resolve_5ffont_5fpath_16',['resolve_font_path',['../namespacescimesh.html#a64c6198d6dac3645ee094fbea9336df9',1,'scimesh']]],
+  ['rotate_5f90_17',['rotate_90',['../structscimesh_1_1Image.html#aa2073affabb1a441d9c569b0e381cfe9',1,'scimesh::Image']]],
+  ['rotate_5fmesh_18',['rotate_mesh',['../namespacescimesh.html#ab85dbdba52e17af76314e2f43a92416a',1,'scimesh']]]
 ];

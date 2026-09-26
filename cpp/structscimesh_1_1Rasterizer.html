@@ -117,87 +117,105 @@ Collaboration diagram for scimesh::Rasterizer:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a42eb6381075961b6b119cedb9503796d" id="r_a42eb6381075961b6b119cedb9503796d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a42eb6381075961b6b119cedb9503796d">Rasterizer</a> (int w, int h)</td></tr>
+<tr class="memitem:a42eb6381075961b6b119cedb9503796d" id="r_a42eb6381075961b6b119cedb9503796d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a42eb6381075961b6b119cedb9503796d">Rasterizer</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">w</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">h</a>)</td></tr>
 <tr class="memdesc:a42eb6381075961b6b119cedb9503796d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a rasterizer for the given output size.  <br /></td></tr>
 <tr class="separator:a42eb6381075961b6b119cedb9503796d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cd181b811d1017c74076224a8c05468" id="r_a0cd181b811d1017c74076224a8c05468"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a0cd181b811d1017c74076224a8c05468">clear</a> (float clear_depth=1.0f)</td></tr>
+<tr class="memitem:a0cd181b811d1017c74076224a8c05468" id="r_a0cd181b811d1017c74076224a8c05468"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a0cd181b811d1017c74076224a8c05468">clear</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">clear_depth</a>=1.0f)</td></tr>
 <tr class="memdesc:a0cd181b811d1017c74076224a8c05468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the depth and normal buffers.  <br /></td></tr>
 <tr class="separator:a0cd181b811d1017c74076224a8c05468"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87d8ee558c345663de2253d00ea0396d" id="r_a87d8ee558c345663de2253d00ea0396d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a87d8ee558c345663de2253d00ea0396d">set_blend_mode</a> (bool enabled)</td></tr>
+<tr class="memitem:a2d9e2658ae0934882440afe199dff602" id="r_a2d9e2658ae0934882440afe199dff602"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a2d9e2658ae0934882440afe199dff602">fog_depth_from_ndc</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">z_ndc</a>) <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a></td></tr>
+<tr class="memdesc:a2d9e2658ae0934882440afe199dff602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a depth-buffer value to a distance in world units.  <br /></td></tr>
+<tr class="separator:a2d9e2658ae0934882440afe199dff602"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87d8ee558c345663de2253d00ea0396d" id="r_a87d8ee558c345663de2253d00ea0396d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a87d8ee558c345663de2253d00ea0396d">set_blend_mode</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">enabled</a>)</td></tr>
 <tr class="memdesc:a87d8ee558c345663de2253d00ea0396d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable alpha blending.  <br /></td></tr>
 <tr class="separator:a87d8ee558c345663de2253d00ea0396d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac12d54b304b8ab18bcb4c83e8221c10f" id="r_ac12d54b304b8ab18bcb4c83e8221c10f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ac12d54b304b8ab18bcb4c83e8221c10f">rasterize_triangle</a> (const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#ac26e9d25c68b88fa0b8e3a95b7b310a3">screen_v0</a>, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#a9b38da84d2aeaf908e0d6b4f626e6e34">color0</a>, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a6165658ce5d06257977fd2a345ff96ff">normal0</a>, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9">uv0</a>, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a728230160d62b4db03b1dcd767b4b900">screen_v1</a>, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#ac1a73b764585f3b052096fb78d3c6e20">color1</a>, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a563334735fb26ea5498c1f484a8e5b9b">normal1</a>, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6">uv1</a>, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a17726443e762b990d2c528bc46eb3ab1">screen_v2</a>, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#af1ccfb420752bd8242d9a0bb8d9268b5">color2</a>, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a0c47bcc6891bb9428ad2a13b15e0ed3a">normal2</a>, const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f">uv2</a>, bool backface_culling, bool smooth_shading, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;light_direction, bool wireframe, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;wireframe_color, <a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;output)</td></tr>
+<tr class="memitem:ac12d54b304b8ab18bcb4c83e8221c10f" id="r_ac12d54b304b8ab18bcb4c83e8221c10f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ac12d54b304b8ab18bcb4c83e8221c10f">rasterize_triangle</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#ac26e9d25c68b88fa0b8e3a95b7b310a3">screen_v0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#a9b38da84d2aeaf908e0d6b4f626e6e34">color0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a6165658ce5d06257977fd2a345ff96ff">normal0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9">uv0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a728230160d62b4db03b1dcd767b4b900">screen_v1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#ac1a73b764585f3b052096fb78d3c6e20">color1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a563334735fb26ea5498c1f484a8e5b9b">normal1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6">uv1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a17726443e762b990d2c528bc46eb3ab1">screen_v2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#af1ccfb420752bd8242d9a0bb8d9268b5">color2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a0c47bcc6891bb9428ad2a13b15e0ed3a">normal2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;<a class="el" href="renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f">uv2</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> backface_culling, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">smooth_shading</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">light_direction</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> wireframe, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;wireframe_color, <a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output</a>)</td></tr>
 <tr class="memdesc:ac12d54b304b8ab18bcb4c83e8221c10f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rasterize a single triangle into the output image.  <br /></td></tr>
 <tr class="separator:ac12d54b304b8ab18bcb4c83e8221c10f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1008f668e07086f2b537442ed5e1895e" id="r_a1008f668e07086f2b537442ed5e1895e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e">rasterize_point</a> (float screen_x, float screen_y, float depth, float radius, const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;color, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;normal, const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;light_direction, <a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;output)</td></tr>
+<tr class="memitem:a1008f668e07086f2b537442ed5e1895e" id="r_a1008f668e07086f2b537442ed5e1895e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e">rasterize_point</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">screen_x</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">screen_y</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> depth, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">radius</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;color, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;normal, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">light_direction</a>, <a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output</a>)</td></tr>
 <tr class="memdesc:a1008f668e07086f2b537442ed5e1895e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rasterize a single point (filled circle) into the output image.  <br /></td></tr>
 <tr class="separator:a1008f668e07086f2b537442ed5e1895e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f3261210c13a660cd2313edd814fdb5" id="r_a4f3261210c13a660cd2313edd814fdb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a4f3261210c13a660cd2313edd814fdb5">apply_ssao</a> (<a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;output, float z_near, float z_far)</td></tr>
+<tr class="memitem:a020d3a6d5a9d783f4fb5b6b2a72e1671" id="r_a020d3a6d5a9d783f4fb5b6b2a72e1671"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a020d3a6d5a9d783f4fb5b6b2a72e1671">rasterize_line</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#ac26e9d25c68b88fa0b8e3a95b7b310a3">screen_v0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#a9b38da84d2aeaf908e0d6b4f626e6e34">color0</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="renderer_8cpp.html#a728230160d62b4db03b1dcd767b4b900">screen_v1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;<a class="el" href="renderer_8cpp.html#ac1a73b764585f3b052096fb78d3c6e20">color1</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="structscimesh_1_1Rasterizer.html#a86b5ae9c312d93ade8c392df59d70459">width</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> <a class="el" href="renderer_8cpp.html#aa0b905b601a602bdad5f3613f39308ef">lit</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;normal, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">light_direction</a>, <a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output</a>)</td></tr>
+<tr class="memdesc:a020d3a6d5a9d783f4fb5b6b2a72e1671"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rasterize a line segment with a screen-space width.  <br /></td></tr>
+<tr class="separator:a020d3a6d5a9d783f4fb5b6b2a72e1671"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f3261210c13a660cd2313edd814fdb5" id="r_a4f3261210c13a660cd2313edd814fdb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a4f3261210c13a660cd2313edd814fdb5">apply_ssao</a> (<a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">output</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="structscimesh_1_1Rasterizer.html#ac6f8e419180901544c410b2222ea28cb">z_near</a>, <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> <a class="el" href="structscimesh_1_1Rasterizer.html#a2b2503a2682bed9480cb2609cf2fb671">z_far</a>)</td></tr>
 <tr class="memdesc:a4f3261210c13a660cd2313edd814fdb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply screen-space ambient occlusion to the output image.  <br /></td></tr>
 <tr class="separator:a4f3261210c13a660cd2313edd814fdb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a6399b18ccd1dbbbf96c8e4b0a4755247" id="r_a6399b18ccd1dbbbf96c8e4b0a4755247"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Image.html">Image</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a6399b18ccd1dbbbf96c8e4b0a4755247">active_texture</a> = nullptr</td></tr>
+<tr class="memitem:a6399b18ccd1dbbbf96c8e4b0a4755247" id="r_a6399b18ccd1dbbbf96c8e4b0a4755247"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Image.html">Image</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a6399b18ccd1dbbbf96c8e4b0a4755247">active_texture</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">nullptr</a></td></tr>
 <tr class="memdesc:a6399b18ccd1dbbbf96c8e4b0a4755247"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional texture image for textured meshes.  <br /></td></tr>
 <tr class="separator:a6399b18ccd1dbbbf96c8e4b0a4755247"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Output dimensions</div></td></tr>
-<tr class="memitem:a86b5ae9c312d93ade8c392df59d70459" id="r_a86b5ae9c312d93ade8c392df59d70459"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a86b5ae9c312d93ade8c392df59d70459">width</a> = 0</td></tr>
+<tr class="memitem:a86b5ae9c312d93ade8c392df59d70459" id="r_a86b5ae9c312d93ade8c392df59d70459"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a86b5ae9c312d93ade8c392df59d70459">width</a> = 0</td></tr>
 <tr class="memdesc:a86b5ae9c312d93ade8c392df59d70459"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output image width in pixels.  <br /></td></tr>
 <tr class="separator:a86b5ae9c312d93ade8c392df59d70459"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a617a7ac19b12317c2cac79e57f0163de" id="r_a617a7ac19b12317c2cac79e57f0163de"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a617a7ac19b12317c2cac79e57f0163de">height</a> = 0</td></tr>
+<tr class="memitem:a617a7ac19b12317c2cac79e57f0163de" id="r_a617a7ac19b12317c2cac79e57f0163de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a617a7ac19b12317c2cac79e57f0163de">height</a> = 0</td></tr>
 <tr class="memdesc:a617a7ac19b12317c2cac79e57f0163de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output image height in pixels.  <br /></td></tr>
 <tr class="separator:a617a7ac19b12317c2cac79e57f0163de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Depth and normal buffers</div></td></tr>
-<tr class="memitem:acb902d6d18babf4962629851700916ef" id="r_acb902d6d18babf4962629851700916ef"><td class="memItemLeft" align="right" valign="top">std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#acb902d6d18babf4962629851700916ef">z_buffer</a></td></tr>
+<tr class="memitem:acb902d6d18babf4962629851700916ef" id="r_acb902d6d18babf4962629851700916ef"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#acb902d6d18babf4962629851700916ef">z_buffer</a></td></tr>
 <tr class="memdesc:acb902d6d18babf4962629851700916ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Z-buffer (depth buffer), one float per pixel.  <br /></td></tr>
 <tr class="separator:acb902d6d18babf4962629851700916ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2f17079774d76e11affd9e286447388" id="r_ae2f17079774d76e11affd9e286447388"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ae2f17079774d76e11affd9e286447388">normal_buffer</a></td></tr>
 <tr class="memdesc:ae2f17079774d76e11affd9e286447388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normal buffer, one Vec3 per pixel.  <br /></td></tr>
 <tr class="separator:ae2f17079774d76e11affd9e286447388"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Blending</div></td></tr>
-<tr class="memitem:ad6d3d9dd7ea6b39b7f17f24b451acf15" id="r_ad6d3d9dd7ea6b39b7f17f24b451acf15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ad6d3d9dd7ea6b39b7f17f24b451acf15">blend_mode</a> = false</td></tr>
+<tr class="memitem:ad6d3d9dd7ea6b39b7f17f24b451acf15" id="r_ad6d3d9dd7ea6b39b7f17f24b451acf15"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ad6d3d9dd7ea6b39b7f17f24b451acf15">blend_mode</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td></tr>
 <tr class="memdesc:ad6d3d9dd7ea6b39b7f17f24b451acf15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable alpha blending for transparent triangles (default: false).  <br /></td></tr>
 <tr class="separator:ad6d3d9dd7ea6b39b7f17f24b451acf15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Specular lighting</div></td></tr>
 <tr class="memitem:a8c86c7eeb39ba2261136d9fd14cd6516" id="r_a8c86c7eeb39ba2261136d9fd14cd6516"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a8c86c7eeb39ba2261136d9fd14cd6516">specular_color</a> = <a class="el" href="structscimesh_1_1Color.html">Color</a>(0.0f, 0.0f, 0.0f, 0.0f)</td></tr>
 <tr class="memdesc:a8c86c7eeb39ba2261136d9fd14cd6516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specular highlight color.  <br /></td></tr>
 <tr class="separator:a8c86c7eeb39ba2261136d9fd14cd6516"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaec94d8432b067611979a1a1e7280332" id="r_aaec94d8432b067611979a1a1e7280332"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#aaec94d8432b067611979a1a1e7280332">shininess</a> = 0.0f</td></tr>
+<tr class="memitem:aaec94d8432b067611979a1a1e7280332" id="r_aaec94d8432b067611979a1a1e7280332"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#aaec94d8432b067611979a1a1e7280332">shininess</a> = 0.0f</td></tr>
 <tr class="memdesc:aaec94d8432b067611979a1a1e7280332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shininess exponent (Phong model).  <br /></td></tr>
 <tr class="separator:aaec94d8432b067611979a1a1e7280332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Lights</div></td></tr>
 <tr class="memitem:a9a1fa8d2588157af1d2e51bebe399fe8" id="r_a9a1fa8d2588157af1d2e51bebe399fe8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structscimesh_1_1Light.html">Light</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a9a1fa8d2588157af1d2e51bebe399fe8">lights</a></td></tr>
 <tr class="memdesc:a9a1fa8d2588157af1d2e51bebe399fe8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structscimesh_1_1Light.html" title="A light source for the Blinn-Phong shading model.">Light</a> sources for Blinn-Phong shading.  <br /></td></tr>
 <tr class="separator:a9a1fa8d2588157af1d2e51bebe399fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a789ababf9ff6a4c5f18d97953d83049b" id="r_a789ababf9ff6a4c5f18d97953d83049b"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a789ababf9ff6a4c5f18d97953d83049b">ambient</a> = 0.3f</td></tr>
+<tr class="memitem:a789ababf9ff6a4c5f18d97953d83049b" id="r_a789ababf9ff6a4c5f18d97953d83049b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a789ababf9ff6a4c5f18d97953d83049b">ambient</a> = 0.3<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td></tr>
 <tr class="memdesc:a789ababf9ff6a4c5f18d97953d83049b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ambient light level (0.0–1.0, default: 0.3).  <br /></td></tr>
 <tr class="separator:a789ababf9ff6a4c5f18d97953d83049b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Post-processing</div></td></tr>
-<tr class="memitem:ae1d95cbcbddfe8d584bcb2e06129ffbf" id="r_ae1d95cbcbddfe8d584bcb2e06129ffbf"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ae1d95cbcbddfe8d584bcb2e06129ffbf">contrast</a> = 1.0f</td></tr>
+<tr class="memitem:ae1d95cbcbddfe8d584bcb2e06129ffbf" id="r_ae1d95cbcbddfe8d584bcb2e06129ffbf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ae1d95cbcbddfe8d584bcb2e06129ffbf">contrast</a> = 1.0f</td></tr>
 <tr class="memdesc:ae1d95cbcbddfe8d584bcb2e06129ffbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contrast adjustment (1.0 = no change).  <br /></td></tr>
 <tr class="separator:ae1d95cbcbddfe8d584bcb2e06129ffbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Fog</div></td></tr>
-<tr class="memitem:a1ce05c153000be7d9b4381f8f1c3a45a" id="r_a1ce05c153000be7d9b4381f8f1c3a45a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1ce05c153000be7d9b4381f8f1c3a45a">fog_enabled</a> = false</td></tr>
+<tr class="memitem:a1ce05c153000be7d9b4381f8f1c3a45a" id="r_a1ce05c153000be7d9b4381f8f1c3a45a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1ce05c153000be7d9b4381f8f1c3a45a">fog_enabled</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td></tr>
 <tr class="memdesc:a1ce05c153000be7d9b4381f8f1c3a45a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable depth fog (default: false).  <br /></td></tr>
 <tr class="separator:a1ce05c153000be7d9b4381f8f1c3a45a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30a3f9d2d66c20c9ecdee9803ab3e41f" id="r_a30a3f9d2d66c20c9ecdee9803ab3e41f"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a30a3f9d2d66c20c9ecdee9803ab3e41f">fog_start</a> = 0.0f</td></tr>
-<tr class="memdesc:a30a3f9d2d66c20c9ecdee9803ab3e41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance where fog begins.  <br /></td></tr>
+<tr class="memitem:a30a3f9d2d66c20c9ecdee9803ab3e41f" id="r_a30a3f9d2d66c20c9ecdee9803ab3e41f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a30a3f9d2d66c20c9ecdee9803ab3e41f">fog_start</a> = 0.0f</td></tr>
+<tr class="memdesc:a30a3f9d2d66c20c9ecdee9803ab3e41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance where fog begins (default: 0).  <br /></td></tr>
 <tr class="separator:a30a3f9d2d66c20c9ecdee9803ab3e41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1abcb000b8eff187ee81c2807cb0e94a" id="r_a1abcb000b8eff187ee81c2807cb0e94a"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1abcb000b8eff187ee81c2807cb0e94a">fog_end</a> = 1.0f</td></tr>
-<tr class="memdesc:a1abcb000b8eff187ee81c2807cb0e94a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance where fog is fully opaque.  <br /></td></tr>
+<tr class="memitem:a1abcb000b8eff187ee81c2807cb0e94a" id="r_a1abcb000b8eff187ee81c2807cb0e94a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1abcb000b8eff187ee81c2807cb0e94a">fog_end</a> = 1.0f</td></tr>
+<tr class="memdesc:a1abcb000b8eff187ee81c2807cb0e94a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance where fog is fully opaque (default: 1).  <br /></td></tr>
 <tr class="separator:a1abcb000b8eff187ee81c2807cb0e94a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27176f397fdc21ebee8ff1be44b23b26" id="r_a27176f397fdc21ebee8ff1be44b23b26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c">FogSpace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a27176f397fdc21ebee8ff1be44b23b26">fog_space</a> = <a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3">FogSpace::WORLD</a></td></tr>
+<tr class="memdesc:a27176f397fdc21ebee8ff1be44b23b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">The space (and unit) of <code>fog_start</code> / <code>fog_end</code> (default: <code><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3" title="World units: distance from the camera, measured along the camera&#39;s viewing direction.">FogSpace::WORLD</a></code>).  <br /></td></tr>
+<tr class="separator:a27176f397fdc21ebee8ff1be44b23b26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6f8e419180901544c410b2222ea28cb" id="r_ac6f8e419180901544c410b2222ea28cb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ac6f8e419180901544c410b2222ea28cb">z_near</a> = 0.1<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td></tr>
+<tr class="memdesc:ac6f8e419180901544c410b2222ea28cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Near plane distance of the current projection (default: 0.1).  <br /></td></tr>
+<tr class="separator:ac6f8e419180901544c410b2222ea28cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b2503a2682bed9480cb2609cf2fb671" id="r_a2b2503a2682bed9480cb2609cf2fb671"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a2b2503a2682bed9480cb2609cf2fb671">z_far</a> = 10000.0f</td></tr>
+<tr class="memdesc:a2b2503a2682bed9480cb2609cf2fb671"><td class="mdescLeft">&#160;</td><td class="mdescRight">Far plane distance of the current projection (default: 10000.0).  <br /></td></tr>
+<tr class="separator:a2b2503a2682bed9480cb2609cf2fb671"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41160bd95dc4f1c5490b249bc3e574a7" id="r_a41160bd95dc4f1c5490b249bc3e574a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a41160bd95dc4f1c5490b249bc3e574a7">orthographic</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td></tr>
+<tr class="memdesc:a41160bd95dc4f1c5490b249bc3e574a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the current projection is orthographic (default: false).  <br /></td></tr>
+<tr class="separator:a41160bd95dc4f1c5490b249bc3e574a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c07a3cef37ccdcc7899eafbf2cc8bc4" id="r_a1c07a3cef37ccdcc7899eafbf2cc8bc4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a1c07a3cef37ccdcc7899eafbf2cc8bc4">fog_color</a> = <a class="el" href="namespacescimesh.html#ae47362ecef3fd1eb96459e719e3c3eb0">TRANSPARENT_BLACK</a></td></tr>
 <tr class="memdesc:a1c07a3cef37ccdcc7899eafbf2cc8bc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The fog color (what distant objects blend into).  <br /></td></tr>
 <tr class="separator:a1c07a3cef37ccdcc7899eafbf2cc8bc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">SSAO (Screen-Space Ambient Occlusion)</div></td></tr>
-<tr class="memitem:ac6d5177d62341820aab75c1bba241925" id="r_ac6d5177d62341820aab75c1bba241925"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ac6d5177d62341820aab75c1bba241925">ssao_enabled</a> = false</td></tr>
+<tr class="memitem:ac6d5177d62341820aab75c1bba241925" id="r_ac6d5177d62341820aab75c1bba241925"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#ac6d5177d62341820aab75c1bba241925">ssao_enabled</a> = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td></tr>
 <tr class="memdesc:ac6d5177d62341820aab75c1bba241925"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable SSAO (default: false).  <br /></td></tr>
 <tr class="separator:ac6d5177d62341820aab75c1bba241925"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a1402b90c41c97c3bc14a77f0d7bd4a" id="r_a0a1402b90c41c97c3bc14a77f0d7bd4a"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a0a1402b90c41c97c3bc14a77f0d7bd4a">ssao_radius</a> = 16.0f</td></tr>
+<tr class="memitem:a0a1402b90c41c97c3bc14a77f0d7bd4a" id="r_a0a1402b90c41c97c3bc14a77f0d7bd4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a0a1402b90c41c97c3bc14a77f0d7bd4a">ssao_radius</a> = 16.0f</td></tr>
 <tr class="memdesc:a0a1402b90c41c97c3bc14a77f0d7bd4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">SSAO sample radius in pixels (default: 16).  <br /></td></tr>
 <tr class="separator:a0a1402b90c41c97c3bc14a77f0d7bd4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68ac02414c0ee3ea18e25b27e93f266e" id="r_a68ac02414c0ee3ea18e25b27e93f266e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a68ac02414c0ee3ea18e25b27e93f266e">ssao_intensity</a> = 0.8f</td></tr>
+<tr class="memitem:a68ac02414c0ee3ea18e25b27e93f266e" id="r_a68ac02414c0ee3ea18e25b27e93f266e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Rasterizer.html#a68ac02414c0ee3ea18e25b27e93f266e">ssao_intensity</a> = 0.8<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td></tr>
 <tr class="memdesc:a68ac02414c0ee3ea18e25b27e93f266e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SSAO darkening intensity (0.0–1.0, default: 0.8).  <br /></td></tr>
 <tr class="separator:a68ac02414c0ee3ea18e25b27e93f266e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -214,15 +232,16 @@ Public Attributes</h2></td></tr>
 <h2><a class="anchor" id="autotoc_md10"></a>
 Usage</h2>
 <p>You typically don't create a <code><a class="el" href="structscimesh_1_1Rasterizer.html" title="Low-level triangle rasterizer with depth buffering and lighting.">Rasterizer</a></code> directly; it is managed internally by <code><a class="el" href="classscimesh_1_1Renderer.html" title="The main rendering engine.">Renderer</a></code>. However, for advanced use:</p>
-<div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Rasterizer.html">Rasterizer</a> rast(800, 600);</div>
-<div class="line">rast.lights.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0,0,1), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,1,1), 1.0f, <span class="keyword">true</span>});</div>
-<div class="line">rast.ambient = 0.4f;</div>
-<div class="line">rast.clear();  <span class="comment">// clear depth and normal buffers</span></div>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Rasterizer.html">Rasterizer</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">rast</a>(800, 600);</div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">rast</a>.lights.push_back(<a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0,0,1), <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(1,1,1), 1.0f, <span class="keyword">true</span>});</div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">rast</a>.ambient = 0.4f;</div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">rast</a>.clear();  <span class="comment">// clear depth and normal buffers</span></div>
 <div class="line"><span class="comment">// ... feed triangles via rasterize_triangle() ...</span></div>
 <div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Color_html"><div class="ttname"><a href="structscimesh_1_1Color.html">scimesh::Color</a></div><div class="ttdoc">An RGBA color with floating-point components.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00088">types.h:88</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Light_html"><div class="ttname"><a href="structscimesh_1_1Light.html">scimesh::Light</a></div><div class="ttdoc">A light source for the Blinn-Phong shading model.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00179">types.h:179</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Rasterizer_html"><div class="ttname"><a href="structscimesh_1_1Rasterizer.html">scimesh::Rasterizer</a></div><div class="ttdoc">Low-level triangle rasterizer with depth buffering and lighting.</div><div class="ttdef"><b>Definition</b> <a href="rasterizer_8h_source.html#l00045">rasterizer.h:45</a></div></div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="classscimesh_1_1Renderer.html" title="The main rendering engine.">Renderer</a>, <a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a>, <a class="el" href="structscimesh_1_1RenderOptions.html" title="All settings that control rendering output.">RenderOptions</a> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00045">45</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
@@ -236,13 +255,13 @@ Usage</h2>
         <tr>
           <td class="memname">scimesh::Rasterizer::Rasterizer </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td>
           <td class="paramname"><em>w</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a>&#160;</td>
           <td class="paramname"><em>h</em>&#160;</td>
         </tr>
         <tr>
@@ -275,7 +294,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scimesh::Rasterizer::apply_ssao </td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::apply_ssao </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;&#160;</td>
           <td class="paramname"><em>output</em>, </td>
@@ -283,13 +302,13 @@ Usage</h2>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>z_near</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>z_far</em>&#160;</td>
         </tr>
         <tr>
@@ -304,14 +323,24 @@ Usage</h2>
 <p>Uses the depth and normal buffers to darken crevices and corners. Must be called after all triangles have been rasterized.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">output</td><td>The image to modify. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">z_near</td><td>Near plane distance. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">z_far</td><td>Far plane distance. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">output</td><td>The image to modify.</td></tr>
   </table>
   </dd>
 </dl>
+<p>Apply screen-space ambient occlusion to the output image.</p>
+<p>Uses the depth and normal buffers filled by <a class="el" href="structscimesh_1_1Rasterizer.html#ac12d54b304b8ab18bcb4c83e8221c10f" title="Rasterize a single triangle into the output image.">rasterize_triangle()</a> to darken creases and contact areas. Requires <code>ssao_enabled</code>.</p>
+<p>The depth buffer holds normalized device depth (<code>[-1, 1]</code>, see <a class="el" href="namespacescimesh.html#a3a91193b767b55d228df67895afbefad" title="Convert from normalized device coordinates (NDC) to screen (pixel) coordinates.">ndc_to_screen()</a>); the matching camera planes have to be passed here so that distances in world units can be recovered (the same inversion that world-space fog uses). Set <code>orthographic</code> when the scene was rendered with a parallel projection.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">output</td><td>The rendered image to darken. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">z_near</td><td>Near plane distance of the camera. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">z_far</td><td>Far plane distance of the camera.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Rasterizer.html#a2d9e2658ae0934882440afe199dff602" title="Convert a depth-buffer value to a distance in world units.">fog_depth_from_ndc()</a>, <a class="el" href="structscimesh_1_1Rasterizer.html#ac6d5177d62341820aab75c1bba241925" title="Enable SSAO (default: false).">ssao_enabled</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00206">206</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00410">410</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
 
 </div>
 </div>
@@ -322,9 +351,9 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scimesh::Rasterizer::clear </td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::clear </td>
           <td>(</td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>clear_depth</em> = <code>1.0f</code></td><td>)</td>
           <td></td>
         </tr>
@@ -344,6 +373,130 @@ Usage</h2>
 
 </div>
 </div>
+<a id="a2d9e2658ae0934882440afe199dff602" name="a2d9e2658ae0934882440afe199dff602"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d9e2658ae0934882440afe199dff602">&#9670;&#160;</a></span>fog_depth_from_ndc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::fog_depth_from_ndc </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
+          <td class="paramname"><em>z_ndc</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a depth-buffer value to a distance in world units. </p>
+<p>Used for world-space fog (<code><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3" title="World units: distance from the camera, measured along the camera&#39;s viewing direction.">FogSpace::WORLD</a></code>): the rasterizer only has the normalized device depth of a fragment, so the corresponding distance from the camera is recovered with the inverse of the projection (perspective or orthographic, selected by <code>orthographic</code>):</p>
+<ul>
+<li>perspective: <code>d = (2*n*f) / (f + n - z_ndc * (f - n))</code></li>
+<li>orthographic: <code>d = (z_ndc * (f - n) + f + n) / 2</code></li>
+</ul>
+<p>where <code>n = z_near</code> and <code>f = z_far</code>. Both formulas are exact, because the depth buffer stores <code>z_ndc</code> for both projection types.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">z_ndc</td><td>Depth-buffer value (normalized device depth, <code>[-1, 1]</code>; <code>-1</code> = near plane, <code>+1</code> = far plane). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Distance from the camera in world units, measured along the viewing direction. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c" title="Coordinate space (and hence the unit) of the fog distances RenderOptions::fog_start and RenderOptions...">FogSpace</a>, <a class="el" href="structscimesh_1_1Rasterizer.html#a27176f397fdc21ebee8ff1be44b23b26" title="The space (and unit) of fog_start / fog_end (default: FogSpace::WORLD).">fog_space</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00049">49</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a020d3a6d5a9d783f4fb5b6b2a72e1671" name="a020d3a6d5a9d783f4fb5b6b2a72e1671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a020d3a6d5a9d783f4fb5b6b2a72e1671">&#9670;&#160;</a></span>rasterize_line()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::rasterize_line </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>screen_v0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramname"><em>color0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>screen_v1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramname"><em>color1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
+          <td class="paramname"><em>width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td>
+          <td class="paramname"><em>lit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>normal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramname"><em>light_direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structscimesh_1_1Image.html">Image</a> &amp;&#160;</td>
+          <td class="paramname"><em>output</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rasterize a line segment with a screen-space width. </p>
+<p>The segment is drawn as a series of stamps along its dominant screen axis (DDA), with linearly interpolated color and depth. This is the counterpart of <a class="el" href="structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e" title="Rasterize a single point (filled circle) into the output image.">rasterize_point()</a> for line layers and is used by the renderer for <a class="el" href="structscimesh_1_1LineLayer.html" title="A batch of independent line segments drawn with a fixed screen-space width.">LineLayer</a> geometry, which has no world-space thickness.</p>
+<p>Depth testing, fog, contrast and alpha blending behave exactly like for triangles and points, so lines can be occluded by meshes and vice versa. Zero-length segments degenerate to a single stamp (a dot).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">screen_v0,screen_v1</td><td>Screen-space endpoints (x, y, depth). </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">color0,color1</td><td>Colors at the two endpoints. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">width</td><td>Line width in <em>device</em> pixels (the caller scales by the supersampling factor, exactly like the radius of <a class="el" href="structscimesh_1_1Rasterizer.html#a1008f668e07086f2b537442ed5e1895e" title="Rasterize a single point (filled circle) into the output image.">rasterize_point()</a>). </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">lit</td><td>Whether to shade the line; false draws the flat color (the default for lines). </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">normal</td><td>Surface normal, used only when <code>lit</code> is true. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">light_direction</td><td><a class="el" href="structscimesh_1_1Light.html" title="A light source for the Blinn-Phong shading model.">Light</a> direction, used only when <code>lit</code> is true. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">output</td><td>The output image. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00349">349</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a1008f668e07086f2b537442ed5e1895e" name="a1008f668e07086f2b537442ed5e1895e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1008f668e07086f2b537442ed5e1895e">&#9670;&#160;</a></span>rasterize_point()</h2>
 
@@ -351,45 +504,45 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scimesh::Rasterizer::rasterize_point </td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::rasterize_point </td>
           <td>(</td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>screen_x</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>screen_y</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>depth</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td>
           <td class="paramname"><em>radius</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
           <td class="paramname"><em>color</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>normal</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>light_direction</em>, </td>
         </tr>
         <tr>
@@ -421,7 +574,7 @@ Usage</h2>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00183">183</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00328">328</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
 
 </div>
 </div>
@@ -432,105 +585,105 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void scimesh::Rasterizer::rasterize_triangle </td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::rasterize_triangle </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>screen_v0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
           <td class="paramname"><em>color0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>normal0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
           <td class="paramname"><em>uv0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>screen_v1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
           <td class="paramname"><em>color1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>normal1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
           <td class="paramname"><em>uv1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>screen_v2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
           <td class="paramname"><em>color2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>normal2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">Vec2</a> &amp;&#160;</td>
           <td class="paramname"><em>uv2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td>
           <td class="paramname"><em>backface_culling</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td>
           <td class="paramname"><em>smooth_shading</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a> &amp;&#160;</td>
           <td class="paramname"><em>light_direction</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td>
           <td class="paramname"><em>wireframe</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> <a class="el" href="structscimesh_1_1Color.html">Color</a> &amp;&#160;</td>
           <td class="paramname"><em>wireframe_color</em>, </td>
         </tr>
         <tr>
@@ -556,11 +709,12 @@ Usage</h2>
 <li>Per-pixel shading (or flat shading if <code>smooth_shading</code> is false)</li>
 <li>Wireframe edge drawing (if enabled)</li>
 </ul>
+<p>Triangles are shaded two-sided: a fragment whose back side is visible (positive screen-space area) and whose normal points away from the camera (<code>normal.z &lt; 0</code>, i.e. the normals are expected in view space) is lit with the normal flipped towards the viewer. Coincident front/back face pairs therefore shade identically, independently of which of the two wins the depth test.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">screen_v0,screen_v1,screen_v2</td><td>Screen-space vertex positions. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">color0,color1,color2</td><td>Per-vertex colors. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">normal0,normal1,normal2</td><td>Per-vertex normals. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">normal0,normal1,normal2</td><td>Per-vertex normals (view space). </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">uv0,uv1,uv2</td><td>Per-vertex texture coordinates. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">backface_culling</td><td>Whether to cull backfaces. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">smooth_shading</td><td>Whether to interpolate normals. </td></tr>
@@ -572,7 +726,7 @@ Usage</h2>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00078">78</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8cpp_source.html#l00162">162</a> of file <a class="el" href="rasterizer_8cpp_source.html">rasterizer.cpp</a>.</p>
 
 </div>
 </div>
@@ -586,9 +740,9 @@ Usage</h2>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void scimesh::Rasterizer::set_blend_mode </td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">void</a> scimesh::Rasterizer::set_blend_mode </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a>&#160;</td>
           <td class="paramname"><em>enabled</em></td><td>)</td>
           <td></td>
         </tr>
@@ -608,7 +762,7 @@ Usage</h2>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00174">174</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00218">218</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -620,7 +774,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structscimesh_1_1Image.html">Image</a>* scimesh::Rasterizer::active_texture = nullptr</td>
+          <td class="memname"><a class="el" href="structscimesh_1_1Image.html">Image</a>* scimesh::Rasterizer::active_texture = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">nullptr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -628,7 +782,7 @@ Usage</h2>
 <p>Optional texture image for textured meshes. </p>
 <p>Set this before rasterizing textured triangles. The triangle's UV coordinates are used to sample this image. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Image.html" title="A 2D RGBA image buffer.">Image</a>, <a class="el" href="structscimesh_1_1Mesh.html#ac1b5d16931f12e107db44f5db6e018b1" title="An optional texture image mapped via UV coordinates.">Mesh::texture</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00240">240</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00331">331</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -639,7 +793,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::ambient = 0.3f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::ambient = 0.3<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -658,7 +812,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool scimesh::Rasterizer::blend_mode = false</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> scimesh::Rasterizer::blend_mode = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -677,7 +831,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::contrast = 1.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::contrast = 1.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -702,7 +856,7 @@ Usage</h2>
 
 <p>The fog color (what distant objects blend into). </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00137">137</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00161">161</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -713,7 +867,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool scimesh::Rasterizer::fog_enabled = false</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> scimesh::Rasterizer::fog_enabled = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -731,14 +885,34 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::fog_end = 1.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::fog_end = 1.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Distance where fog is fully opaque. </p>
+<p>Distance where fog is fully opaque (default: 1). </p>
+<p>Interpreted in the space given by <code>fog_space</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00134">134</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00138">138</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+
+</div>
+</div>
+<a id="a27176f397fdc21ebee8ff1be44b23b26" name="a27176f397fdc21ebee8ff1be44b23b26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27176f397fdc21ebee8ff1be44b23b26">&#9670;&#160;</a></span>fog_space</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c">FogSpace</a> scimesh::Rasterizer::fog_space = <a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3">FogSpace::WORLD</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The space (and unit) of <code>fog_start</code> / <code>fog_end</code> (default: <code><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3" title="World units: distance from the camera, measured along the camera&#39;s viewing direction.">FogSpace::WORLD</a></code>). </p>
+<p>If <code><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3" title="World units: distance from the camera, measured along the camera&#39;s viewing direction.">FogSpace::WORLD</a></code>, the values are converted from the depth buffer using <code>z_near</code>, <code>z_far</code> and <code>orthographic</code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c" title="Coordinate space (and hence the unit) of the fog distances RenderOptions::fog_start and RenderOptions...">FogSpace</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00144">144</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -749,14 +923,15 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::fog_start = 0.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::fog_start = 0.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Distance where fog begins. </p>
+<p>Distance where fog begins (default: 0). </p>
+<p>Interpreted in the space given by <code>fog_space</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00131">131</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00133">133</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -767,7 +942,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int scimesh::Rasterizer::height = 0</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> scimesh::Rasterizer::height = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -816,6 +991,25 @@ Usage</h2>
 
 </div>
 </div>
+<a id="a41160bd95dc4f1c5490b249bc3e574a7" name="a41160bd95dc4f1c5490b249bc3e574a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41160bd95dc4f1c5490b249bc3e574a7">&#9670;&#160;</a></span>orthographic</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> scimesh::Rasterizer::orthographic = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether the current projection is orthographic (default: false). </p>
+<p>Affects the depth-buffer -&gt; world-units conversion for world-space fog. </p>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00158">158</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+
+</div>
+</div>
 <a id="aaec94d8432b067611979a1a1e7280332" name="aaec94d8432b067611979a1a1e7280332"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaec94d8432b067611979a1a1e7280332">&#9670;&#160;</a></span>shininess</h2>
 
@@ -823,7 +1017,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::shininess = 0.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::shininess = 0.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -861,14 +1055,14 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool scimesh::Rasterizer::ssao_enabled = false</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bool</a> scimesh::Rasterizer::ssao_enabled = <a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">false</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Enable SSAO (default: false). </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00145">145</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00169">169</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -879,14 +1073,14 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::ssao_intensity = 0.8f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::ssao_intensity = 0.8<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>SSAO darkening intensity (0.0–1.0, default: 0.8). </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00151">151</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00175">175</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -897,14 +1091,14 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::Rasterizer::ssao_radius = 16.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::ssao_radius = 16.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>SSAO sample radius in pixels (default: 16). </p>
 
-<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00148">148</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00172">172</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>
@@ -915,7 +1109,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int scimesh::Rasterizer::width = 0</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">int</a> scimesh::Rasterizer::width = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -933,7 +1127,7 @@ Usage</h2>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;float&gt; scimesh::Rasterizer::z_buffer</td>
+          <td class="memname">std::vector&lt;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&gt; scimesh::Rasterizer::z_buffer</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -942,6 +1136,44 @@ Usage</h2>
 <p>Stores the depth of the closest surface at each pixel. A new triangle only overwrites a pixel if its depth is closer. </p>
 
 <p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00064">64</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+
+</div>
+</div>
+<a id="a2b2503a2682bed9480cb2609cf2fb671" name="a2b2503a2682bed9480cb2609cf2fb671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b2503a2682bed9480cb2609cf2fb671">&#9670;&#160;</a></span>z_far</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::z_far = 10000.0f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Far plane distance of the current projection (default: 10000.0). </p>
+<p>Only used to convert depth-buffer values to world units for world-space fog. </p>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00154">154</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
+
+</div>
+</div>
+<a id="ac6f8e419180901544c410b2222ea28cb" name="ac6f8e419180901544c410b2222ea28cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6f8e419180901544c410b2222ea28cb">&#9670;&#160;</a></span>z_near</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::Rasterizer::z_near = 0.1<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Near plane distance of the current projection (default: 0.1). </p>
+<p>Only used to convert depth-buffer values to world units for world-space fog. </p>
+
+<p class="definition">Definition at line <a class="el" href="rasterizer_8h_source.html#l00149">149</a> of file <a class="el" href="rasterizer_8h_source.html">rasterizer.h</a>.</p>
 
 </div>
 </div>

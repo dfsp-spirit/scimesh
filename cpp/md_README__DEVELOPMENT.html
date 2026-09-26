@@ -93,8 +93,8 @@ $(document).ready(function(){initNavTree('md_README__DEVELOPMENT.html',''); init
   <div class="headertitle"><div class="title">scimesh Development Information</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md41"></a></p>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md43"></a></p>
+<h2><a class="anchor" id="autotoc_md44"></a>
 Required system dev dependencies</h2>
 <p>To build and check the R package, you will need these:</p>
 <div class="fragment"><div class="line">sudo apt install build-essential qpdf tidy pandoc libuv1-dev libharfbuzz-dev libfribidi-dev</div>
@@ -104,19 +104,47 @@ Required system dev dependencies</h2>
 </div><!-- fragment --><p>And finally, install tinytex for vignette building:</p>
 <div class="fragment"><div class="line">install.packages(&quot;tinytex&quot;)</div>
 <div class="line">tinytex::install_tinytex()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md43"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md45"></a>
 Running the C++ unit tests</h2>
 <p>The C++ tests use <a href="https://github.com/catchorg/Catch2">Catch2</a> (amalgamated) and are in <code>cpp_tests/</code>:</p>
 <div class="fragment"><div class="line">cd cpp_tests</div>
 <div class="line">cmake -B build</div>
 <div class="line">cmake --build build</div>
 <div class="line">./build/scimesh_tests</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md44"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md46"></a>
+C++ code coverage</h2>
+<p>Coverage of the C++ core is measured with clang's source-based coverage and reported with <code>llvm-cov</code>. The helper script builds the test suite with instrumentation, runs it and writes a report:</p>
+<div class="fragment"><div class="line">dev_tools/coverage_cpp.sh                 # build, run all tests, report</div>
+<div class="line">dev_tools/coverage_cpp.sh &quot;[fog]&quot;         # only matching Catch2 tests</div>
+<div class="line">CXX=clang++-18 dev_tools/coverage_cpp.sh  # use a specific clang</div>
+</div><!-- fragment --><p><b>Requirements (Linux):</b> <code>clang</code>, plus <code>llvm-profdata</code> and <code>llvm-cov</code> of the same major version, and <code>cmake</code>. On Debian/Ubuntu: <code>sudo apt install clang llvm</code>.</p>
+<p>The report is written to <code>coverage/</code> (gitignored): <code>coverage/html/index.html</code> for browsing, <code>coverage/lcov.info</code> if you want coverage gutters in your editor (e.g. the VS Code "Coverage Gutters" extension).</p>
+<p>Notes:</p>
+<ul>
+<li>Test code, the Catch2 amalgamation and all vendored third-party code (<code>src/third_party/</code>, whose header-only libraries are inlined into the core) are excluded from the report.</li>
+<li>Library files that no test references are not linked into the test binary at all, so they do not show up in the report - not even as 0 % (e.g. <code><a class="el" href="obj__io_8cpp.html">obj_io.cpp</a></code> and <code><a class="el" href="transforms_8cpp.html">transforms.cpp</a></code>, which are exercised from R instead). A file shown at 0 % is linked but never executed (e.g. <code><a class="el" href="ply__io_8cpp.html">ply_io.cpp</a></code>).</li>
+<li>Coverage is a local development tool: nothing is uploaded, there is no badge and there are no coverage thresholds (vendored third-party headers would break any gate). The <code>Coverage (C++)</code> CI workflow stores the HTML report as an artifact but never fails on low coverage.</li>
+<li>Coverage of the R layer is not measured here - use <code>covr::package_coverage()</code> in R for that. The C++ code inside the R package is a separate build (see <code>src/Makevars</code>) and is not covered by this script.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md47"></a>
+Checking compatibility with the macOS toolchain</h2>
+<p>A missing standard header is invisible to almost every build we have: libstdc++ (GCC, i.e. R on Linux and Windows) and libc++ 15+ (Xcode 15+, i.e. the <code>macos-latest</code> CI runner) both pull headers such as <code>&lt;array&gt;</code> in transitively via <code>&lt;functional&gt;</code>. The CRAN macOS builders use the clang 14 / libc++ 14 toolchain, which does not - so such code fails there with a confusing &lsquo;implicit instantiation of undefined template 'std::array&lt;...&gt;&rsquo;` (this is what broke the CRAN installation of 0.3.4). Compile every translation unit with libc++ 14 to check:</p>
+<div class="fragment"><div class="line">dev_tools/check_libcxx_strictness.sh                    # needs libc++ &lt;= 14</div>
+<div class="line">CXX=clang++-14 dev_tools/check_libcxx_strictness.sh     # use a specific clang</div>
+<div class="line">LIBCXX_INC=/usr/lib/llvm-14/include/c++/v1 dev_tools/check_libcxx_strictness.sh</div>
+</div><!-- fragment --><p><b>Requirements (Linux):</b> <code>clang</code> plus the libc++ headers of version &lt;= 14. On Debian/Ubuntu: <code>sudo apt install clang-14 libc++-14-dev</code>. The check is <code>-fsyntax-only</code>, so nothing is linked and R is only needed for the two Rcpp binding translation units (they are skipped when R or Rcpp is missing). The script refuses to run with libc++ &gt;= 15, because that standard library cannot reproduce the strict behaviour. The <code>C++ stdlib strictness</code> CI workflow runs this on every push/PR, on the pinned <code>ubuntu-24.04</code> image (newer Ubuntu releases no longer ship libc++ 14).</p>
+<h2><a class="anchor" id="autotoc_md48"></a>
+Examples</h2>
+<p>The example programs are part of what we ship, so they are built and run:</p>
+<div class="fragment"><div class="line">./examples/cpp/run_all_cpp.sh      # builds and runs every C++ example</div>
+<div class="line">./examples/R/run_all_R.sh          # runs every R example (needs scimesh installed)</div>
+</div><!-- fragment --><p>Both can take a name to run a single example. The <code>Examples</code> CI workflow does this on every push/PR, because the C++ examples are not compiled by any test target - breakage in them would otherwise go unnoticed.</p>
+<h2><a class="anchor" id="autotoc_md49"></a>
 Running the R unit tests</h2>
 <div class="fragment"><div class="line">devtools::test()</div>
 </div><!-- fragment --><p>Or via R CMD check:</p>
 <div class="fragment"><div class="line">R CMD build . &amp;&amp; R CMD check scimesh_*.tar.gz</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md45"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md50"></a>
 Generating C++ API documentation</h2>
 <p>The C++ API documentation is generated with <a href="https://www.doxygen.nl/">Doxygen</a>. The configuration is in <code>Doxyfile</code> at the repository root.</p>
 <p><b>Prerequisites:</b> Install Doxygen (and optionally Graphviz for diagrams):</p>
@@ -127,12 +155,12 @@ Generating C++ API documentation</h2>
 </div><!-- fragment --><p>This produces HTML output in <code>docs/cpp_api/html/</code>. Open <code>docs/cpp_api/html/index.html</code> in a browser to view the docs.</p>
 <p>The published API documentation is available at: <code><a href="https://dfsp-spirit.github.io/scimesh/">https://dfsp-spirit.github.io/scimesh/</a></code></p>
 <p>It is built and deployed automatically via GitHub Actions (<code>.github/workflows/docs.yml</code>) on every push to <code>main</code>.</p>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 Making a release</h2>
 <ul>
 <li>bump version in all of these files:<ul>
 <li><code>DESCRIPTION</code> (R package version)</li>
-<li><code>CMakeLists.txt</code> — the <code>project(scimesh VERSION ...)</code> line (C++ version, single source of truth)<ul>
+<li><code>CMakeLists.txt</code> — the <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">project(scimesh VERSION ...)</a></code> line (C++ version, single source of truth)<ul>
 <li>The C++ header <code>version.h</code> is <b>auto-generated</b> by CMake from this value — no need to edit it manually.</li>
 </ul>
 </li>

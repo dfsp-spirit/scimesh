@@ -1,0 +1,7 @@
+<map id="scimesh::TextNodeRef" name="scimesh::TextNodeRef">
+<area shape="rect" id="Node000001" title="A non&#45;owning reference to one text layer in a scene, together with its placement transform (and optio..." alt="" coords="5,181,172,207"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1TextLayer.html" title="A batch of text labels drawn together, in one coordinate space." alt="" coords="15,93,162,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,133,91,181,86,181,86,133"/>
+<area shape="rect" id="Node000003" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="29,5,148,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,45,91,93,86,93,86,45"/>
+</map>

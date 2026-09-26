@@ -1,0 +1,24 @@
+<map id="src/core/scimesh/font.h" name="src/core/scimesh/font.h">
+<area shape="rect" id="Node000001" title="TrueType font loading, glyph rasterization and text measurement." alt="" coords="586,5,759,31"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="434,79,562,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="646,33,540,76,538,71,644,28"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="563,152,625,177"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="669,32,609,141,604,139,664,30"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="650,152,717,177"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="676,31,684,138,679,138,671,31"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="741,152,799,177"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="683,30,757,139,752,142,678,33"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="761,79,838,104"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="694,28,768,69,765,74,692,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="428,152,539,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="498,105,491,139,486,138,493,104"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,152,116,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="434,105,130,154,129,149,433,100"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="140,152,251,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="450,107,258,151,257,146,449,101"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="275,152,404,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="474,106,379,149,377,144,471,102"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="515,102,569,141,566,146,512,106"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="529,102,641,145,640,149,527,107"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="544,101,728,149,727,154,542,107"/>
+</map>

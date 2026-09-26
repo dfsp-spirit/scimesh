@@ -94,6 +94,7 @@ $(document).ready(function(){initNavTree('types_8h.html',''); initResizable(); }
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">types.h File Reference</div></div>
 </div><!--header-->
@@ -135,95 +136,115 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="types_8h__dep__incl.png" border="0" usemap="#asrc_2core_2scimesh_2types_8hdep" alt=""/></div>
 <map name="asrc_2core_2scimesh_2types_8hdep" id="asrc_2core_2scimesh_2types_8hdep">
-<area shape="rect" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="1191,5,1374,31"/>
-<area shape="rect" href="ply__io_8cpp.html" title=" " alt="" coords="54,328,197,353"/>
-<area shape="poly" title=" " alt="" coords="1178,23,891,29,537,39,228,56,128,68,98,74,83,81,65,109,57,142,58,178,66,214,94,280,120,326,115,329,89,283,61,215,53,179,52,142,60,107,80,77,96,69,127,62,228,51,536,34,891,23,1178,18"/>
-<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="881,328,1077,353"/>
-<area shape="poly" title=" " alt="" coords="1178,30,964,53,836,71,705,94,580,122,469,156,422,175,381,196,348,218,324,242,315,261,317,269,323,278,344,285,392,293,541,308,881,331,880,337,541,313,391,298,343,290,320,282,312,271,310,260,319,238,344,214,378,191,419,170,467,151,579,117,704,88,835,66,963,48,1177,25"/>
-<area shape="rect" href="render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="701,401,878,441"/>
-<area shape="poly" title=" " alt="" coords="1177,21,898,23,549,30,382,37,235,48,124,62,86,71,61,81,36,99,20,117,11,140,8,171,8,261,9,290,13,313,23,332,43,351,78,364,140,376,321,395,526,407,701,415,700,420,526,413,320,400,140,381,76,370,40,356,19,336,8,315,3,291,3,261,3,171,6,139,15,115,32,95,59,76,84,66,123,57,235,43,381,32,549,25,898,17,1177,16"/>
-<area shape="rect" href="to__string_8h.html" title=" " alt="" coords="1309,489,1457,529"/>
-<area shape="poly" title=" " alt="" coords="1387,31,1448,48,1504,76,1528,94,1546,116,1558,141,1563,170,1563,342,1559,369,1549,393,1534,415,1515,435,1472,468,1429,492,1427,487,1469,464,1512,431,1530,412,1544,391,1554,367,1557,342,1557,171,1553,143,1542,118,1524,98,1501,80,1446,53,1386,36"/>
-<area shape="rect" href="clipping_8h.html" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="2493,79,2691,104"/>
-<area shape="poly" title=" " alt="" coords="1388,22,2493,82,2492,87,1388,28"/>
-<area shape="rect" href="colormap_8h.html" title="Colormap data structure and data&#45;to&#45;color mapping utilities." alt="" coords="93,79,301,104"/>
-<area shape="poly" title=" " alt="" coords="1178,27,799,49,320,81,302,83,301,77,320,76,799,44,1177,22"/>
-<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="1283,79,1471,104"/>
-<area shape="poly" title=" " alt="" coords="1310,37,1363,76,1360,81,1307,41"/>
-<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="1113,159,1295,185"/>
-<area shape="poly" title=" " alt="" coords="1273,44,1212,160,1208,158,1268,41"/>
-<area shape="rect" href="rasterizer_8h.html" title="The Rasterizer — the per&#45;pixel rendering engine." alt="" coords="2283,159,2491,185"/>
-<area shape="poly" title=" " alt="" coords="1387,30,1776,80,2271,149,2318,157,2318,162,2270,155,1776,86,1387,35"/>
-<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="2089,152,2258,192"/>
-<area shape="poly" title=" " alt="" coords="1364,30,2089,154,2088,159,1363,36"/>
-<area shape="rect" href="camera_8cpp.html" title=" " alt="" coords="902,409,1055,434"/>
-<area shape="poly" title=" " alt="" coords="981,367,981,408,976,408,976,367"/>
-<area shape="rect" href="gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="1131,409,1319,434"/>
-<area shape="poly" title=" " alt="" coords="1028,355,1190,406,1189,411,1027,360"/>
-<area shape="poly" title=" " alt="" coords="939,361,836,404,834,399,937,356"/>
-<area shape="rect" href="renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="537,497,738,522"/>
-<area shape="poly" title=" " alt="" coords="868,357,763,376,720,389,691,403,671,425,657,451,642,497,637,496,652,449,667,422,688,399,718,384,762,371,867,352"/>
-<area shape="poly" title=" " alt="" coords="1009,359,1070,399,1095,421,1121,439,1168,459,1217,474,1309,495,1308,500,1216,479,1166,464,1119,444,1091,425,1066,403,1006,363"/>
-<area shape="poly" title=" " alt="" coords="745,450,659,499,656,494,743,446"/>
-<area shape="poly" title=" " alt="" coords="892,439,1124,473,1309,496,1308,502,1123,478,892,444"/>
-<area shape="rect" href="renderer_8cpp.html" title=" " alt="" coords="2337,577,2495,603"/>
-<area shape="poly" title=" " alt="" coords="752,513,2336,583,2336,588,751,518"/>
-<area shape="poly" title=" " alt="" coords="2633,108,2660,126,2683,150,2699,178,2707,202,2709,259,2709,423,2704,458,2688,487,2664,512,2635,533,2601,550,2566,563,2496,581,2495,575,2564,558,2599,545,2632,528,2661,508,2684,484,2699,456,2704,422,2704,259,2702,203,2695,180,2679,154,2657,130,2630,113"/>
-<area shape="rect" href="clipping_8cpp.html" title=" " alt="" coords="2515,159,2669,185"/>
-<area shape="poly" title=" " alt="" coords="2595,118,2595,159,2589,159,2589,118"/>
-<area shape="rect" href="colormap_8cpp.html" title="Implementation of the ColorMap and apply_colormap() functions." alt="" coords="93,159,259,185"/>
-<area shape="poly" title=" " alt="" coords="193,118,182,160,177,158,188,117"/>
-<area shape="poly" title=" " alt="" coords="1270,102,1022,122,723,153,581,172,460,193,370,217,341,229,323,242,309,262,303,283,304,303,311,322,324,342,341,360,388,396,443,428,502,456,603,494,601,499,500,460,441,433,385,400,338,364,320,345,307,325,299,304,298,282,305,260,319,238,338,225,368,212,459,188,580,167,722,147,1022,117,1269,97"/>
-<area shape="poly" title=" " alt="" coords="1423,108,1453,125,1479,150,1498,177,1507,201,1511,226,1512,259,1512,342,1509,366,1502,389,1476,431,1444,466,1412,491,1409,487,1440,462,1472,428,1497,387,1504,365,1507,342,1507,259,1506,227,1502,202,1493,179,1475,154,1450,130,1420,112"/>
-<area shape="rect" href="image_8cpp.html" title=" " alt="" coords="1319,159,1465,185"/>
-<area shape="poly" title=" " alt="" coords="1385,117,1392,159,1387,160,1379,118"/>
-<area shape="poly" title=" " alt="" coords="1341,112,1230,162,1228,157,1339,107"/>
-<area shape="poly" title=" " alt="" coords="1485,94,1835,112,2053,128,2271,149,2323,157,2323,162,2270,155,2052,133,1835,118,1485,99"/>
-<area shape="poly" title=" " alt="" coords="1209,198,1227,408,1222,408,1204,199"/>
-<area shape="poly" title=" " alt="" coords="1099,180,952,187,791,200,654,218,609,229,584,242,566,272,560,307,562,344,572,381,603,449,631,495,627,498,598,451,567,383,557,345,554,307,561,270,581,238,607,224,653,213,790,194,952,182,1099,174"/>
-<area shape="poly" title=" " alt="" coords="1269,185,1372,212,1413,226,1435,238,1452,270,1459,305,1457,341,1450,377,1424,442,1397,491,1393,488,1419,440,1444,375,1452,340,1453,305,1447,272,1431,242,1411,231,1370,217,1268,190"/>
-<area shape="rect" href="fs__mesh__converter_8h.html" title="Convert FreeSurfer meshes (libfs) to scimesh Mesh objects." alt="" coords="595,240,741,280"/>
-<area shape="poly" title=" " alt="" coords="1101,189,938,212,754,243,742,245,741,240,753,237,937,207,1101,184"/>
-<area shape="rect" href="normals_8h.html" title="Compute per&#45;vertex surface normals for lighting." alt="" coords="1597,247,1797,273"/>
-<area shape="poly" title=" " alt="" coords="1281,184,1308,189,1631,245,1630,250,1308,195,1280,190"/>
-<area shape="rect" href="obj__io_8h.html" title="Read Wavefront OBJ files (.obj)." alt="" coords="765,247,952,273"/>
-<area shape="poly" title=" " alt="" coords="1145,191,905,250,904,245,1144,185"/>
-<area shape="rect" href="ply__io_8h.html" title="Read Stanford PLY files (.ply)." alt="" coords="333,247,520,273"/>
-<area shape="poly" title=" " alt="" coords="1099,184,844,208,539,243,491,250,490,245,538,237,843,202,1098,179"/>
-<area shape="rect" href="primitives_8h.html" title="Procedural geometry generators." alt="" coords="1821,247,2035,273"/>
-<area shape="poly" title=" " alt="" coords="1276,184,1308,189,1449,206,1559,214,1669,222,1810,237,1861,245,1860,250,1809,243,1668,228,1558,220,1448,211,1308,195,1276,190"/>
-<area shape="rect" href="scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="1235,247,1421,273"/>
-<area shape="poly" title=" " alt="" coords="1233,190,1313,245,1310,249,1230,195"/>
-<area shape="rect" href="stl__io_8h.html" title="Read and write STL files (.stl)." alt="" coords="977,247,1159,273"/>
-<area shape="poly" title=" " alt="" coords="1176,194,1088,249,1085,245,1173,190"/>
-<area shape="rect" href="transforms_8h.html" title="Mesh transformation functions: translate, scale, rotate, and general matrix transforms." alt="" coords="2059,247,2277,273"/>
-<area shape="poly" title=" " alt="" coords="1274,184,1308,189,1515,209,1677,215,1839,220,2047,237,2101,245,2100,250,2046,243,1839,226,1677,220,1515,214,1308,195,1273,190"/>
-<area shape="rect" href="obj__io_8cpp.html" title=" " alt="" coords="595,328,738,353"/>
-<area shape="poly" title=" " alt="" coords="670,294,670,328,664,328,665,294"/>
-<area shape="poly" title=" " alt="" coords="1651,280,1260,411,1259,406,1649,275"/>
-<area shape="poly" title=" " alt="" coords="1725,279,1775,314,1836,351,1992,426,2148,491,2285,542,2382,575,2380,580,2284,547,2146,496,1990,431,1833,356,1772,319,1722,283"/>
-<area shape="rect" href="normals_8cpp.html" title=" " alt="" coords="1615,328,1772,353"/>
-<area shape="poly" title=" " alt="" coords="1699,287,1697,328,1691,328,1693,286"/>
-<area shape="rect" href="primitives_8cpp.html" title=" " alt="" coords="1847,328,2017,353"/>
-<area shape="poly" title=" " alt="" coords="1745,274,1899,325,1897,331,1743,279"/>
-<area shape="poly" title=" " alt="" coords="819,280,696,330,694,326,817,275"/>
-<area shape="poly" title=" " alt="" coords="371,279,170,331,169,325,369,273"/>
-<area shape="poly" title=" " alt="" coords="1932,286,1934,328,1929,328,1927,287"/>
-<area shape="poly" title=" " alt="" coords="1264,278,1030,331,1029,325,1263,273"/>
-<area shape="poly" title=" " alt="" coords="1315,286,1235,410,1231,407,1311,283"/>
-<area shape="poly" title=" " alt="" coords="1223,277,1028,303,870,331,756,357,695,378,671,390,655,403,643,426,637,452,638,496,633,497,632,451,638,424,651,400,668,385,693,373,754,352,869,325,1027,298,1222,272"/>
-<area shape="poly" title=" " alt="" coords="1336,286,1381,489,1376,490,1331,287"/>
-<area shape="rect" href="transforms_8cpp.html" title=" " alt="" coords="2142,328,2317,353"/>
-<area shape="poly" title=" " alt="" coords="2187,282,2222,326,2218,329,2183,285"/>
-<area shape="poly" title=" " alt="" coords="2472,185,2566,207,2606,221,2632,238,2650,262,2658,284,2659,339,2659,423,2653,455,2639,484,2617,508,2590,529,2528,560,2469,580,2467,575,2526,555,2587,525,2613,505,2634,481,2648,454,2653,422,2653,339,2653,285,2646,264,2629,242,2604,226,2565,212,2471,190"/>
-<area shape="rect" href="rasterizer_8cpp.html" title=" " alt="" coords="2453,247,2619,273"/>
-<area shape="poly" title=" " alt="" coords="2420,189,2517,245,2514,249,2417,194"/>
-<area shape="poly" title=" " alt="" coords="2266,194,2319,215,2368,246,2388,265,2404,287,2415,312,2419,339,2419,423,2419,577,2413,577,2413,423,2413,340,2410,313,2400,290,2384,269,2365,250,2317,220,2264,199"/>
-<area shape="poly" title=" " alt="" coords="2075,194,1761,250,1760,245,2074,188"/>
-<area shape="poly" title=" " alt="" coords="2234,196,2264,213,2288,234,2300,257,2299,269,2291,282,2278,290,2254,298,2185,312,2018,334,2017,328,2184,307,2253,293,2276,285,2287,278,2293,268,2295,258,2284,237,2261,217,2231,200"/>
-<area shape="poly" title=" " alt="" coords="2075,186,1421,252,1421,247,2075,181"/>
-<area shape="poly" title=" " alt="" coords="2272,191,2307,210,2336,239,2343,260,2336,281,2323,298,2306,312,2270,330,2267,326,2303,307,2319,294,2331,279,2338,260,2331,241,2304,214,2270,196"/>
-<area shape="poly" title=" " alt="" coords="2267,193,2488,245,2487,250,2266,198"/>
+<area shape="rect" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="1734,5,1917,31"/>
+<area shape="rect" href="ply__io_8cpp.html" title=" " alt="" coords="130,328,273,353"/>
+<area shape="poly" title=" " alt="" coords="1720,23,1391,26,964,36,573,53,432,66,350,81,276,108,220,136,196,154,175,177,154,205,134,241,129,260,134,279,155,306,182,326,178,330,152,310,130,281,124,260,130,239,150,202,171,173,193,150,217,132,274,103,349,76,432,61,573,48,964,31,1391,21,1720,17"/>
+<area shape="rect" href="camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="1270,328,1466,353"/>
+<area shape="poly" title=" " alt="" coords="1760,37,1675,62,1577,103,1527,130,1479,162,1436,199,1398,242,1386,263,1378,287,1371,328,1366,327,1373,286,1381,261,1394,238,1432,195,1476,158,1524,126,1574,99,1674,57,1758,31"/>
+<area shape="rect" href="render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="889,401,1066,441"/>
+<area shape="poly" title=" " alt="" coords="1720,22,1368,27,1145,34,919,47,708,66,533,92,465,109,414,128,381,148,373,159,371,171,371,261,374,279,385,296,403,312,427,326,489,351,565,371,650,387,736,399,888,413,888,418,735,404,649,392,564,376,487,356,424,331,400,316,381,300,370,281,365,262,365,170,369,157,378,145,411,123,463,104,532,87,707,61,918,42,1145,29,1368,22,1720,17"/>
+<area shape="rect" href="to__string_8h.html" title=" " alt="" coords="751,489,899,529"/>
+<area shape="poly" title=" " alt="" coords="1720,22,1406,24,989,33,576,50,405,64,275,81,228,87,180,88,94,89,59,95,32,108,22,119,14,132,8,171,8,342,14,368,31,391,58,411,95,429,138,445,189,459,303,479,427,493,550,501,751,506,751,511,549,506,426,498,302,485,187,464,137,450,92,434,55,416,27,394,9,370,3,342,3,170,9,130,17,116,28,104,57,90,93,83,180,82,227,81,274,76,404,59,575,45,988,27,1406,19,1720,17"/>
+<area shape="rect" href="clipping_8h.html" title="Triangle clipping against planes (view frustum and clip planes)." alt="" coords="2810,247,3009,273"/>
+<area shape="poly" title=" " alt="" coords="1924,30,2232,76,2344,91,2431,101,2518,117,2625,150,2662,169,2697,190,2785,222,2864,245,2863,250,2783,227,2695,194,2659,174,2623,154,2516,122,2431,106,2343,97,2232,81,1923,35"/>
+<area shape="rect" href="colormap_8h.html" title="Colormap data structure and data&#45;to&#45;color mapping utilities." alt="" coords="2687,79,2895,104"/>
+<area shape="poly" title=" " alt="" coords="1931,23,2668,76,2687,78,2686,83,2668,81,1930,29"/>
+<area shape="rect" href="font_8h.html" title="TrueType font loading, glyph rasterization and text measurement." alt="" coords="1929,79,2103,104"/>
+<area shape="poly" title=" " alt="" coords="1870,33,1986,76,1984,81,1868,38"/>
+<area shape="rect" href="text_8h.html" title="Text labels — the TextLayer." alt="" coords="1857,159,2031,185"/>
+<area shape="poly" title=" " alt="" coords="1845,40,1937,158,1933,161,1841,43"/>
+<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="1666,79,1854,104"/>
+<area shape="poly" title=" " alt="" coords="1807,43,1773,80,1769,77,1803,39"/>
+<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="1018,159,1201,185"/>
+<area shape="poly" title=" " alt="" coords="1720,25,1560,31,1380,42,1226,59,1172,69,1143,81,1128,98,1119,119,1112,159,1107,158,1114,118,1124,95,1140,76,1171,64,1225,53,1379,37,1560,26,1720,20"/>
+<area shape="rect" href="rasterizer_8h.html" title="The Rasterizer — the per&#45;pixel rendering engine." alt="" coords="2404,159,2612,185"/>
+<area shape="poly" title=" " alt="" coords="1914,30,2032,50,2162,76,2334,119,2470,157,2469,162,2333,124,2161,81,2031,56,1913,35"/>
+<area shape="rect" href="lines_8h.html" title="Screen&#45;space line primitives — the LineLayer." alt="" coords="1153,79,1332,104"/>
+<area shape="poly" title=" " alt="" coords="1720,35,1333,82,1332,76,1720,29"/>
+<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="2210,152,2379,192"/>
+<area shape="poly" title=" " alt="" coords="1925,30,2018,49,2116,76,2198,112,2265,149,2263,154,2196,117,2114,81,2017,54,1924,35"/>
+<area shape="rect" href="spline_8h.html" title="Smooth curve sampling through ordered 3D points (splines)." alt="" coords="2919,79,3105,104"/>
+<area shape="poly" title=" " alt="" coords="1931,21,2357,40,2631,56,2907,76,2919,77,2918,82,2906,81,2630,62,2357,46,1930,26"/>
+<area shape="rect" href="camera_8cpp.html" title=" " alt="" coords="2291,409,2445,434"/>
+<area shape="poly" title=" " alt="" coords="1480,348,2291,411,2291,417,1480,353"/>
+<area shape="rect" href="gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="1142,409,1330,434"/>
+<area shape="poly" title=" " alt="" coords="1338,363,1257,411,1254,406,1336,358"/>
+<area shape="poly" title=" " alt="" coords="1298,359,1067,405,1065,400,1297,353"/>
+<area shape="rect" href="renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="1370,497,1571,522"/>
+<area shape="poly" title=" " alt="" coords="1385,364,1466,495,1461,498,1380,366"/>
+<area shape="poly" title=" " alt="" coords="1371,368,1365,407,1357,427,1343,443,1310,463,1264,478,1207,490,1144,498,1013,508,900,511,900,506,1013,503,1144,493,1206,484,1262,473,1308,458,1340,439,1352,424,1360,405,1366,367"/>
+<area shape="poly" title=" " alt="" coords="1080,438,1406,494,1405,499,1079,443"/>
+<area shape="poly" title=" " alt="" coords="933,450,860,492,857,487,931,446"/>
+<area shape="rect" href="renderer_8cpp.html" title=" " alt="" coords="2429,577,2587,603"/>
+<area shape="poly" title=" " alt="" coords="1585,517,2429,580,2428,585,1585,522"/>
+<area shape="poly" title=" " alt="" coords="2888,284,2869,305,2852,329,2839,358,2834,385,2832,436,2831,460,2826,483,2814,507,2794,531,2759,550,2707,565,2588,584,2587,579,2706,560,2757,545,2790,527,2810,504,2821,482,2826,459,2827,435,2828,385,2834,357,2847,327,2865,301,2884,280"/>
+<area shape="rect" href="clipping_8cpp.html" title=" " alt="" coords="2861,328,3016,353"/>
+<area shape="poly" title=" " alt="" coords="2921,285,2937,327,2932,329,2916,287"/>
+<area shape="rect" href="colormap_8cpp.html" title="Implementation of the ColorMap and apply_colormap() functions." alt="" coords="2708,159,2873,185"/>
+<area shape="poly" title=" " alt="" coords="2793,118,2793,159,2788,159,2788,118"/>
+<area shape="rect" href="font_8cpp.html" title="Implementation of the TrueType font API (see font.h)." alt="" coords="2055,159,2185,185"/>
+<area shape="poly" title=" " alt="" coords="2044,110,2106,157,2103,161,2040,114"/>
+<area shape="poly" title=" " alt="" coords="1998,116,1957,161,1953,157,1994,112"/>
+<area shape="poly" title=" " alt="" coords="2015,185,2043,189,2120,197,2197,197,2271,196,2339,198,2398,208,2423,218,2444,232,2462,250,2475,274,2483,304,2485,339,2485,423,2488,467,2494,511,2508,577,2502,578,2489,512,2483,468,2480,423,2480,339,2477,305,2470,276,2457,254,2441,236,2420,223,2396,213,2339,203,2271,201,2197,202,2120,202,2042,195,2014,190"/>
+<area shape="rect" href="scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="1147,247,1333,273"/>
+<area shape="poly" title=" " alt="" coords="1844,189,1795,195,1333,250,1333,245,1794,189,1843,183"/>
+<area shape="rect" href="text_8cpp.html" title="Implementation of the text layer (see text.h)." alt="" coords="1939,247,2069,273"/>
+<area shape="poly" title=" " alt="" coords="1962,195,1998,245,1993,248,1958,198"/>
+<area shape="poly" title=" " alt="" coords="1272,278,1350,325,1348,330,1269,282"/>
+<area shape="poly" title=" " alt="" coords="1242,286,1239,408,1234,408,1237,286"/>
+<area shape="poly" title=" " alt="" coords="1330,272,1420,294,1456,309,1479,326,1491,348,1498,371,1498,420,1489,465,1478,497,1473,496,1484,464,1493,420,1493,372,1487,350,1475,330,1454,313,1418,299,1329,278"/>
+<area shape="poly" title=" " alt="" coords="1155,278,1089,295,1015,320,943,356,909,378,878,403,861,423,848,447,832,490,827,488,843,444,856,420,874,399,906,374,940,351,1013,315,1087,290,1154,273"/>
+<area shape="poly" title=" " alt="" coords="1780,113,1839,184,1878,239,1885,261,1884,271,1878,282,1857,302,1836,313,1813,318,1790,318,1742,316,1715,320,1688,330,1622,371,1563,419,1515,465,1483,498,1479,494,1511,461,1559,415,1619,367,1685,326,1714,315,1741,311,1790,312,1813,312,1834,308,1854,298,1874,278,1879,269,1880,261,1874,241,1835,187,1776,116"/>
+<area shape="poly" title=" " alt="" coords="1653,98,1285,109,1049,120,805,134,571,153,368,177,284,191,216,207,165,224,134,242,106,275,95,305,99,331,116,356,145,378,185,399,232,417,287,433,408,460,536,479,752,501,751,506,535,485,407,465,285,438,231,422,182,404,143,383,112,359,94,333,90,304,101,272,130,238,162,219,214,202,283,186,367,172,571,148,804,129,1049,114,1285,104,1652,92"/>
+<area shape="poly" title=" " alt="" coords="1800,107,1918,157,1916,162,1798,112"/>
+<area shape="rect" href="image_8cpp.html" title=" " alt="" coords="1637,159,1782,185"/>
+<area shape="poly" title=" " alt="" coords="1747,117,1719,161,1715,158,1743,114"/>
+<area shape="poly" title=" " alt="" coords="1653,108,1201,162,1201,157,1652,103"/>
+<area shape="poly" title=" " alt="" coords="1868,98,2109,119,2392,149,2442,157,2441,162,2392,155,2108,124,1868,103"/>
+<area shape="poly" title=" " alt="" coords="1115,198,1123,237,1137,279,1158,318,1183,354,1227,407,1223,410,1179,357,1154,321,1132,281,1118,238,1110,199"/>
+<area shape="poly" title=" " alt="" coords="1105,198,1095,249,1091,313,1093,347,1100,381,1112,412,1131,440,1146,451,1169,462,1229,479,1300,491,1370,499,1370,504,1299,496,1227,484,1167,467,1144,456,1127,443,1108,415,1095,382,1088,348,1085,313,1090,248,1100,197"/>
+<area shape="poly" title=" " alt="" coords="1005,187,950,196,897,208,854,223,827,242,810,271,800,304,795,339,796,375,807,440,821,488,816,490,801,441,791,375,790,339,794,303,805,269,823,238,851,218,896,203,949,191,1004,182"/>
+<area shape="poly" title=" " alt="" coords="1140,190,1224,245,1221,249,1137,194"/>
+<area shape="rect" href="fs__mesh__converter_8h.html" title="Convert FreeSurfer meshes (libfs) to scimesh Mesh objects." alt="" coords="405,240,552,280"/>
+<area shape="poly" title=" " alt="" coords="1005,186,800,209,564,243,553,245,552,240,564,237,800,203,1004,181"/>
+<area shape="rect" href="normals_8h.html" title="Compute per&#45;vertex surface normals for lighting." alt="" coords="2195,247,2395,273"/>
+<area shape="poly" title=" " alt="" coords="1215,177,1597,202,2082,237,2195,247,2194,252,2081,243,1596,208,1214,183"/>
+<area shape="rect" href="obj__io_8h.html" title="Read Wavefront OBJ files (.obj)." alt="" coords="576,247,763,273"/>
+<area shape="poly" title=" " alt="" coords="1038,190,728,250,727,245,1037,185"/>
+<area shape="rect" href="ply__io_8h.html" title="Read Stanford PLY files (.ply)." alt="" coords="144,247,331,273"/>
+<area shape="poly" title=" " alt="" coords="1004,185,394,243,329,250,329,245,393,237,1004,180"/>
+<area shape="rect" href="primitives_8h.html" title="Procedural geometry generators." alt="" coords="1651,247,1864,273"/>
+<area shape="poly" title=" " alt="" coords="1214,183,1639,237,1688,245,1687,250,1638,243,1214,188"/>
+<area shape="rect" href="stl__io_8h.html" title="Read and write STL files (.stl)." alt="" coords="838,247,1021,273"/>
+<area shape="poly" title=" " alt="" coords="1074,193,955,249,953,245,1072,188"/>
+<area shape="rect" href="transforms_8h.html" title="Mesh transformation functions: translate, scale, rotate, and general matrix transforms." alt="" coords="1408,247,1627,273"/>
+<area shape="poly" title=" " alt="" coords="1178,185,1464,245,1463,250,1177,190"/>
+<area shape="rect" href="obj__io_8cpp.html" title=" " alt="" coords="503,328,646,353"/>
+<area shape="poly" title=" " alt="" coords="514,287,562,326,559,330,511,291"/>
+<area shape="poly" title=" " alt="" coords="2253,280,2133,330,2108,344,2082,356,2017,370,1932,381,1725,400,1508,412,1330,420,1330,414,1508,407,1725,395,1932,376,2016,364,2081,351,2106,340,2131,326,2251,275"/>
+<area shape="poly" title=" " alt="" coords="2309,285,2318,318,2319,336,2316,354,2308,369,2299,379,2290,388,2282,402,2277,422,2282,440,2300,466,2321,490,2372,528,2425,556,2472,575,2470,580,2423,561,2369,533,2318,493,2296,470,2278,442,2272,422,2278,400,2285,385,2295,375,2304,366,2311,352,2314,336,2313,318,2304,286"/>
+<area shape="rect" href="normals_8cpp.html" title=" " alt="" coords="2144,328,2301,353"/>
+<area shape="poly" title=" " alt="" coords="2277,285,2235,330,2231,326,2273,281"/>
+<area shape="rect" href="primitives_8cpp.html" title=" " alt="" coords="1899,328,2069,353"/>
+<area shape="poly" title=" " alt="" coords="2237,279,2030,331,2029,325,2236,273"/>
+<area shape="poly" title=" " alt="" coords="646,284,590,330,587,326,643,280"/>
+<area shape="poly" title=" " alt="" coords="229,286,209,329,204,327,224,284"/>
+<area shape="poly" title=" " alt="" coords="1804,275,1952,325,1950,330,1802,280"/>
+<area shape="rect" href="transforms_8cpp.html" title=" " alt="" coords="1699,328,1874,353"/>
+<area shape="poly" title=" " alt="" coords="1571,274,1748,325,1747,331,1569,279"/>
+<area shape="poly" title=" " alt="" coords="2592,185,2685,207,2724,222,2750,238,2768,262,2775,284,2776,339,2776,423,2771,456,2755,486,2733,510,2704,531,2672,548,2639,561,2574,580,2573,575,2637,556,2670,543,2702,526,2729,506,2751,482,2765,455,2771,422,2771,339,2770,285,2763,264,2746,242,2722,226,2683,212,2591,190"/>
+<area shape="rect" href="rasterizer_8cpp.html" title=" " alt="" coords="2571,247,2736,273"/>
+<area shape="poly" title=" " alt="" coords="2541,189,2635,245,2632,249,2538,194"/>
+<area shape="poly" title=" " alt="" coords="1245,118,1243,247,1238,247,1240,118"/>
+<area shape="poly" title=" " alt="" coords="2364,197,2389,215,2409,239,2418,262,2421,286,2413,335,2395,379,2378,410,2373,407,2391,377,2408,334,2416,286,2413,263,2404,241,2385,218,2361,201"/>
+<area shape="poly" title=" " alt="" coords="2392,193,2458,214,2485,226,2503,238,2522,261,2532,284,2536,309,2536,339,2536,423,2533,468,2527,512,2514,578,2508,577,2522,511,2528,467,2531,423,2531,339,2530,309,2527,285,2518,264,2500,242,2482,230,2456,219,2391,198"/>
+<area shape="poly" title=" " alt="" coords="2394,189,2816,245,2815,250,2393,195"/>
+<area shape="poly" title=" " alt="" coords="2197,195,1971,216,1795,223,1619,228,1396,243,1328,250,1327,245,1396,237,1619,223,1794,218,1971,211,2196,189"/>
+<area shape="poly" title=" " alt="" coords="2219,198,2043,250,2042,245,2217,193"/>
+<area shape="poly" title=" " alt="" coords="2297,206,2297,247,2292,247,2292,206"/>
+<area shape="poly" title=" " alt="" coords="2251,201,2184,242,2156,263,2127,282,2069,310,2017,330,2015,326,2067,305,2124,278,2153,259,2181,238,2248,197"/>
+<area shape="poly" title=" " alt="" coords="2220,199,2173,218,2127,242,2114,252,2106,262,2097,273,2083,282,2044,296,1989,309,1868,331,1867,325,1988,304,2042,291,2080,278,2093,269,2102,259,2110,249,2124,238,2170,213,2218,194"/>
+<area shape="poly" title=" " alt="" coords="2387,193,2606,245,2605,250,2386,198"/>
 </map>
 </div>
 </div>
@@ -251,28 +272,41 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a17e3c4a58dcc18d0b6050479e4151da8" id="r_a17e3c4a58dcc18d0b6050479e4151da8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">scimesh::Vec2</a> = glm::vec2</td></tr>
+<tr class="memitem:a17e3c4a58dcc18d0b6050479e4151da8" id="r_a17e3c4a58dcc18d0b6050479e4151da8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a17e3c4a58dcc18d0b6050479e4151da8">scimesh::Vec2</a> = glm::vec2</td></tr>
 <tr class="memdesc:a17e3c4a58dcc18d0b6050479e4151da8"><td class="mdescLeft">&#160;</td><td class="mdescRight">2-component floating-point vector (xy).  <br /></td></tr>
 <tr class="separator:a17e3c4a58dcc18d0b6050479e4151da8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a500854f7e819a236d4887daef660f0bc" id="r_a500854f7e819a236d4887daef660f0bc"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a> = glm::vec3</td></tr>
+<tr class="memitem:a500854f7e819a236d4887daef660f0bc" id="r_a500854f7e819a236d4887daef660f0bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a> = glm::vec3</td></tr>
 <tr class="memdesc:a500854f7e819a236d4887daef660f0bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">3-component floating-point vector (xyz).  <br /></td></tr>
 <tr class="separator:a500854f7e819a236d4887daef660f0bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8f1a95bc594998bed4f4c2b7cb24c02" id="r_af8f1a95bc594998bed4f4c2b7cb24c02"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#af8f1a95bc594998bed4f4c2b7cb24c02">scimesh::Vec4</a> = glm::vec4</td></tr>
+<tr class="memitem:af8f1a95bc594998bed4f4c2b7cb24c02" id="r_af8f1a95bc594998bed4f4c2b7cb24c02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#af8f1a95bc594998bed4f4c2b7cb24c02">scimesh::Vec4</a> = glm::vec4</td></tr>
 <tr class="memdesc:af8f1a95bc594998bed4f4c2b7cb24c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">4-component floating-point vector (xyzw).  <br /></td></tr>
 <tr class="separator:af8f1a95bc594998bed4f4c2b7cb24c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45b6c7d1253ca6c20e8c6dc2de7ecbf8" id="r_a45b6c7d1253ca6c20e8c6dc2de7ecbf8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">scimesh::Mat4</a> = glm::mat4</td></tr>
+<tr class="memitem:a45b6c7d1253ca6c20e8c6dc2de7ecbf8" id="r_a45b6c7d1253ca6c20e8c6dc2de7ecbf8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a45b6c7d1253ca6c20e8c6dc2de7ecbf8">scimesh::Mat4</a> = glm::mat4</td></tr>
 <tr class="memdesc:a45b6c7d1253ca6c20e8c6dc2de7ecbf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">4×4 floating-point matrix.  <br /></td></tr>
 <tr class="separator:a45b6c7d1253ca6c20e8c6dc2de7ecbf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a83210248fca9fc04882983ef6cc5bfa7" id="r_a83210248fca9fc04882983ef6cc5bfa7"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7">scimesh::PlaneSpace</a> { <a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7a5289492cf082446ca4a6eec9f72f1ec3">scimesh::WORLD</a>
+, <a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7aeaa2d12d8afc4f0e044064ec4770f054">scimesh::EYE</a>
+ }</td></tr>
+<tr class="memdesc:a83210248fca9fc04882983ef6cc5bfa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinate space in which a ClipPlane is defined.  <a href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7">More...</a><br /></td></tr>
+<tr class="separator:a83210248fca9fc04882983ef6cc5bfa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad750eddde0a816f6ffa79e22dba6f36c" id="r_ad750eddde0a816f6ffa79e22dba6f36c"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c">scimesh::FogSpace</a> { <a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca5289492cf082446ca4a6eec9f72f1ec3">scimesh::WORLD</a>
+, <a class="el" href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36ca05348efc65be2412765a31aab7a3b848">scimesh::NDC</a>
+ }</td></tr>
+<tr class="memdesc:ad750eddde0a816f6ffa79e22dba6f36c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinate space (and hence the unit) of the fog distances RenderOptions::fog_start and RenderOptions::fog_end.  <a href="namespacescimesh.html#ad750eddde0a816f6ffa79e22dba6f36c">More...</a><br /></td></tr>
+<tr class="separator:ad750eddde0a816f6ffa79e22dba6f36c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a74b7b3fab4d4d74fd20616780e7a5e1a" id="r_a74b7b3fab4d4d74fd20616780e7a5e1a"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a74b7b3fab4d4d74fd20616780e7a5e1a">scimesh::DEFAULT_COLOR</a> {0.7f, 0.7f, 0.7f, 1.0f}</td></tr>
+<tr class="memitem:a74b7b3fab4d4d74fd20616780e7a5e1a" id="r_a74b7b3fab4d4d74fd20616780e7a5e1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">constexpr</a> <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a74b7b3fab4d4d74fd20616780e7a5e1a">scimesh::DEFAULT_COLOR</a> {0.7<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, 0.7<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, 0.7<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">f</a>, 1.0f}</td></tr>
 <tr class="memdesc:a74b7b3fab4d4d74fd20616780e7a5e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default mesh color: a neutral light gray (0.7, 0.7, 0.7).  <br /></td></tr>
 <tr class="separator:a74b7b3fab4d4d74fd20616780e7a5e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae47362ecef3fd1eb96459e719e3c3eb0" id="r_ae47362ecef3fd1eb96459e719e3c3eb0"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#ae47362ecef3fd1eb96459e719e3c3eb0">scimesh::TRANSPARENT_BLACK</a> {0.0f, 0.0f, 0.0f, 0.0f}</td></tr>
+<tr class="memitem:ae47362ecef3fd1eb96459e719e3c3eb0" id="r_ae47362ecef3fd1eb96459e719e3c3eb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">constexpr</a> <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#ae47362ecef3fd1eb96459e719e3c3eb0">scimesh::TRANSPARENT_BLACK</a> {0.0f, 0.0f, 0.0f, 0.0f}</td></tr>
 <tr class="memdesc:ae47362ecef3fd1eb96459e719e3c3eb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A fully transparent black color (0, 0, 0, 0).  <br /></td></tr>
 <tr class="separator:ae47362ecef3fd1eb96459e719e3c3eb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8552f8964b41e7ba07ccabef374449ae" id="r_a8552f8964b41e7ba07ccabef374449ae"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a8552f8964b41e7ba07ccabef374449ae">scimesh::WHITE</a> {1.0f, 1.0f, 1.0f, 1.0f}</td></tr>
+<tr class="memitem:a8552f8964b41e7ba07ccabef374449ae" id="r_a8552f8964b41e7ba07ccabef374449ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">constexpr</a> <a class="el" href="structscimesh_1_1Color.html">Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh.html#a8552f8964b41e7ba07ccabef374449ae">scimesh::WHITE</a> {1.0f, 1.0f, 1.0f, 1.0f}</td></tr>
 <tr class="memdesc:a8552f8964b41e7ba07ccabef374449ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">An opaque white color (1, 1, 1, 1).  <br /></td></tr>
 <tr class="separator:a8552f8964b41e7ba07ccabef374449ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>

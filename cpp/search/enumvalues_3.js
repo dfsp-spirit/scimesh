@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['horizontal_0',['HORIZONTAL',['../namespacescimesh.html#a0053cbaf13ff13f50a9220cb562f0ed0a86e5d0d8407ce71f7e2004ef3949894e',1,'scimesh']]]
+  ['flat_0',['FLAT',['../namespacescimesh.html#aa1c1cc668348d0b9ebac157bf2f78527af88a77e3d68d251c3dc4008c327b5a0c',1,'scimesh']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['scene_0',['Scene',['../structscimesh_1_1Scene.html',1,'scimesh']]],
-  ['scenenoderef_1',['SceneNodeRef',['../structscimesh_1_1SceneNodeRef.html',1,'scimesh']]]
+  ['rasterizer_0',['Rasterizer',['../structscimesh_1_1Rasterizer.html',1,'scimesh']]],
+  ['renderer_1',['Renderer',['../classscimesh_1_1Renderer.html',1,'scimesh']]],
+  ['renderoptions_2',['RenderOptions',['../structscimesh_1_1RenderOptions.html',1,'scimesh']]]
 ];

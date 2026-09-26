@@ -1,4 +1,30 @@
 var searchData=
 [
-  ['viridis_0',['viridis',['../structscimesh_1_1ColorMap.html#a9a834c63714782f694056b6f2d14f6e2',1,'scimesh::ColorMap']]]
+  ['sample_0',['sample',['../structscimesh_1_1ColorMap.html#ad9c6f264c53ed58880ba2a0ac46ed1cb',1,'scimesh::ColorMap']]],
+  ['sample_5fbilinear_1',['sample_bilinear',['../structscimesh_1_1Image.html#af61b6175e815126e15cddb9593258123',1,'scimesh::Image']]],
+  ['sample_5fcount_2',['sample_count',['../namespacescimesh_1_1detail.html#a11a93cbdaa537db878afd5c453bea7a8',1,'scimesh::detail']]],
+  ['scale_3',['scale',['../structscimesh_1_1Image.html#a32c8477931cc40f538a91ed0ce80d449',1,'scimesh::Image']]],
+  ['scale_5fmesh_4',['scale_mesh',['../namespacescimesh.html#acc20474edab6ad0de3ad1932f9f65301',1,'scimesh::scale_mesh(Mesh &amp;mesh, float uniform_scale)'],['../namespacescimesh.html#aa87b98fab9bce771e51225c1a196d25e',1,'scimesh::scale_mesh(Mesh &amp;mesh, const Vec3 &amp;scale)']]],
+  ['segment_5fcount_5',['segment_count',['../namespacescimesh_1_1detail.html#aee97034561a3678b6af476104de54b8b',1,'scimesh::detail']]],
+  ['set_5fblend_5fmode_6',['set_blend_mode',['../structscimesh_1_1Rasterizer.html#a87d8ee558c345663de2253d00ea0396d',1,'scimesh::Rasterizer']]],
+  ['set_5fline_5faffects_5fbounds_7',['set_line_affects_bounds',['../structscimesh_1_1Scene.html#a11e840d272c9f7168c49b81b2c95e47b',1,'scimesh::Scene::set_line_affects_bounds(size_t index, bool affects_bounds)'],['../structscimesh_1_1Scene.html#a00667753e66794b18c65a0e29ff1fce8',1,'scimesh::Scene::set_line_affects_bounds(const std::string &amp;name, bool affects_bounds)']]],
+  ['set_5fline_5ftransform_8',['set_line_transform',['../structscimesh_1_1Scene.html#a459c23a207ff62a55e0e2ca0281e3e68',1,'scimesh::Scene']]],
+  ['set_5fname_9',['set_name',['../structscimesh_1_1Scene.html#ab96e1c2d2fb824bdf68676d6b3ceb22e',1,'scimesh::Scene']]],
+  ['set_5fpixel_10',['set_pixel',['../structscimesh_1_1Image.html#a70b615c616803ac8ded12c4b5bfd29eb',1,'scimesh::Image']]],
+  ['set_5ftext_5ftransform_11',['set_text_transform',['../structscimesh_1_1Scene.html#a20030894efd2990c8c96562337bd64a6',1,'scimesh::Scene']]],
+  ['set_5ftransform_12',['set_transform',['../structscimesh_1_1Scene.html#a054c513f5666319b6e97d4f55f10edf1',1,'scimesh::Scene']]],
+  ['shade_5fpixel_13',['shade_pixel',['../namespacescimesh.html#a64c5ad9e14b213e188950311cce03191',1,'scimesh']]],
+  ['shade_5fpixel_5fmulti_14',['shade_pixel_multi',['../namespacescimesh.html#a93443a52fde1516c87b88fb49617e067',1,'scimesh']]],
+  ['size_15',['size',['../structscimesh_1_1Scene.html#a8c4e409e0531ad7f4f7b8a380d8e1c1f',1,'scimesh::Scene::size()'],['../structscimesh_1_1LineLayer.html#a1fa63119b2a5380a01a9561d7c7bc470',1,'scimesh::LineLayer::size()'],['../structscimesh_1_1ColorMap.html#abd8f470f7fc21bd83aba9e1b0dceb7de',1,'scimesh::ColorMap::size()']]],
+  ['source_5fpath_16',['source_path',['../classscimesh_1_1Font.html#ab1250c7d4bfeb16f2cce9fb29a16f568',1,'scimesh::Font']]],
+  ['stack_5fhorizontal_17',['stack_horizontal',['../namespacescimesh.html#aa59219f2948f5deeb649852a19c50da2',1,'scimesh']]],
+  ['stack_5fvertical_18',['stack_vertical',['../namespacescimesh.html#aacaafefc8276257c028a75e7e14c75b1',1,'scimesh']]],
+  ['stem_19',['stem',['../namespacescimesh_1_1gltf__io_1_1detail.html#af080e61f9ee901701207517d74212acf',1,'scimesh::gltf_io::detail']]],
+  ['str_5fcrop_20',['str_crop',['../namespacescimesh.html#ae4cf43f2fd9954a6526cfb78e55453db',1,'scimesh']]],
+  ['str_5ffog_5fspace_21',['str_fog_space',['../namespacescimesh.html#acfd6ab5eaab1364b80ad6a927c6893c6',1,'scimesh']]],
+  ['str_5fmerge_22',['str_merge',['../namespacescimesh.html#aafec19719f61270bbef5ee9f6fd09e46',1,'scimesh']]],
+  ['str_5fplane_5fspace_23',['str_plane_space',['../namespacescimesh.html#a36a648371658c9b0518e0637802a77c6',1,'scimesh']]],
+  ['str_5fprojection_24',['str_projection',['../namespacescimesh.html#aab8c90717e15e28cc2c0b008914564ec',1,'scimesh']]],
+  ['str_5fshading_25',['str_shading',['../namespacescimesh.html#a837e63fb9606d63fd26540e18a6baa93',1,'scimesh']]],
+  ['string_5for_26',['string_or',['../structscimesh_1_1TextLayer.html#a86699345486db723a27749b62e88aca5',1,'scimesh::TextLayer']]]
 ];

@@ -15,7 +15,9 @@ var to__string_8h =
     [ "operator<<", "to__string_8h.html#a056e87ee0d7d171e385b2e45d996644a", null ],
     [ "operator<<", "to__string_8h.html#ab673f0d6df3888873c0a317b724699e2", null ],
     [ "str_crop", "to__string_8h.html#ae4cf43f2fd9954a6526cfb78e55453db", null ],
+    [ "str_fog_space", "to__string_8h.html#acfd6ab5eaab1364b80ad6a927c6893c6", null ],
     [ "str_merge", "to__string_8h.html#aafec19719f61270bbef5ee9f6fd09e46", null ],
+    [ "str_plane_space", "to__string_8h.html#a36a648371658c9b0518e0637802a77c6", null ],
     [ "str_projection", "to__string_8h.html#aab8c90717e15e28cc2c0b008914564ec", null ],
     [ "str_shading", "to__string_8h.html#a837e63fb9606d63fd26540e18a6baa93", null ]
 ];

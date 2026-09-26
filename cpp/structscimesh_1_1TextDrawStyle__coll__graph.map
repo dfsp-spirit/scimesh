@@ -1,0 +1,5 @@
+<map id="scimesh::TextDrawStyle" name="scimesh::TextDrawStyle">
+<area shape="rect" id="Node000001" title="How to draw text onto an image with draw_text()." alt="" coords="5,108,184,133"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="35,5,154,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,45,97,108,92,108,92,45"/>
+</map>

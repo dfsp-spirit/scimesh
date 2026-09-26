@@ -1,0 +1,24 @@
+<map id="src/core/scimesh/lines.h" name="src/core/scimesh/lines.h">
+<area shape="rect" id="Node000001" title="Screen&#45;space line primitives — the LineLayer." alt="" coords="192,5,371,31"/>
+<area shape="rect" id="Node000002" href="$scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="189,79,374,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="284,44,284,79,279,79,279,44"/>
+<area shape="rect" id="Node000003" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="281,152,477,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,110,365,150,362,154,307,114"/>
+<area shape="rect" id="Node000005" href="$gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="33,233,221,258"/>
+<area shape="poly" id="edge11_Node000002_Node000005" title=" " alt="" coords="262,115,141,234,137,231,259,112"/>
+<area shape="rect" id="Node000007" href="$renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="336,321,537,346"/>
+<area shape="poly" id="edge12_Node000002_Node000007" title=" " alt="" coords="219,110,138,134,97,151,60,169,30,190,12,213,9,225,9,237,13,250,22,264,42,279,72,292,152,311,246,322,335,328,335,333,245,328,151,316,70,297,39,284,18,267,8,252,3,238,3,224,8,211,27,186,57,165,95,146,136,129,217,105"/>
+<area shape="rect" id="Node000009" href="$to__string_8h.html" title=" " alt="" coords="616,313,764,353"/>
+<area shape="poly" id="edge13_Node000002_Node000009" title=" " alt="" coords="361,104,453,124,553,151,641,184,673,203,695,224,704,246,706,270,699,314,694,313,701,270,699,247,690,227,670,207,638,189,552,156,452,129,360,109"/>
+<area shape="rect" id="Node000004" href="$camera_8cpp.html" title=" " alt="" coords="245,233,398,258"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="365,190,332,234,328,231,360,187"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="330,184,164,235,163,230,329,179"/>
+<area shape="rect" id="Node000006" href="$render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="474,225,652,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="419,180,520,223,518,228,417,185"/>
+<area shape="poly" id="edge9_Node000003_Node000007" title=" " alt="" coords="395,188,412,224,428,277,437,320,432,321,423,279,407,226,390,190"/>
+<area shape="poly" id="edge10_Node000003_Node000009" title=" " alt="" coords="491,175,594,193,636,207,665,223,680,244,688,268,693,313,688,314,683,270,675,247,661,227,634,211,593,198,490,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="525,275,455,323,452,318,522,271"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="604,271,663,311,660,315,601,276"/>
+<area shape="rect" id="Node000008" href="$renderer_8cpp.html" title=" " alt="" coords="357,401,516,427"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="439,360,439,401,434,401,434,360"/>
+</map>

@@ -1,9 +1,14 @@
 var searchData=
 [
-  ['up_0',['up',['../structscimesh_1_1Camera.html#aad99d0633c14a23e223aaf0173bcb849',1,'scimesh::Camera']]],
-  ['uv_1',['uv',['../structscimesh_1_1ViewClipVertex.html#a3bdbefa24623a37867e7739415ce8cb8',1,'scimesh::ViewClipVertex::uv'],['../structscimesh_1_1ClipVertex.html#a3a7e1be915999cf18720f9c7b6affcb1',1,'scimesh::ClipVertex::uv']]],
-  ['uv0_2',['uv0',['../renderer_8cpp.html#ab6aca3b48ba7a45dc89c363f759e14b9',1,'renderer.cpp']]],
-  ['uv1_3',['uv1',['../renderer_8cpp.html#a74b294108930ab6e80211a1def14c3b6',1,'renderer.cpp']]],
-  ['uv2_4',['uv2',['../renderer_8cpp.html#ac3c93778c877600b8bbb05075fdcec5f',1,'renderer.cpp']]],
-  ['uvs_5',['uvs',['../structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da',1,'scimesh::Mesh']]]
+  ['text_5fnames_0',['text_names',['../structscimesh_1_1Scene.html#a04e400c3d647e989fd16ec03cfb135d1',1,'scimesh::Scene']]],
+  ['text_5ftransforms_1',['text_transforms',['../structscimesh_1_1Scene.html#a702877970fa79e8831ea087b3e29f829',1,'scimesh::Scene']]],
+  ['texts_2',['texts',['../structscimesh_1_1Scene.html#a180568b5f42b20155ab112a60034d075',1,'scimesh::Scene']]],
+  ['texture_3',['texture',['../structscimesh_1_1Mesh.html#ac1b5d16931f12e107db44f5db6e018b1',1,'scimesh::Mesh']]],
+  ['threads_4',['threads',['../structscimesh_1_1RenderOptions.html#a8d2d9e75c39a539ae46a0df92a2341c2',1,'scimesh::RenderOptions']]],
+  ['to_5',['to',['../structscimesh_1_1LineLayer.html#af8723bf92dbf41494a1e091ad39de82d',1,'scimesh::LineLayer']]],
+  ['total_5fnan_5fcount_6',['total_nan_count',['../structscimesh_1_1MultiApplyColormapResult.html#a3fdf8fef218f9bf9544316059d0ce07e',1,'scimesh::MultiApplyColormapResult']]],
+  ['transform_7',['transform',['../structscimesh_1_1LineNodeRef.html#accad6993e09c41ad1f62f45f115f4e6d',1,'scimesh::LineNodeRef::transform'],['../structscimesh_1_1SceneNodeRef.html#ac2a1cd62816d4f8e450ab3728170f261',1,'scimesh::SceneNodeRef::transform'],['../structscimesh_1_1TextNodeRef.html#a6b9fcef0ec685d9ba3f7e04085392906',1,'scimesh::TextNodeRef::transform']]],
+  ['transforms_8',['transforms',['../structscimesh_1_1Scene.html#a414534d24451da3cef818a35aa4af5ac',1,'scimesh::Scene']]],
+  ['transparent_5fblack_9',['TRANSPARENT_BLACK',['../namespacescimesh.html#ae47362ecef3fd1eb96459e719e3c3eb0',1,'scimesh']]],
+  ['triangles_10',['triangles',['../structscimesh_1_1Mesh.html#ae5bc35d3b894ba07c018d4513d767046',1,'scimesh::Mesh']]]
 ];

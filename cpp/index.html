@@ -124,6 +124,10 @@ C++ layer</h2>
 <li>Depth cueing (fog)</li>
 <li>Clip planes</li>
 <li>Procedural geometry: spheres, cylinders, cuboids, pyramids, tetrahedra, tori, planes</li>
+<li>Batched primitives: thousands of spheres/cylinders as a single mesh</li>
+<li>Polyline tubes with rotation-minimizing frames (curved edges, streamlines)</li>
+<li>Scene line layers: pixel-wide lines without geometry (wireframes, graph edges)</li>
+<li>Text labels: anti-aliased TrueType glyphs anchored in world space (labels that follow the camera and can be hidden by the geometry) or in screen space (titles, panel tags, captions), with optional halos, in a bundled font</li>
 <li>Mesh I/O: STL (binary/ASCII), Wavefront OBJ, Stanford PLY</li>
 <li>Image I/O: PNG, PPM, BMP</li>
 <li>Automatic camera framing (<code>camera_fit_mesh</code>, <code>camera_fit_scene</code>)</li>
@@ -141,7 +145,35 @@ R Layer</h2>
 <li>Colorbars (combine with your main plot with image composition!)</li>
 </ul>
 <p>If you need colorbars in C++, have a look at <a href="https://github.com/dfsp-spirit/scibar">scibar</a>.</p>
-<h1><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
+Global render defaults (R)</h2>
+<p>Anti-aliasing can be switched on for a whole session instead of per render call. <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">render_options()</a></code> resolves <code>aa_samples</code> from the global option <code>scimesh.aa_samples</code> (default <code>1</code>, i.e. no AA) unless you pass it explicitly:</p>
+<div class="fragment"><div class="line">options(scimesh.aa_samples = 2)      # 2x2 supersampling, 4 for 4x4</div>
+<div class="line">img &lt;- render_scene(scene(mesh))     # anti-aliased, no extra arguments needed</div>
+<div class="line">options(scimesh.aa_samples = NULL)   # back to no AA</div>
+</div><!-- fragment --><p>This is most noticeable on screen-space lines and points (e.g. connectome edges, see <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">line_layer()</a></code> and <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">render_segments()</a></code>), which get smooth edges instead of a hard staircase pattern. The cost grows with <code>aa_samples^2</code>, both in render time and in memory (the internal framebuffer is <code>width * aa_samples</code> by <code>height * aa_samples</code>).</p>
+<h2><a class="anchor" id="autotoc_md28"></a>
+Text labels (R)</h2>
+<p><code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">text_layer()</a></code> annotates a figure. Labels are billboards: they always face the camera and keep their size in pixels, and the font ships with the package, so no system font is needed. Positions are either world space (the label sticks to the 3D location it annotates, and is hidden when geometry is in front of it) or screen space (<code>space = "screen"</code>, pixels from the top left corner):</p>
+<div class="fragment"><div class="line">surf &lt;- generate_sphere(c(0, 0, 0), radius = 1)</div>
+<div class="line">cam  &lt;- camera_auto(list(surf), direction = c(0, 0, 1))</div>
+<div class="line"> </div>
+<div class="line">sc &lt;- scene(list(surf), camera = cam,</div>
+<div class="line">            options = render_options(background_color = c(1, 1, 1, 1)),</div>
+<div class="line">            texts = list(</div>
+<div class="line">                # a label that belongs to the scene, anchored above the sphere</div>
+<div class="line">                text_layer(matrix(c(0, 1.3, 0), ncol = 3), &quot;superior&quot;,</div>
+<div class="line">                           size = 20, adj = c(0.5, 0)),</div>
+<div class="line">                # a direction annotation that must stay readable: no depth test</div>
+<div class="line">                text_layer(matrix(c(1.4, 0, 0), ncol = 3), &quot;anterior&quot;,</div>
+<div class="line">                           size = 18, adj = c(0, 0.5),</div>
+<div class="line">                           colors = c(0.8, 0.1, 0.1, 1), depth_test = FALSE),</div>
+<div class="line">                # a panel tag, positioned in output pixels</div>
+<div class="line">                text_layer(c(12, 10), &quot;A&quot;, space = &quot;screen&quot;, adj = c(0, 1),</div>
+<div class="line">                           size = 28, halo_color = c(1, 1, 1, 0.9))))</div>
+<div class="line">img &lt;- render_scene(sc)</div>
+</div><!-- fragment --><p>Labels can also be measured (<code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">text_extent()</a></code>), projected from 3D to image pixels (<code>world_to_screen()</code>), rotated (<code>rotation = 90</code> reads bottom to top, for a vertical axis label), and used without any mesh (<code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">render_text()</a></code>). Use <code>font_file = "path/to/font.ttf"</code> or the <code>SCIMESH_FONT</code> environment variable to replace the bundled Inter font.</p>
+<h1><a class="anchor" id="autotoc_md29"></a>
 What scimesh is not</h1>
 <ul>
 <li>Not a plotting framework — use ggplot2, lattice, or plotly for statistical plots. scimesh renders 3D geometry.</li>
@@ -149,18 +181,18 @@ What scimesh is not</h1>
 <li>Not a system for physical based rendering — no PBR materials, no raytracing, etc.</li>
 <li>Not a mesh editing/manipulation framework — it reads, transforms, and renders meshes but does not provide interactive editing, mesh repair, remeshing, or boolean operations. For mesh repair and remeshing in R, see the <a href="https://cran.r-project.org/package=Rvcg">Rvcg</a> package (wraps VCGLib).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md28"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Installation</h1>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 R package</h2>
 <div class="fragment"><div class="line"># Install from GitHub</div>
 <div class="line">remotes::install_github(&quot;dfsp-spirit/scimesh&quot;)</div>
 <div class="line"> </div>
 <div class="line"># For FreeSurfer neuroimaging data</div>
 <div class="line">remotes::install_github(&quot;dfsp-spirit/freesurferformats&quot;)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md30"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md32"></a>
 C++</h2>
-<h3><a class="anchor" id="autotoc_md31"></a>
+<h3><a class="anchor" id="autotoc_md33"></a>
 Via CMake FetchContent (recommended)</h3>
 <div class="fragment"><div class="line">include(FetchContent)</div>
 <div class="line">FetchContent_Declare(</div>
@@ -173,12 +205,12 @@ Via CMake FetchContent (recommended)</h3>
 <div class="line">add_executable(my_app main.cpp)</div>
 <div class="line">target_link_libraries(my_app PRIVATE scimesh)</div>
 </div><!-- fragment --><p>That's it — no manual source listing, include paths, or preprocessor defines needed.</p>
-<h3><a class="anchor" id="autotoc_md32"></a>
+<h3><a class="anchor" id="autotoc_md34"></a>
 Manually (header + source)</h3>
 <p>The C++ core lives in <code>src/core/</code>. To use scimesh in a C++ project without CMake, add the source files and include paths to your build system. See <a class="el" href="CPP__GETTING__STARTED_8md.html">`CPP_GETTING_STARTED.md`</a> for details.</p>
-<h1><a class="anchor" id="autotoc_md33"></a>
+<h1><a class="anchor" id="autotoc_md35"></a>
 Quick Start</h1>
-<h2><a class="anchor" id="autotoc_md34"></a>
+<h2><a class="anchor" id="autotoc_md36"></a>
 R</h2>
 <div class="fragment"><div class="line">library(scimesh)</div>
 <div class="line"> </div>
@@ -206,22 +238,22 @@ R</h2>
 <div class="line"># Side-by-side</div>
 <div class="line">img &lt;- stack_horizontal(img_shaded, img_wire)</div>
 <div class="line">write_png(img, &quot;sphere.png&quot;)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md35"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md37"></a>
 C++</h2>
-<h1><a class="anchor" id="autotoc_md36"></a>
+<h1><a class="anchor" id="autotoc_md38"></a>
 Documentation</h1>
 <ul>
 <li><b>R vignette</b>: <code>vignettes/scimesh.Rmd</code> — comprehensive guide to the R package with examples for all major features.</li>
 <li><b>R examples</b>: <a href="examples/R/"><code>examples/R/</code></a> — runnable scripts demonstrating textured rendering, transparency, and neuroimaging visualization.</li>
 <li><b>R live help</b>: Help for a specific function can be accessed in the usual R manner: <code>?&lt;function&gt;</code>, where you replace <code>&lt;function&gt;</code> with a function name. Like this: <code>?read_ply</code>.</li>
-<li><b>R live demos</b>: Run <code>example(&lt;function&gt;)</code> to see a live demo that uses the function <code>&lt;function&gt;</code>. Like this: <code>example(read_ply)</code>.</li>
+<li><b>R live demos</b>: Run <code>example(&lt;function&gt;)</code> to see a live demo that uses the function <code>&lt;function&gt;</code>. Like this: <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">example(read_ply)</a></code>.</li>
 <li><b>R API Documentation</b>: <a href="https://dfsp-spirit.github.io/scimesh/r">dfsp-spirit.github.io/scimesh/r</a></li>
 <li><b>C++ getting started</b>: <a href="https://dfsp-spirit.github.io/scimesh/cpp/cpp_getting_started.html"><code>cpp_getting_started.html</code></a> — gentle introduction to the C++ renderer. <a class="el" href="cpp_getting_started.html">Getting Started with scimesh C++</a></li>
 <li><b>C++ examples</b>: <a href="examples/cpp/"><code>examples/cpp/</code></a> — standalone programs covering textured OBJ, transparency, protein visualization, and whole-brain rendering.</li>
 <li><b>C++ API Documentation</b>: <a href="https://dfsp-spirit.github.io/scimesh/cpp">dfsp-spirit.github.io/scimesh/cpp</a></li>
 <li><b>Tests:</b> Some of the <a href="./cpp_tests/">unit tests for cpp</a> and <a href="(./tests/testthat/)">for R</a> that come with this package are essentially examples that illustrate how to use the functions.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md37"></a>
+<h2><a class="anchor" id="autotoc_md39"></a>
 Direct Links to Example Program Source Code</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -261,7 +293,7 @@ Direct Links to Example Program Source Code</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="examples/cpp/full_CLI_renderer/"><code>examples/cpp/full_CLI_renderer/</code></a>   </td><td class="markdownTableBodyNone">C++   </td><td class="markdownTableBodyNone">Self-contained CLI renderer with TOML config + CLI overrides   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md40"></a>
 Acknowledgements</h1>
 <p>Thanks heaps to the authors of these great software packages that scimesh is built upon:</p>
 <ul>
@@ -275,10 +307,10 @@ Acknowledgements</h1>
 <p>And of course, thanks to the authors of the dependencies of these packages, and their dependencies...</p>
 <p>Detailed information on the licenses for all these packages (all MIT-compatible) can be found in the file THIRD_PARTY_LICENSES.md.</p>
 <p><em>Note: This section is to give credit only. Users do <b>not</b> need to worry about installing these dependencies, they come vendored with scimesh already.</em></p>
-<h1><a class="anchor" id="autotoc_md39"></a>
+<h1><a class="anchor" id="autotoc_md41"></a>
 Developer Information</h1>
 <p>Please refer to <a class="el" href="md_README__DEVELOPMENT.html">README_DEVELOPMENT.md</a>.</p>
-<h1><a class="anchor" id="autotoc_md40"></a>
+<h1><a class="anchor" id="autotoc_md42"></a>
 License and Author</h1>
 <p>License: <a href="./LICENSE">MIT</a></p>
 <p>Author: <a href="https://ts.rcmd.org/">Tim Schäfer</a> </p>

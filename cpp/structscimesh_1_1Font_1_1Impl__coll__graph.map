@@ -1,0 +1,5 @@
+<map id="scimesh::Font::Impl" name="scimesh::Font::Impl">
+<area shape="rect" id="Node000001" title="Shared font state: the font bytes, the parsed font and the glyph cache." alt="" coords="11,93,160,119"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1FontMetrics.html" title="Vertical metrics of a font at a given pixel size." alt="" coords="5,5,165,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,45,88,93,83,93,83,45"/>
+</map>

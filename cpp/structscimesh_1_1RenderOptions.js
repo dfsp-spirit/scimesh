@@ -11,6 +11,7 @@ var structscimesh_1_1RenderOptions =
     [ "fog_color", "structscimesh_1_1RenderOptions.html#afcd590a1b52d943c98fa1537c0f6b4f0", null ],
     [ "fog_enabled", "structscimesh_1_1RenderOptions.html#a16e7f63630fa15fc922258a5bf11b413", null ],
     [ "fog_end", "structscimesh_1_1RenderOptions.html#ae4043e3c104d9564f03f322da8182572", null ],
+    [ "fog_space", "structscimesh_1_1RenderOptions.html#a5649fc398604d05c44c12a8a2467c6bd", null ],
     [ "fog_start", "structscimesh_1_1RenderOptions.html#a34e243ae0f92fc8ca3485fd4d7231496", null ],
     [ "height", "structscimesh_1_1RenderOptions.html#a4a26a61872a3a587bd0bf5d4d1478579", null ],
     [ "invert_normals", "structscimesh_1_1RenderOptions.html#afec614402fd7c2f08c7a1709a146de60", null ],

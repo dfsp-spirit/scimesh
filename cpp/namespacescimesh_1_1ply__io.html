@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('namespacescimesh_1_1ply__io.html','');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aec1f211605b2f399e3e66d7711918711" id="r_aec1f211605b2f399e3e66d7711918711"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">read_ply</a> (const std::string &amp;path)</td></tr>
+<tr class="memitem:aec1f211605b2f399e3e66d7711918711" id="r_aec1f211605b2f399e3e66d7711918711"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">read_ply</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> std::string &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">path</a>)</td></tr>
 <tr class="memdesc:aec1f211605b2f399e3e66d7711918711"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a mesh from a Stanford PLY file.  <br /></td></tr>
 <tr class="separator:aec1f211605b2f399e3e66d7711918711"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -117,7 +117,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> scimesh::ply_io::read_ply </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> std::string &amp;&#160;</td>
           <td class="paramname"><em>path</em></td><td>)</td>
           <td></td>
         </tr>
@@ -139,16 +139,20 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> scan = <a class="code hl_function" href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a>(<span class="stringliteral">&quot;bunny.ply&quot;</span>);</div>
-<div class="line">std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded &quot;</span> &lt;&lt; scan.<a class="code hl_variable" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c">vertices</a>.size() &lt;&lt; <span class="stringliteral">&quot; vertices\n&quot;</span>;</div>
-<div class="ttc" id="anamespacescimesh_1_1ply__io_html_aec1f211605b2f399e3e66d7711918711"><div class="ttname"><a href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a></div><div class="ttdeci">Mesh read_ply(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Stanford PLY file.</div><div class="ttdef"><b>Definition</b> <a href="ply__io_8cpp_source.html#l00012">ply_io.cpp:12</a></div></div>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scan</a> = <a class="code hl_function" href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a>(<span class="stringliteral">&quot;bunny.ply&quot;</span>);</div>
+<div class="line">std::cout &lt;&lt; <span class="stringliteral">&quot;Loaded &quot;</span> &lt;&lt; <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scan</a>.vertices.size() &lt;&lt; <span class="stringliteral">&quot; vertices\n&quot;</span>;</div>
+<div class="ttc" id="anamespacescimesh_1_1ply__io_html_aec1f211605b2f399e3e66d7711918711"><div class="ttname"><a href="namespacescimesh_1_1ply__io.html#aec1f211605b2f399e3e66d7711918711">scimesh::ply_io::read_ply</a></div><div class="ttdeci">Mesh read_ply(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Stanford PLY file.</div><div class="ttdef"><b>Definition</b> <a href="ply__io_8cpp_source.html#l00048">ply_io.cpp:48</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html"><div class="ttname"><a href="structscimesh_1_1Mesh.html">scimesh::Mesh</a></div><div class="ttdoc">A 3D triangle mesh using an indexed face set representation.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00076">mesh.h:76</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_ab9765dc4fa9dde15c08beead8503ea7c"><div class="ttname"><a href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c">scimesh::Mesh::vertices</a></div><div class="ttdeci">std::vector&lt; Vec3 &gt; vertices</div><div class="ttdoc">3D vertex positions.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00086">mesh.h:86</a></div></div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Color support</dt><dd>If the PLY file contains per-vertex RGB colors, they are automatically loaded into <code><a class="el" href="structscimesh_1_1Mesh.html#a8bb87b1dce18edb5aa7b806f6e98cb59" title="Per-vertex RGBA colors.">Mesh::colors</a></code>. Use <code>mesh.has_colors()</code> to check.</dd></dl>
+<dl class="section user"><dt>Unsupported</dt><dd><ul>
+<li>Texture coordinates — PLY files with texture coordinates lose them; assign <code><a class="el" href="structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da" title="Per-vertex texture coordinates (UVs).">Mesh::uvs</a></code> yourself if you need textured rendering.</li>
+</ul>
+</dd></dl>
 <dl class="section see"><dt>See also</dt><dd>read_obj(), read_stl(), <a class="el" href="structscimesh_1_1Mesh.html#a97282f7ea3227bbca4814f9c1df89597" title="Does the mesh have per-vertex colors?">Mesh::has_colors()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ply__io_8cpp_source.html#l00012">12</a> of file <a class="el" href="ply__io_8cpp_source.html">ply_io.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ply__io_8cpp_source.html#l00048">48</a> of file <a class="el" href="ply__io_8cpp_source.html">ply_io.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,0 +1,31 @@
+<map id="src/core/scimesh/font.h" name="src/core/scimesh/font.h">
+<area shape="rect" id="Node000001" title="TrueType font loading, glyph rasterization and text measurement." alt="" coords="570,5,743,31"/>
+<area shape="rect" id="Node000002" href="$font_8cpp.html" title="Implementation of the TrueType font API (see font.h)." alt="" coords="503,79,634,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="634,41,585,81,581,76,630,37"/>
+<area shape="rect" id="Node000003" href="$text_8h.html" title="Text labels — the TextLayer." alt="" coords="658,79,831,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="683,37,732,76,729,81,680,41"/>
+<area shape="rect" id="Node000004" href="$renderer_8cpp.html" title=" " alt="" coords="292,475,451,500"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="747,118,747,237,747,320,745,343,739,365,716,400,682,429,640,450,593,466,544,477,451,487,451,482,543,471,591,461,638,445,679,424,712,397,734,362,740,342,742,320,742,237,742,118"/>
+<area shape="rect" id="Node000005" href="$scene_8h.html" title="The Scene — a collection of meshes rendered together." alt="" coords="469,152,655,177"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="704,111,593,154,591,149,702,106"/>
+<area shape="rect" id="Node000012" href="$text_8cpp.html" title="Implementation of the text layer (see text.h)." alt="" coords="782,152,913,177"/>
+<area shape="poly" id="edge17_Node000003_Node000012" title=" " alt="" coords="774,110,832,150,829,154,771,114"/>
+<area shape="rect" id="Node000006" href="$camera_8h.html" title="Camera definition and helper functions for view setup." alt="" coords="267,225,463,251"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="518,184,398,228,396,223,517,179"/>
+<area shape="rect" id="Node000008" href="$gltf__io_8h.html" title="Write scenes to glTF 2.0 (.gltf + .bin) or binary glTF (.glb)." alt="" coords="468,306,656,331"/>
+<area shape="poly" id="edge14_Node000005_Node000008" title=" " alt="" coords="565,191,565,306,559,306,559,191"/>
+<area shape="rect" id="Node000010" href="$renderer_8h.html" title="The Renderer — the main entry point for drawing meshes to images." alt="" coords="15,394,216,419"/>
+<area shape="poly" id="edge15_Node000005_Node000010" title=" " alt="" coords="456,178,333,194,200,219,138,236,85,255,42,276,15,300,8,318,15,337,28,355,46,370,84,392,81,396,43,375,25,359,10,340,3,318,11,297,39,272,83,250,137,231,199,214,332,189,455,173"/>
+<area shape="rect" id="Node000011" href="$to__string_8h.html" title=" " alt="" coords="356,387,504,427"/>
+<area shape="poly" id="edge16_Node000005_Node000011" title=" " alt="" coords="591,183,628,214,663,253,675,275,682,297,681,319,671,340,645,359,603,375,505,397,504,392,602,370,642,355,667,337,676,318,677,297,670,277,658,256,624,218,588,187"/>
+<area shape="rect" id="Node000007" href="$camera_8cpp.html" title=" " alt="" coords="37,306,191,331"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="316,257,151,309,150,303,315,252"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="407,253,534,303,532,308,405,258"/>
+<area shape="rect" id="Node000009" href="$render__options_8h.html" title="RenderOptions — all settings that control how meshes are drawn." alt="" coords="215,299,392,339"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="349,263,320,300,316,297,345,260"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="253,246,184,253,117,263,61,279,41,289,27,300,20,313,21,325,26,338,36,350,65,373,94,392,91,396,62,378,33,354,22,340,15,326,15,311,23,297,38,284,59,274,116,258,184,247,252,241"/>
+<area shape="poly" id="edge13_Node000006_Node000011" title=" " alt="" coords="385,260,407,298,422,345,430,386,425,387,417,346,402,300,380,263"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="251,347,142,396,139,392,249,342"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="344,344,404,384,401,389,341,349"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="167,421,335,472,333,477,165,426"/>
+</map>

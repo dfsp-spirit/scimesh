@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('namespacescimesh_1_1obj__io.html','');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a692ee50dd2dca0cc00fe987ae40a5f59" id="r_a692ee50dd2dca0cc00fe987ae40a5f59"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">read_obj</a> (const std::string &amp;path)</td></tr>
+<tr class="memitem:a692ee50dd2dca0cc00fe987ae40a5f59" id="r_a692ee50dd2dca0cc00fe987ae40a5f59"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">read_obj</a> (<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> std::string &amp;<a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">path</a>)</td></tr>
 <tr class="memdesc:a692ee50dd2dca0cc00fe987ae40a5f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a mesh from a Wavefront OBJ file.  <br /></td></tr>
 <tr class="separator:a692ee50dd2dca0cc00fe987ae40a5f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -117,7 +117,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structscimesh_1_1Mesh.html">Mesh</a> scimesh::obj_io::read_obj </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">const</a> std::string &amp;&#160;</td>
           <td class="paramname"><em>path</em></td><td>)</td>
           <td></td>
         </tr>
@@ -125,7 +125,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Load a mesh from a Wavefront OBJ file. </p>
-<p>Reads vertex positions, face indices, and optionally normals and texture coordinates from the file. OBJ is a text format — you can open <code>.obj</code> files in any text editor to inspect them.</p>
+<p>Reads vertex positions and face indices from the file. OBJ is a text format — you can open <code>.obj</code> files in any text editor to inspect them.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>Filesystem path to the <code>.obj</code> file. </td></tr>
@@ -139,13 +139,13 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> model = <a class="code hl_function" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a>(<span class="stringliteral">&quot;teapot.obj&quot;</span>);</div>
-<div class="line"><span class="keywordflow">if</span> (!model.<a class="code hl_function" href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb">is_valid</a>()) {</div>
+<dl class="section user"><dt>Example</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">model</a> = <a class="code hl_function" href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a>(<span class="stringliteral">&quot;teapot.obj&quot;</span>);</div>
+<div class="line"><span class="keywordflow">if</span> (!<a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">model</a>.is_valid()) {</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load valid mesh from OBJ file\n&quot;</span>;</div>
 <div class="line">}</div>
 <div class="ttc" id="anamespacescimesh_1_1obj__io_html_a692ee50dd2dca0cc00fe987ae40a5f59"><div class="ttname"><a href="namespacescimesh_1_1obj__io.html#a692ee50dd2dca0cc00fe987ae40a5f59">scimesh::obj_io::read_obj</a></div><div class="ttdeci">Mesh read_obj(const std::string &amp;path)</div><div class="ttdoc">Load a mesh from a Wavefront OBJ file.</div><div class="ttdef"><b>Definition</b> <a href="obj__io_8cpp_source.html#l00008">obj_io.cpp:8</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html"><div class="ttname"><a href="structscimesh_1_1Mesh.html">scimesh::Mesh</a></div><div class="ttdoc">A 3D triangle mesh using an indexed face set representation.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00076">mesh.h:76</a></div></div>
-<div class="ttc" id="astructscimesh_1_1Mesh_html_a44fe684a6f5e9dd61b65709eeed1b1eb"><div class="ttname"><a href="structscimesh_1_1Mesh.html#a44fe684a6f5e9dd61b65709eeed1b1eb">scimesh::Mesh::is_valid</a></div><div class="ttdeci">bool is_valid() const</div><div class="ttdoc">Check whether the mesh is in a valid, renderable state.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00231">mesh.h:231</a></div></div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section user"><dt>Supported features</dt><dd><ul>
 <li>Vertex positions (v)</li>
@@ -157,7 +157,7 @@ Functions</h2></td></tr>
 </dd></dl>
 <dl class="section user"><dt>Unsupported</dt><dd><ul>
 <li>Vertex normals (vn) — call <a class="el" href="namespacescimesh.html#a48db43f881f780c9b217915748be0d37" title="Compute per-vertex normals by averaging adjacent face normals.">compute_vertex_normals()</a> after loading</li>
-<li>Texture coordinates (vt) — UVs default to (0,0)</li>
+<li>Texture coordinates (vt) — no UVs are loaded, so textured rendering needs UVs that you assign yourself (see <a class="el" href="structscimesh_1_1Mesh.html#ad79cc804a9e8fde7a4592aa00a4d11da" title="Per-vertex texture coordinates (UVs).">Mesh::uvs</a>). The data is parsed by libfs, so supporting <code>vt</code> would be a small addition; until then the renderer gets no UVs from an OBJ file.</li>
 <li>Materials (.mtl) — only geometry is loaded, colors are not imported from material files.</li>
 </ul>
 </dd></dl>

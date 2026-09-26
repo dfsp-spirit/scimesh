@@ -8,5 +8,6 @@ var searchData=
   ['base_5fg_5',['base_g',['../structscimesh_1_1gltf__io_1_1detail_1_1PackedMesh.html#a330f44e712f73806df776a205a1b3039',1,'scimesh::gltf_io::detail::PackedMesh']]],
   ['base_5fr_6',['base_r',['../structscimesh_1_1gltf__io_1_1detail_1_1PackedMesh.html#a22c74fe92c1d18df9449078f10159e0d',1,'scimesh::gltf_io::detail::PackedMesh']]],
   ['bin_7',['bin',['../structscimesh_1_1gltf__io_1_1detail_1_1GltfOutput.html#a5bb19d3dbb89f0da55cfe257b78d3905',1,'scimesh::gltf_io::detail::GltfOutput']]],
-  ['blend_5fmode_8',['blend_mode',['../structscimesh_1_1Rasterizer.html#ad6d3d9dd7ea6b39b7f17f24b451acf15',1,'scimesh::Rasterizer']]]
+  ['bitmap_8',['bitmap',['../text_8cpp.html#a77a8c06002c14b016e5654328199d3fd',1,'text.cpp']]],
+  ['blend_5fmode_9',['blend_mode',['../structscimesh_1_1Rasterizer.html#ad6d3d9dd7ea6b39b7f17f24b451acf15',1,'scimesh::Rasterizer']]]
 ];

@@ -105,27 +105,43 @@ $(document).ready(function(){initNavTree('structscimesh_1_1ClipPlane.html',''); 
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a638121b2c559148eb1dc876866fec6be" id="r_a638121b2c559148eb1dc876866fec6be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1ClipPlane.html#a638121b2c559148eb1dc876866fec6be">normal</a> = <a class="el" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0.0f, 0.0f, -1.0f)</td></tr>
-<tr class="memdesc:a638121b2c559148eb1dc876866fec6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The plane normal vector (should be unit-length).  <br /></td></tr>
+<tr class="memdesc:a638121b2c559148eb1dc876866fec6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The plane normal vector.  <br /></td></tr>
 <tr class="separator:a638121b2c559148eb1dc876866fec6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed5222289fb98d782321fcdacb50fdb3" id="r_aed5222289fb98d782321fcdacb50fdb3"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1ClipPlane.html#aed5222289fb98d782321fcdacb50fdb3">offset</a> = 0.0f</td></tr>
-<tr class="memdesc:aed5222289fb98d782321fcdacb50fdb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Offset along the normal.  <br /></td></tr>
+<tr class="memitem:aed5222289fb98d782321fcdacb50fdb3" id="r_aed5222289fb98d782321fcdacb50fdb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1ClipPlane.html#aed5222289fb98d782321fcdacb50fdb3">offset</a> = 0.0f</td></tr>
+<tr class="memdesc:aed5222289fb98d782321fcdacb50fdb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed distance of the plane from the origin along <code>normal</code>.  <br /></td></tr>
 <tr class="separator:aed5222289fb98d782321fcdacb50fdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0da2eb938f56aba025ab5c1220ca293" id="r_af0da2eb938f56aba025ab5c1220ca293"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7">PlaneSpace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1ClipPlane.html#af0da2eb938f56aba025ab5c1220ca293">space</a> = <a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7a5289492cf082446ca4a6eec9f72f1ec3">PlaneSpace::WORLD</a></td></tr>
+<tr class="memdesc:af0da2eb938f56aba025ab5c1220ca293"><td class="mdescLeft">&#160;</td><td class="mdescRight">The space <a class="el" href="structscimesh_1_1ClipPlane.html#a638121b2c559148eb1dc876866fec6be" title="The plane normal vector.">ClipPlane::normal</a> and <a class="el" href="structscimesh_1_1ClipPlane.html#aed5222289fb98d782321fcdacb50fdb3" title="Signed distance of the plane from the origin along normal.">ClipPlane::offset</a> refer to.  <br /></td></tr>
+<tr class="separator:af0da2eb938f56aba025ab5c1220ca293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A clipping plane that can hide parts of the scene. </p>
-<p>A clip plane is defined by a normal vector and an offset. Anything on the "negative" side of the plane (where <code>dot(point, normal) + offset &lt; 0</code>) is discarded during rendering.</p>
-<p>Clip planes are useful for cross-section views (e.g., slicing through a brain mesh to show internal structures).</p>
-<dl class="section user"><dt>Example: clip everything behind Z=0</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> opts;</div>
-<div class="line">opts.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7">clip_planes</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1ClipPlane.html">ClipPlane</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0, 0, -1), 0.0f});</div>
-<div class="line"><span class="comment">// negates everything with Z &lt; 0</span></div>
+<p>Geometry on the "negative" side of the plane is discarded, i.e. a point <code>p</code> is <em>kept</em> when <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">dot(p, normal)</a> + offset &gt;= 0</code>. Which space <code>p</code> lives in is selected by <a class="el" href="structscimesh_1_1ClipPlane.html#af0da2eb938f56aba025ab5c1220ca293" title="The space ClipPlane::normal and ClipPlane::offset refer to.">ClipPlane::space</a>:</p>
+<ul>
+<li><code><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7a5289492cf082446ca4a6eec9f72f1ec3" title="World (scene) space: the plane is fixed in the scene, so it does not move when the camera moves.">PlaneSpace::WORLD</a></code> (<b>default</b>): <code>p</code> is the world-space position, so the plane is a fixed feature of the scene. Cutting the midsagittal plane of a brain mesh (<code>normal = (-1,0,0)</code>, <code>offset = 0</code>) keeps cutting the same place while the camera orbits.</li>
+<li><code><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7aeaa2d12d8afc4f0e044064ec4770f054" title="Eye (view/camera) space: the plane is anchored to the camera and therefore travels and rotates with i...">PlaneSpace::EYE</a></code>: <code>p</code> is the view-space (eye-space) position, i.e. <code>p = view * p_world</code>. The plane moves with the camera.</li>
+</ul>
+<p>The <code>normal</code> is normalized internally, and <code>offset</code> is always a signed distance in world units along the (normalized) normal — scaling the normal does not change the plane. A zero-length normal neutralizes the plane (it clips nothing) instead of discarding the whole scene.</p>
+<p>Clip planes are useful for cross-section views (e.g., slicing through a brain mesh to show internal structures). Multiple planes are combined with a logical AND: only geometry kept by <em>all</em> planes is rendered.</p>
+<dl class="section user"><dt>Example: world-space cross-section (default)</dt><dd><div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>;</div>
+<div class="line"><span class="comment">// Keep the half of the scene with world x &lt;= 0.  The cut stays at</span></div>
+<div class="line"><span class="comment">// x = 0 no matter where the camera is placed.</span></div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.<a class="code hl_variable" href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7">clip_planes</a>.push_back(<a class="code hl_struct" href="structscimesh_1_1ClipPlane.html">ClipPlane</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(-1, 0, 0), 0.0f});</div>
 <div class="ttc" id="anamespacescimesh_html_a500854f7e819a236d4887daef660f0bc"><div class="ttname"><a href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">scimesh::Vec3</a></div><div class="ttdeci">glm::vec3 Vec3</div><div class="ttdoc">3-component floating-point vector (xyz).</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00046">types.h:46</a></div></div>
-<div class="ttc" id="astructscimesh_1_1ClipPlane_html"><div class="ttname"><a href="structscimesh_1_1ClipPlane.html">scimesh::ClipPlane</a></div><div class="ttdoc">A clipping plane that can hide parts of the scene.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00224">types.h:224</a></div></div>
+<div class="ttc" id="astructscimesh_1_1ClipPlane_html"><div class="ttname"><a href="structscimesh_1_1ClipPlane.html">scimesh::ClipPlane</a></div><div class="ttdoc">A clipping plane that can hide parts of the scene.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00263">types.h:263</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html">scimesh::RenderOptions</a></div><div class="ttdoc">All settings that control rendering output.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00074">render_options.h:74</a></div></div>
-<div class="ttc" id="astructscimesh_1_1RenderOptions_html_a6344ec29e93473762446ec91b69bfaa7"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7">scimesh::RenderOptions::clip_planes</a></div><div class="ttdeci">std::vector&lt; ClipPlane &gt; clip_planes</div><div class="ttdoc">Optional clip planes for cross-section views.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00216">render_options.h:216</a></div></div>
+<div class="ttc" id="astructscimesh_1_1RenderOptions_html_a6344ec29e93473762446ec91b69bfaa7"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7">scimesh::RenderOptions::clip_planes</a></div><div class="ttdeci">std::vector&lt; ClipPlane &gt; clip_planes</div><div class="ttdoc">Optional clip planes for cross-section views.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00237">render_options.h:237</a></div></div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --></dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1RenderOptions.html" title="All settings that control rendering output.">RenderOptions</a>, <a class="el" href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7" title="Optional clip planes for cross-section views.">RenderOptions::clip_planes</a> </dd></dl>
+<dl class="section user"><dt>Example: eye-space (camera-attached) cutaway</dt><dd><div class="fragment"><div class="line"><span class="comment">// Keep only geometry at least 2 world units in front of the camera,</span></div>
+<div class="line"><span class="comment">// so the camera always &quot;sees inside&quot; the scene.</span></div>
+<div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.clip_planes.push_back(</div>
+<div class="line">    <a class="code hl_struct" href="structscimesh_1_1ClipPlane.html">ClipPlane</a>{<a class="code hl_typedef" href="namespacescimesh.html#a500854f7e819a236d4887daef660f0bc">Vec3</a>(0, 0, -1), -2.0f, <a class="code hl_enumvalue" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7aeaa2d12d8afc4f0e044064ec4770f054">PlaneSpace::EYE</a>});</div>
+<div class="ttc" id="anamespacescimesh_html_a83210248fca9fc04882983ef6cc5bfa7aeaa2d12d8afc4f0e044064ec4770f054"><div class="ttname"><a href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7aeaa2d12d8afc4f0e044064ec4770f054">scimesh::PlaneSpace::EYE</a></div><div class="ttdeci">@ EYE</div><div class="ttdoc">Eye (view/camera) space: the plane is anchored to the camera and therefore travels and rotates with i...</div></div>
+</div><!-- fragment --></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1RenderOptions.html" title="All settings that control rendering output.">RenderOptions</a>, <a class="el" href="structscimesh_1_1RenderOptions.html#a6344ec29e93473762446ec91b69bfaa7" title="Optional clip planes for cross-section views.">RenderOptions::clip_planes</a>, <a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7" title="Coordinate space in which a ClipPlane is defined.">PlaneSpace</a>, <a class="el" href="namespacescimesh.html#a7c2d872e4bead1da3ce0ee38d5120ea2" title="Convert a ClipPlane to view (eye) space, ready for clipping.">clip_plane_to_view_space()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00224">224</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00263">263</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a638121b2c559148eb1dc876866fec6be" name="a638121b2c559148eb1dc876866fec6be"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a638121b2c559148eb1dc876866fec6be">&#9670;&#160;</a></span>normal</h2>
@@ -139,10 +155,11 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The plane normal vector (should be unit-length). </p>
-<p>Points toward the "keep" side of the plane. Default: (0, 0, -1), i.e., removing things behind Z=0. </p>
+<p>The plane normal vector. </p>
+<p>Points toward the "keep" side of the plane. It does not have to be unit-length: it is normalized internally, and <a class="el" href="structscimesh_1_1ClipPlane.html#aed5222289fb98d782321fcdacb50fdb3" title="Signed distance of the plane from the origin along normal.">ClipPlane::offset</a> is always interpreted as a distance in world units.</p>
+<p>Default: (0, 0, -1). </p>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00229">229</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00271">271</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 </div>
 </div>
@@ -153,15 +170,35 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float scimesh::ClipPlane::offset = 0.0f</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">float</a> scimesh::ClipPlane::offset = 0.0f</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Offset along the normal. </p>
-<p>A point <code>p</code> is kept when <code>dot(p, normal) + offset &gt;= 0</code>. </p>
+<p>Signed distance of the plane from the origin along <code>normal</code>. </p>
+<p>A point <code>p</code> is kept when <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">dot(p, normal)</a> + offset &gt;= 0</code> in the space given by <a class="el" href="structscimesh_1_1ClipPlane.html#af0da2eb938f56aba025ab5c1220ca293" title="The space ClipPlane::normal and ClipPlane::offset refer to.">ClipPlane::space</a>, so <code>offset = -d</code> puts the plane at distance <code>d</code> from the origin when the normal is unit-length.</p>
+<p>Default: 0 (the plane passes through the origin). </p>
 
-<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00234">234</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00280">280</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
+
+</div>
+</div>
+<a id="af0da2eb938f56aba025ab5c1220ca293" name="af0da2eb938f56aba025ab5c1220ca293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0da2eb938f56aba025ab5c1220ca293">&#9670;&#160;</a></span>space</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7">PlaneSpace</a> scimesh::ClipPlane::space = <a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7a5289492cf082446ca4a6eec9f72f1ec3">PlaneSpace::WORLD</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The space <a class="el" href="structscimesh_1_1ClipPlane.html#a638121b2c559148eb1dc876866fec6be" title="The plane normal vector.">ClipPlane::normal</a> and <a class="el" href="structscimesh_1_1ClipPlane.html#aed5222289fb98d782321fcdacb50fdb3" title="Signed distance of the plane from the origin along normal.">ClipPlane::offset</a> refer to. </p>
+<p>Default: <code><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7a5289492cf082446ca4a6eec9f72f1ec3" title="World (scene) space: the plane is fixed in the scene, so it does not move when the camera moves.">PlaneSpace::WORLD</a></code>. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacescimesh.html#a83210248fca9fc04882983ef6cc5bfa7" title="Coordinate space in which a ClipPlane is defined.">PlaneSpace</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="types_8h_source.html#l00286">286</a> of file <a class="el" href="types_8h_source.html">types.h</a>.</p>
 
 </div>
 </div>

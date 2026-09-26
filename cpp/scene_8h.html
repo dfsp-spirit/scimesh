@@ -100,6 +100,8 @@ $(document).ready(function(){initNavTree('scene_8h.html',''); initResizable(); }
 <p>The Scene — a collection of meshes rendered together.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="mesh_8h_source.html">scimesh/mesh.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="lines_8h_source.html">scimesh/lines.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="text_8h_source.html">scimesh/text.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="math__utils_8h_source.html">scimesh/math_utils.h</a>&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -107,42 +109,62 @@ Include dependency graph for scene.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="scene_8h__incl.png" border="0" usemap="#asrc_2core_2scimesh_2scene_8h" alt=""/></div>
 <map name="asrc_2core_2scimesh_2scene_8h" id="asrc_2core_2scimesh_2scene_8h">
-<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="703,5,889,31"/>
-<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="497,79,625,104"/>
-<area shape="poly" title=" " alt="" coords="759,33,613,77,612,72,758,28"/>
-<area shape="rect" title=" " alt="" coords="741,299,800,324"/>
-<area shape="poly" title=" " alt="" coords="881,28,967,47,1011,60,1050,76,1081,96,1102,119,1107,133,1108,147,1104,163,1096,179,1068,212,1035,239,997,260,958,277,879,299,814,310,813,304,878,294,956,272,995,255,1032,234,1064,208,1091,176,1099,161,1102,147,1102,134,1097,122,1078,100,1047,81,1009,65,966,52,880,33"/>
-<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="715,79,877,104"/>
-<area shape="poly" title=" " alt="" coords="799,31,799,65,793,65,793,31"/>
-<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="395,225,523,251"/>
-<area shape="poly" title=" " alt="" coords="541,106,511,126,485,154,471,183,464,213,459,211,466,181,480,150,508,122,538,102"/>
-<area shape="rect" title=" " alt="" coords="654,299,717,324"/>
-<area shape="poly" title=" " alt="" coords="585,102,615,122,642,150,661,184,673,221,686,285,680,286,668,222,656,187,638,154,611,126,582,106"/>
-<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="495,152,628,177"/>
-<area shape="poly" title=" " alt="" coords="564,104,564,138,559,138,559,104"/>
-<area shape="rect" title=" " alt="" coords="357,152,419,177"/>
-<area shape="poly" title=" " alt="" coords="534,106,430,149,428,144,532,102"/>
-<area shape="rect" title=" " alt="" coords="250,299,361,324"/>
-<area shape="poly" title=" " alt="" coords="435,253,344,295,342,290,433,248"/>
-<area shape="rect" title=" " alt="" coords="385,299,495,324"/>
-<area shape="poly" title=" " alt="" coords="458,252,449,286,444,285,453,250"/>
-<area shape="rect" title=" " alt="" coords="519,299,630,324"/>
-<area shape="poly" title=" " alt="" coords="479,248,545,289,543,294,476,253"/>
-<area shape="rect" title=" " alt="" coords="97,299,226,324"/>
-<area shape="poly" title=" " alt="" coords="412,253,223,298,222,293,410,248"/>
-<area shape="poly" title=" " alt="" coords="496,248,642,294,640,299,494,253"/>
-<area shape="rect" title=" " alt="" coords="5,299,72,324"/>
-<area shape="poly" title=" " alt="" coords="395,250,257,271,86,301,85,296,256,265,394,245"/>
-<area shape="poly" title=" " alt="" coords="514,248,729,296,729,296,728,301,727,301,513,253"/>
-<area shape="poly" title=" " alt="" coords="546,180,488,219,485,215,543,175"/>
-<area shape="poly" title=" " alt="" coords="566,177,577,211,598,249,623,272,650,290,647,294,619,276,594,252,572,213,561,178"/>
-<area shape="poly" title=" " alt="" coords="521,180,87,300,85,294,519,175"/>
-<area shape="poly" title=" " alt="" coords="580,175,744,288,741,293,577,180"/>
-<area shape="poly" title=" " alt="" coords="779,107,718,141,641,180,576,205,514,224,513,219,574,200,639,175,716,137,776,102"/>
-<area shape="rect" title=" " alt="" coords="863,152,1081,177"/>
-<area shape="poly" title=" " alt="" coords="825,102,931,144,929,149,823,106"/>
-<area shape="rect" title=" " alt="" coords="753,152,839,177"/>
-<area shape="poly" title=" " alt="" coords="799,104,799,138,793,138,793,104"/>
+<area shape="rect" title="The Scene — a collection of meshes rendered together." alt="" coords="420,5,605,31"/>
+<area shape="rect" href="mesh_8h.html" title="The Mesh — the central data structure for 3D geometry in scimesh." alt="" coords="154,79,282,104"/>
+<area shape="poly" title=" " alt="" coords="466,33,279,78,278,73,465,28"/>
+<area shape="rect" title=" " alt="" coords="826,299,885,324"/>
+<area shape="poly" title=" " alt="" coords="606,22,746,36,907,60,984,77,1051,97,1105,121,1126,135,1141,150,1152,167,1156,183,1154,198,1147,212,1121,237,1082,257,1036,274,987,288,899,306,898,301,986,283,1034,269,1080,252,1118,232,1143,209,1149,197,1151,183,1147,169,1137,154,1122,139,1103,126,1049,102,982,82,906,65,746,41,605,28"/>
+<area shape="rect" href="lines_8h.html" title="Screen&#45;space line primitives — the LineLayer." alt="" coords="306,79,429,104"/>
+<area shape="poly" title=" " alt="" coords="490,33,404,75,402,70,488,28"/>
+<area shape="rect" href="text_8h.html" title="Text labels — the TextLayer." alt="" coords="453,79,572,104"/>
+<area shape="poly" title=" " alt="" coords="515,31,515,65,510,65,510,31"/>
+<area shape="rect" href="math__utils_8h.html" title="Low&#45;level math utilities for the rendering pipeline." alt="" coords="596,79,757,104"/>
+<area shape="poly" title=" " alt="" coords="540,28,639,71,636,76,538,33"/>
+<area shape="rect" href="types_8h.html" title="Fundamental types used throughout the scimesh rendering engine." alt="" coords="399,225,527,251"/>
+<area shape="poly" title=" " alt="" coords="239,102,363,175,434,216,431,221,361,180,236,106"/>
+<area shape="rect" title=" " alt="" coords="91,299,153,324"/>
+<area shape="poly" title=" " alt="" coords="215,105,135,287,130,285,210,103"/>
+<area shape="rect" href="image_8h.html" title="The Image — an RGBA pixel buffer with compositing and I/O operations." alt="" coords="397,152,530,177"/>
+<area shape="poly" title=" " alt="" coords="258,101,411,146,410,151,257,107"/>
+<area shape="rect" title=" " alt="" coords="5,152,68,177"/>
+<area shape="poly" title=" " alt="" coords="190,107,80,149,78,144,188,102"/>
+<area shape="rect" title=" " alt="" coords="600,299,711,324"/>
+<area shape="poly" title=" " alt="" coords="495,248,612,291,610,296,493,253"/>
+<area shape="rect" title=" " alt="" coords="177,299,288,324"/>
+<area shape="poly" title=" " alt="" coords="427,253,284,297,282,292,425,248"/>
+<area shape="rect" title=" " alt="" coords="312,299,423,324"/>
+<area shape="poly" title=" " alt="" coords="449,253,396,292,393,288,446,249"/>
+<area shape="rect" title=" " alt="" coords="447,299,576,324"/>
+<area shape="poly" title=" " alt="" coords="473,250,498,286,494,289,469,253"/>
+<area shape="poly" title=" " alt="" coords="401,253,168,301,167,296,400,248"/>
+<area shape="rect" title=" " alt="" coords="735,299,802,324"/>
+<area shape="poly" title=" " alt="" coords="515,248,722,296,721,301,514,253"/>
+<area shape="poly" title=" " alt="" coords="528,246,656,266,812,296,811,301,655,271,527,251"/>
+<area shape="poly" title=" " alt="" coords="466,178,466,212,461,212,461,178"/>
+<area shape="poly" title=" " alt="" coords="437,180,163,296,161,291,435,175"/>
+<area shape="poly" title=" " alt="" coords="489,175,733,290,731,295,487,180"/>
+<area shape="poly" title=" " alt="" coords="499,175,635,223,695,248,814,292,812,297,693,253,633,228,497,180"/>
+<area shape="poly" title=" " alt="" coords="368,104,367,138,370,158,378,176,398,199,424,217,421,221,394,203,373,179,365,159,362,139,363,104"/>
+<area shape="poly" title=" " alt="" coords="310,107,204,131,161,143,140,154,123,185,116,220,116,255,119,285,114,285,110,255,110,219,118,183,136,150,160,138,203,125,309,102"/>
+<area shape="rect" title=" " alt="" coords="554,152,639,177"/>
+<area shape="poly" title=" " alt="" coords="405,101,547,145,545,150,403,107"/>
+<area shape="poly" title=" " alt="" coords="457,107,418,124,401,137,387,153,383,171,391,187,408,203,428,216,425,221,404,207,387,190,378,171,382,151,397,133,415,120,455,102"/>
+<area shape="poly" title=" " alt="" coords="484,107,377,154,249,229,151,293,148,289,246,224,374,150,482,102"/>
+<area shape="poly" title=" " alt="" coords="572,100,743,128,847,150,859,165,866,183,872,219,870,255,865,285,860,284,865,254,867,219,861,184,854,168,845,154,742,134,572,105"/>
+<area shape="poly" title=" " alt="" coords="507,106,481,142,477,139,502,103"/>
+<area shape="poly" title=" " alt="" coords="528,102,574,141,571,145,524,106"/>
+<area shape="rect" href="font_8h.html" title="TrueType font loading, glyph rasterization and text measurement." alt="" coords="715,152,833,177"/>
+<area shape="poly" title=" " alt="" coords="555,101,719,146,718,151,554,107"/>
+<area shape="poly" title=" " alt="" coords="725,180,527,225,526,220,723,175"/>
+<area shape="poly" title=" " alt="" coords="715,175,565,194,476,209,388,228,350,240,312,253,167,299,166,294,310,248,348,234,387,223,475,204,565,189,714,169"/>
+<area shape="poly" title=" " alt="" coords="749,180,720,199,707,212,696,226,694,244,702,261,717,276,735,290,732,294,713,280,697,264,688,245,692,224,702,208,716,195,746,175"/>
+<area shape="poly" title=" " alt="" coords="783,176,844,285,840,288,778,179"/>
+<area shape="rect" title=" " alt="" coords="706,225,783,251"/>
+<area shape="poly" title=" " alt="" coords="772,179,757,214,752,212,767,177"/>
+<area shape="poly" title=" " alt="" coords="679,105,674,141,666,161,653,179,629,199,600,214,541,232,540,227,598,209,626,195,649,176,661,159,668,139,674,104"/>
+<area shape="poly" title=" " alt="" coords="666,106,622,145,618,141,662,102"/>
+<area shape="rect" title=" " alt="" coords="909,152,1127,177"/>
+<area shape="poly" title=" " alt="" coords="732,101,950,147,949,152,731,107"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">

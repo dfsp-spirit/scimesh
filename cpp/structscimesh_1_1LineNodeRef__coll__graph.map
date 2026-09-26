@@ -1,0 +1,5 @@
+<map id="scimesh::LineNodeRef" name="scimesh::LineNodeRef">
+<area shape="rect" id="Node000001" title="A non&#45;owning reference to one line layer in a scene, together with its placement transform (and optio..." alt="" coords="5,93,172,119"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1LineLayer.html" title="A batch of independent line segments drawn with a fixed screen&#45;space width." alt="" coords="15,5,162,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,45,91,93,86,93,86,45"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="scimesh::TextLayer" name="scimesh::TextLayer">
+<area shape="rect" id="Node000001" title="A batch of text labels drawn together, in one coordinate space." alt="" coords="5,93,152,119"/>
+<area shape="rect" id="Node000002" href="$structscimesh_1_1Color.html" title="An RGBA color with floating&#45;point components." alt="" coords="19,5,138,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,45,81,93,76,93,76,45"/>
+</map>

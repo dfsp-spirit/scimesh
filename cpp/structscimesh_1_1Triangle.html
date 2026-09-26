@@ -104,13 +104,13 @@ $(document).ready(function(){initNavTree('structscimesh_1_1Triangle.html',''); i
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae379043b274924ff2236e39a324a50a7" id="r_ae379043b274924ff2236e39a324a50a7"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#ae379043b274924ff2236e39a324a50a7">v0</a> = 0</td></tr>
+<tr class="memitem:ae379043b274924ff2236e39a324a50a7" id="r_ae379043b274924ff2236e39a324a50a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#ae379043b274924ff2236e39a324a50a7">v0</a> = 0</td></tr>
 <tr class="memdesc:ae379043b274924ff2236e39a324a50a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of the first vertex in <a class="el" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c" title="3D vertex positions.">Mesh::vertices</a>.  <br /></td></tr>
 <tr class="separator:ae379043b274924ff2236e39a324a50a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade2e27653584f0cfb7e87c5b5fd3cb98" id="r_ade2e27653584f0cfb7e87c5b5fd3cb98"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#ade2e27653584f0cfb7e87c5b5fd3cb98">v1</a> = 0</td></tr>
+<tr class="memitem:ade2e27653584f0cfb7e87c5b5fd3cb98" id="r_ade2e27653584f0cfb7e87c5b5fd3cb98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#ade2e27653584f0cfb7e87c5b5fd3cb98">v1</a> = 0</td></tr>
 <tr class="memdesc:ade2e27653584f0cfb7e87c5b5fd3cb98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of the second vertex in <a class="el" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c" title="3D vertex positions.">Mesh::vertices</a>.  <br /></td></tr>
 <tr class="separator:ade2e27653584f0cfb7e87c5b5fd3cb98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a584bc9ecb201459947f5dcb67e33489c" id="r_a584bc9ecb201459947f5dcb67e33489c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#a584bc9ecb201459947f5dcb67e33489c">v2</a> = 0</td></tr>
+<tr class="memitem:a584bc9ecb201459947f5dcb67e33489c" id="r_a584bc9ecb201459947f5dcb67e33489c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structscimesh_1_1Triangle.html#a584bc9ecb201459947f5dcb67e33489c">v2</a> = 0</td></tr>
 <tr class="memdesc:a584bc9ecb201459947f5dcb67e33489c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of the third vertex in <a class="el" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c" title="3D vertex positions.">Mesh::vertices</a>.  <br /></td></tr>
 <tr class="separator:a584bc9ecb201459947f5dcb67e33489c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -118,11 +118,12 @@ Public Attributes</h2></td></tr>
 <div class="textblock"><p>A triangle defined by three vertex indices. </p>
 <p>A <code><a class="el" href="structscimesh_1_1Triangle.html" title="A triangle defined by three vertex indices.">Triangle</a></code> does <b>not</b> store actual 3D positions. Instead it stores three <b>indices</b> (<code>v0</code>, <code>v1</code>, <code>v2</code>) into a <code><a class="el" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c" title="3D vertex positions.">Mesh::vertices</a></code> array. This is the standard "indexed face set" representation used throughout computer graphics: vertices are stored once and triangles reference them.</p>
 <dl class="section user"><dt>How it works (indexed face set)</dt><dd><div class="fragment"><div class="line"><span class="comment">// Imagine a mesh with 4 vertices:</span></div>
-<div class="line">mesh.vertices = { vA, vB, vC, vD };</div>
+<div class="line">mesh.vertices = { <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">vA</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">vB</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">vC</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">vD</a> };</div>
 <div class="line">mesh.triangles = {</div>
 <div class="line">    {0, 1, 2},  <span class="comment">// first triangle:  vertices[0], vertices[1], vertices[2]</span></div>
 <div class="line">    {1, 2, 3}   <span class="comment">// second triangle: vertices[1], vertices[2], vertices[3]</span></div>
 <div class="line">};</div>
+<div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
 </div><!-- fragment --></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structscimesh_1_1Mesh.html" title="A 3D triangle mesh using an indexed face set representation.">Mesh</a>, <a class="el" href="structscimesh_1_1Mesh.html#ab9765dc4fa9dde15c08beead8503ea7c" title="3D vertex positions.">Mesh::vertices</a>, <a class="el" href="structscimesh_1_1Mesh.html#ae5bc35d3b894ba07c018d4513d767046" title="Triangle index triplets.">Mesh::triangles</a> </dd></dl>
 
@@ -135,7 +136,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint32_t scimesh::Triangle::v0 = 0</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a> scimesh::Triangle::v0 = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -153,7 +154,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint32_t scimesh::Triangle::v1 = 0</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a> scimesh::Triangle::v1 = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -171,7 +172,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint32_t scimesh::Triangle::v2 = 0</td>
+          <td class="memname"><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">uint32_t</a> scimesh::Triangle::v2 = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
