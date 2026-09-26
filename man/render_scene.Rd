@@ -13,7 +13,10 @@ nodes.  Each mesh descriptor is a list with components
 \code{vertices} (Nx3 matrix), \code{triangles} (Mx3 integer matrix),
 and optionally \code{colors}, \code{face_colors}, \code{normals}, and
 \code{default_color}.  Elements may also be rgl-style lists (with
-\code{vb} and \code{it}), which are converted automatically.}
+\code{vb} and \code{it}), which are converted automatically.
+A \code{scimesh_scene} may hold line layers and text layers, which are
+drawn together with the meshes (see \code{\link{line_layer}} and
+\code{\link{text_layer}}).}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.
 Ignored (falls back to the scene's camera) when \code{meshes} is a

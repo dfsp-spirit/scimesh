@@ -111,3 +111,46 @@ TEST_CASE("Rasterizer without backface culling renders both sides", "[rasterizer
     img.get_pixel(50, 50, rr, gg, bb, aa);
     REQUIRE(rr > 0);
 }
+
+TEST_CASE("A pixel on a shared triangle edge is rasterized by one triangle",
+          "[rasterizer]") {
+    // Two translucent triangles forming a quad whose shared diagonal lies
+    // exactly on the centers of the pixels it crosses: (10, 10) to (50, 50) is
+    // the line y = x, and pixel centers are at (x + 0.5, y + 0.5).  Every pixel
+    // of the quad must be blended exactly once, including the ones on the
+    // diagonal.  Evaluating the edge function in the direction each triangle
+    // happens to walk along the shared edge gives the two triangles values that
+    // differ in their last bits, so on some platforms such a pixel used to be
+    // covered by *both* triangles (blended twice - a dark seam) and on others by
+    // neither (a crack).
+    Image img(64, 64);
+    img.clear(255, 255, 255, 255);
+    Rasterizer r(64, 64);
+    r.clear(1.0f);
+    r.set_blend_mode(true);
+
+    const Color half_red(1, 0, 0, 0.5f);
+    const Vec3 n(0, 0, 1);
+    const Vec3 light(0, 0, 1);
+    auto triangle = [&](const Vec3 &a, const Vec3 &b, const Vec3 &c) {
+        r.rasterize_triangle(a, half_red, n, Vec2(0, 0),
+                             b, half_red, n, Vec2(0, 0),
+                             c, half_red, n, Vec2(0, 0),
+                             false, false, light, false, Color(), img);
+    };
+    triangle(Vec3(10, 10, 0.5f), Vec3(50, 10, 0.5f), Vec3(50, 50, 0.5f));
+    triangle(Vec3(10, 10, 0.5f), Vec3(50, 50, 0.5f), Vec3(10, 50, 0.5f));
+
+    uint8_t rr, gg, bb, aa;
+    img.get_pixel(20, 30, rr, gg, bb, aa);   // inside the lower right half
+    const uint8_t lower = gg;
+    img.get_pixel(30, 20, rr, gg, bb, aa);   // inside the upper left half
+    const uint8_t upper = gg;
+    img.get_pixel(30, 30, rr, gg, bb, aa);   // exactly on the shared diagonal
+    const uint8_t on_edge = gg;
+
+    REQUIRE(upper == lower);
+    REQUIRE(on_edge == lower);   // exactly one blend, not two and not zero
+    REQUIRE(on_edge > 0);
+    REQUIRE(on_edge < 255);
+}

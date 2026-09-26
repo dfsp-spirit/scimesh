@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(scimesh VERSION 0.3.4 LANGUAGES CXX)
+project(scimesh VERSION 0.4.0 LANGUAGES CXX)
 
 # ---- scimesh static library ------------------------------------------------
 # This is the core C++ software renderer.  Link against this target to use
@@ -31,6 +31,8 @@ add_library(scimesh STATIC
     src/core/transforms.cpp
     src/core/ply_io.cpp
     src/core/obj_io.cpp
+    src/core/font.cpp
+    src/core/text.cpp
     src/third_party/tinyply.cpp
 )
 
@@ -49,7 +51,14 @@ target_include_directories(scimesh SYSTEM PUBLIC
 
 # ---- compile features & definitions -----------------------------------------
 target_compile_features(scimesh PUBLIC cxx_std_17)
-target_compile_definitions(scimesh PRIVATE SCIMESH_STB_WRITE_IMPL SCIMESH_STB_READ_IMPL)
+target_compile_definitions(scimesh PRIVATE SCIMESH_STB_WRITE_IMPL SCIMESH_STB_READ_IMPL SCIMESH_STB_TRUETYPE_IMPL)
+
+# ---- bundled font -----------------------------------------------------------
+# Default font for text labels (see text.h / font.h).  It is compiled in as the
+# default_font_path() fallback for builds from the source tree, and installed to
+# <prefix>/share/scimesh/fonts/ so that installed consumers can point at it.
+set(SCIMESH_FONT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/inst/extdata/Inter-Regular.ttf)
+target_compile_definitions(scimesh PRIVATE SCIMESH_DEFAULT_FONT="${SCIMESH_FONT_FILE}")
 
 # ---- generated version header -----------------------------------------------
 # Generates scimesh/version.h from the project version declared above.
@@ -85,4 +94,10 @@ install(DIRECTORY src/core/
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scimesh/version.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scimesh
+)
+
+# The bundled font and its license (SIL OFL 1.1) travel together.
+install(FILES ${SCIMESH_FONT_FILE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/inst/extdata/Inter-Regular-LICENSE.txt
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/scimesh/fonts
 )

@@ -26,6 +26,8 @@ or a scimesh mesh descriptor list (with \code{vertices} and
 Ignored when \code{vertices} is a list.}
 
 \item{colors}{Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
+The fourth column is the alpha value; alpha < 1 renders the mesh
+translucently (see the Transparency section below).
 Use \code{face_colors} (Mx4) for per-triangle colours instead.}
 
 \item{face_colors}{Optional Mx4 numeric matrix of per-face RGBA colors,
@@ -34,10 +36,15 @@ use the same colour.  Takes precedence over vertex \code{colors}.}
 
 \item{normals}{Optional Nx3 numeric matrix of vertex normals.}
 
-\item{uv}{Optional Nx2 numeric matrix of texture coordinates (0-1).}
+\item{uv}{Optional Nx2 numeric matrix of texture coordinates (0-1).  scimesh
+uses image-space UVs: \code{v = 0} is the \emph{top} edge of the texture
+image, so \code{c(0, 0)} addresses its top-left pixel.  UVs from OBJ/PLY
+files, rgl or Blender use the opposite convention and must be converted
+with \code{\link{flip_uvs}()} first.}
 
 \item{texture}{Optional texture image as a 3D array (H x W x 3 or 4)
-with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.}
+with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.  Row 1 of
+the array is the top row of the image, matching the UV convention above.}
 
 \item{camera}{A camera list from \code{camera()} or \code{camera_auto()}.}
 
@@ -55,6 +62,18 @@ descriptor list, or as an rgl \code{tmesh3d}-style list (with
 \code{vb}/\code{it} components).  rgl meshes are transparently
 converted via \code{\link{mesh_from_rgl}()}.
 }
+\section{Transparency}{
+
+The fourth column of \code{colors} (and of \code{face_colors}) is the
+alpha value: values \code{< 1} make the mesh translucent, and the renderer
+blends it with whatever is behind it automatically - there is no flag to
+set.  Per-vertex alpha is interpolated across each triangle, so a smooth
+fade is possible, and \code{alpha = 0} makes geometry invisible (holes).
+Translucent triangles are drawn back-to-front after the opaque geometry,
+so they are correctly hidden by opaque meshes in front of them.  Use
+\code{\link{set_mesh_alpha}()} to set one alpha value for a whole mesh.
+}
+
 \examples{
 # Render a simple colored triangle
 verts <- matrix(c(0, 0, 0,  1, 0, 0,  0.5, 1, 0), ncol = 3, byrow = TRUE)

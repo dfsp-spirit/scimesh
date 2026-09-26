@@ -15,7 +15,8 @@ A mesh descriptor list.
 \description{
 Reads a PLY file (ASCII or binary) with optional per-vertex colors
 and returns a scimesh mesh descriptor list with \code{vertices},
-\code{triangles}, and optionally \code{colors}.
+\code{triangles}, and optionally \code{colors}.  Texture coordinates in the
+file are ignored.
 }
 \examples{
 \dontrun{

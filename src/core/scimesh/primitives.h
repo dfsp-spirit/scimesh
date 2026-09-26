@@ -41,24 +41,72 @@ Mesh generate_sphere(const Vec3 &center, float radius, int segments, const Color
 /// @brief Generate a cylinder between two endpoints.
 ///
 /// The cylinder runs from `start` to `end` with a circular cross-section
-/// of the given radius.  End caps are included.
+/// of the given radius.  By default end caps are included; pass
+/// `caps = false` for an open tube, which uses roughly half the geometry
+/// (`4 * segments + 2` vertices with caps vs. `2 * segments` without, for
+/// the same segment count).  Open tubes are the better choice whenever the
+/// ends are not visible, e.g. edges of a network graph whose nodes are
+/// drawn as spheres, or wireframe-like line bundles.
 ///
 /// @param start    Starting point (center of bottom cap).
 /// @param end      Ending point (center of top cap).
 /// @param radius   Radius of the cylinder.
 /// @param segments Number of sides around the circumference (≥ 3).
 /// @param color    Uniform color.
+/// @param caps     Whether to close both ends with triangle fans (default: true).
 /// @return A new Mesh with normals.
 ///
 /// @par Example
 /// @code{.cpp}
 /// Mesh pillar = generate_cylinder({0,0,0}, {0,5,0}, 0.5f, 16,
 ///                                  Color(0.7f, 0.7f, 0.7f));
+/// // Open tube, half the geometry (e.g. for graph edges):
+/// Mesh edge = generate_cylinder({0,0,0}, {0,5,0}, 0.05f, 8,
+///                                Color(0.7f, 0.7f, 0.7f), false);
 /// @endcode
 ///
-/// @see generate_cone(), generate_arrow()
+/// @see generate_cone(), generate_arrow(), generate_multi_cylinders()
 Mesh generate_cylinder(const Vec3 &start, const Vec3 &end, float radius,
-                       int segments, const Color &color);
+                       int segments, const Color &color, bool caps = true);
+
+/// @brief Generate a tube (generalized cylinder) along a polyline path.
+///
+/// Sweeps a circular cross-section of the given radius along the points of
+/// `path`, which allows for curved shapes (arches, Bezier samples, streamlines,
+/// graph edges drawn as arcs).  A path of exactly two points produces the same
+/// shape as generate_cylinder().
+///
+/// The cross-section frames are computed by **parallel transport**
+/// (rotation-minimizing frames): the frame of each ring is derived from the
+/// previous ring by the minimal rotation between the two tangents.  This keeps
+/// the tube from twisting around its own axis.  Interior tangent directions are
+/// mitered (the direction from the previous to the next path point), so joints
+/// between segments stay watertight; note that very sharp turns pinch the tube
+/// slightly on the inside of the bend.
+///
+/// Consecutive duplicate path points are removed.  If fewer than two distinct
+/// points remain, an empty mesh is returned.
+///
+/// @param path      Path points to sweep along (at least 2 distinct points).
+/// @param radius    Radius of the tube.
+/// @param segments  Number of sides around the circumference (≥ 3).
+/// @param color     Uniform color.
+/// @param cap_start Whether to close the beginning with a triangle fan (default: true).
+/// @param cap_end   Whether to close the end with a triangle fan (default: true).
+/// @return A new Mesh with normals (radial, pointing away from the centerline).
+///
+/// @par Example
+/// @code{.cpp}
+/// // A curved tube through three points, open at both ends:
+/// std::vector<Vec3> path = {{0,0,0}, {1,1,0}, {2,0,0}};
+/// Mesh arc = generate_tube(path, 0.1f, 12, Color(0.8f, 0.2f, 0.2f),
+///                          false, false);
+/// @endcode
+///
+/// @see generate_cylinder(), generate_multi_tubes()
+Mesh generate_tube(const std::vector<Vec3> &path, float radius, int segments,
+                   const Color &color, bool cap_start = true,
+                   bool cap_end = true);
 
 /// @brief Generate a cone from a base circle to a tip point.
 ///
@@ -248,8 +296,10 @@ Mesh generate_plane(const Vec3 &center, const Vec3 &normal,
 /// all spheres share a single mesh with one vertex/triangle array.
 ///
 /// @param centers  Array of center points.
-/// @param radii    Array of radii (same length as `centers`).
-/// @param colors   Array of colors (same length as `centers`).
+/// @param radii    Array of radii (recycled from the first entry if shorter;
+///                 an empty array means radius 1.0).
+/// @param colors   Array of colors (recycled from the first entry if shorter;
+///                 an empty array means white).
 /// @param segments Subdivisions per sphere (default: 16).
 /// @return A single Mesh containing all spheres.
 ///
@@ -274,9 +324,14 @@ Mesh generate_multi_spheres(const std::vector<Vec3> &centers,
 ///
 /// @param starts   Array of start points.
 /// @param ends     Array of end points (same length as `starts`).
-/// @param radii    Array of radii (same length).
-/// @param colors   Array of colors (same length).
+/// @param radii    Array of radii (recycled from the first entry if shorter;
+///                 an empty array means radius 1.0).
+/// @param colors   Array of colors (recycled from the first entry if shorter;
+///                 an empty array means white).
 /// @param segments Subdivisions per cylinder (default: 12).
+/// @param caps     Whether to close both ends of each cylinder (default: true,
+///                 see generate_cylinder()).  Pass `false` to save about half
+///                 of the vertices/triangles when the ends are hidden.
 /// @return A single Mesh containing all cylinders.
 ///
 /// @par Example
@@ -293,6 +348,40 @@ Mesh generate_multi_cylinders(const std::vector<Vec3> &starts,
                               const std::vector<Vec3> &ends,
                               const std::vector<float> &radii,
                               const std::vector<Color> &colors,
-                              int segments = 12);
+                              int segments = 12, bool caps = true);
+
+/// @brief Generate multiple tubes in a single mesh (efficient batching).
+///
+/// Much faster than calling generate_tube() many times and merging — all tubes
+/// share a single mesh with one vertex/triangle array.  The paths may differ in
+/// length; short or degenerate paths simply contribute no geometry.
+///
+/// @param paths    Array of paths, each a vector of points (≥ 2 distinct points
+///                 per path for it to produce geometry).
+/// @param radii    Array of radii (recycled from the first entry if shorter;
+///                 an empty array means radius 1.0).
+/// @param colors   Array of colors (recycled from the first entry if shorter;
+///                 an empty array means white).
+/// @param segments Subdivisions around the circumference (default: 12).
+/// @param caps     Whether to close both ends of every tube (default: false,
+///                 since batched tubes are typically connected at the ends).
+/// @return A single Mesh containing all tubes.
+///
+/// @par Example
+/// @code{.cpp}
+/// std::vector<std::vector<Vec3>> paths = {
+///     {{0,0,0}, {1,1,0}, {2,0,0}},
+///     {{0,0,1}, {1,1,1}, {2,0,1}}}
+/// ;
+/// std::vector<float> rads = {0.1f, 0.1f};
+/// std::vector<Color> cols = {Color(1,0,0), Color(0,0,1)};
+/// Mesh tubes = generate_multi_tubes(paths, rads, cols, 12, false);
+/// @endcode
+///
+/// @see generate_tube(), generate_multi_cylinders()
+Mesh generate_multi_tubes(const std::vector<std::vector<Vec3>> &paths,
+                          const std::vector<float> &radii,
+                          const std::vector<Color> &colors,
+                          int segments = 12, bool caps = false);
 
 } // namespace scimesh

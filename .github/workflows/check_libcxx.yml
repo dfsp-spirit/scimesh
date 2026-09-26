@@ -1,0 +1,42 @@
+name: C++ stdlib strictness
+
+# Compiles every translation unit of the R package against libc++ 14, the
+# standard library of the clang 14 toolchain used by the CRAN macOS builders
+# (r-release-macos-x86_64, r-oldrel-macos-x86_64, r-oldrel-macos-arm64).
+#
+# None of the other builds can catch a missing standard header: libstdc++ (GCC,
+# i.e. the Linux and Windows checks) and libc++ >= 15 (Xcode 15+, i.e. the
+# `macos-latest` runner in R-CMD-check.yaml) pull headers like <array> in
+# transitively via <functional>.  libc++ 14 does not, which is how a missing
+# `#include <array>` in src/core/primitives.cpp broke the CRAN installation of
+# scimesh 0.3.4 on macOS ("implicit instantiation of undefined template
+# 'std::array<...>'") while every other check stayed green.  Fixed in 0.4.0.
+#
+# The job is fast (syntax-only, no linking, no R needed) and runs on every
+# push/PR.  Locally the same thing is available via
+# dev_tools/check_libcxx_strictness.sh.
+#
+# Runs on the pinned 24.04 image because the job needs the libc++-14 packages,
+# which newer Ubuntu releases no longer ship.
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  libcxx14:
+    name: Compile with libc++ 14
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install clang 14 and libc++ 14
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-14 libc++-14-dev
+
+      - name: Compile all translation units with libc++ 14
+        run: CXX=clang++-14 ./dev_tools/check_libcxx_strictness.sh

@@ -7,6 +7,16 @@
 #' \code{vb}/\code{it} components).  rgl meshes are transparently
 #' converted via \code{\link{mesh_from_rgl}()}.
 #'
+#' @section Transparency:
+#' The fourth column of \code{colors} (and of \code{face_colors}) is the
+#' alpha value: values \code{< 1} make the mesh translucent, and the renderer
+#' blends it with whatever is behind it automatically - there is no flag to
+#' set.  Per-vertex alpha is interpolated across each triangle, so a smooth
+#' fade is possible, and \code{alpha = 0} makes geometry invisible (holes).
+#' Translucent triangles are drawn back-to-front after the opaque geometry,
+#' so they are correctly hidden by opaque meshes in front of them.  Use
+#' \code{\link{set_mesh_alpha}()} to set one alpha value for a whole mesh.
+#'
 #' @param vertices Either an Nx3 numeric matrix of vertex positions,
 #'   or a scimesh mesh descriptor list (with \code{vertices} and
 #'   \code{triangles} components), or an rgl-style list (with
@@ -14,14 +24,21 @@
 #' @param triangles Mx3 integer matrix of triangle indices (1-based).
 #'   Ignored when \code{vertices} is a list.
 #' @param colors Optional Nx4 numeric matrix of RGBA vertex colors (0-1).
+#'   The fourth column is the alpha value; alpha < 1 renders the mesh
+#'   translucently (see the Transparency section below).
 #'   Use \code{face_colors} (Mx4) for per-triangle colours instead.
 #' @param face_colors Optional Mx4 numeric matrix of per-face RGBA colors,
 #'   one row per triangle.  When present, all three vertices of a triangle
 #'   use the same colour.  Takes precedence over vertex \code{colors}.
 #' @param normals Optional Nx3 numeric matrix of vertex normals.
-#' @param uv Optional Nx2 numeric matrix of texture coordinates (0-1).
+#' @param uv Optional Nx2 numeric matrix of texture coordinates (0-1).  scimesh
+#'   uses image-space UVs: \code{v = 0} is the \emph{top} edge of the texture
+#'   image, so \code{c(0, 0)} addresses its top-left pixel.  UVs from OBJ/PLY
+#'   files, rgl or Blender use the opposite convention and must be converted
+#'   with \code{\link{flip_uvs}()} first.
 #' @param texture Optional texture image as a 3D array (H x W x 3 or 4)
-#'   with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.
+#'   with values in \code{[0, 1]}, e.g. from \code{png::readPNG()}.  Row 1 of
+#'   the array is the top row of the image, matching the UV convention above.
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #' @param options A render options list from \code{render_options()}.
 #' @return A list with components \code{width}, \code{height}, and
@@ -122,6 +139,9 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 #'   and optionally \code{colors}, \code{face_colors}, \code{normals}, and
 #'   \code{default_color}.  Elements may also be rgl-style lists (with
 #'   \code{vb} and \code{it}), which are converted automatically.
+#'   A \code{scimesh_scene} may hold line layers and text layers, which are
+#'   drawn together with the meshes (see \code{\link{line_layer}} and
+#'   \code{\link{text_layer}}).
 #' @param camera A camera list from \code{camera()} or \code{camera_auto()}.
 #'   Ignored (falls back to the scene's camera) when \code{meshes} is a
 #'   \code{scimesh_scene} and \code{camera} is \code{NULL}.
@@ -151,13 +171,19 @@ render_mesh <- function(vertices, triangles = NULL, colors = NULL,
 render_scene <- function(meshes, camera = NULL, options = NULL) {
     if (inherits(meshes, "scimesh_scene")) {
         sc <- meshes
-        meshes <- sc$meshes
         if (is.null(camera)) {
             camera <- sc$camera
         }
         if (is.null(options)) {
             options <- sc$options
         }
+        if (is.null(options)) {
+            options <- render_options()
+        }
+        if (is.null(camera)) {
+            stop("camera must be provided (or set in the scene)")
+        }
+        return(scimesh_render_scene(scene_data_from_scene(sc), camera, options))
     }
     if (!is.list(meshes)) {
         stop("meshes must be a list of mesh descriptors or scene nodes")
@@ -177,6 +203,39 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
     }
 
     scimesh_render_scene(scene_data, camera, options)
+}
+
+#' Assemble the scene data passed to the C++ layer
+#'
+#' Turns a scene descriptor (see \code{\link{scene}()}) into the flat list of
+#' scene nodes that the C++ layer builds a \code{scimesh::Scene} from: the
+#' meshes first, then the line layers, then the text layers, in the order in
+#' which they are drawn.
+#'
+#' @param sc A scene descriptor list, see \code{\link{scene}()}.
+#' @return A list of scene nodes.
+#' @noRd
+scene_data_from_scene <- function(sc) {
+    if (!inherits(sc, "scimesh_scene")) {
+        stop("sc must be a scene descriptor, see scene()")
+    }
+    nodes <- lapply(sc$meshes, as_scimesh_scene_node)
+    for (i in seq_along(nodes)) {
+        m <- nodes[[i]]$mesh
+        if (!is.list(m) || is.null(m$vertices) || is.null(m$triangles)) {
+            stop("each mesh must be a list with 'vertices' and 'triangles'")
+        }
+    }
+    # Line layers are appended to the scene so that the renderer draws them
+    # together with the meshes (same camera, same depth buffer).
+    if (length(sc$lines) > 0L) {
+        nodes <- c(nodes, normalize_line_layers(sc$lines))
+    }
+    # Text layers are appended after the lines (they are drawn last).
+    if (length(sc$texts) > 0L) {
+        nodes <- c(nodes, normalize_text_layers(sc$texts))
+    }
+    return(nodes)
 }
 
 #' Create render options
@@ -215,18 +274,39 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #'   darker darks and lighter highlights (S-curve).  Formula:
 #'   \code{(value - 0.5) * contrast + 0.5}, clamped to \code{[0, 1]}.
 #' @param fog_enabled Enable depth cueing (fog).  Default \code{FALSE}.
-#' @param fog_start Z-depth where fog begins (0 = near plane, 1 = far
-#'   plane).  Default 0.
-#' @param fog_end Z-depth where fog is fully opaque.  Default 1.
+#' @param fog_start Distance where fog begins, i.e. where objects start
+#'   fading toward \code{fog_color}.  Default 0.
+#' @param fog_end Distance where fog is fully opaque.  Must be larger
+#'   than \code{fog_start}.  Default 1.
 #' @param fog_color RGBA fog colour (0-1 scale).  Defaults to
 #'   \code{background_color}.
+#' @param fog_space Character, either \code{"world"} (default) or
+#'   \code{"ndc"}: the space (and therefore the unit) of
+#'   \code{fog_start} and \code{fog_end}.
+#'   \describe{
+#'     \item{\code{"world"}}{Distances in world units from the camera,
+#'       measured along the viewing direction.  \code{fog_start = 20} means
+#'       "fog starts 20 world units in front of the camera".  This is
+#'       independent of \code{near_plane}/\code{far_plane} and of the
+#'       projection type.}
+#'     \item{\code{"ndc"}}{Normalized device depth, i.e. the raw depth-buffer
+#'       values in \code{[-1, 1]}, where \code{-1} is the near plane,
+#'       \code{0} the middle of the depth range and \code{+1} the far plane.
+#'       This is the legacy behaviour; it depends on the near/far plane
+#'       settings and is strongly non-linear for perspective cameras.}
+#'   }
 #' @param threads Number of render threads.  0 = auto-detect (use all
 #'   cores), 1 = single-threaded (deterministic).  Default 0.
 #'   Requires OpenMP at compile time.
-#' @param clip_planes A list of clip plane descriptors, each a list
-#'   with \code{normal} (length-3 vector) and \code{offset} (numeric).
-#'   Points satisfying \code{dot(normal, position) + offset >= 0} are
-#'   kept.  Default \code{NULL} (no clipping).
+#' @param clip_planes A list of clip planes (see \code{\link{clip_plane}}),
+#'   or \code{NULL} (default) for no clipping.  Each plane removes the
+#'   geometry on its negative side, i.e. a point \code{p} is kept when
+#'   \code{dot(normal, p) + offset >= 0}; several planes are combined with a
+#'   logical AND.  By default \code{p} is the world-space position, so the cut
+#'   is fixed in the scene and does not move when the camera moves; use
+#'   \code{clip_plane(..., space = "eye")} for a camera-relative cut.
+#'   Note that clip planes only apply to mesh and triangle rendering;
+#'   \code{render_points()} and \code{render_spheres()} ignore them.
 #' @param ssao_enabled Enable screen-space ambient occlusion.
 #'   Default \code{FALSE}.
 #' @param ssao_radius Screen-space sample radius in pixels.  Default 16.
@@ -234,8 +314,20 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #' @param aa_samples Anti-aliasing supersampling factor.  Renders
 #'   internally at \code{width * aa_samples} x
 #'   \code{height * aa_samples}, then downsamples to the requested
-#'   size via box averaging.  Default \code{1} (no AA), \code{2} for
-#'   2x2 SSAA, \code{4} for 4x4.
+#'   size via box averaging.  Use \code{1} (the default) for no AA,
+#'   \code{2} for 2x2 SSAA, \code{4} for 4x4.  If \code{NULL}, the
+#'   global option \code{scimesh.aa_samples} is used (which defaults
+#'   to \code{1}).  Set that option once per session to enable AA for
+#'   all render calls, e.g. \code{options(scimesh.aa_samples = 2)}.
+#'   Note that AA increases render time and memory roughly with
+#'   \code{aa_samples^2}, and that thin lines and points get smoother
+#'   edges from it.
+#' @param near_plane Distance of the near clipping plane (default 0.1).
+#'   Geometry closer to the camera is clipped away.  Also defines the
+#'   depth range together with \code{far_plane}, which matters when
+#'   \code{fog_space = "ndc"}.
+#' @param far_plane Distance of the far clipping plane (default 10000).
+#'   Must be larger than \code{near_plane}.
 #' @return A render options list for use with \code{render_mesh()} or
 #'   \code{render_scene()}.
 #'
@@ -253,6 +345,33 @@ render_scene <- function(meshes, camera = NULL, options = NULL) {
 #' opts <- render_options(wireframe = TRUE,
 #'     wireframe_color = c(0, 0, 0, 1),
 #'     background_color = c(0, 0, 0, 0))
+#'
+#' # World-space clip plane: keep the half of the scene with x <= 0.
+#' # The cut stays at x = 0, whatever the camera does.
+#' opts <- render_options(clip_planes = list(
+#'     clip_plane(normal = c(-1, 0, 0), offset = 0)))
+#'
+#' # Eye-space clip plane: additionally remove everything closer than 2 units
+#' # to the camera (camera-attached cutaway).
+#' opts <- render_options(clip_planes = list(
+#'     clip_plane(normal = c(-1, 0, 0), offset = 0),
+#'     clip_plane(normal = c(0, 0, -1), offset = -2, space = "eye")))
+#'
+#' # Fog in world units (default): fade from 20 to 60 units away from the
+#' # camera
+#' opts <- render_options(fog_enabled = TRUE, fog_start = 20, fog_end = 60,
+#'     fog_color = c(0.9, 0.95, 1, 1))
+#'
+#' # Legacy normalized-device-depth fog, for backwards compatibility
+#' opts <- render_options(fog_enabled = TRUE, fog_space = "ndc",
+#'     fog_start = 0.5, fog_end = 1)
+#'
+#' # Enable 2x2 anti-aliasing for this session: affects all subsequent
+#' # render calls that do not pass \code{aa_samples} explicitly.
+#' old <- options(scimesh.aa_samples = 2L)
+#' opts <- render_options()
+#' opts$aa_samples
+#' options(old)
 #'
 #' @export
 render_options <- function(width = 800L, height = 600L,
@@ -273,13 +392,21 @@ render_options <- function(width = 800L, height = 600L,
                            fog_start = 0,
                            fog_end = 1,
                            fog_color = c(0, 0, 0, 0),
+                           fog_space = c("world", "ndc"),
                            threads = 0L,
                            clip_planes = NULL,
                            ssao_enabled = FALSE,
                            ssao_radius = 16,
                            ssao_intensity = 0.8,
-                           aa_samples = 1L) {
+                           aa_samples = NULL,
+                           near_plane = 0.1,
+                           far_plane = 10000) {
     shading <- match.arg(shading)
+    fog_space <- match.arg(fog_space)
+    aa_samples <- resolve_aa_samples(aa_samples)
+    check_fog_options(fog_start, fog_end)
+    clip_planes <- check_clip_planes(clip_planes)
+    check_planes_near_far(near_plane, far_plane)
     structure(list(
         width = as.integer(width),
         height = as.integer(height),
@@ -300,13 +427,43 @@ render_options <- function(width = 800L, height = 600L,
         fog_start = as.numeric(fog_start),
         fog_end = as.numeric(fog_end),
         fog_color = as.numeric(fog_color),
+        fog_space = fog_space,
         threads = as.integer(threads),
         clip_planes = clip_planes,
         ssao_enabled = isTRUE(ssao_enabled),
         ssao_radius = as.numeric(ssao_radius),
         ssao_intensity = as.numeric(ssao_intensity),
-        aa_samples = as.integer(aa_samples)
+        aa_samples = as.integer(aa_samples),
+        near_plane = as.numeric(near_plane),
+        far_plane = as.numeric(far_plane)
     ), class = "scimesh_options")
+}
+
+#' Resolve the anti-aliasing supersampling factor
+#'
+#' Internal helper used by \code{\link{render_options}}.  A value of
+#' \code{NULL} means "not specified by the caller", in which case the global
+#' option \code{scimesh.aa_samples} is used.  This allows switching on
+#' anti-aliasing for a whole session with
+#' \code{options(scimesh.aa_samples = 2)}, without touching any render call.
+#'
+#' @param aa_samples \code{NULL}, or a single positive integer.
+#' @return A single positive integer.
+#' @keywords internal
+#' @noRd
+resolve_aa_samples <- function(aa_samples) {
+    if (is.null(aa_samples)) {
+        aa_samples <- getOption("scimesh.aa_samples", 1L)
+        if (is.null(aa_samples)) {
+            aa_samples <- 1L
+        }
+    }
+    if (!is.numeric(aa_samples) || length(aa_samples) != 1L ||
+        is.na(aa_samples) || !is.finite(aa_samples) || aa_samples < 1 ||
+        abs(aa_samples - round(aa_samples)) > 1e-8) {
+        stop("aa_samples must be a single positive integer, or NULL to use the global option 'scimesh.aa_samples'.")
+    }
+    as.integer(round(aa_samples))
 }
 
 #' Render raw triangles without index buffer

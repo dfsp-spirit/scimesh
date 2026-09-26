@@ -1,7 +1,7 @@
 Package: scimesh
 Type: Package
 Title: Headless Publication-Quality 3D Mesh Rendering Engine
-Version: 0.3.4
+Version: 0.4.0
 Authors@R: c(
     person("Tim", "Sch\u00e4fer", email = "ts+code@rcmd.org",
            role = c("aut", "cre")),
@@ -11,21 +11,22 @@ Authors@R: c(
            comment = "Author of GLM - OpenGL Mathematics (src/third_party/glm/)"),
     person("Dimitri", "Diakopoulos", role = "ctb",
            comment = "Author of tinyply (src/third_party/tinyply.{h,cpp})"),
-    person("Syoyo", "Fujita", role = "ctb",
-           comment = "Author of tinyobjloader (src/third_party/tiny_obj_loader.h)"),
     person("Tim", "Sch\u00e4fer", role = "ctb",
            comment = "Author of libfs (src/third_party/libfs.h)"),
     person("Sebastian", "Reiter", role = "ctb",
            comment = "Author of stl_reader (src/third_party/stl_reader.h)"),
     person("Sean", "Barrett", role = "ctb",
-           comment = "Author of stb libraries (src/third_party/stb_image*.h)")
+           comment = "Author of stb libraries (src/third_party/stb_image*.h, src/third_party/stb_truetype.h)"),
+    person("Rasmus", "Andersson", role = "ctb",
+           comment = "Author of the Inter font (inst/extdata/Inter-Regular.ttf, SIL OFL 1.1)")
     )
 Description: A fast, GPU-free 3D software renderer written in modern C++17 with
     native R bindings. Renders triangle meshes to publication-quality images
     entirely on the CPU, requiring no display server or graphics hardware.
     Features multi-light Blinn-Phong shading, screen-space ambient occlusion,
     anti-aliasing, depth fog, transparency, wireframe rendering, texture
-    mapping, and procedural geometry generation. Supports standard mesh
+    mapping, screen-space lines and text labels, and procedural geometry
+    generation. Supports standard mesh
     file formats with PNG and PPM output. Works on high-performance
     computing clusters, headless servers, containers, and continuous
     integration pipelines, making it suitable for scientific visualization

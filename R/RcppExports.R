@@ -13,6 +13,10 @@ scimesh_camera_fit_mesh <- function(mesh_data, direction, up, fov_degrees = 45.0
     .Call(`_scimesh_scimesh_camera_fit_mesh`, mesh_data, direction, up, fov_degrees, margin, projection)
 }
 
+scimesh_camera_fit_scene <- function(scene_data, direction, up, fov_degrees = 45.0, margin = 1.1, projection = "perspective") {
+    .Call(`_scimesh_scimesh_camera_fit_scene`, scene_data, direction, up, fov_degrees, margin, projection)
+}
+
 scimesh_transform_mesh <- function(mesh_data, matrix_4x4) {
     .Call(`_scimesh_scimesh_transform_mesh`, mesh_data, matrix_4x4)
 }
@@ -37,8 +41,40 @@ scimesh_generate_multi_spheres <- function(centers, radii, colors, segments = 16
     .Call(`_scimesh_scimesh_generate_multi_spheres`, centers, radii, colors, segments)
 }
 
-scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segments = 12L) {
-    .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments)
+scimesh_generate_multi_cylinders <- function(starts, ends, radii, colors, segments = 12L, caps = TRUE) {
+    .Call(`_scimesh_scimesh_generate_multi_cylinders`, starts, ends, radii, colors, segments, caps)
+}
+
+scimesh_generate_tube <- function(path, radius, segments, color, cap_start = TRUE, cap_end = TRUE) {
+    .Call(`_scimesh_scimesh_generate_tube`, path, radius, segments, color, cap_start, cap_end)
+}
+
+scimesh_generate_multi_tubes <- function(paths, radii, colors, segments = 12L, caps = FALSE) {
+    .Call(`_scimesh_scimesh_generate_multi_tubes`, paths, radii, colors, segments, caps)
+}
+
+scimesh_catmull_rom_path <- function(points, samples_per_segment = 8L, closed = FALSE, alpha = 0.5) {
+    .Call(`_scimesh_scimesh_catmull_rom_path`, points, samples_per_segment, closed, alpha)
+}
+
+scimesh_bspline_path <- function(points, samples_per_segment = 8L, closed = FALSE) {
+    .Call(`_scimesh_scimesh_bspline_path`, points, samples_per_segment, closed)
+}
+
+scimesh_bezier_path <- function(control_points, samples = 64L) {
+    .Call(`_scimesh_scimesh_bezier_path`, control_points, samples)
+}
+
+scimesh_resample_path <- function(path, step, closed = FALSE) {
+    .Call(`_scimesh_scimesh_resample_path`, path, step, closed)
+}
+
+scimesh_path_length <- function(path, closed = FALSE) {
+    .Call(`_scimesh_scimesh_path_length`, path, closed)
+}
+
+scimesh_path_curvature <- function(path, closed = FALSE) {
+    .Call(`_scimesh_scimesh_path_curvature`, path, closed)
 }
 
 scimesh_generate_cone <- function(base, tip, radius, segments, color) {
@@ -55,6 +91,26 @@ scimesh_render_triangles_raw <- function(positions, colors, camera_data, options
 
 scimesh_render_points_raw <- function(positions, colors, radius, camera_data, options_data) {
     .Call(`_scimesh_scimesh_render_points_raw`, positions, colors, radius, camera_data, options_data)
+}
+
+scimesh_render_lines_raw <- function(from, to, colors, width, camera_data, options_data, lit = FALSE) {
+    .Call(`_scimesh_scimesh_render_lines_raw`, from, to, colors, width, camera_data, options_data, lit)
+}
+
+scimesh_text_extent <- function(text, size, font_file = "", line_spacing = 1.2) {
+    .Call(`_scimesh_scimesh_text_extent`, text, size, font_file, line_spacing)
+}
+
+scimesh_default_font_path <- function() {
+    .Call(`_scimesh_scimesh_default_font_path`)
+}
+
+scimesh_font_info <- function(font_file, size) {
+    .Call(`_scimesh_scimesh_font_info`, font_file, size)
+}
+
+scimesh_world_to_screen <- function(points, camera_data, width, height, options_data) {
+    .Call(`_scimesh_scimesh_world_to_screen`, points, camera_data, width, height, options_data)
 }
 
 scimesh_generate_cuboid <- function(center, half_extents, color) {

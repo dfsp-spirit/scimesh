@@ -19,12 +19,14 @@ declare -a EXAMPLES=(
     spot_cow:spot_cow
     transparency:transparency_demo
     protein_data_bank_pdb_file:protein_demo
+    spline_tube:spline_tube
     whole_brain_annot:whole_brain_annot
     whole_brain_sulc:whole_brain_sulc
     whole_brain_sulc_fsaverage:whole_brain_sulc_fsaverage
     bunny:bunny
     dragon:dragon
     brain_video:brain_video
+    text_labels:text_labels
     'full_CLI_renderer:scimesh_render:--mesh ../../../../test_data/stanford_3d_scanning_repo/bunny/bun_zipper.ply --output full_cli_renderer_demo'
 )
 

@@ -99,15 +99,17 @@ are available:
 | `contrast` | numeric | 1.0 | S-curve contrast multiplier |
 | `lights` | list or `NULL` | `NULL` | Custom light list (auto-default if `NULL`) |
 | `fog_enabled` | logical | `FALSE` | Enable depth fog |
-| `fog_start` | numeric | 0 | Near-plane fog start |
-| `fog_end` | numeric | 1 | Far-plane fog end |
+| `fog_start` | numeric | 0 | Distance where the fog fade begins |
+| `fog_end` | numeric | 1 | Distance where fog is fully opaque |
+| `fog_space` | `"world"` / `"ndc"` | `"world"` | Unit of `fog_start`/`fog_end` |
 | `fog_color` | RGBA vector | `c(0,0,0,0)` | Fog color |
 | `aa_samples` | integer (1, 2, or 4) | 1 | Ordered-grid supersampling factor |
 | `ssao_enabled` | logical | `FALSE` | Enable screen-space ambient occlusion |
 | `ssao_radius` | numeric | 16 | SSAO sample radius in pixels |
 | `ssao_intensity` | numeric | 0.8 | SSAO occlusion strength (0–1) |
 | `threads` | integer | 0 | Number of CPU threads (0 = auto) |
-| `clip_planes` | list or `NULL` | `NULL` | Custom clipping planes |
+| `clip_planes` | list or `NULL` | `NULL` | Clip planes (see [Clip Planes](#clip-planes)) |
+| `near_plane`, `far_plane` | numeric | 0.1, 10000 | Depth range of the camera |
 
 The following sections cover the most important options in detail.
 
@@ -326,24 +328,83 @@ extensively in the C++ examples.
 ### Depth Fog
 
 Atmospheric depth fog fades distant geometry toward a background color,
-useful for emphasising foreground objects or creating stylised renders:
+useful for emphasising foreground objects or creating stylised renders.
+By default the fog distances are given in **world units** (distance from
+the camera), so a scene looks the same no matter where the camera is
+placed:
 
 ```r
 render_options(
     fog_enabled = TRUE,
-    fog_start = 0.6,              # begin fade at 60 % depth
-    fog_end = 1.0,                # fully fogged at far plane
-    fog_color = c(0.9, 0.95, 1, 1))  # pale blue fog
+    fog_start = 20,                   # start fading 20 world units away
+    fog_end = 60,                     # fully fogged 60 world units away
+    fog_color = c(0.9, 0.95, 1, 1))   # pale blue fog
 ```
 
-Fog is applied linearly between `fog_start` and `fog_end` in
-normalised device coordinates.
+The fade is applied linearly between `fog_start` and `fog_end`, measured
+along the viewing direction. This is independent of the near/far clipping
+planes (`near_plane`, `far_plane`) and of the projection type.
+
+For backwards compatibility, the pre-0.3.5 behaviour of specifying fog
+in **normalized device depth** (the raw depth buffer, `-1` = near plane,
+`+1` = far plane) is still available, but has to be requested explicitly:
+
+```r
+render_options(
+    fog_enabled = TRUE,
+    fog_space = "ndc",
+    fog_start = 0.5,                  # half way into the depth range
+    fog_end = 1.0)
+```
+
+### Clip Planes
+
+Clip planes remove the geometry on one side of a plane, which is useful
+for cross-sections, cutaways, and "half-brain" style figures. A plane is
+built with `clip_plane()` and passed to `render_options(clip_planes = ...)`;
+several planes are combined with a logical AND. A point `p` is kept when
+`dot(normal, p) + offset >= 0`, i.e. `normal` points toward the part that
+stays visible.
+
+By default the plane is defined in **world space**, so the cut is a fixed
+feature of the scene and does not move when the camera is moved — which is
+what makes it usable for orbit videos and multi-view figures:
+
+```r
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(-1, 0, 0), offset = 0)))  # keep world x <= 0
+```
+
+The same scene rendered from any camera position always shows the same cut.
+
+Pass `space = "eye"` for a plane that is defined **relative to the camera**
+and therefore travels with it (the classic OpenGL `glClipPlane` behaviour).
+This is handy for camera-attached cutaways, e.g. removing everything closer
+than 2 units to the viewer so that the camera always sees inside the mesh:
+
+```r
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(0, 0, -1), offset = -2, space = "eye")))
+```
+
+Both modes can be mixed in the same `clip_planes` list.
 
 ### Semi-Transparent Overlays
 
-scimesh supports proper alpha blending with depth-sorted back-to-front
-rendering.  This is useful for visualising nested surfaces (e.g., white
-matter and pial surface in neuroimaging), or for glass-brain effects.
+scimesh blends meshes whose colors are not fully opaque.  The fourth column of
+`colors` (or of `face_colors`, or the alpha of `color` for the generated
+meshes) is the alpha value, and there is nothing to switch on: a mesh with
+alpha < 1 takes part in the blended pass automatically.  The renderer
+
+* interpolates per-vertex alpha across each triangle, so smooth fades work,
+* draws the translucent triangles back-to-front, after the opaque geometry,
+* depth-tests them against the opaque geometry, so translucent geometry behind
+  an opaque mesh stays hidden and does not wash it out,
+* treats alpha 0 as fully invisible (`holes`), e.g. for the medial wall.
+
+`set_mesh_alpha(mesh, alpha)` is the shortcut for a uniform alpha
+(`set_mesh_alpha(mesh, 0.1)` for the 10 % brain shell used as a spatial
+reference).
 
 **R example:**
 ```{r, eval=FALSE}
@@ -375,7 +436,147 @@ write_png(img, temp_file)
 printf("Transparent render written to: %s\n", temp_file)
 ```
 
+**Recipe: a half-transparent medial wall** (in this case with the cortex colored
+by sulcal depth, so the inside of the hemisphere stays visible):
+
+```{r, eval=FALSE}
+surface <- freesurferformats::read.fs.surface("sub-01/surf/lh.white")
+sulc    <- freesurferformats::read.fs.morph("sub-01/surf/lh.sulc")
+cortex  <- freesurferformats::read.fs.label("sub-01/label/lh.cortex.label")
+
+nv <- nrow(surface$vertices)
+medial_wall <- !(seq_len(nv) %in% cortex)
+sulc[medial_wall] <- NA                        # no data on the medial wall
+
+colors <- apply_colormap(sulc, colormap = viridis_colormap(256L),
+    nan_color = c(1, 1, 1, 1), winsor_percentiles = c(2, 98))
+if (ncol(colors) == 3) colors <- cbind(colors, 1)
+colors[medial_wall, 4] <- 0.5                  # 50 % transparent
+
+brain <- list(vertices = surface$vertices, triangles = surface$faces,
+              colors = colors)
+img <- render_scene(list(brain), camera_auto(brain, direction = c(1, 0, 0)),
+    render_options(background_color = c(1, 1, 1, 1)))
+```
+
+Per-vertex alpha can vary freely, which makes gradients possible:
+
+```{r, eval=FALSE}
+quads <- generate_plane(color = c(0.8, 0.2, 0.2, 1))
+quads$colors[, 4] <- rep(c(0, 1), each = nrow(quads$colors) / 2)
+```
+
+**File formats:** PLY vertex colors are read with their alpha (8-bit or float),
+including RGBA files whose alpha is stored with a different type than the RGB
+channels.  OBJ and STL do not carry transparency, and the FreeSurfer converters
+take it from the data: `mesh_from_fs(..., detect_transparency = TRUE)` (C++)
+turns vertices without data into holes, and
+`convert_fs_mesh(fs_mesh, morph, rgb, nan_alpha = 0.5f)` makes them
+half-transparent instead.
+
 **C++ example:** See `examples/cpp/transparency/` in the repository.
+
+**Known limitations:** transparency is resolved per triangle (painter's
+algorithm), so *intersecting*, *coplanar* or very large translucent triangles can
+blend in the wrong order, and a translucent surface never occludes anything (it
+writes no depth).  Point rendering (`render_points()`) does not blend at all;
+use `render_spheres()` (which renders meshes) for translucent spheres.
+
+### Text Labels
+
+`text_layer()` adds text to a scene, which is what figures need to name a region,
+an atom or a panel.  Labels are **billboards**: they always face the camera and
+keep the size given in `size` (in output pixels), so they stay readable from every
+viewpoint — unlike text that is converted into 3D geometry, which skews as the
+camera moves.  Labels create no geometry, they are drawn after the meshes and
+lines (so they appear on top of the model), and the font ships with the package
+(Inter, SIL OFL 1.1), so no system font is required.
+
+Positions are either **world space** (the default) or **screen space**
+(`space = "screen"`, measured in output pixels from the top-left corner):
+
+```{r, eval=FALSE}
+surf <- generate_sphere(c(0, 0, 0), radius = 1)
+cam  <- camera_auto(list(surf), direction = c(0, 0, 1))
+opts <- render_options(width = 500, height = 400,
+                       background_color = c(1, 1, 1, 1))
+
+sc <- scene(list(surf), camera = cam, options = opts,
+            texts = list(
+                # world space: anchored above the sphere, follows the camera
+                text_layer(matrix(c(0, 1.3, 0), ncol = 3), "superior",
+                           size = 20, adj = c(0.5, 0)),
+                # a direction label that must stay readable: no depth test
+                text_layer(matrix(c(1.4, 0, 0), ncol = 3), "anterior",
+                           size = 18, adj = c(0, 0.5),
+                           colors = c(0.75, 0.15, 0.15, 1), depth_test = FALSE),
+                # screen space: a panel tag in the top-left corner
+                text_layer(c(12, 10), "A", space = "screen", adj = c(0, 1),
+                           size = 28, halo_color = c(1, 1, 1, 0.9)),
+                # screen space: a vertical axis label (rotation in degrees,
+                # counter-clockwise, about the anchor)
+                text_layer(c(16, 210), "sulcal depth", space = "screen",
+                           adj = c(0, 0.5), size = 16, rotation = 90)))
+img <- render_scene(sc)
+```
+
+Labelling a brain surface works exactly the same way: the labels carry world
+coordinates of the region they name, and are hidden when the surface is in front
+of them (unless `depth_test = FALSE`).
+
+```{r, eval=FALSE}
+surface <- freesurferformats::read.fs.surface("sub-01/surf/lh.white")
+sulc    <- freesurferformats::read.fs.morph("sub-01/surf/lh.sulc")
+colors  <- apply_colormap(sulc, colormap = viridis_colormap(256L),
+                          winsor_percentiles = c(2, 98))
+if (ncol(colors) == 3) colors <- cbind(colors, 1)
+
+brain <- list(vertices = surface$vertices, triangles = surface$faces,
+              colors = colors)
+cam <- camera_auto(brain, direction = c(1, 0, 0))   # lateral view
+
+# The free surface is roughly 100 mm wide, so the labels sit at x = +-55 mm.
+sc <- scene(list(brain), camera = cam,
+            options = render_options(width = 600, height = 500,
+                                     background_color = c(1, 1, 1, 1)),
+            texts = list(
+                text_layer(matrix(c(-55, 0, 0), ncol = 3), "posterior",
+                           size = 22, adj = c(1, 0.5), depth_test = FALSE),
+                text_layer(matrix(c(55, 0, 0), ncol = 3), "anterior",
+                           size = 22, adj = c(0, 0.5), depth_test = FALSE)))
+img <- render_scene(sc)
+```
+
+Things worth knowing:
+
+- `adj` places the anchor on the text box, exactly like `adj` in base R
+  graphics: `c(0, 0)` is the bottom-left corner, `c(1, 1)` the top-right one, and
+  `c(0.5, 0.5)` (default) centres the text on the position.
+- `rotation` turns the label about its anchor, in degrees, counter-clockwise:
+  90 writes along a vertical axis (a y-axis label), 180 upside down, and any
+  other angle lets a label follow an annotation line.  The rotation happens in
+  the image plane, so it works for screen-space and world-space labels alike.
+- `offset` shifts the label by a number of pixels after anchoring, which is the
+  easy way to put an atom label *next to* an atom instead of onto it.
+- `depth_test` (default `TRUE`) hides a world-space label when geometry is in
+  front of its anchor.  Use `FALSE` for annotations that must always be readable,
+  and for labels anchored on a surface.
+- `halo_color` (with `halo_width`) draws an outline behind the glyphs, which
+  keeps labels readable on dark or busy geometry.
+- `colors` sets per-label colours, `"\n"` starts a new line, and `text_extent()`
+  measures a label so you can right-align a caption or keep two labels from
+  overlapping.
+- `world_to_screen()` converts world coordinates into the pixels of a rendered
+  image, which is what you need to place a screen-space label next to a location
+  in the scene (or to draw a callout line with `line_layer()`).
+- No mesh at all is needed for screen-space labels: `render_text()` draws labels
+  onto the background described by the render options.
+- Replace the typeface with `font_file = "path/to/font.ttf"`, or for the whole
+  session by setting the `SCIMESH_FONT` environment variable.
+
+The same feature is available in the C++ API (`TextLayer`, `Scene::add_texts()`,
+`draw_text()`, see `examples/cpp/text_labels/`) and in the CLI renderer
+(`--text`, `--text-at`, `--text-size`, `--text-screen`, `--text-rotation`, ...).
 
 ### Background and Transparency
 
@@ -479,22 +680,42 @@ When `face_colors` is provided, it takes precedence over vertex
 
 ### Texture Mapping
 
-Load a texture image and assign UV coordinates to render textured
-meshes:
+Load a texture image, give the mesh UV coordinates and render it:
 
 ```r
 # Requires the 'png' package
 library(png)
-tex <- readPNG("texture.png")
+tex <- readPNG("texture.png")   # H x W x C array, row 1 = top of the image
 
-# UV coordinates (Nx2, values 0-1) must match vertex order
-mesh <- read_obj("textured.obj")  # OBJ reader extracts UVs
+# UV coordinates (Nx2, values 0-1) must match the vertex order of the mesh.
+# scimesh UVs are image-space: c(0, 0) is the TOP LEFT pixel of the texture.
+uv <- cbind(c(0, 1, 1, 0), c(0, 0, 1, 1))   # e.g. a quad
 
 img <- render_mesh(mesh$vertices, mesh$triangles,
-    uv = mesh$uv, texture = tex)
+    uv = uv, texture = tex)
 ```
 
-Bilinear texture sampling is used for smooth results.
+Bilinear texture sampling is used for smooth results, and the texel is
+multiplied with the vertex color (so use white vertices to show the texture
+unchanged).
+
+UVs are read from files by **no** scimesh reader: `read_obj()` and `read_ply()`
+return geometry (and colors/normals where available), but drop texture
+coordinates, so you have to supply `uv` yourself.  Note also that OBJ files,
+rgl, OpenGL and tools like Blender store UVs with the *opposite* origin
+(`v = 0` at the bottom of the image); convert such coordinates once with
+`flip_uvs()`:
+
+```r
+# UVs taken from an OBJ file / another 3D tool: v = 0 is the bottom
+uv_obj <- rbind(c(0, 1), c(1, 1), c(1, 0), c(0, 0))
+mesh <- flip_uvs(list(vertices = mesh$vertices, triangles = mesh$triangles,
+                      uv = uv_obj))
+img <- render_mesh(mesh$vertices, mesh$triangles, uv = mesh$uv, texture = tex)
+```
+
+**C++ example:** `examples/cpp/spot_cow/` renders Keenan Crane's textured cow
+from an OBJ file plus a PNG texture, including the UV conversion.
 
 ### Mesh Utilities
 

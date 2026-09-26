@@ -10,12 +10,15 @@ read_obj(path)
 \item{path}{Path to the OBJ file.}
 }
 \value{
-A mesh descriptor list.
+A mesh descriptor list with \code{vertices} and \code{triangles}.
 }
 \description{
-Reads a Wavefront OBJ file (with optional UV coordinates and normals)
-and returns a scimesh mesh descriptor list with \code{vertices},
-\code{triangles}, and optionally \code{uv} and \code{normals}.
+Reads the geometry (vertices and triangles) of a Wavefront OBJ file and
+returns a scimesh mesh descriptor list with \code{vertices} and
+\code{triangles}.  Normals and texture coordinates in the file are ignored:
+call \code{\link{compute_vertex_normals}()} if you need normals, and assign
+\code{uv} yourself (see \code{\link{render_mesh}}) if you want to render the
+mesh with a texture.
 }
 \examples{
 \dontrun{

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <cstdint>
+#include <cstdio>
 
 using namespace scimesh;
 
@@ -808,4 +809,54 @@ TEST_CASE("stack_horizontal single image", "[image][stack]") {
     REQUIRE(result.width == 7);
     REQUIRE(result.height == 5);
     check_pixel(result, 3, 2, 64, 128, 192, 255);
+}
+
+TEST_CASE("Image pixel rows are top-down (y = 0 is the top row)", "[image]") {
+    // Pins the documented convention: row 0 is the **top** row of the image,
+    // both in memory and in the files written by write_png().  ndc_to_screen()
+    // returns y with the same orientation (0 = top), which is what lets the
+    // rasterizer write screen coordinates into the buffer directly, and what
+    // the text renderer relies on when drawing glyphs.
+    Image img(4, 3);
+    img.clear(0, 0, 0, 255);
+    img.set_pixel(0, 0, 255, 0, 0, 255);  // first row -> top
+    img.set_pixel(3, 2, 0, 0, 255, 255);  // last row  -> bottom
+
+    // Row 0 is the first `width * 4` bytes of the buffer.
+    REQUIRE(img.pixels[0] == 255);
+    REQUIRE(img.pixels[1] == 0);
+    REQUIRE(img.pixels[(2 * 4 + 3) * 4 + 2] == 255);
+
+    // get_pixel()/set_pixel() agree with the raw layout.
+    check_pixel(img, 0, 0, 255, 0, 0, 255);
+    check_pixel(img, 3, 2, 0, 0, 255, 255);
+
+    // crop() treats its y argument as the first (top) row.
+    Image top_left = img;
+    top_left.crop(0, 0, 1, 1);
+    check_pixel(top_left, 0, 0, 255, 0, 0, 255);
+
+    Image bottom_row = img;
+    bottom_row.crop(0, 2, 4, 1);
+    check_pixel(bottom_row, 3, 0, 0, 0, 255, 255);
+
+    // grow(top = 2) adds the new rows at the top, i.e. at the start of the buffer.
+    Image grown = img;
+    grown.grow(2, 0, 0, 0, Color(1, 1, 1, 1));
+    REQUIRE(grown.height == 5);
+    check_pixel(grown, 0, 0, 255, 255, 255, 255);  // new top rows are white
+    check_pixel(grown, 0, 1, 255, 255, 255, 255);
+    check_pixel(grown, 0, 2, 255, 0, 0, 255);      // original y=0 moved to y=2
+    check_pixel(grown, 0, 3, 0, 0, 0, 255);        // original y=1 moved to y=3
+
+    // The convention survives a PNG round trip: the row written first is read
+    // back first.
+    const std::string path = "test_output_row_order.png";
+    REQUIRE(img.write_png(path));
+    const Image reloaded = Image::read_image(path);
+    REQUIRE(reloaded.width == 4);
+    REQUIRE(reloaded.height == 3);
+    check_pixel(reloaded, 0, 0, 255, 0, 0, 255);
+    check_pixel(reloaded, 3, 2, 0, 0, 255, 255);
+    std::remove(path.c_str());
 }

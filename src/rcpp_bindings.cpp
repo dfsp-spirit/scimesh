@@ -4,12 +4,15 @@
 #include <scimesh/transforms.h>
 #include <scimesh/normals.h>
 #include <scimesh/primitives.h>
+#include <scimesh/spline.h>
 #include <scimesh/colormap.h>
 #include <scimesh/to_string.h>
 #include <scimesh/stl_io.h>
 #include <scimesh/obj_io.h>
 #include <scimesh/ply_io.h>
 #include <scimesh/gltf_io.h>
+#include <scimesh/font.h>
+#include <scimesh/text.h>
 
 using namespace Rcpp;
 
@@ -31,6 +34,32 @@ scimesh::Vec3 vec3_from_r(const NumericVector &v) {
         static_cast<float>(v[2]));
 }
 
+// Nx3 point matrix -> path.  Rows are points, columns are x, y, z.
+std::vector<scimesh::Vec3> vec3_path_from_r(const NumericMatrix &m) {
+    std::vector<scimesh::Vec3> path;
+    path.reserve(static_cast<size_t>(m.nrow()));
+    for (int i = 0; i < m.nrow(); i++) {
+        path.push_back(scimesh::Vec3(
+            static_cast<float>(m(i, 0)),
+            static_cast<float>(m(i, 1)),
+            static_cast<float>(m(i, 2))));
+    }
+    return path;
+}
+
+// Path -> Nx3 point matrix (0 rows for an empty path, which the R layer
+// treats as "no points").
+NumericMatrix vec3_path_to_r(const std::vector<scimesh::Vec3> &path) {
+    NumericMatrix out(static_cast<int>(path.size()), 3);
+    for (size_t i = 0; i < path.size(); i++) {
+        const int row = static_cast<int>(i);
+        out(row, 0) = static_cast<double>(path[i].x);
+        out(row, 1) = static_cast<double>(path[i].y);
+        out(row, 2) = static_cast<double>(path[i].z);
+    }
+    return out;
+}
+
 scimesh::ShadingMode parse_shading(const std::string &s) {
     if (s == "flat") return scimesh::ShadingMode::FLAT;
     return scimesh::ShadingMode::SMOOTH;
@@ -39,6 +68,16 @@ scimesh::ShadingMode parse_shading(const std::string &s) {
 scimesh::ProjectionType parse_projection(const std::string &s) {
     if (s == "orthographic") return scimesh::ProjectionType::ORTHOGRAPHIC;
     return scimesh::ProjectionType::PERSPECTIVE;
+}
+
+scimesh::PlaneSpace parse_plane_space(const std::string &s) {
+    if (s == "eye") return scimesh::PlaneSpace::EYE;
+    return scimesh::PlaneSpace::WORLD;
+}
+
+scimesh::FogSpace parse_fog_space(const std::string &s) {
+    if (s == "ndc") return scimesh::FogSpace::NDC;
+    return scimesh::FogSpace::WORLD;
 }
 
 scimesh::Mesh build_mesh_from_r(List mesh_desc) {
@@ -212,6 +251,14 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["aa_samples"])) {
         opts.aa_samples = as<int>(opt_desc["aa_samples"]);
     }
+    if (opt_desc.containsElementNamed("near_plane") &&
+        !Rf_isNull(opt_desc["near_plane"])) {
+        opts.near_plane = as<float>(opt_desc["near_plane"]);
+    }
+    if (opt_desc.containsElementNamed("far_plane") &&
+        !Rf_isNull(opt_desc["far_plane"])) {
+        opts.far_plane = as<float>(opt_desc["far_plane"]);
+    }
     if (opt_desc.containsElementNamed("specular_color") &&
         !Rf_isNull(opt_desc["specular_color"])) {
         opts.specular_color = color_from_r(opt_desc["specular_color"]);
@@ -275,6 +322,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
         !Rf_isNull(opt_desc["fog_color"])) {
         opts.fog_color = color_from_r(opt_desc["fog_color"]);
     }
+    if (opt_desc.containsElementNamed("fog_space") &&
+        !Rf_isNull(opt_desc["fog_space"])) {
+        opts.fog_space = parse_fog_space(as<std::string>(opt_desc["fog_space"]));
+    }
 
     if (opt_desc.containsElementNamed("threads") &&
         !Rf_isNull(opt_desc["threads"])) {
@@ -307,6 +358,10 @@ scimesh::RenderOptions build_options_from_r(List opt_desc) {
             if (cp.containsElementNamed("offset") &&
                 !Rf_isNull(cp["offset"])) {
                 plane.offset = as<float>(cp["offset"]);
+            }
+            if (cp.containsElementNamed("space") &&
+                !Rf_isNull(cp["space"])) {
+                plane.space = parse_plane_space(as<std::string>(cp["space"]));
             }
             opts.clip_planes.push_back(plane);
         }
@@ -419,19 +474,253 @@ scimesh::Mat4 mat4_from_r(const NumericMatrix &m) {
     return out;
 }
 
+/// Build a scimesh LineLayer from an R line layer descriptor.
+///
+/// The descriptor is a list with components `from` (Nx3), `to` (Nx3),
+/// optional `colors` (Nx4 or a single RGBA vector), `width`, `depth_test` and
+/// `lit`.  Use lines() on the R side to create one.
+scimesh::LineLayer build_line_layer_from_r(List layer) {
+    scimesh::LineLayer out;
+
+    NumericMatrix from = layer["from"];
+    NumericMatrix to = layer["to"];
+    const int n = std::min(from.nrow(), to.nrow());
+    out.from.reserve(n);
+    out.to.reserve(n);
+    for (int i = 0; i < n; i++) {
+        out.from.push_back(scimesh::Vec3(
+            static_cast<float>(from(i, 0)),
+            static_cast<float>(from(i, 1)),
+            static_cast<float>(from(i, 2))));
+        out.to.push_back(scimesh::Vec3(
+            static_cast<float>(to(i, 0)),
+            static_cast<float>(to(i, 1)),
+            static_cast<float>(to(i, 2))));
+    }
+
+    if (layer.containsElementNamed("colors")) {
+        SEXP cs = layer["colors"];
+        if (cs != R_NilValue) {
+            NumericMatrix colors(cs);
+            out.colors.reserve(colors.nrow());
+            for (int i = 0; i < colors.nrow(); i++) {
+                out.colors.push_back(scimesh::Color(
+                    static_cast<float>(colors(i, 0)),
+                    static_cast<float>(colors(i, 1)),
+                    static_cast<float>(colors(i, 2)),
+                    static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+            }
+        }
+    }
+
+    if (layer.containsElementNamed("width")) {
+        SEXP w = layer["width"];
+        if (w != R_NilValue) {
+            out.width = static_cast<float>(as<double>(w));
+        }
+    }
+    if (layer.containsElementNamed("depth_test")) {
+        SEXP d = layer["depth_test"];
+        if (d != R_NilValue) {
+            out.depth_test = as<bool>(d);
+        }
+    }
+    if (layer.containsElementNamed("lit")) {
+        SEXP l = layer["lit"];
+        if (l != R_NilValue) {
+            out.lit = as<bool>(l);
+        }
+    }
+    if (layer.containsElementNamed("affects_bounds")) {
+        SEXP a = layer["affects_bounds"];
+        if (a != R_NilValue) {
+            out.affects_bounds = as<bool>(a);
+        }
+    }
+
+    return out;
+}
+
+/// Build a scimesh TextLayer from an R text layer descriptor.
+///
+/// The descriptor is a list with components `strings` (character vector),
+/// `positions` (Nx3 or Nx2 numeric matrix; Nx2 is screen space), optional
+/// `colors` (Nx4 or a single RGBA vector), `size` (text height in pixels),
+/// `font_file` (path to a .ttf, "" = bundled font), `space` ("world" or
+/// "screen"), `adj` (length 2), `offset` (length 2), `line_spacing`,
+/// `rotation` (degrees), `depth_test`, `halo_color` (length 3 or 4) and
+/// `halo_width`.  Use text_layer() on the R side to create one.
+scimesh::TextLayer build_text_layer_from_r(List layer) {
+    scimesh::TextLayer out;
+
+    CharacterVector strings = layer["strings"];
+    out.strings.reserve(strings.size());
+    for (int i = 0; i < strings.size(); i++) {
+        out.strings.push_back(as<std::string>(strings[i]));
+    }
+
+    NumericMatrix positions = layer["positions"];
+    out.positions.reserve(positions.nrow());
+    for (int i = 0; i < positions.nrow(); i++) {
+        out.positions.push_back(scimesh::Vec3(
+            static_cast<float>(positions(i, 0)),
+            static_cast<float>(positions(i, 1)),
+            positions.ncol() > 2 ? static_cast<float>(positions(i, 2)) : 0.0f));
+    }
+
+    if (layer.containsElementNamed("colors")) {
+        SEXP cs = layer["colors"];
+        if (cs != R_NilValue) {
+            NumericMatrix colors(cs);
+            out.colors.reserve(colors.nrow());
+            for (int i = 0; i < colors.nrow(); i++) {
+                out.colors.push_back(scimesh::Color(
+                    static_cast<float>(colors(i, 0)),
+                    static_cast<float>(colors(i, 1)),
+                    static_cast<float>(colors(i, 2)),
+                    static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+            }
+        }
+    }
+
+    if (layer.containsElementNamed("size")) {
+        SEXP s = layer["size"];
+        if (s != R_NilValue) out.size = static_cast<float>(as<double>(s));
+    }
+    if (layer.containsElementNamed("font_file")) {
+        SEXP f = layer["font_file"];
+        if (f != R_NilValue) out.font_file = as<std::string>(f);
+    }
+    if (layer.containsElementNamed("space")) {
+        SEXP sp = layer["space"];
+        if (sp != R_NilValue) {
+            out.space = (as<std::string>(sp) == "screen")
+                            ? scimesh::TextSpace::SCREEN
+                            : scimesh::TextSpace::WORLD;
+        }
+    }
+    if (layer.containsElementNamed("adj")) {
+        SEXP a = layer["adj"];
+        if (a != R_NilValue) {
+            NumericVector adj(a);
+            if (adj.size() >= 2) {
+                out.adj = scimesh::Vec2(static_cast<float>(adj[0]),
+                                        static_cast<float>(adj[1]));
+            }
+        }
+    }
+    if (layer.containsElementNamed("offset")) {
+        SEXP o = layer["offset"];
+        if (o != R_NilValue) {
+            NumericVector offset(o);
+            if (offset.size() >= 2) {
+                out.offset = scimesh::Vec2(static_cast<float>(offset[0]),
+                                           static_cast<float>(offset[1]));
+            }
+        }
+    }
+    if (layer.containsElementNamed("line_spacing")) {
+        SEXP ls = layer["line_spacing"];
+        if (ls != R_NilValue) out.line_spacing = static_cast<float>(as<double>(ls));
+    }
+    if (layer.containsElementNamed("rotation")) {
+        SEXP r = layer["rotation"];
+        if (r != R_NilValue) out.rotation = static_cast<float>(as<double>(r));
+    }
+    if (layer.containsElementNamed("depth_test")) {
+        SEXP d = layer["depth_test"];
+        if (d != R_NilValue) out.depth_test = as<bool>(d);
+    }
+    if (layer.containsElementNamed("halo_color")) {
+        SEXP h = layer["halo_color"];
+        if (h != R_NilValue) {
+            NumericVector halo(h);
+            if (halo.size() >= 3) {
+                out.halo_color = scimesh::Color(
+                    static_cast<float>(halo[0]), static_cast<float>(halo[1]),
+                    static_cast<float>(halo[2]),
+                    static_cast<float>(halo.size() > 3 ? halo[3] : 1.0f));
+            }
+        }
+    }
+    if (layer.containsElementNamed("halo_width")) {
+        SEXP hw = layer["halo_width"];
+        if (hw != R_NilValue) out.halo_width = static_cast<float>(as<double>(hw));
+    }
+
+    return out;
+}
+
 /// Build a scimesh Scene from an R list of mesh descriptors or scene nodes.
 ///
 /// Each entry may be a bare mesh descriptor (scimesh or rgl format, via
-/// build_mesh_from_r) or a scene node list with components `mesh` (a mesh
+/// build_mesh_from_r), a scene node list with components `mesh` (a mesh
 /// descriptor), optional `transform` (4x4 NumericMatrix), and optional
-/// `name` (string).
+/// `name` (string), a line layer (class `scimesh_lines`, created by lines()),
+/// or a text layer (class `scimesh_text`, created by text_layer()).  Line and
+/// text layers may be wrapped into a scene node with a `transform`.
 scimesh::Scene build_scene_from_r(List scene_data) {
     scimesh::Scene scene;
     for (int i = 0; i < scene_data.size(); i++) {
         List entry = scene_data[i];
-        scimesh::Mesh mesh;
         scimesh::Mat4 t(1.0f);
         std::string name;
+
+        // Line layer, possibly wrapped into a scene node (with a transform).
+        SEXP layer_sexp = R_NilValue;
+        if (Rf_inherits(entry, "scimesh_lines")) {
+            layer_sexp = entry;
+        } else if (entry.containsElementNamed("lines")) {
+            SEXP inner = entry["lines"];
+            if (inner != R_NilValue && Rf_inherits(inner, "scimesh_lines")) {
+                layer_sexp = inner;
+                if (entry.containsElementNamed("transform")) {
+                    SEXP tr = entry["transform"];
+                    if (tr != R_NilValue) {
+                        t = mat4_from_r(NumericMatrix(tr));
+                    }
+                }
+                if (entry.containsElementNamed("name")) {
+                    SEXP nm = entry["name"];
+                    if (nm != R_NilValue) {
+                        name = as<std::string>(nm);
+                    }
+                }
+            }
+        }
+        if (layer_sexp != R_NilValue) {
+            scene.add_lines(build_line_layer_from_r(List(layer_sexp)), t, name);
+            continue;
+        }
+
+        // Text layer, possibly wrapped into a scene node (with a transform).
+        SEXP text_sexp = R_NilValue;
+        if (Rf_inherits(entry, "scimesh_text")) {
+            text_sexp = entry;
+        } else if (entry.containsElementNamed("text")) {
+            SEXP inner = entry["text"];
+            if (inner != R_NilValue && Rf_inherits(inner, "scimesh_text")) {
+                text_sexp = inner;
+                if (entry.containsElementNamed("transform")) {
+                    SEXP tr = entry["transform"];
+                    if (tr != R_NilValue) {
+                        t = mat4_from_r(NumericMatrix(tr));
+                    }
+                }
+                if (entry.containsElementNamed("name")) {
+                    SEXP nm = entry["name"];
+                    if (nm != R_NilValue) {
+                        name = as<std::string>(nm);
+                    }
+                }
+            }
+        }
+        if (text_sexp != R_NilValue) {
+            scene.add_texts(build_text_layer_from_r(List(text_sexp)), t, name);
+            continue;
+        }
+
+        scimesh::Mesh mesh;
         SEXP me = entry["mesh"];
         if (TYPEOF(me) == VECSXP) {
             // scene node form: list(mesh = ..., transform = ..., name = ...)
@@ -489,6 +778,22 @@ List scimesh_render_scene(List scene_data, List camera_data, List options_data) 
 }
 
 
+// ---- Cameras -----------------------------------------------------------------
+
+/// Convert a camera to the R representation used by camera()/camera_auto().
+List camera_to_r_list(const scimesh::Camera &cam) {
+    List out = List::create(
+        Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),
+        Named("center") = NumericVector::create(
+            cam.center.x, cam.center.y, cam.center.z),
+        Named("up") = NumericVector::create(cam.up.x, cam.up.y, cam.up.z),
+        Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
+            ? "orthographic" : "perspective"),
+        Named("fov") = cam.fov_degrees);
+    out.attr("class") = "scimesh_camera";
+    return out;
+}
+
 // [[Rcpp::export]]
 List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
                               NumericVector up, double fov_degrees = 45.0,
@@ -508,16 +813,29 @@ List scimesh_camera_fit_mesh(List mesh_data, NumericVector direction,
         static_cast<float>(margin),
         proj);
 
-    List out = List::create(
-        Named("eye") = NumericVector::create(cam.eye.x, cam.eye.y, cam.eye.z),
-        Named("center") = NumericVector::create(
-            cam.center.x, cam.center.y, cam.center.z),
-        Named("up") = NumericVector::create(cam.up.x, cam.up.y, cam.up.z),
-        Named("projection") = (cam.projection == scimesh::ProjectionType::ORTHOGRAPHIC
-            ? "orthographic" : "perspective"),
-        Named("fov") = cam.fov_degrees);
-    out.attr("class") = "scimesh_camera";
-    return out;
+    return camera_to_r_list(cam);
+}
+
+// [[Rcpp::export]]
+List scimesh_camera_fit_scene(List scene_data, NumericVector direction,
+                               NumericVector up, double fov_degrees = 45.0,
+                               double margin = 1.1,
+                               CharacterVector projection = "perspective") {
+    scimesh::Scene scene = build_scene_from_r(scene_data);
+    scimesh::Vec3 dir = vec3_from_r(direction);
+    scimesh::Vec3 up_vec = vec3_from_r(up);
+
+    std::string proj_str = as<std::string>(projection);
+    scimesh::ProjectionType proj = scimesh::ProjectionType::PERSPECTIVE;
+    if (proj_str == "orthographic") proj = scimesh::ProjectionType::ORTHOGRAPHIC;
+
+    scimesh::Camera cam = scimesh::camera_fit_scene(
+        scene, dir, up_vec,
+        static_cast<float>(fov_degrees),
+        static_cast<float>(margin),
+        proj);
+
+    return camera_to_r_list(cam);
 }
 
 // ---- Mesh transforms -------------------------------------------------------
@@ -583,7 +901,7 @@ List scimesh_generate_multi_spheres(NumericMatrix centers, NumericVector radii,
 // [[Rcpp::export]]
 List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends,
                                       NumericVector radii, NumericMatrix colors,
-                                      int segments = 12) {
+                                      int segments = 12, bool caps = true) {
     int n = starts.nrow();
     std::vector<scimesh::Vec3> s, e;
     std::vector<float> r;
@@ -604,8 +922,118 @@ List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends,
             static_cast<float>(colors(i, 2)),
             static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
     }
-    scimesh::Mesh mesh = scimesh::generate_multi_cylinders(s, e, r, col, segments);
+    scimesh::Mesh mesh = scimesh::generate_multi_cylinders(s, e, r, col, segments, caps);
     return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_tube(NumericMatrix path, double radius, int segments,
+                           NumericVector color, bool cap_start = true,
+                           bool cap_end = true) {
+    std::vector<scimesh::Vec3> pts;
+    pts.reserve(path.nrow());
+    for (int i = 0; i < path.nrow(); i++) {
+        pts.push_back(scimesh::Vec3(
+            static_cast<float>(path(i, 0)),
+            static_cast<float>(path(i, 1)),
+            static_cast<float>(path(i, 2))));
+    }
+    scimesh::Color c(
+        static_cast<float>(color[0]),
+        static_cast<float>(color[1]),
+        static_cast<float>(color[2]),
+        static_cast<float>(color.size() > 3 ? color[3] : 1.0f));
+    scimesh::Mesh mesh = scimesh::generate_tube(
+        pts, static_cast<float>(radius), segments, c, cap_start, cap_end);
+    return mesh_to_r_list(mesh);
+}
+
+// [[Rcpp::export]]
+List scimesh_generate_multi_tubes(List paths, NumericVector radii,
+                                  NumericMatrix colors, int segments = 12,
+                                  bool caps = false) {
+    int n = paths.size();
+    std::vector<std::vector<scimesh::Vec3>> all_paths;
+    std::vector<float> r;
+    std::vector<scimesh::Color> col;
+    all_paths.reserve(n);
+    for (int i = 0; i < n; i++) {
+        NumericMatrix m = paths[i];
+        std::vector<scimesh::Vec3> pts;
+        pts.reserve(m.nrow());
+        for (int j = 0; j < m.nrow(); j++) {
+            pts.push_back(scimesh::Vec3(
+                static_cast<float>(m(j, 0)),
+                static_cast<float>(m(j, 1)),
+                static_cast<float>(m(j, 2))));
+        }
+        all_paths.push_back(pts);
+    }
+    for (int i = 0; i < n; i++) {
+        // Missing radii/colors are recycled from the first entry by the C++
+        // generators; only pass what the caller actually provided.
+        if (i < radii.size()) r.push_back(static_cast<float>(radii[i]));
+        if (colors.nrow() > 0 && i < colors.nrow()) {
+            col.push_back(scimesh::Color(
+                static_cast<float>(colors(i, 0)),
+                static_cast<float>(colors(i, 1)),
+                static_cast<float>(colors(i, 2)),
+                static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+        }
+    }
+    scimesh::Mesh mesh = scimesh::generate_multi_tubes(all_paths, r, col, segments, caps);
+    return mesh_to_r_list(mesh);
+}
+
+// ---- Splines --------------------------------------------------------------
+// [[Rcpp::export]]
+NumericMatrix scimesh_catmull_rom_path(NumericMatrix points,
+                                       int samples_per_segment = 8,
+                                       bool closed = false,
+                                       double alpha = 0.5) {
+    std::vector<scimesh::Vec3> path = scimesh::catmull_rom_path(
+        vec3_path_from_r(points), samples_per_segment, closed,
+        static_cast<float>(alpha));
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_bspline_path(NumericMatrix points,
+                                   int samples_per_segment = 8,
+                                   bool closed = false) {
+    std::vector<scimesh::Vec3> path = scimesh::bspline_path(
+        vec3_path_from_r(points), samples_per_segment, closed);
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_bezier_path(NumericMatrix control_points,
+                                  int samples = 64) {
+    std::vector<scimesh::Vec3> path =
+        scimesh::bezier_path(vec3_path_from_r(control_points), samples);
+    return vec3_path_to_r(path);
+}
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_resample_path(NumericMatrix path, double step,
+                                    bool closed = false) {
+    std::vector<scimesh::Vec3> resampled = scimesh::resample_by_arclength(
+        vec3_path_from_r(path), static_cast<float>(step), closed);
+    return vec3_path_to_r(resampled);
+}
+
+// [[Rcpp::export]]
+double scimesh_path_length(NumericMatrix path, bool closed = false) {
+    return static_cast<double>(
+        scimesh::path_length(vec3_path_from_r(path), closed));
+}
+
+// [[Rcpp::export]]
+NumericVector scimesh_path_curvature(NumericMatrix path,
+                                     bool closed = false) {
+    std::vector<float> curvature =
+        scimesh::path_curvature(vec3_path_from_r(path), closed);
+    return NumericVector(curvature.begin(), curvature.end());
 }
 
 // ---- Procedural primitives (single) -----------------------------------------
@@ -686,6 +1114,125 @@ List scimesh_render_points_raw(NumericMatrix positions, NumericMatrix colors,
     scimesh::Image img = renderer.render_points_raw(verts, cols,
         static_cast<float>(radius), cam, opts);
     return image_to_r_list(img);
+}
+
+// [[Rcpp::export]]
+List scimesh_render_lines_raw(NumericMatrix from, NumericMatrix to,
+                              NumericMatrix colors, double width,
+                              List camera_data, List options_data,
+                              bool lit = false) {
+    scimesh::Camera cam = build_camera_from_r(camera_data);
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+
+    const int n = std::min(from.nrow(), to.nrow());
+    std::vector<scimesh::Vec3> starts, ends;
+    std::vector<scimesh::Color> cols;
+    starts.reserve(n);
+    ends.reserve(n);
+    cols.reserve(n);
+    for (int i = 0; i < n; i++) {
+        starts.push_back(scimesh::Vec3(
+            static_cast<float>(from(i, 0)),
+            static_cast<float>(from(i, 1)),
+            static_cast<float>(from(i, 2))));
+        ends.push_back(scimesh::Vec3(
+            static_cast<float>(to(i, 0)),
+            static_cast<float>(to(i, 1)),
+            static_cast<float>(to(i, 2))));
+        if (i < colors.nrow()) {
+            cols.push_back(scimesh::Color(
+                static_cast<float>(colors(i, 0)),
+                static_cast<float>(colors(i, 1)),
+                static_cast<float>(colors(i, 2)),
+                static_cast<float>(colors.ncol() > 3 ? colors(i, 3) : 1.0f)));
+        }
+    }
+
+    scimesh::Renderer renderer;
+    scimesh::Image result;
+    if (lit) {
+        // The raw renderer draws flat lines; shading has to go through a
+        // LineLayer with lit = TRUE, added to a scene.
+        scimesh::LineLayer layer;
+        layer.from = starts;
+        layer.to = ends;
+        layer.colors = cols;
+        layer.width = static_cast<float>(width);
+        layer.lit = true;
+        scimesh::Scene scene;
+        scene.add_lines(layer);
+        result = renderer.render_scene(scene, cam, opts);
+    } else {
+        result = renderer.render_lines_raw(starts, ends, cols,
+                                           static_cast<float>(width), cam, opts);
+    }
+    return image_to_r_list(result);
+}
+
+// ---- Text labels ------------------------------------------------------------
+
+// [[Rcpp::export]]
+NumericMatrix scimesh_text_extent(CharacterVector text, double size,
+                                  std::string font_file = "",
+                                  double line_spacing = 1.2) {
+    const int n = text.size();
+    NumericMatrix out(n, 5);
+    CharacterVector colnames = CharacterVector::create(
+        "width", "height", "ascent", "descent", "lines");
+    out.attr("dimnames") = List::create(R_NilValue, colnames);
+    for (int i = 0; i < n; i++) {
+        const scimesh::TextExtent ext = scimesh::measure_text(
+            as<std::string>(text[i]), static_cast<float>(size), font_file,
+            static_cast<float>(line_spacing));
+        out(i, 0) = ext.width;
+        out(i, 1) = ext.height;
+        out(i, 2) = ext.ascent;
+        out(i, 3) = ext.descent;
+        out(i, 4) = static_cast<double>(ext.line_count);
+    }
+    return out;
+}
+
+// [[Rcpp::export]]
+std::string scimesh_default_font_path() {
+    return scimesh::default_font_path();
+}
+
+// [[Rcpp::export]]
+List scimesh_font_info(std::string font_file, double size) {
+    const scimesh::Font font = scimesh::cached_font(font_file, static_cast<float>(size));
+    const scimesh::FontMetrics m = font.metrics();
+    return List::create(
+        _["family"] = font.family_name(),
+        _["path"] = font.source_path(),
+        _["size"] = font.pixel_size(),
+        _["ascent"] = m.ascent,
+        _["descent"] = m.descent,
+        _["line_gap"] = m.line_gap);
+}
+
+// [[Rcpp::export]]
+DataFrame scimesh_world_to_screen(NumericMatrix points, List camera_data,
+                                 int width, int height, List options_data) {
+    scimesh::Camera cam = build_camera_from_r(camera_data);
+    scimesh::RenderOptions opts = build_options_from_r(options_data);
+
+    const int n = points.nrow();
+    NumericVector x(n), y(n), depth(n);
+    LogicalVector in_front(n);
+    for (int i = 0; i < n; i++) {
+        const scimesh::ProjectedPoint p = scimesh::world_to_screen(
+            cam, scimesh::Vec3(static_cast<float>(points(i, 0)),
+                               static_cast<float>(points(i, 1)),
+                               static_cast<float>(points(i, 2))),
+            width, height, opts.projection, opts.near_plane, opts.far_plane);
+        x[i] = p.pixel.x;
+        y[i] = p.pixel.y;
+        depth[i] = p.depth;
+        in_front[i] = p.in_front;
+    }
+    return DataFrame::create(_["x"] = x, _["y"] = y, _["depth"] = depth,
+                             _["in_front"] = in_front);
 }
 
 // ---- Procedural geometry ----------------------------------------------------
@@ -779,6 +1326,10 @@ void scimesh_write_gltf(List scene_data, CharacterVector path,
     scimesh::Scene scene = build_scene_from_r(scene_data);
     std::string p = as<std::string>(path);
     std::string fmt = format;
+
+    if (scene.line_count() > 0) {
+        Rcpp::warning("glTF does not support scene line layers: %d line layer(s) were skipped. Use render_scene() to draw them.", static_cast<int>(scene.line_count()));
+    }
 
     scimesh::Camera cam_storage;
     scimesh::Camera *cam = nullptr;

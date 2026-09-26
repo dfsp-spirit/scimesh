@@ -52,6 +52,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scimesh_camera_fit_scene
+List scimesh_camera_fit_scene(List scene_data, NumericVector direction, NumericVector up, double fov_degrees, double margin, CharacterVector projection);
+RcppExport SEXP _scimesh_scimesh_camera_fit_scene(SEXP scene_dataSEXP, SEXP directionSEXP, SEXP upSEXP, SEXP fov_degreesSEXP, SEXP marginSEXP, SEXP projectionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type scene_data(scene_dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type direction(directionSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type up(upSEXP);
+    Rcpp::traits::input_parameter< double >::type fov_degrees(fov_degreesSEXP);
+    Rcpp::traits::input_parameter< double >::type margin(marginSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type projection(projectionSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_camera_fit_scene(scene_data, direction, up, fov_degrees, margin, projection));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scimesh_transform_mesh
 List scimesh_transform_mesh(List mesh_data, NumericMatrix matrix_4x4);
 RcppExport SEXP _scimesh_scimesh_transform_mesh(SEXP mesh_dataSEXP, SEXP matrix_4x4SEXP) {
@@ -128,8 +144,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // scimesh_generate_multi_cylinders
-List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends, NumericVector radii, NumericMatrix colors, int segments);
-RcppExport SEXP _scimesh_scimesh_generate_multi_cylinders(SEXP startsSEXP, SEXP endsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP) {
+List scimesh_generate_multi_cylinders(NumericMatrix starts, NumericMatrix ends, NumericVector radii, NumericMatrix colors, int segments, bool caps);
+RcppExport SEXP _scimesh_scimesh_generate_multi_cylinders(SEXP startsSEXP, SEXP endsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP, SEXP capsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -138,7 +154,115 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
     Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
-    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_cylinders(starts, ends, radii, colors, segments));
+    Rcpp::traits::input_parameter< bool >::type caps(capsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_cylinders(starts, ends, radii, colors, segments, caps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_tube
+List scimesh_generate_tube(NumericMatrix path, double radius, int segments, NumericVector color, bool cap_start, bool cap_end);
+RcppExport SEXP _scimesh_scimesh_generate_tube(SEXP pathSEXP, SEXP radiusSEXP, SEXP segmentsSEXP, SEXP colorSEXP, SEXP cap_startSEXP, SEXP cap_endSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< double >::type radius(radiusSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type color(colorSEXP);
+    Rcpp::traits::input_parameter< bool >::type cap_start(cap_startSEXP);
+    Rcpp::traits::input_parameter< bool >::type cap_end(cap_endSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_tube(path, radius, segments, color, cap_start, cap_end));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_generate_multi_tubes
+List scimesh_generate_multi_tubes(List paths, NumericVector radii, NumericMatrix colors, int segments, bool caps);
+RcppExport SEXP _scimesh_scimesh_generate_multi_tubes(SEXP pathsSEXP, SEXP radiiSEXP, SEXP colorsSEXP, SEXP segmentsSEXP, SEXP capsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type paths(pathsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type radii(radiiSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< int >::type segments(segmentsSEXP);
+    Rcpp::traits::input_parameter< bool >::type caps(capsSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_generate_multi_tubes(paths, radii, colors, segments, caps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_catmull_rom_path
+NumericMatrix scimesh_catmull_rom_path(NumericMatrix points, int samples_per_segment, bool closed, double alpha);
+RcppExport SEXP _scimesh_scimesh_catmull_rom_path(SEXP pointsSEXP, SEXP samples_per_segmentSEXP, SEXP closedSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples_per_segment(samples_per_segmentSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_catmull_rom_path(points, samples_per_segment, closed, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_bspline_path
+NumericMatrix scimesh_bspline_path(NumericMatrix points, int samples_per_segment, bool closed);
+RcppExport SEXP _scimesh_scimesh_bspline_path(SEXP pointsSEXP, SEXP samples_per_segmentSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples_per_segment(samples_per_segmentSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_bspline_path(points, samples_per_segment, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_bezier_path
+NumericMatrix scimesh_bezier_path(NumericMatrix control_points, int samples);
+RcppExport SEXP _scimesh_scimesh_bezier_path(SEXP control_pointsSEXP, SEXP samplesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type control_points(control_pointsSEXP);
+    Rcpp::traits::input_parameter< int >::type samples(samplesSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_bezier_path(control_points, samples));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_resample_path
+NumericMatrix scimesh_resample_path(NumericMatrix path, double step, bool closed);
+RcppExport SEXP _scimesh_scimesh_resample_path(SEXP pathSEXP, SEXP stepSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< double >::type step(stepSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_resample_path(path, step, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_path_length
+double scimesh_path_length(NumericMatrix path, bool closed);
+RcppExport SEXP _scimesh_scimesh_path_length(SEXP pathSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_path_length(path, closed));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_path_curvature
+NumericVector scimesh_path_curvature(NumericMatrix path, bool closed);
+RcppExport SEXP _scimesh_scimesh_path_curvature(SEXP pathSEXP, SEXP closedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type closed(closedSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_path_curvature(path, closed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -200,6 +324,74 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
     Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
     rcpp_result_gen = Rcpp::wrap(scimesh_render_points_raw(positions, colors, radius, camera_data, options_data));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_render_lines_raw
+List scimesh_render_lines_raw(NumericMatrix from, NumericMatrix to, NumericMatrix colors, double width, List camera_data, List options_data, bool lit);
+RcppExport SEXP _scimesh_scimesh_render_lines_raw(SEXP fromSEXP, SEXP toSEXP, SEXP colorsSEXP, SEXP widthSEXP, SEXP camera_dataSEXP, SEXP options_dataSEXP, SEXP litSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type to(toSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type colors(colorsSEXP);
+    Rcpp::traits::input_parameter< double >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    Rcpp::traits::input_parameter< bool >::type lit(litSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_render_lines_raw(from, to, colors, width, camera_data, options_data, lit));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_text_extent
+NumericMatrix scimesh_text_extent(CharacterVector text, double size, std::string font_file, double line_spacing);
+RcppExport SEXP _scimesh_scimesh_text_extent(SEXP textSEXP, SEXP sizeSEXP, SEXP font_fileSEXP, SEXP line_spacingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type text(textSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type font_file(font_fileSEXP);
+    Rcpp::traits::input_parameter< double >::type line_spacing(line_spacingSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_text_extent(text, size, font_file, line_spacing));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_default_font_path
+std::string scimesh_default_font_path();
+RcppExport SEXP _scimesh_scimesh_default_font_path() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(scimesh_default_font_path());
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_font_info
+List scimesh_font_info(std::string font_file, double size);
+RcppExport SEXP _scimesh_scimesh_font_info(SEXP font_fileSEXP, SEXP sizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type font_file(font_fileSEXP);
+    Rcpp::traits::input_parameter< double >::type size(sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_font_info(font_file, size));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scimesh_world_to_screen
+DataFrame scimesh_world_to_screen(NumericMatrix points, List camera_data, int width, int height, List options_data);
+RcppExport SEXP _scimesh_scimesh_world_to_screen(SEXP pointsSEXP, SEXP camera_dataSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP options_dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< List >::type camera_data(camera_dataSEXP);
+    Rcpp::traits::input_parameter< int >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< int >::type height(heightSEXP);
+    Rcpp::traits::input_parameter< List >::type options_data(options_dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(scimesh_world_to_screen(points, camera_data, width, height, options_data));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -544,17 +736,31 @@ static const R_CallMethodDef CallEntries[] = {
     {"_scimesh_scimesh_render_mesh", (DL_FUNC) &_scimesh_scimesh_render_mesh, 3},
     {"_scimesh_scimesh_render_scene", (DL_FUNC) &_scimesh_scimesh_render_scene, 3},
     {"_scimesh_scimesh_camera_fit_mesh", (DL_FUNC) &_scimesh_scimesh_camera_fit_mesh, 6},
+    {"_scimesh_scimesh_camera_fit_scene", (DL_FUNC) &_scimesh_scimesh_camera_fit_scene, 6},
     {"_scimesh_scimesh_transform_mesh", (DL_FUNC) &_scimesh_scimesh_transform_mesh, 2},
     {"_scimesh_scimesh_translate_mesh", (DL_FUNC) &_scimesh_scimesh_translate_mesh, 2},
     {"_scimesh_scimesh_scale_mesh", (DL_FUNC) &_scimesh_scimesh_scale_mesh, 2},
     {"_scimesh_scimesh_scale_mesh_nonuniform", (DL_FUNC) &_scimesh_scimesh_scale_mesh_nonuniform, 2},
     {"_scimesh_scimesh_rotate_mesh", (DL_FUNC) &_scimesh_scimesh_rotate_mesh, 3},
     {"_scimesh_scimesh_generate_multi_spheres", (DL_FUNC) &_scimesh_scimesh_generate_multi_spheres, 4},
-    {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 5},
+    {"_scimesh_scimesh_generate_multi_cylinders", (DL_FUNC) &_scimesh_scimesh_generate_multi_cylinders, 6},
+    {"_scimesh_scimesh_generate_tube", (DL_FUNC) &_scimesh_scimesh_generate_tube, 6},
+    {"_scimesh_scimesh_generate_multi_tubes", (DL_FUNC) &_scimesh_scimesh_generate_multi_tubes, 5},
+    {"_scimesh_scimesh_catmull_rom_path", (DL_FUNC) &_scimesh_scimesh_catmull_rom_path, 4},
+    {"_scimesh_scimesh_bspline_path", (DL_FUNC) &_scimesh_scimesh_bspline_path, 3},
+    {"_scimesh_scimesh_bezier_path", (DL_FUNC) &_scimesh_scimesh_bezier_path, 2},
+    {"_scimesh_scimesh_resample_path", (DL_FUNC) &_scimesh_scimesh_resample_path, 3},
+    {"_scimesh_scimesh_path_length", (DL_FUNC) &_scimesh_scimesh_path_length, 2},
+    {"_scimesh_scimesh_path_curvature", (DL_FUNC) &_scimesh_scimesh_path_curvature, 2},
     {"_scimesh_scimesh_generate_cone", (DL_FUNC) &_scimesh_scimesh_generate_cone, 5},
     {"_scimesh_scimesh_generate_arrow", (DL_FUNC) &_scimesh_scimesh_generate_arrow, 7},
     {"_scimesh_scimesh_render_triangles_raw", (DL_FUNC) &_scimesh_scimesh_render_triangles_raw, 4},
     {"_scimesh_scimesh_render_points_raw", (DL_FUNC) &_scimesh_scimesh_render_points_raw, 5},
+    {"_scimesh_scimesh_render_lines_raw", (DL_FUNC) &_scimesh_scimesh_render_lines_raw, 7},
+    {"_scimesh_scimesh_text_extent", (DL_FUNC) &_scimesh_scimesh_text_extent, 4},
+    {"_scimesh_scimesh_default_font_path", (DL_FUNC) &_scimesh_scimesh_default_font_path, 0},
+    {"_scimesh_scimesh_font_info", (DL_FUNC) &_scimesh_scimesh_font_info, 2},
+    {"_scimesh_scimesh_world_to_screen", (DL_FUNC) &_scimesh_scimesh_world_to_screen, 5},
     {"_scimesh_scimesh_generate_cuboid", (DL_FUNC) &_scimesh_scimesh_generate_cuboid, 3},
     {"_scimesh_scimesh_generate_pyramid", (DL_FUNC) &_scimesh_scimesh_generate_pyramid, 4},
     {"_scimesh_scimesh_generate_tetrahedron", (DL_FUNC) &_scimesh_scimesh_generate_tetrahedron, 5},

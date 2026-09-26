@@ -1,10 +1,385 @@
 scimesh Changes
 ===============
 
+Version 0.4.0 -- Batch primitives, tubes, line layers and text labels
+-------------------------------------------------------------------
+
+- NEW: polyline tubes.  `generate_tube()` sweeps a circular cross-section
+  along a path of points, and `generate_multi_tubes()` batches many such paths
+  into a single mesh.  The cross-section frames are computed by parallel
+  transport (rotation-minimizing frames), so tubes do not twist around their own
+  axis, and mitered joints keep the segments watertight.  R: `generate_tube()`
+  and `generate_tubes()`.  Useful for curved edges, streamlines and any shape
+  that is not a straight cylinder.
+- NEW: spline sampling — smooth curves through ordered 3D points.  A new
+  header-only module (`src/core/scimesh/spline.h`) turns a coarse list of
+  waypoints into a dense path, which is what the path-taking features of the
+  library need and what callers previously had to bring themselves (the
+  `generate_tube()` documentation promised "arcs, Bezier samples, streamlines"
+  without offering a way to produce one).  `catmull_rom_path()` interpolates the
+  input points and is the default choice; it is **centripetal** by default,
+  which is what keeps unevenly spaced points (the norm for measured data) from
+  producing cusps, loops and self-intersections, and `alpha = 0` recovers the
+  textbook uniform curve.  `hermite_path()` takes caller-supplied tangents
+  instead of deriving them, `bspline_path()` approximates the points (for
+  smoothing noisy input, at the cost of not passing through them) and
+  `bezier_path()` samples a control polygon with de Casteljau.  Around those,
+  `resample_by_arclength()` evens out the spacing along a path — the sweep
+  places exactly one cross-section per path point, so uniform *arc length*
+  spacing is what makes a tube look evenly subdivided — and `path_length()`,
+  `path_tangents()` and `path_curvature()` are the queries that drive it.
+  `path_curvature()` is the one worth knowing about: sweeping a tube of radius
+  `r` along a curve whose curvature reaches `kappa` folds the tube inside out,
+  so `1 / max(path_curvature(path))` is the largest radius a path can take.
+  Open curves get a reflected phantom neighbour at both ends (so they start and
+  end exactly at the first and last point, along the outer segment), closed
+  curves use their wrapped neighbours, and both `closed = true` cases end on a
+  copy of the first point, so a swept tube closes on itself; the arc-length
+  resampling of a closed path is covered in a whole number of steps so the seam
+  is a regular step instead of a leftover gap.  This is pure geometry on
+  `std::vector<Vec3>` — no mesh, no renderer, no I/O, no new dependency, and
+  not a domain-specific feature — so it composes with primitives.h, lines.h and
+  your own code alike, including camera paths.  R: `spline_path()`,
+  `bezier_path()`, `resample_path()`, `path_length()` and `path_curvature()`.
+  `examples/cpp/spline_tube/` and `examples/R/spline_tube/` render the same
+  waypoints as a faceted polyline tube and as a smooth spline tube side by side,
+  plus a closed trefoil knot.
+- NEW: line layers — screen-space lines as first-class scene primitives.  A
+  `LineLayer` stores segments, per-segment colors and a width **in pixels** and
+  creates no geometry, which makes it the cheap way to draw thousands of thin
+  lines (wireframes, graph or connectome edges, trajectories).  Line layers are
+  drawn by `Renderer::render_scene()` in the same pass as the meshes (same
+  camera, same depth buffer, back-to-front blending for translucent lines), they
+  contribute to `Scene::compute_bounding_box()` unless their `affects_bounds`
+  flag is false (see below), and the mesh exporters skip them
+  (`scimesh_write_gltf()` warns).  R: `line_layer()`, the `lines` argument of
+  `scene()`, and `render_segments()` for free-standing lines.
+- NEW: line layers are content by default, i.e. they define the bounding box of
+  their scene exactly like a mesh does, and the camera fitted to the scene
+  covers them.  This is what makes a scene that contains only lines drawable at
+  all: a tractogram or a connectome without a brain surface used to have no
+  geometry to derive a camera from.  Lines that are decoration rather than
+  content (a leader line pointing at a label, an axis cross, a scale bar drawn
+  as segments) can opt out with `LineLayer::affects_bounds = false` (R:
+  `line_layer(..., affects_bounds = FALSE)`, and
+  `scene_set_line_affects_bounds(scene, index/name, affects_bounds)` for a layer
+  that is already part of a scene), so that adding such a layer can never push
+  the camera away from the data.  A scene without meshes is framed by its lines
+  even if they all opted out, since there is nothing else to fit.  Note that
+  text layers are still ignored by the bounding box, because the extent of a
+  label depends on the font and the output size rather than on world space.
+- NEW: R function `camera_fit_scene()` fits a camera to a whole scene, i.e. to
+  its meshes together with the line layers that affect the bounds.  It is the
+  scene counterpart of `camera_auto()` (which takes meshes), and the two share
+  the same framing convention (bounding box center, distance from the extent).
+  `camera_auto()` now also documents that it does not consider scene contents.
+- NEW: `Renderer::render_lines_raw()` renders line segments directly, and
+  `Rasterizer::rasterize_line()` rasterizes a segment with a screen-space width
+  (flat/unlit by default, like hardware line rendering).
+- NEW: R functions `generate_multi_spheres()` and `generate_multi_cylinders()`
+  expose the batched primitive generators (one mesh for thousands of spheres or
+  cylinders), which previously existed only in C++.
+- NEW: `caps` argument for `generate_cylinder()` and `generate_multi_cylinders()`
+  (R and C++).  Open cylinders/tubes use about half the vertices and triangles,
+  which matters for large edge bundles whose ends are hidden inside node
+  spheres.  The default is unchanged (`caps = TRUE`).
+- PERF: the batched generators (`generate_multi_spheres()`,
+  `generate_multi_cylinders()`, `generate_multi_tubes()`) reserve the exact
+  final size before merging, instead of growing the arrays incrementally.
+- FIX: the batched generators no longer read out of bounds when the `radii` or
+  `colors` array is empty (missing entries are recycled from the first entry;
+  an empty array now means "use the default", i.e. radius 1.0 and white).
+- FIX: `Rasterizer::rasterize_line()` qualified the shadowed `width`/`height`
+  members in its pixel bounds check (the `width` parameter of the function
+  shadowed `Rasterizer::width`), which made the line invisible.
+- FIX: the C++ core now compiles with libc++ (clang on macOS).
+  `src/core/primitives.cpp` used `std::array` (pyramid and tetrahedron faces)
+  without including `<array>`, and `std::swap` without `<utility>`.  libstdc++
+  (GCC, i.e. the Linux and Windows builds) pulls both in transitively, so the
+  bug was invisible there; libc++ does not, so the package failed to install on
+  macOS with "implicit instantiation of undefined template 'std::array<...>'".
+  libc++ only forward-declares `std::array` in `<__tuple>` (for `tuple_size`
+  and `tuple_element`), which is why the message says "undefined template"
+  instead of "no member named array".  This is the installation ERROR reported
+  by the CRAN checks for 0.3.4 on r-release-macos-x86_64, r-oldrel-macos-x86_64
+  and r-oldrel-macos-arm64.  All source files are now verified to compile with
+  libc++ 14 (the toolchain used by those three flavors) and libc++ 18, as well
+  as with libstdc++.
+- NEW: global anti-aliasing default.  `render_options()` now takes
+  `aa_samples = NULL` and resolves that `NULL` from the global option
+  `scimesh.aa_samples` (default 1, i.e. no AA).  Setting
+  `options(scimesh.aa_samples = 2)` therefore switches on 2x2 supersampling for
+  every render call that does not pass `aa_samples` explicitly (2 for 2x2, 4 for
+  4x4 SSAA).  This is mainly interesting for screen-space lines and points,
+  whose hard edges become smooth boundaries under supersampling; the cost is
+  proportional to `aa_samples^2` in render time and memory.  Passing a number
+  explicitly still overrides the option, and invalid values (including an
+  invalid global option) are reported as errors instead of being ignored.
+- NEW: text labels — annotations for figures, without any geometry.  A
+  `TextLayer` stores strings with anchor positions, a font size **in pixels**,
+  colors and optional halos, and is drawn by `Renderer::render_scene()` after
+  the meshes and the lines, so labels end up on top of the geometry.  Positions
+  are either **world space** (projected with the scene camera, so a label sticks
+  to the brain region or atom it annotates) or **screen space** (output pixels,
+  which is what titles, panel tags and captions need).  Labels are billboards:
+  they always face the camera and keep their pixel size, and they are hidden by
+  geometry in front of their anchor unless `depth_test = FALSE`, so a world-space
+  label behaves like an annotation *of* a surface instead of shining through the
+  model.  `adj` places the anchor on the text box (as in `rgl`), pixel offsets
+  nudge a label next to its anchor, multi-line labels are supported, and halos
+  keep text readable on dark or busy geometry.  Glyphs are rasterized with
+  `stb_truetype` (vendored, public domain) from the bundled
+  `inst/extdata/Inter-Regular.ttf` (SIL OFL 1.1), which can be replaced per
+  label or by setting the `SCIMESH_FONT` environment variable.  R:
+  `text_layer()`, the `texts` argument of `scene()` and `render_text()` for
+  free-standing labels; `text_extent()` measures labels for layout.  Labels can
+  be rotated (`rotation`, in degrees counter-clockwise about the anchor, in the
+  image plane): 90 turns a label into a vertical axis label, 180 into an
+  upside-down one, and arbitrary angles let a label follow an annotation line.
+  Unrotated labels keep the exact, integer-aligned rasterization path, so
+  existing output is unchanged.
+- NEW: the low-level font API in C++ — `Font` (load a `.ttf`, metrics, glyph
+  coverage bitmaps, text measurement), `draw_text()` to draw text into any
+  `Image` (including rotated, via `TextDrawStyle::rotation`), and
+  `measure_text()` for layout decisions.  `Font::decode_utf8()`
+  means UTF-8 labels ("°C", accented names) work.
+- NEW: `world_to_screen()` (C++ and R) projects world coordinates to the pixels
+  of a rendered image using the same matrices as the renderer, which is what
+  screen-space annotations and callout lines need.
+- NEW: CLI text options — `--text`, `--text-at`, `--text-size`, `--text-color`,
+  `--text-halo`, `--text-halo-width`, `--text-font`, `--text-screen`,
+  `--text-no-depth`, `--text-adj`, `--text-offset` and `--text-rotation`, plus
+  a `[text]` section in `config.toml`, so figures can be annotated without
+  writing any code.
+- NEW: `flip_uvs()` (C++ and R) mirrors the `v` texture coordinate of a mesh
+  (`v -> 1 - v`), converting UVs that use the bottom-left origin to scimesh's
+  image-space UVs.  This is the documented one-liner for UVs that come from OBJ,
+  PLY, rgl, OpenGL or Blender; `examples/cpp/spot_cow/` uses it.
+- DOC: the texture-mapping documentation now states the UV convention instead of
+  leaving it to be discovered.  scimesh UVs (`Mesh::uvs`, the R `uv` argument)
+  are **image space**, like every other coordinate in the package: `v = 0` is
+  the *top* row of the texture image, matching `Image::sample_bilinear()`, which
+  the renderer calls with the UVs unchanged.  UVs from file formats and other
+  tools (v = 0 at the bottom) have to be converted with `flip_uvs()`; the vignette
+  and the `uv`/`texture` documentation say so, and a renderer test pins the
+  orientation so it cannot drift silently.
+- DOC/FIX: the vignette claimed that `read_obj()` extracts UVs and showed a
+  textured-OBJ recipe on that basis.  No scimesh reader returns texture
+  coordinates (`obj_io::read_obj()` and `ply_io::read_ply()` drop them), so the
+  vignette, the `read_obj()`/`read_ply()` and `render_mesh()` documentation now
+  say what actually happens and how to supply UVs yourself.  `obj_io.h` also
+  promised `vn`/`vt` in its summary while listing them as unsupported.
+
+Breaking changes
+----------------
+- BRK: clip planes are now defined in **world space** by default.  In 0.3.4 and
+  earlier the `normal` and `offset` were interpreted in eye (camera) space, so
+  the cut travelled with the camera and had to be re-tuned for every viewpoint.
+  For the old behaviour, pass `PlaneSpace::EYE` (C++) or
+  `clip_plane(..., space = "eye")` (R).  Note that the old behaviour was also
+  documented incorrectly: the docs described a world-space plane.  See
+  ClipPlane::space and ?clip_plane.
+- BRK: fog distances (`fog_start`/`fog_end`) are now given in **world units**
+  (distance from the camera) by default, and are therefore independent of the
+  near/far planes and of the projection type.  The legacy interpretation as raw
+  normalized device depth is still available via `FogSpace::NDC` (C++) or
+  `fog_space = "ndc"` (R).  Previously the C++ docs claimed world units (which
+  they were not) and the R docs claimed normalized depth in [0, 1] (the values
+  were actually raw depth buffer values in [-1, 1]).
+- NEW: R function `clip_plane()` creates and validates clip plane descriptors,
+  with an explicit `space` argument ("world" or "eye"), plus examples for both.
+- NEW: `render_options()` validates `clip_planes` (normal must be a finite,
+  non-zero length-3 vector; `offset` a finite number; `space` valid) and the
+  fog settings (finite, `fog_end > fog_start`).  Previously malformed clip
+  planes were silently replaced by defaults in the C++ binding.
+- NEW: `render_options()` exposes `near_plane` and `far_plane` (defaults 0.1 and
+  10000, matching the C++ defaults), which define the depth range that NDC fog
+  and mode "ndc" refer to.
+- NEW: C++ `clip_plane_to_view_space()` converts a ClipPlane into the view space
+  in which clipping happens (world planes are shifted by `dot(normal, eye)`).
+  A zero-length normal now neutralizes its plane (clips nothing) instead of
+  discarding the whole scene, and the normal is normalized without rescaling
+  `offset`, so non-unit normals no longer move the plane.
+- NEW: C++ `Rasterizer::fog_depth_from_ndc()` inverts the depth mapping of both
+  perspective and orthographic projections, so world-space fog works for both.
+- FIX: fog no longer divides by zero when `fog_start == fog_end`.
+- DOC: document the coordinate space and unit of clip planes and fog in the C++
+  headers, the R docs and the vignette, with worked examples for world and
+  eye/NDC mode; document that multiple clip planes are ANDed and that point
+  rendering ignores clip planes.
+- DEV: add C++ tests (cpp_tests/test_clip_planes.cpp, cpp_tests/test_fog.cpp) and
+  R tests (tests/testthat/test-clip-planes.R, tests/testthat/test-fog.R) for the
+  coordinate spaces, camera invariance, plane combination and input validation.
+  `RenderOptions::clip_planes` and the fog space had no test coverage at all
+  before this release.
+- FIX: the `full_CLI_renderer` example could not be linked (and neither could any
+  other consumer that includes libfs.h in more than one translation unit): the
+  vendored libfs header defined its 49 free functions without `inline`, so
+  linking `libscimesh.a` (which contains them, via `obj_io.cpp`) together with a
+  TU that also includes `libfs.h`/`fs_mesh_converter.h` failed with "multiple
+  definition of `fs::...`" errors.  The fix belongs to libfs itself (libfs commit
+  ab88cb4, "CHG: inline some functions") and is included in the vendored copy
+  (see the DEP entry below).
+- DEP: update the vendored libfs (src/third_party/libfs.h) from v0.6.0 to libfs
+  commit ab88cb4 ("CHG: inline some functions"), i.e. v0.6.1 (upstream commit
+  7bd0c26, "Volume header fixes": NIfTI sform/qform and vox2ras handling now
+  match FreeSurfer's `mri_convert`) plus the fix that marks all 49 libfs free
+  functions `inline`, so that the header can be included from more than one
+  translation unit.  ab88cb4 is on the libfs `develop` branch and not part of a
+  libfs release yet; the next libfs release should therefore be picked up when
+  it is tagged.  scimesh only reads meshes through libfs (OBJ via
+  `fs::Mesh::from_obj`, FreeSurfer surfaces via fs_mesh_converter.h), so the
+  volume/geometry fixes do not change rendering output; the libfs test suite
+  (150339 assertions) passes with the change.
+- NEW: full_CLI_renderer example: new `[fog] space` config key and
+  `--fog-space` flag ("world" or "ndc").
+- FIX: `full_CLI_renderer` example: an unknown `--fog-space` value now warns and
+  falls back to world units.
+- FIX: `full_CLI_renderer` example: `--output` now honours a supported image
+  extension (`.png`, `.ppm`, `.bmp`, any case) instead of appending it a second
+  time (`--output brain.png` used to write `brain.png.png`).  Such an extension
+  selects the output format and overrides `--format`; names without an extension
+  still get the extension of `--format` appended, and the "Wrote <file>" message
+  now reports the path that was actually written.
+- DEV: C++ code coverage can now be measured: `cpp_tests` configured with
+  `-DSCIMESH_COVERAGE=ON` (clang) instruments the tests and the library, and
+  `dev_tools/coverage_cpp.sh` builds, runs the tests and writes a report (text
+  summary, HTML, lcov trace file) to `coverage/`.  Test code, the Catch2
+  amalgamation and `src/third_party/` are excluded from the report.  This is a
+  local tool only: no upload, no badge, no coverage gates.  First baseline for
+  src/core: 71.8 % lines, 66.1 % branches - with `ply_io.cpp` at 0 % and
+  `obj_io.cpp`/`transforms.cpp` not even linked into the test binary (no C++
+  test references them).  New C++ tests for mesh file I/O (`test_io.cpp`),
+  mesh transforms (`test_transforms.cpp`), renderer features/SSAO
+  (`test_render_features.cpp`), string formatting (`test_to_string.cpp`),
+  colormaps (viridis and empty input, in `test_colormap.cpp`) and the
+  FreeSurfer/PLY brain mesh path (in `test_brain_mesh.cpp`, whose test data path
+  was wrong so the test silently did nothing) raise this to 91.6 % lines and
+  79.0 % branches, with `ply_io.cpp`, `obj_io.cpp` and `transforms.cpp` now
+  linked and covered (`transforms.cpp` at 100 %).  The new R test
+  `tests/testthat/test-ssao.R` covers screen-space ambient occlusion through the
+  R API.
+- DEV: CI: new `examples.yml` workflow builds and runs all C++ examples
+  (Linux and macOS) plus the R examples on every push/PR.  Previously no CI job
+  compiled the examples at all, which is how the full_CLI_renderer link error
+  could go unnoticed.  New `coverage.yml` workflow (manual dispatch or push to
+  develop) runs the coverage script and stores the HTML report as a build
+  artifact.
+- FIX: the mesh transforms `scale_mesh()`, `rotate_mesh()` and
+  `transform_mesh()` now update per-vertex normals (C++ and R).  They used to
+  move the vertices and leave the normals untouched, which is only correct for
+  translations: after `scale_mesh(mesh, c(1, 1, 4))` or any rotation the normals
+  no longer matched the surface, so shading was visibly wrong (users had to pass
+  `invert_normals = TRUE` or recompute the normals by hand).  Normals are now
+  transformed with the inverse transpose of the matrix and renormalized, which is
+  the correct rule for non-uniform scaling, shearing and mirroring; a singular
+  matrix (e.g. a scale of 0) falls back to the plain 3x3 transform.  Meshes
+  without normals are unaffected, `translate_mesh()` still leaves normals alone
+  (as it must), and the C++ header and R docs now state all of this.
+- FIX: `mesh_from_fs()` with `detect_transparency = TRUE` could never mark
+  anything as transparent, so FreeSurfer brain surfaces were rendered with an
+  opaque white medial wall.  Vertices whose per-vertex value is `NaN` (that is
+  FreeSurfer's "no data" marker) were always turned into opaque white, so no
+  vertex ever had an alpha < 1; on top of that, the loop looking for such
+  vertices was guarded by `has_colors()`, so it could be skipped entirely.  Such
+  vertices now get alpha 0, which makes the renderer blend them (and set
+  `has_transparency`), so a medial wall can be seen through.
+- FIX: screen-space ambient occlusion (`ssao_enabled = TRUE`) had no visible
+  effect at all, for three independent reasons: (1) `Rasterizer::apply_ssao()`
+  treated depth buffer values as if they were in [0, 1] when they are in
+  [-1, 1], so the depth inversion was wrong for both projections.  The exact
+  inversion for both projections now lives in one shared helper
+  (`view_distance_from_ndc()`, which `Rasterizer::fog_depth_from_ndc()` also
+  uses), so SSAO and world-space fog can no longer disagree about the depth
+  range; (2) `ssao_radius` is documented (and now handled) in
+  pixels, but was used as a world/screen-space factor, and is now rounded and
+  clamped to at least one pixel; (3) the hemisphere test that decides whether a
+  sample may occlude mixed normalized device depth with pixel units and had the
+  wrong sign, so it rejected every valid occluder - the sample offset is now
+  built from the world-unit depth difference.  Dead code (`depth_C/D/E`,
+  `radius_scale`) was removed, and the new tests (C++ and R) assert that SSAO
+  actually changes pixels for a perspective and for an orthographic render.
+- FIX: translucent geometry lying *behind* opaque geometry was blended on top of
+  it, which is what made a very transparent mesh look wrong: the blended pass
+  ignored the depth buffer entirely
+  (`if (blend_mode || depth < z_buffer[idx])`), so a translucent medial wall
+  painted over the structures inside the brain.  Translucent fragments now pass
+  the same depth test as opaque ones; they still do not *write* depth, so the
+  buffer always holds the nearest opaque surface.
+- FIX: the translucent pass sorted its triangles the wrong way round.  The
+  centroid depth is a view-space z (the camera looks down -Z, so nearer is
+  larger), and the sort was descending, i.e. front-to-back: the nearest
+  translucent surface was drawn first and then covered by the ones behind it.
+  Sorting is now back-to-front (`a.view_z < b.view_z`), which makes the result
+  independent of the order in which the meshes were added to the scene.
+- NEW: transparency no longer has to be declared.  `Mesh::is_transparent()`
+  derives it from `default_color`, `colors` and `face_colors`, and that is what
+  the renderer uses, so per-vertex, per-face and uniform-alpha meshes blend
+  without setting `Mesh::has_transparency` (which is still honored as a manual
+  override, never cleared by `Mesh::update_transparency()`).  Readers, the
+  FreeSurfer converters and `Scene::add()` refresh the flag so it is accurate
+  when inspected, and the R layer derives it from the colors it receives.
+- NEW: PLY vertex colors now keep their alpha.  RGBA files (8-bit `alpha` as
+  well as float `alpha`, including the common case of 8-bit RGB with a float
+  alpha) are read into `Color::a` and mark the mesh as translucent; previously
+  alpha was silently dropped (`a = 1.0`).  Alpha without any RGB is kept as a
+  white vertex with that alpha.
+- NEW: C++ `convert_fs_mesh(fs_mesh, morph_data, rgb_colors, nan_alpha)` gained
+  the `nan_alpha` parameter (default 1.0 = unchanged behaviour): pass 0.0 to
+  punch holes at vertices without data (the medial wall) or e.g. 0.5 to draw
+  them half transparent.  `mesh_from_fs(detect_transparency = TRUE)` keeps
+  producing holes.
+- NEW: R `set_mesh_alpha(mesh, alpha)` returns a mesh with a uniform alpha
+  (creating colors from `default_color`/gray if the mesh has none), the
+  one-liner for a 10 % reference shell.
+- DOC: document transparency end to end: the alpha column of `colors`, the
+  per-vertex interpolation, the back-to-front ordering and depth test, the
+  medial-wall recipe and the remaining limitations (per-triangle ordering,
+  no occlusion by translucent surfaces, `render_points()` does not blend) in
+  the vignette, `?render_mesh`, `?set_mesh_alpha`, `Mesh`, `Rasterizer` and
+  `Scene::add()`.
+- DOC: `camera_auto()`/`camera_fit_scene()`/`camera_fit_mesh()` documented
+  `direction` as the direction the camera looks along, but the camera is placed
+  at `center + direction * distance`, i.e. it is the side you view the mesh
+  from (`c(0,0,1)` = front view of a +Z facing mesh).  The parameter docs now
+  say so; the behaviour is unchanged.
+- DEV: new `examples/cpp/transparency/` and `examples/R/transparency/` (both
+  built and run by the examples CI job) render three scenes: translucent spheres
+  with an opaque sphere inside the shell and one behind it, an alpha ramp from
+  1.0 to 0.05, and a hemisphere whose medial wall is 50 % transparent with two
+  opaque "voxels" inside it and an 80 % transparent sphere in front.
+- DEV: new C++ tests (cpp_tests/test_transparency.cpp) and R tests
+  (tests/testthat/test-transparency.R) cover detection, blending, the depth-test
+  and ordering fixes, per-vertex alpha interpolation, alpha 0 holes, PLY alpha
+  round-trips and the FreeSurfer `nan_alpha` option.
+- FIX: rendering a double-sided mesh was platform dependent and produced visible
+  artifacts, because two floating point ties were resolved by the rounding of
+  the platform.  (1) `generate_plane()` (and other manually built meshes)
+  contain a front and a back face at exactly the same depth, so *which* of the
+  two wins the depth test is a tie: on some builds the back face won on about a
+  quarter of the pixels and, being shaded with its own (away pointing) normal,
+  came out ambient-lit - an opaque plane was speckled with dark pixels (940 of
+  4096 at 64x64 on x86-64, with plain `-O2` *and* `-O3`).  `Rasterizer::
+  rasterize_triangle()` now shades such fragments two-sided, i.e. a visible back
+  side whose normal points away from the viewer is lit with the normal flipped
+  towards the camera, so both faces of the pair look the same and the tie no
+  longer matters.  A mesh whose normals disagree with its winding is left alone,
+  so `RenderOptions::invert_normals` keeps its effect.  (2) The two triangles
+  that make up a quad share a diagonal, and a pixel center lying exactly on it
+  was covered by both of them (blended twice) or by neither (a crack), again
+  depending on the rounding: a translucent plane had a seam of double-attenuated
+  pixels (0.7^4 instead of 0.7^2 of the background).  Edge functions are now
+  evaluated in a canonical endpoint order, which makes the value bit-identical
+  in all triangles sharing an edge, and a new edge fill rule (analogous to the
+  "top-left" rule of hardware rasterizers) gives a pixel sitting exactly on an
+  edge to exactly one of them.  Coverage and blending no longer depend on the
+  platform; regression tests in cpp_tests/test_rasterizer.cpp and
+  cpp_tests/test_transparency.cpp pin both invariants.
+
 Version 0.3.4 -- Minor fix for CRAN only
 -----------------------------------------
 - FIX: adapt link in docs to prevent winbuilder warning
--
+
 
 Version 0.3.3 -- Scene transforms, scene object, glTF export
 ------------------------------------------------------------

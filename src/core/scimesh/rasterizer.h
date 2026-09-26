@@ -127,11 +127,35 @@ struct Rasterizer {
     /// @brief Enable depth fog (default: false).
     bool fog_enabled = false;
 
-    /// @brief Distance where fog begins.
+    /// @brief Distance where fog begins (default: 0).
+    ///
+    /// Interpreted in the space given by `fog_space`.
     float fog_start = 0.0f;
 
-    /// @brief Distance where fog is fully opaque.
+    /// @brief Distance where fog is fully opaque (default: 1).
+    ///
+    /// Interpreted in the space given by `fog_space`.
     float fog_end = 1.0f;
+
+    /// @brief The space (and unit) of `fog_start` / `fog_end` (default: `FogSpace::WORLD`).
+    /// If `FogSpace::WORLD`, the values are converted from the depth buffer
+    /// using `z_near`, `z_far` and `orthographic`.
+    /// @see FogSpace
+    FogSpace fog_space = FogSpace::WORLD;
+
+    /// @brief Near plane distance of the current projection (default: 0.1).
+    /// Only used to convert depth-buffer values to world units for
+    /// world-space fog.
+    float z_near = 0.1f;
+
+    /// @brief Far plane distance of the current projection (default: 10000.0).
+    /// Only used to convert depth-buffer values to world units for
+    /// world-space fog.
+    float z_far = 10000.0f;
+
+    /// @brief Whether the current projection is orthographic (default: false).
+    /// Affects the depth-buffer -> world-units conversion for world-space fog.
+    bool orthographic = false;
 
     /// @brief The fog color (what distant objects blend into).
     Color fog_color = TRANSPARENT_BLACK;
@@ -167,6 +191,26 @@ struct Rasterizer {
     /// @param clear_depth Initial depth value (default: 1.0 = farthest).
     void clear(float clear_depth = 1.0f);
 
+    /// @brief Convert a depth-buffer value to a distance in world units.
+    ///
+    /// Used for world-space fog (`FogSpace::WORLD`): the rasterizer only has
+    /// the normalized device depth of a fragment, so the corresponding
+    /// distance from the camera is recovered with the inverse of the
+    /// projection (perspective or orthographic, selected by `orthographic`):
+    ///
+    /// - perspective:    `d = (2*n*f) / (f + n - z_ndc * (f - n))`
+    /// - orthographic:   `d = (z_ndc * (f - n) + f + n) / 2`
+    ///
+    /// where `n = z_near` and `f = z_far`.  Both formulas are exact, because
+    /// the depth buffer stores `z_ndc` for both projection types.
+    ///
+    /// @param z_ndc Depth-buffer value (normalized device depth, `[-1, 1]`;
+    ///              `-1` = near plane, `+1` = far plane).
+    /// @return Distance from the camera in world units, measured along the
+    ///         viewing direction.
+    /// @see FogSpace, fog_space
+    float fog_depth_from_ndc(float z_ndc) const;
+
     /// @brief Enable or disable alpha blending.
     ///
     /// @param enabled If `true`, transparent fragments blend with the
@@ -184,9 +228,16 @@ struct Rasterizer {
     /// - Per-pixel shading (or flat shading if `smooth_shading` is false)
     /// - Wireframe edge drawing (if enabled)
     ///
+    /// Triangles are shaded two-sided: a fragment whose back side is visible
+    /// (positive screen-space area) and whose normal points away from the camera
+    /// (`normal.z < 0`, i.e. the normals are expected in view space) is lit with
+    /// the normal flipped towards the viewer.  Coincident front/back face pairs
+    /// therefore shade identically, independently of which of the two wins the
+    /// depth test.
+    ///
     /// @param screen_v0, screen_v1, screen_v2  Screen-space vertex positions.
     /// @param color0, color1, color2           Per-vertex colors.
-    /// @param normal0, normal1, normal2         Per-vertex normals.
+    /// @param normal0, normal1, normal2         Per-vertex normals (view space).
     /// @param uv0, uv1, uv2                    Per-vertex texture coordinates.
     /// @param backface_culling                 Whether to cull backfaces.
     /// @param smooth_shading                   Whether to interpolate normals.
@@ -222,14 +273,54 @@ struct Rasterizer {
                          const Vec3 &normal, const Vec3 &light_direction,
                          Image &output);
 
+    /// @brief Rasterize a line segment with a screen-space width.
+    ///
+    /// The segment is drawn as a series of stamps along its dominant screen
+    /// axis (DDA), with linearly interpolated color and depth.  This is the
+    /// counterpart of rasterize_point() for line layers and is used by the
+    /// renderer for LineLayer geometry, which has no world-space thickness.
+    ///
+    /// Depth testing, fog, contrast and alpha blending behave exactly like for
+    /// triangles and points, so lines can be occluded by meshes and vice versa.
+    /// Zero-length segments degenerate to a single stamp (a dot).
+    ///
+    /// @param screen_v0, screen_v1  Screen-space endpoints (x, y, depth).
+    /// @param color0, color1        Colors at the two endpoints.
+    /// @param width                 Line width in *device* pixels (the caller
+    ///                              scales by the supersampling factor, exactly
+    ///                              like the radius of rasterize_point()).
+    /// @param lit                   Whether to shade the line; false draws the
+    ///                              flat color (the default for lines).
+    /// @param normal                Surface normal, used only when `lit` is true.
+    /// @param light_direction       Light direction, used only when `lit` is true.
+    /// @param[in,out] output        The output image.
+    void rasterize_line(const Vec3 &screen_v0, const Color &color0,
+                        const Vec3 &screen_v1, const Color &color1,
+                        float width, bool lit, const Vec3 &normal,
+                        const Vec3 &light_direction, Image &output);
+
     /// @brief Apply screen-space ambient occlusion to the output image.
     ///
     /// Uses the depth and normal buffers to darken crevices and corners.
     /// Must be called after all triangles have been rasterized.
     ///
     /// @param[in,out] output  The image to modify.
-    /// @param z_near          Near plane distance.
-    /// @param z_far           Far plane distance.
+    /// @brief Apply screen-space ambient occlusion to the output image.
+    ///
+    /// Uses the depth and normal buffers filled by rasterize_triangle() to
+    /// darken creases and contact areas.  Requires `ssao_enabled`.
+    ///
+    /// The depth buffer holds normalized device depth (`[-1, 1]`, see
+    /// ndc_to_screen()); the matching camera planes have to be passed here so
+    /// that distances in world units can be recovered (the same inversion that
+    /// world-space fog uses).  Set `orthographic` when the scene was rendered
+    /// with a parallel projection.
+    ///
+    /// @param[in,out] output  The rendered image to darken.
+    /// @param z_near          Near plane distance of the camera.
+    /// @param z_far           Far plane distance of the camera.
+    ///
+    /// @see fog_depth_from_ndc(), ssao_enabled
     void apply_ssao(Image &output, float z_near, float z_far);
 
     /// @brief Optional texture image for textured meshes.
@@ -241,9 +332,14 @@ struct Rasterizer {
 
 private:
     /// @brief Compute final pixel color with lighting, then write to output.
+    ///
+    /// @param lit When false, the color is written without any lighting
+    ///        calculation (used for flat, hardware-like line rendering).  Fog,
+    ///        contrast, depth testing and blending still apply.
     void shade_and_write(int x, int y, float depth,
                          const Color &color, const Vec3 &normal,
-                         const Vec3 &light_direction, Image &output);
+                         const Vec3 &light_direction, Image &output,
+                         bool lit = true);
 };
 
 } // namespace scimesh

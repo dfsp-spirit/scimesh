@@ -1,8 +1,11 @@
 #' Apply a 4x4 transformation matrix to a mesh
 #'
 #' Transforms all vertex positions in a mesh by a 4x4 homogeneous
-#' matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors and
-#' normals are untouched.
+#' matrix (applied as \code{M * (x, y, z, 1)^T}).  Vertex colors are
+#' kept as they are; vertex normals (if the mesh has any) are
+#' transformed by the inverse transpose of \code{M}, so that shading
+#' stays correct for shearing and non-uniform scaling.  Use
+#' \code{compute_vertex_normals()} if the mesh has no normals yet.
 #'
 #' @param mesh A mesh descriptor list with \code{vertices} and
 #'   \code{triangles}, as returned by \code{render_mesh()} or built
@@ -27,6 +30,9 @@ transform_mesh <- function(mesh, matrix) {
 
 #' Translate a mesh
 #'
+#' Vertex colors and normals are untouched: a translation does not change
+#' the orientation of a surface.
+#'
 #' @param mesh A mesh descriptor list.
 #' @param translation Length-3 numeric vector (x, y, z).
 #' @return A new mesh descriptor list with translated vertices.
@@ -45,6 +51,11 @@ translate_mesh <- function(mesh, translation) {
 }
 
 #' Scale a mesh uniformly or per-axis
+#'
+#' Per-vertex normals (if the mesh has any) are scaled as well, using the
+#' inverse transpose of the scaling matrix: a non-uniform scale would
+#' otherwise leave normals pointing in a direction that no longer matches
+#' the surface, which shows up as wrong shading.
 #'
 #' @param mesh A mesh descriptor list.
 #' @param scale A single numeric scale factor (uniform) or a
@@ -71,6 +82,8 @@ scale_mesh <- function(mesh, scale) {
 
 #' Rotate a mesh around an axis
 #'
+#' Vertex normals (if the mesh has any) are rotated with the mesh.
+#'
 #' @param mesh A mesh descriptor list.
 #' @param angle_rad Rotation angle in radians.
 #' @param axis Length-3 numeric vector defining the rotation axis.
@@ -86,6 +99,101 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
     if (length(axis) != 3L) stop("axis must be a numeric vector of length 3")
     if (length(angle_rad) != 1L) stop("angle_rad must be a single numeric value")
     scimesh_rotate_mesh(mesh, angle_rad, axis)
+}
+
+#' Set the transparency of a whole mesh
+#'
+#' Returns a copy of the mesh in which every vertex (and every face, if
+#' per-face colors are used) has the given alpha value.  The renderer blends
+#' meshes whose colors are not fully opaque automatically, so this is all that
+#' is needed to draw a mesh translucently - for example a brain surface at
+#' 10 percent opacity for spatial reference.
+#'
+#' A mesh without colors gets uniform colors first (its \code{default_color}
+#' if it has one, light gray otherwise), so the mesh keeps its appearance and
+#' only becomes see-through.  Use \code{alpha = 0} for completely invisible
+#' geometry and \code{alpha = 1} to make a mesh opaque again.
+#'
+#' @param mesh A mesh descriptor list (see \code{as_scimesh_mesh}), e.g. as
+#'   returned by \code{generate_sphere()} or \code{read_ply()}.
+#' @param alpha Alpha value in \code{[0, 1]}: 0 = fully transparent,
+#'   1 = fully opaque.
+#' @return A mesh descriptor list with the alpha applied.
+#'
+#' @examples
+#' sphere <- generate_sphere(c(0, 0, 0), 1)
+#' ghost  <- set_mesh_alpha(sphere, 0.2)
+#'
+#' # Per-vertex alpha (here: every other vertex transparent) can be set
+#' # directly on the color matrix:
+#' cols <- sphere$colors
+#' cols[, 4] <- rep(c(0, 1), length.out = nrow(cols))
+#' sphere$colors <- cols
+#'
+#' @seealso \code{\link{render_mesh}}, \code{\link{scene}}
+#' @export
+set_mesh_alpha <- function(mesh, alpha) {
+    mesh <- as_scimesh_mesh(mesh)
+    if (!is.numeric(alpha) || length(alpha) != 1L || !is.finite(alpha) ||
+        alpha < 0 || alpha > 1) {
+        stop("alpha must be a single number in [0, 1]")
+    }
+    nv <- nrow(mesh$vertices)
+    if (is.null(mesh$colors)) {
+        base <- mesh$default_color
+        if (is.null(base)) base <- c(0.7, 0.7, 0.7, 1)
+        if (length(base) < 4L) base <- c(base[1:3], 1)
+        mesh$colors <- matrix(rep(base[1:4], each = nv), nrow = nv)
+    }
+    mesh$colors[, 4] <- alpha
+    if (!is.null(mesh$face_colors)) {
+        mesh$face_colors[, 4] <- alpha
+    }
+    mesh
+}
+
+#' Flip the texture coordinates of a mesh vertically
+#'
+#' scimesh stores texture coordinates in \strong{image space}, with \code{v = 0}
+#' at the \emph{top} edge of the texture image — the same rule as every other
+#' coordinate in scimesh (\code{c(0, 0)} addresses the top-left pixel of the
+#' texture image, \code{c(1, 1)} the bottom-right one).  OBJ and PLY files,
+#' OpenGL, rgl and tools like Blender and MeshLab use the opposite convention
+#' (\code{v = 0} at the bottom), so UVs taken from those sources have to be
+#' converted once; this function does that, instead of you having to rewrite the
+#' second column by hand.
+#'
+#' Geometry, colors and normals are untouched.  A mesh without texture
+#' coordinates is returned unchanged, so calling this is safe either way.
+#'
+#' @param mesh A mesh descriptor (scimesh or rgl format, see
+#'   \code{\link{as_scimesh_mesh}()}).
+#' @return The mesh with flipped UVs.
+#'
+#' @examples
+#' quad <- list(vertices = matrix(c(-1, -1, 0, 1, -1, 0, 1, 1, 0,
+#'                                  -1, -1, 0, 1, 1, 0, -1, 1, 0),
+#'                                ncol = 3, byrow = TRUE),
+#'              triangles = matrix(c(1, 2, 3, 1, 3, 4), ncol = 3, byrow = TRUE),
+#'              # UVs with v = 0 at the bottom (OBJ/OpenGL convention)
+#'              uv = matrix(c(0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0),
+#'                          ncol = 2, byrow = TRUE))
+#' flipped <- flip_uvs(quad)
+#' flipped$uv[, 2]  # v is now measured from the top of the texture
+#'
+#' @seealso \code{\link{render_mesh}} (the \code{uv} and \code{texture}
+#'   arguments)
+#' @export
+flip_uvs <- function(mesh) {
+    mesh <- as_scimesh_mesh(mesh)
+    if (is.null(mesh$uv) || length(mesh$uv) == 0L) {
+        return(mesh)
+    }
+    if (!is.matrix(mesh$uv) || ncol(mesh$uv) != 2L) {
+        stop("mesh$uv must be an Nx2 numeric matrix")
+    }
+    mesh$uv[, 2L] <- 1 - mesh$uv[, 2L]
+    mesh
 }
 
 #' Render multiple spheres from point data
@@ -119,20 +227,7 @@ rotate_mesh <- function(mesh, angle_rad, axis = c(0, 0, 1)) {
 render_spheres <- function(centers, radii, colors, camera,
                            options = render_options(),
                            segments = 16L) {
-    if (!is.matrix(centers) || ncol(centers) != 3L) {
-        stop("centers must be an Nx3 numeric matrix")
-    }
-    n <- nrow(centers)
-    if (length(radii) == 1L) radii <- rep(radii, n)
-    if (length(radii) != n) stop("radii must be length N or 1")
-    if (is.vector(colors) && length(colors) %in% c(3L, 4L)) {
-        if (length(colors) == 3L) colors <- c(colors, 1)
-        colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
-    }
-    if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
-        stop("colors must be an Nx4 numeric matrix")
-    }
-    mesh <- scimesh_generate_multi_spheres(centers, radii, colors, segments)
+    mesh <- generate_multi_spheres(centers, radii, colors, segments = segments)
     render_scene(list(mesh), camera, options)
 }
 
@@ -165,24 +260,8 @@ render_spheres <- function(centers, radii, colors, camera,
 render_lines <- function(from, to, radii = 0.1, colors, camera,
                          options = render_options(),
                          segments = 12L) {
-    if (!is.matrix(from) || ncol(from) != 3L) {
-        stop("from must be an Nx3 numeric matrix")
-    }
-    if (!is.matrix(to) || ncol(to) != 3L) {
-        stop("to must be an Nx3 numeric matrix")
-    }
-    n <- nrow(from)
-    if (nrow(to) != n) stop("from and to must have the same number of rows")
-    if (length(radii) == 1L) radii <- rep(radii, n)
-    if (length(radii) != n) stop("radii must be length N or 1")
-    if (is.vector(colors) && length(colors) %in% c(3L, 4L)) {
-        if (length(colors) == 3L) colors <- c(colors, 1)
-        colors <- matrix(colors, nrow = n, ncol = 4L, byrow = TRUE)
-    }
-    if (!is.matrix(colors) || nrow(colors) != n || ncol(colors) < 3L) {
-        stop("colors must be an Nx4 numeric matrix")
-    }
-    mesh <- scimesh_generate_multi_cylinders(from, to, radii, colors, segments)
+    mesh <- generate_multi_cylinders(from, to, radii = radii, colors = colors,
+                                     segments = segments)
     render_scene(list(mesh), camera, options)
 }
 
@@ -253,6 +332,102 @@ mesh_from_rgl <- function(tmesh) {
 }
 
 # ---- internal helpers for transparent rgl interop --------------------------
+
+#' Validate and normalize a set of 3D points
+#'
+#' Internal helper shared by the generator and render functions.  Accepts an
+#' Nx3 numeric matrix or a single length-3 numeric vector (which is treated as
+#' a single point) and returns an Nx3 numeric matrix of storage mode double,
+#' as expected by the C++ layer.  An empty (0-row) matrix is allowed and means
+#' "no points"; the generators then return an empty mesh.
+#'
+#' @param x A numeric matrix with 3 columns, or a length-3 numeric vector.
+#' @param arg_name Name of the argument, used in error messages.
+#' @return An Nx3 numeric matrix.
+#' @keywords internal
+check_points_matrix <- function(x, arg_name = "x") {
+    if (is.null(x)) {
+        stop(arg_name, " must not be NULL")
+    }
+    if (is.numeric(x) && is.null(dim(x)) && length(x) == 3L) {
+        x <- matrix(as.double(x), nrow = 1L)
+    }
+    if (!is.matrix(x) || !is.numeric(x) || ncol(x) != 3L) {
+        stop(arg_name, " must be an Nx3 numeric matrix or a length-3 numeric vector")
+    }
+    storage.mode(x) <- "double"
+    return(x)
+}
+
+#' Recycle a per-primitive radius vector to the requested length
+#'
+#' A single value is applied to all primitives, a vector of the exact length is
+#' used as-is, and an empty (or NULL) input means "no radii given", which the
+#' C++ generators interpret as radius 1.0.
+#'
+#' @param radii Numeric vector of radii, or NULL.
+#' @param n Number of primitives.
+#' @param arg_name Name of the argument, used in error messages.
+#' @return Numeric vector of length `n`, or a zero-length vector.
+#' @keywords internal
+recycle_radii <- function(radii, n, arg_name = "radii") {
+    if (is.null(radii) || length(radii) == 0L) {
+        return(numeric(0))
+    }
+    if (!is.numeric(radii)) {
+        stop(arg_name, " must be numeric")
+    }
+    if (length(radii) == 1L) {
+        return(rep(as.double(radii), n))
+    }
+    if (length(radii) != n) {
+        stop(sprintf("%s must be of length 1 or %d, got %d", arg_name, n,
+                     length(radii)))
+    }
+    return(as.double(radii))
+}
+
+#' Recycle per-primitive colors to an Nx4 matrix
+#'
+#' Accepts a single RGB/RGBA vector (applied to all primitives), a single-row
+#' matrix (recycled), or an Nx4 (or Nx3, alpha is set to 1) matrix.  An empty
+#' input means "no colors given", which the C++ generators interpret as white.
+#'
+#' @param colors Numeric vector or matrix of RGB/RGBA colors, or NULL.
+#' @param n Number of primitives.
+#' @param arg_name Name of the argument, used in error messages.
+#' @return An Nx4 numeric matrix, or a 0x4 matrix.
+#' @keywords internal
+recycle_colors <- function(colors, n, arg_name = "colors") {
+    if (is.null(colors) || length(colors) == 0L) {
+        return(matrix(numeric(0), nrow = 0L, ncol = 4L))
+    }
+    if (is.numeric(colors) && is.null(dim(colors))) {
+        if (!length(colors) %in% c(3L, 4L)) {
+            stop(arg_name, " must be an RGB or RGBA vector (length 3 or 4)")
+        }
+        if (length(colors) == 3L) {
+            colors <- c(colors, 1)
+        }
+        return(matrix(rep(as.double(colors), length.out = n * 4L),
+                      nrow = n, byrow = TRUE))
+    }
+    if (!is.matrix(colors) || !is.numeric(colors) || ncol(colors) < 3L) {
+        stop(arg_name, " must be an Nx4 numeric matrix or an RGB(A) vector")
+    }
+    colors <- as.matrix(colors)
+    if (ncol(colors) == 3L) {
+        colors <- cbind(colors, 1)
+    }
+    if (nrow(colors) == 1L) {
+        colors <- colors[rep(1L, n), , drop = FALSE]
+    } else if (nrow(colors) != n) {
+        stop(sprintf("%s must have 1 or %d rows, got %d", arg_name, n,
+                     nrow(colors)))
+    }
+    storage.mode(colors) <- "double"
+    return(unname(colors))
+}
 
 #' Convert rgl or scimesh mesh to canonical scimesh format
 #'
@@ -406,24 +581,190 @@ generate_sphere <- function(center, radius = 1, segments = 32,
 #'
 #' Creates a cylinder from \code{start} to \code{end} with the given
 #' \code{radius}, subdivided into \code{segments} around the axis.
-#' Both end caps are included.
+#' Both end caps are included unless \code{caps = FALSE} is passed.
 #'
 #' @param start Length-3 vector: cylinder start point.
 #' @param end Length-3 vector: cylinder end point.
 #' @param radius Cylinder radius.
 #' @param segments Subdivision count (default 32).
 #' @param color Length-4 RGBA colour.
+#' @param caps Whether to close both ends with caps (default TRUE).  Pass FALSE
+#'   for an open tube, which roughly halves the number of vertices and
+#'   triangles.  Useful for edges whose ends are hidden by other geometry.
 #' @return A mesh descriptor list.
 #'
 #' @examples
 #' mesh <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), radius = 0.5)
 #' nrow(mesh$vertices)
+#' open <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), radius = 0.5, caps = FALSE)
+#' nrow(open$vertices)
 #'
 #' @export
 generate_cylinder <- function(start, end, radius = 0.5, segments = 32,
-                              color = c(1, 1, 1, 1)) {
+                              color = c(1, 1, 1, 1), caps = TRUE) {
     scimesh_generate_multi_cylinders(
-        rbind(start), rbind(end), radius, matrix(color, nrow = 1), segments)
+        check_points_matrix(start, "start"), check_points_matrix(end, "end"),
+        as.double(radius), matrix(recycle_colors(color, 1L), nrow = 1L),
+        as.integer(segments), isTRUE(caps))
+}
+
+#' Generate multiple spheres as a single mesh
+#'
+#' Batched variant of \code{generate_sphere()}: all spheres are generated into
+#' one mesh with a single vertex/triangle array, which is much faster than
+#' generating and merging them one by one.  This is the function to use for
+#' thousands of nodes, e.g. the nodes of a network graph or a point cloud.  The
+#' returned mesh can be added to a scene and rendered with \code{render_scene()}
+#' or \code{render_mesh()}.
+#'
+#' @param centers Nx3 numeric matrix of sphere centres (or a length-3 vector for
+#'   a single sphere).
+#' @param radii Numeric vector of radii (length 1, recycled; or one per sphere).
+#' @param colors RGBA colour(s): a single vector applied to all spheres, or an
+#'   Nx4 numeric matrix (values in \code{[0, 1]}, alpha optional).
+#' @param segments Subdivision count per sphere (default 16).
+#' @return A mesh descriptor list with \code{vertices}, \code{triangles} and
+#'   \code{colors}.
+#'
+#' @examples
+#' centers <- matrix(c(0, 0, 0, 2, 0, 0), ncol = 3, byrow = TRUE)
+#' mesh <- generate_multi_spheres(centers, radii = c(0.5, 0.3),
+#'                                colors = c(1, 0, 0, 1), segments = 12)
+#' nrow(mesh$vertices) > 0
+#'
+#' @seealso \code{\link{generate_sphere}}, \code{\link{generate_multi_cylinders}}
+#' @export
+generate_multi_spheres <- function(centers, radii = 1, colors = c(1, 1, 1, 1),
+                                   segments = 16L) {
+    centers <- check_points_matrix(centers, "centers")
+    n <- nrow(centers)
+    scimesh_generate_multi_spheres(centers, recycle_radii(radii, n),
+                                   recycle_colors(colors, n),
+                                   as.integer(segments))
+}
+
+#' Generate multiple cylinders as a single mesh
+#'
+#' Batched variant of \code{generate_cylinder()}: all cylinders are generated
+#' into one mesh.  This is the function to use for thousands of straight edges,
+#' e.g. the edges of a network graph or a connectome.  Pass \code{caps = FALSE}
+#' to leave the ends open, which is usually what you want when the ends are
+#' hidden inside spherical nodes (and roughly halves the geometry).
+#'
+#' @param from Nx3 numeric matrix of start points (or a length-3 vector).
+#' @param to Nx3 numeric matrix of end points (same number of rows as
+#'   \code{from}).
+#' @param radii Numeric vector of radii (length 1, recycled; or one per
+#'   cylinder).
+#' @param colors RGBA colour(s): a single vector applied to all cylinders, or an
+#'   Nx4 numeric matrix (values in \code{[0, 1]}, alpha optional).
+#' @param segments Subdivision count around the circumference (default 12).
+#' @param caps Whether to close both ends of every cylinder (default TRUE).
+#' @return A mesh descriptor list with \code{vertices}, \code{triangles} and
+#'   \code{colors}.
+#'
+#' @examples
+#' from <- matrix(c(0, 0, 0, 1, 0, 0), ncol = 3, byrow = TRUE)
+#' to   <- matrix(c(0, 3, 0, 1, 3, 0), ncol = 3, byrow = TRUE)
+#' mesh <- generate_multi_cylinders(from, to, radii = 0.1,
+#'                                  colors = c(0.7, 0.7, 0.7, 1), caps = FALSE)
+#' nrow(mesh$vertices) > 0
+#'
+#' @seealso \code{\link{generate_cylinder}}, \code{\link{generate_tubes}}
+#' @export
+generate_multi_cylinders <- function(from, to, radii = 0.1,
+                                     colors = c(1, 1, 1, 1),
+                                     segments = 12L, caps = TRUE) {
+    from <- check_points_matrix(from, "from")
+    to <- check_points_matrix(to, "to")
+    if (nrow(from) != nrow(to)) {
+        stop(sprintf("from and to must have the same number of rows, got %d and %d",
+                     nrow(from), nrow(to)))
+    }
+    n <- nrow(from)
+    scimesh_generate_multi_cylinders(from, to, recycle_radii(radii, n),
+                                     recycle_colors(colors, n),
+                                     as.integer(segments), isTRUE(caps))
+}
+
+#' Generate a tube (generalized cylinder) along a path
+#'
+#' Sweeps a circular cross-section along the points of \code{path}, which allows
+#' for curved shapes such as arcs, Bezier samples of network edges or
+#' streamlines.  A path of exactly two points produces the same mesh as
+#' \code{generate_cylinder()}.
+#'
+#' The cross-section frames are computed by parallel transport
+#' (rotation-minimizing frames), so the tube does not twist around its own axis.
+#' Consecutive duplicate points are removed; a path with fewer than two distinct
+#' points yields an empty mesh.
+#'
+#' @param path Nx3 numeric matrix of path points (or a length-3 vector).
+#' @param radius Tube radius (default 0.1).
+#' @param segments Subdivision count around the circumference (default 12).
+#' @param color Length-4 RGBA colour.
+#' @param cap_start Whether to close the beginning of the tube (default TRUE).
+#' @param cap_end Whether to close the end of the tube (default TRUE).
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' path <- matrix(c(0, 0, 0, 1, 1, 0, 2, 0, 0), ncol = 3, byrow = TRUE)
+#' arc <- generate_tube(path, radius = 0.1, segments = 12,
+#'                      cap_start = FALSE, cap_end = FALSE)
+#' nrow(arc$vertices) > 0
+#'
+#' @seealso \code{\link{generate_tubes}}, \code{\link{generate_cylinder}}
+#' @export
+generate_tube <- function(path, radius = 0.1, segments = 12L,
+                          color = c(1, 1, 1, 1), cap_start = TRUE,
+                          cap_end = TRUE) {
+    path <- check_points_matrix(path, "path")
+    scimesh_generate_tube(path, as.double(radius), as.integer(segments),
+                          as.double(recycle_colors(color, 1L)),
+                          isTRUE(cap_start), isTRUE(cap_end))
+}
+
+#' Generate multiple tubes as a single mesh
+#'
+#' Batched variant of \code{generate_tube()}: all tubes are generated into one
+#' mesh.  Paths may differ in length.  This is the function to use for curved
+#' edges, e.g. connectome edges drawn as arcs.
+#'
+#' @param paths List of Nx3 numeric matrices (one per tube).  Each path needs at
+#'   least two distinct points to produce geometry.
+#' @param radii Numeric vector of radii (length 1, recycled; or one per tube).
+#' @param colors RGBA colour(s): a single vector applied to all tubes, or an Nx4
+#'   numeric matrix (values in \code{[0, 1]}, alpha optional).
+#' @param segments Subdivision count around the circumference (default 12).
+#' @param caps Whether to close both ends of every tube (default FALSE, since
+#'   batched tubes are typically connected at their ends).
+#' @return A mesh descriptor list.
+#'
+#' @examples
+#' paths <- list(matrix(c(0, 0, 0, 1, 1, 0), ncol = 3, byrow = TRUE),
+#'               matrix(c(0, 0, 2, 1, 1, 2, 2, 0, 2), ncol = 3, byrow = TRUE))
+#' mesh <- generate_tubes(paths, radii = 0.05, segments = 8)
+#' nrow(mesh$vertices) > 0
+#'
+#' @seealso \code{\link{generate_tube}}, \code{\link{generate_multi_cylinders}}
+#' @export
+generate_tubes <- function(paths, radii = 0.1, colors = c(1, 1, 1, 1),
+                           segments = 12L, caps = FALSE) {
+    if (!is.list(paths)) {
+        stop("paths must be a list of Nx3 numeric matrices")
+    }
+    paths <- lapply(seq_along(paths), function(i) {
+        check_points_matrix(paths[[i]], sprintf("paths[[%d]]", i))
+    })
+    n <- length(paths)
+    if (n == 0L) {
+        return(scimesh_generate_multi_tubes(list(), numeric(0),
+                                            matrix(numeric(0), nrow = 0L, ncol = 4L),
+                                            as.integer(segments), isTRUE(caps)))
+    }
+    scimesh_generate_multi_tubes(paths, recycle_radii(radii, n),
+                                 recycle_colors(colors, n),
+                                 as.integer(segments), isTRUE(caps))
 }
 
 #' Generate a cone mesh
@@ -613,12 +954,15 @@ write_stl <- function(mesh, path, format = c("binary", "ascii")) {
 
 #' Read a Wavefront OBJ file
 #'
-#' Reads a Wavefront OBJ file (with optional UV coordinates and normals)
-#' and returns a scimesh mesh descriptor list with \code{vertices},
-#' \code{triangles}, and optionally \code{uv} and \code{normals}.
+#' Reads the geometry (vertices and triangles) of a Wavefront OBJ file and
+#' returns a scimesh mesh descriptor list with \code{vertices} and
+#' \code{triangles}.  Normals and texture coordinates in the file are ignored:
+#' call \code{\link{compute_vertex_normals}()} if you need normals, and assign
+#' \code{uv} yourself (see \code{\link{render_mesh}}) if you want to render the
+#' mesh with a texture.
 #'
 #' @param path Path to the OBJ file.
-#' @return A mesh descriptor list.
+#' @return A mesh descriptor list with \code{vertices} and \code{triangles}.
 #'
 #' @examples
 #' \dontrun{
@@ -635,7 +979,8 @@ read_obj <- function(path) {
 #'
 #' Reads a PLY file (ASCII or binary) with optional per-vertex colors
 #' and returns a scimesh mesh descriptor list with \code{vertices},
-#' \code{triangles}, and optionally \code{colors}.
+#' \code{triangles}, and optionally \code{colors}.  Texture coordinates in the
+#' file are ignored.
 #'
 #' @param path Path to the PLY file.
 #' @return A mesh descriptor list.

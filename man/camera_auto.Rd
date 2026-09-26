@@ -18,9 +18,12 @@ camera_auto(
 \item{mesh}{Either an Nx3 numeric matrix of vertex positions, or a
 mesh descriptor list with a \code{vertices} component.}
 
-\item{direction}{The view direction as a length-3 vector. For
-example, \code{c(0, 0, -1)} looks along the negative Z axis.
-Ignored when \code{rgl_compat = TRUE}.}
+\item{direction}{Direction from the mesh towards the camera, as a
+length-3 vector: it selects the side you view the mesh from (the
+camera is placed at \code{center + direction * distance}).  For
+example, \code{c(0, 0, 1)} gives a front view of a mesh that faces
++Z, and \code{c(1, 0, 0)} looks at it from its +X side.  Ignored
+when \code{rgl_compat = TRUE}.}
 
 \item{up}{The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
 Ignored when \code{rgl_compat = TRUE}.}
@@ -42,8 +45,9 @@ A camera list, with S3 class \code{"scimesh_camera"}.
 }
 \description{
 Computes a camera position that frames the entire mesh in view.
-The camera looks along the given direction, positioned at a distance
-that ensures the mesh fits within the field of view.
+The camera is placed on the side given by \code{direction} and looks
+back at the mesh, at a distance that ensures the mesh fits within the
+field of view.
 }
 \details{
 When \code{rgl_compat = TRUE}, the camera mimics rgl's default
@@ -51,6 +55,12 @@ auto-framing behaviour: a 30° FOV, 15° elevation, and the distance
 is computed from the \emph{bounding sphere} of the mesh (the
 half-diagonal of the axis-aligned bounding box), reproducing the
 formula \code{distance = sphere_radius / sin(FOV/2)} used by rgl.
+}
+\note{
+This function frames a mesh (or a set of vertices).  It does not know
+  about scene contents such as line layers or text labels; use
+  \code{\link{camera_fit_scene}} to fit a camera to a whole scene, including
+  the line layers that contribute to the scene bounds.
 }
 \examples{
 verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,

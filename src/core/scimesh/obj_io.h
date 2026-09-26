@@ -16,9 +16,8 @@ namespace obj_io {
 
 /// @brief Load a mesh from a Wavefront OBJ file.
 ///
-/// Reads vertex positions, face indices, and optionally normals and texture
-/// coordinates from the file.  OBJ is a text format — you can open `.obj`
-/// files in any text editor to inspect them.
+/// Reads vertex positions and face indices from the file.  OBJ is a text
+/// format — you can open `.obj` files in any text editor to inspect them.
 ///
 /// @param path Filesystem path to the `.obj` file.
 /// @return A Mesh populated with the file's geometry.
@@ -42,7 +41,10 @@ namespace obj_io {
 ///
 /// @par Unsupported
 /// - Vertex normals (vn) — call compute_vertex_normals() after loading
-/// - Texture coordinates (vt) — UVs default to (0,0)
+/// - Texture coordinates (vt) — no UVs are loaded, so textured rendering needs
+///   UVs that you assign yourself (see Mesh::uvs).  The data is parsed by
+///   libfs, so supporting `vt` would be a small addition; until then the
+///   renderer gets no UVs from an OBJ file.
 /// - Materials (.mtl) — only geometry is loaded, colors are not imported
 ///   from material files.
 ///

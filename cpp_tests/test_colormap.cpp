@@ -284,6 +284,46 @@ TEST_CASE("apply_colormap multi basic", "[colormap]") {
     REQUIRE(result.pooled_data_max == Approx(10.0f));
 }
 
+TEST_CASE("ColorMap::viridis returns the built-in 256-entry LUT", "[colormap][viridis]") {
+    const ColorMap &viridis = ColorMap::viridis();
+    REQUIRE(viridis.size() == 256);
+    REQUIRE_FALSE(viridis.empty());
+
+    // The endpoints are the first and last entries of the matplotlib viridis
+    // lookup table.
+    const Color lo = viridis.sample(0.0f);
+    REQUIRE(lo.r == Approx(0.267004f).margin(1e-4f));
+    REQUIRE(lo.g == Approx(0.004874f).margin(1e-4f));
+    REQUIRE(lo.b == Approx(0.329415f).margin(1e-4f));
+
+    const Color hi = viridis.sample(1.0f);
+    REQUIRE(hi.r == Approx(0.993248f).margin(1e-4f));
+    REQUIRE(hi.b == Approx(0.143936f).margin(1e-4f));
+
+    // All entries are opaque, and the map brightens towards the top end
+    // (dark purple -> teal -> yellow).
+    for (const auto &c : viridis.colors) {
+        REQUIRE(c.a == Approx(1.0f));
+    }
+    const Color mid = viridis.sample(0.5f);
+    REQUIRE(mid.g > lo.g);
+    REQUIRE(hi.g > mid.g);
+    REQUIRE(hi.b < mid.b);
+
+    // It is a singleton, and can be used directly with apply_colormap().
+    REQUIRE(&ColorMap::viridis() == &viridis);
+    const auto result = apply_colormap({0.0f, 0.5f, 1.0f}, viridis);
+    REQUIRE(result.colors.size() == 3);
+    REQUIRE(result.colors[0].r == Approx(lo.r).margin(1e-3f));
+    REQUIRE(result.colors[2].b == Approx(hi.b).margin(1e-3f));
+}
+
+TEST_CASE("apply_colormap with no datasets returns an empty result", "[colormap]") {
+    auto cmap = make_test_cmap();
+    const auto result = apply_colormap(std::vector<std::vector<float>>{}, cmap);
+    REQUIRE(result.per_dataset.empty());
+}
+
 TEST_CASE("apply_colormap multi global_range", "[colormap]") {
     auto cmap = make_test_cmap();
     // lh hemisphere data: 1–3, rh hemisphere data: 7–9

@@ -36,6 +36,81 @@ cmake --build build
 ./build/scimesh_tests
 ```
 
+### C++ code coverage
+
+Coverage of the C++ core is measured with clang's source-based coverage and
+reported with `llvm-cov`.  The helper script builds the test suite with
+instrumentation, runs it and writes a report:
+
+```sh
+dev_tools/coverage_cpp.sh                 # build, run all tests, report
+dev_tools/coverage_cpp.sh "[fog]"         # only matching Catch2 tests
+CXX=clang++-18 dev_tools/coverage_cpp.sh  # use a specific clang
+```
+
+**Requirements (Linux):** `clang`, plus `llvm-profdata` and `llvm-cov` of the
+same major version, and `cmake`.  On Debian/Ubuntu: `sudo apt install clang llvm`.
+
+The report is written to `coverage/` (gitignored): `coverage/html/index.html`
+for browsing, `coverage/lcov.info` if you want coverage gutters in your editor
+(e.g. the VS Code "Coverage Gutters" extension).
+
+Notes:
+
+* Test code, the Catch2 amalgamation and all vendored third-party code
+  (`src/third_party/`, whose header-only libraries are inlined into the core)
+  are excluded from the report.
+* Library files that no test references are not linked into the test binary at
+  all, so they do not show up in the report - not even as 0 % (e.g.
+  `obj_io.cpp` and `transforms.cpp`, which are exercised from R instead).  A file
+  shown at 0 % is linked but never executed (e.g. `ply_io.cpp`).
+* Coverage is a local development tool: nothing is uploaded, there is no badge
+  and there are no coverage thresholds (vendored third-party headers would break
+  any gate).  The `Coverage (C++)` CI workflow stores the HTML report as an
+  artifact but never fails on low coverage.
+* Coverage of the R layer is not measured here - use `covr::package_coverage()`
+in R for that.  The C++ code inside the R package is a separate build (see
+`src/Makevars`) and is not covered by this script.
+
+### Checking compatibility with the macOS toolchain
+
+A missing standard header is invisible to almost every build we have: libstdc++
+(GCC, i.e. R on Linux and Windows) and libc++ 15+ (Xcode 15+, i.e. the
+`macos-latest` CI runner) both pull headers such as `<array>` in transitively
+via `<functional>`.  The CRAN macOS builders use the clang 14 / libc++ 14
+toolchain, which does not - so such code fails there with a confusing
+`implicit instantiation of undefined template 'std::array<...>'` (this is what
+broke the CRAN installation of 0.3.4).  Compile every translation unit with
+libc++ 14 to check:
+
+```sh
+dev_tools/check_libcxx_strictness.sh                    # needs libc++ <= 14
+CXX=clang++-14 dev_tools/check_libcxx_strictness.sh     # use a specific clang
+LIBCXX_INC=/usr/lib/llvm-14/include/c++/v1 dev_tools/check_libcxx_strictness.sh
+```
+
+**Requirements (Linux):** `clang` plus the libc++ headers of version <= 14.  On
+Debian/Ubuntu: `sudo apt install clang-14 libc++-14-dev`.  The check is
+`-fsyntax-only`, so nothing is linked and R is only needed for the two Rcpp
+binding translation units (they are skipped when R or Rcpp is missing).  The
+script refuses to run with libc++ >= 15, because that standard library cannot
+reproduce the strict behaviour.  The `C++ stdlib strictness` CI workflow runs
+this on every push/PR, on the pinned `ubuntu-24.04` image (newer Ubuntu releases
+no longer ship libc++ 14).
+
+### Examples
+
+The example programs are part of what we ship, so they are built and run:
+
+```sh
+./examples/cpp/run_all_cpp.sh      # builds and runs every C++ example
+./examples/R/run_all_R.sh          # runs every R example (needs scimesh installed)
+```
+
+Both can take a name to run a single example.  The `Examples` CI workflow does
+this on every push/PR, because the C++ examples are not compiled by any test
+target - breakage in them would otherwise go unnoticed.
+
 ### Running the R unit tests
 
 ```r

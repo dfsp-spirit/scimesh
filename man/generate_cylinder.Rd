@@ -9,7 +9,8 @@ generate_cylinder(
   end,
   radius = 0.5,
   segments = 32,
-  color = c(1, 1, 1, 1)
+  color = c(1, 1, 1, 1),
+  caps = TRUE
 )
 }
 \arguments{
@@ -22,6 +23,10 @@ generate_cylinder(
 \item{segments}{Subdivision count (default 32).}
 
 \item{color}{Length-4 RGBA colour.}
+
+\item{caps}{Whether to close both ends with caps (default TRUE).  Pass FALSE
+for an open tube, which roughly halves the number of vertices and
+triangles.  Useful for edges whose ends are hidden by other geometry.}
 }
 \value{
 A mesh descriptor list.
@@ -29,10 +34,12 @@ A mesh descriptor list.
 \description{
 Creates a cylinder from \code{start} to \code{end} with the given
 \code{radius}, subdivided into \code{segments} around the axis.
-Both end caps are included.
+Both end caps are included unless \code{caps = FALSE} is passed.
 }
 \examples{
 mesh <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), radius = 0.5)
 nrow(mesh$vertices)
+open <- generate_cylinder(c(0, -1, 0), c(0, 1, 0), radius = 0.5, caps = FALSE)
+nrow(open$vertices)
 
 }

@@ -33,8 +33,9 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #' Auto-frame a camera to fit a mesh or vertex set
 #'
 #' Computes a camera position that frames the entire mesh in view.
-#' The camera looks along the given direction, positioned at a distance
-#' that ensures the mesh fits within the field of view.
+#' The camera is placed on the side given by \code{direction} and looks
+#' back at the mesh, at a distance that ensures the mesh fits within the
+#' field of view.
 #'
 #' When \code{rgl_compat = TRUE}, the camera mimics rgl's default
 #' auto-framing behaviour: a 30° FOV, 15° elevation, and the distance
@@ -44,9 +45,12 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #'
 #' @param mesh Either an Nx3 numeric matrix of vertex positions, or a
 #'   mesh descriptor list with a \code{vertices} component.
-#' @param direction The view direction as a length-3 vector. For
-#'   example, \code{c(0, 0, -1)} looks along the negative Z axis.
-#'   Ignored when \code{rgl_compat = TRUE}.
+#' @param direction Direction from the mesh towards the camera, as a
+#'   length-3 vector: it selects the side you view the mesh from (the
+#'   camera is placed at \code{center + direction * distance}).  For
+#'   example, \code{c(0, 0, 1)} gives a front view of a mesh that faces
+#'   +Z, and \code{c(1, 0, 0)} looks at it from its +X side.  Ignored
+#'   when \code{rgl_compat = TRUE}.
 #' @param up The up vector as a length-3 vector. Default \code{c(0, 1, 0)}.
 #'   Ignored when \code{rgl_compat = TRUE}.
 #' @param fov Field of view in degrees. Default 45° (30° when
@@ -58,6 +62,11 @@ camera <- function(eye, center, up = c(0, 1, 0),
 #'   \code{"orthographic"}. When orthographic, the camera distance is
 #'   computed to tightly frame the mesh regardless of FOV.
 #' @return A camera list, with S3 class \code{"scimesh_camera"}.
+#'
+#' @note This function frames a mesh (or a set of vertices).  It does not know
+#'   about scene contents such as line layers or text labels; use
+#'   \code{\link{camera_fit_scene}} to fit a camera to a whole scene, including
+#'   the line layers that contribute to the scene bounds.
 #'
 #' @examples
 #' verts <- matrix(c(-1,-1,-1, 1,-1,-1, 1,1,-1, -1,1,-1,
@@ -144,6 +153,55 @@ camera_auto <- function(mesh, direction = c(0, 0, -1), up = c(0, 1, 0),
     } else {
         scimesh_camera_fit_mesh(mesh_data, direction, up, fov, margin, projection)
     }
+}
+
+
+#' Fit a camera to a whole scene
+#'
+#' Computes a camera that frames the contents of a scene (see
+#' \code{\link{scene}}), i.e. its meshes together with the line layers that
+#' contribute to the scene bounds (see \code{\link{line_layer}}, parameter
+#' \code{affects_bounds}).  Use this instead of \code{\link{camera_auto}} when
+#' the camera has to consider something else than a mesh: a scene that contains
+#' only line layers (e.g. a tractogram or a connectome without a brain surface)
+#' is framed by those lines, and decorational layers
+#' (\code{affects_bounds = FALSE}) are ignored.
+#'
+#' The camera is placed on the line from the center of the bounding box along
+#' \code{direction}, at a distance that makes the content fit into the field of
+#' view, exactly like \code{\link{camera_auto}} does it for a mesh.
+#'
+#' @param scene A scene descriptor list, see \code{\link{scene}()}.
+#' @param direction Length-3 view direction, from the camera towards the scene
+#'   (default \code{c(0, 0, -1)}, i.e. looking along -Z).
+#' @param up Length-3 up vector (default \code{c(0, 1, 0)}).
+#' @param fov Vertical field of view in degrees (default 45).
+#' @param margin Scale factor applied to the fitted distance; values above 1
+#'   leave a margin around the content (default 1.1).
+#' @param projection Projection type, \code{"perspective"} (default) or
+#'   \code{"orthographic"}.
+#'
+#' @return A camera list (see \code{\link{camera}()}) with class
+#'   \code{"scimesh_camera"}.
+#'
+#' @seealso \code{\link{camera_auto}} for meshes, \code{\link{scene}},
+#'   \code{\link{scene_set_line_affects_bounds}}
+#' @examples
+#' # A scene without any mesh is framed by its lines.
+#' line <- line_layer(matrix(c(0, 0, 0), ncol = 3), matrix(c(2, 0, 0), ncol = 3))
+#' sc <- scene(list(), lines = line)
+#' cam <- camera_fit_scene(sc, direction = c(0, 0, -1))
+#'
+#' @export
+camera_fit_scene <- function(scene, direction = c(0, 0, -1), up = c(0, 1, 0),
+                             fov = 45, margin = 1.1,
+                             projection = c("perspective", "orthographic")) {
+    projection <- match.arg(projection)
+    if (!inherits(scene, "scimesh_scene")) {
+        stop("scene must be a scene descriptor, see scene()")
+    }
+    scimesh_camera_fit_scene(scene_data_from_scene(scene), direction, up, fov,
+                             margin, projection)
 }
 
 #' Orbit a camera around an axis

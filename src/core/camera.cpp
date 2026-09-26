@@ -1,4 +1,5 @@
 #include <scimesh/camera.h>
+#include <scimesh/math_utils.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 #include <cmath>
@@ -33,6 +34,38 @@ Mat4 Camera::get_projection_matrix(float aspect_ratio, float near_plane, float f
         float half_w = half_h * aspect_ratio;
         return glm::ortho(-half_w, half_w, -half_h, half_h, near_plane, far_plane);
     }
+}
+
+ProjectedPoint world_to_screen(const Camera &camera, const Vec3 &world, int width,
+                               int height, ProjectionType projection,
+                               float near_plane, float far_plane) {
+    if (width <= 0 || height <= 0) {
+        throw std::invalid_argument("world_to_screen: width and height must be > 0");
+    }
+    ProjectedPoint out;
+
+    // Same matrices as the render pipeline: the render options decide the
+    // projection type, the camera only provides its position and framing.
+    Camera proj_cam = camera;
+    proj_cam.projection = projection;
+    const Mat4 view = camera.get_view_matrix();
+    const float aspect = static_cast<float>(width) / static_cast<float>(height);
+    const Mat4 projection_matrix =
+        proj_cam.get_projection_matrix(aspect, near_plane, far_plane);
+
+    const Vec4 clip = transform_point_homogeneous(projection_matrix * view, world);
+    if (clip.w <= 1e-6f) {
+        return out;  // at or behind the camera plane: not visible
+    }
+
+    const Vec3 ndc = perspective_divide(clip);
+    float screen_x = 0.0f, screen_y = 0.0f, depth = 0.0f;
+    ndc_to_screen(ndc, width, height, screen_x, screen_y, depth);
+
+    out.pixel = Vec2(screen_x, screen_y);
+    out.depth = depth;
+    out.in_front = true;
+    return out;
 }
 
 Camera camera_look_at(const Vec3 &center, float radius,

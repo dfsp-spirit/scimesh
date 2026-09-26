@@ -16,7 +16,10 @@ length-3 numeric vector for per-axis scaling (x, y, z).}
 A new mesh descriptor list with scaled vertices.
 }
 \description{
-Scale a mesh uniformly or per-axis
+Per-vertex normals (if the mesh has any) are scaled as well, using the
+inverse transpose of the scaling matrix: a non-uniform scale would
+otherwise leave normals pointing in a direction that no longer matches
+the surface, which shows up as wrong shading.
 }
 \examples{
 mesh <- generate_cuboid(c(0, 0, 0), c(1, 1, 1))

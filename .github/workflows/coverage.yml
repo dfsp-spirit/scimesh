@@ -1,0 +1,42 @@
+name: Coverage (C++)
+
+# Internal coverage report for the C++ core.  Deliberately minimal:
+#
+#   * no upload to a coverage service and no badge (the report is attached as a
+#     build artifact and printed to the job log instead),
+#   * no coverage thresholds - the numerous vendored third-party headers
+#     (glm, stb, libfs, tinyply) would break any gate,
+#   * nothing here is meant to block a pull request.
+#
+# Runs on manual dispatch and on pushes to develop, rather than on every PR,
+# because the instrumented build is slower than the normal test job.
+#
+# Locally the same thing is available via dev_tools/coverage_cpp.sh.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop]
+
+jobs:
+  coverage:
+    name: C++ coverage (clang/llvm)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install LLVM coverage tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm
+
+      - name: Build, run tests and report coverage
+        run: ./dev_tools/coverage_cpp.sh
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpp-coverage-html
+          path: coverage/html
+          if-no-files-found: error

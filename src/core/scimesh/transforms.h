@@ -29,6 +29,9 @@ void translate_mesh(Mesh &mesh, const Vec3 &translation);
 /// @brief Scale a mesh non-uniformly along each axis.
 ///
 /// Multiplies each vertex position component-wise by `scale`.
+/// Per-vertex normals (if any) are updated as well, using the inverse
+/// transpose of the scaling matrix, so that shading stays correct for
+/// non-uniform scales.
 ///
 /// @param[in,out] mesh  The mesh to modify.
 /// @param         scale Scale factors per axis (e.g., {2,1,1} doubles width).
@@ -43,7 +46,9 @@ void scale_mesh(Mesh &mesh, const Vec3 &scale);
 
 /// @brief Scale a mesh uniformly in all directions.
 ///
-/// Multiplies every vertex position by `uniform_scale`.
+/// Multiplies every vertex position by `uniform_scale`.  Per-vertex normals
+/// (if any) are updated as well; a uniform scale does not change their
+/// direction.
 ///
 /// @param[in,out] mesh          The mesh to modify.
 /// @param         uniform_scale Scale factor (1.0 = unchanged, 2.0 = double size).
@@ -59,7 +64,8 @@ void scale_mesh(Mesh &mesh, float uniform_scale);
 /// @brief Rotate a mesh around an arbitrary axis.
 ///
 /// Uses the right-hand rule: positive angle = counter-clockwise when
-/// looking along the axis toward the origin.
+/// looking along the axis toward the origin.  Per-vertex normals (if any)
+/// are rotated with the mesh.
 ///
 /// @param[in,out] mesh          The mesh to modify.
 /// @param         angle_radians Rotation angle in **radians**.
@@ -81,6 +87,11 @@ void rotate_mesh(Mesh &mesh, float angle_radians, const Vec3 &axis);
 /// into a single matrix using GLM functions like `glm::translate()`,
 /// `glm::rotate()`, and `glm::scale()`.
 ///
+/// Per-vertex normals (if any) are transformed as well, by the inverse
+/// transpose of the upper-left 3×3 block, so that shading stays correct for
+/// shearing and non-uniform scaling.  Meshes without normals are unaffected,
+/// and `compute_vertex_normals()` can be used to generate them.
+///
 /// @param[in,out] mesh   The mesh to modify.
 /// @param         matrix A 4×4 transformation matrix (column-major, GLM style).
 ///
@@ -94,6 +105,30 @@ void rotate_mesh(Mesh &mesh, float angle_radians, const Vec3 &axis);
 ///
 /// @see translate_mesh(), rotate_mesh(), scale_mesh()
 void transform_mesh(Mesh &mesh, const Mat4 &matrix);
+
+/// @brief Flip the texture coordinates of a mesh vertically (v → 1 − v).
+///
+/// scimesh stores UVs in **image space**, with v = 0 at the *top* edge of the
+/// texture image (see Mesh::uvs).  OBJ and PLY files, OpenGL, rgl and tools
+/// such as Blender and MeshLab use the opposite convention, with v = 0 at the
+/// bottom.  Call this once on a mesh whose UVs come from such a source, instead
+/// of rewriting the coordinates by hand (this is exactly what the
+/// `examples/cpp/spot_cow/` example needs for its OBJ texture coordinates).
+///
+/// Mesh geometry, colors and normals are untouched.  Meshes without UVs are
+/// left as they are, so this is safe to call unconditionally.
+///
+/// @param mesh The mesh whose UVs to flip (modified in place).
+///
+/// @par Example
+/// @code{.cpp}
+/// Mesh model = obj_io::read_obj("model.obj");
+/// model.uvs = uvs_from_obj;   // bottom-left origin, e.g. from libfs
+/// flip_uvs(model);            // now v = 0 is the top of the texture
+/// @endcode
+///
+/// @see Mesh::uvs, transform_mesh()
+void flip_uvs(Mesh &mesh);
 
 /// @brief Convert a FreeSurfer-format mesh (flat vertex/face arrays) to a
 ///        scimesh Mesh.

@@ -1,0 +1,53 @@
+name: Examples
+
+# Builds and runs all example programs.  The C++ examples are otherwise not
+# compiled by any test target, so nothing else would notice them breaking
+# (that is how the full_CLI_renderer link error went unnoticed).
+#
+# The examples write their output into their own build directories; no images
+# are committed or uploaded.
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  cpp-examples:
+    name: C++ examples (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build and run all C++ examples
+        run: ./examples/cpp/run_all_cpp.sh
+
+  r-examples:
+    name: R examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools
+          needs: development
+
+      - name: Install scimesh
+        run: R CMD INSTALL --no-multiarch --with-keep.source .
+        shell: bash
+
+      - name: Run all R examples
+        run: ./examples/R/run_all_R.sh
+        shell: bash

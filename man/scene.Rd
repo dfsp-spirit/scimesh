@@ -4,7 +4,15 @@
 \alias{scene}
 \title{Create a scene descriptor}
 \usage{
-scene(meshes, camera = NULL, options = NULL, transforms = NULL, names = NULL)
+scene(
+  meshes,
+  camera = NULL,
+  options = NULL,
+  transforms = NULL,
+  names = NULL,
+  lines = NULL,
+  texts = NULL
+)
 }
 \arguments{
 \item{meshes}{A list of mesh descriptors (scimesh or rgl format, see
@@ -25,11 +33,27 @@ overriding any embedded \code{transform} in the nodes.  May contain
 
 \item{names}{Optional character vector, one per mesh, overriding any
 embedded \code{name}.}
+
+\item{lines}{\code{NULL}, a line layer (see \code{\link{line_layer}}), or a
+list of them.  Line layers are drawn after the meshes with a width
+measured in pixels and without creating any geometry, which makes them the
+cheap way to draw many thin lines (wireframes, graph or connectome edges).
+They share the depth buffer with the meshes and contribute to the scene
+bounding box (and thus to the camera framing), unless the layer sets
+\code{affects_bounds = FALSE}, see \code{\link{line_layer}}.}
+
+\item{texts}{\code{NULL}, a text layer (see \code{\link{text_layer}}), or a
+list of them.  Text layers are drawn after the meshes and the lines as
+billboards and create no geometry either, so they are the way to annotate a
+figure (region names, atom labels, panel tags).  Unlike line layers they are
+ignored by the scene bounding box, since their extent depends on the font
+and the output size.}
 }
 \value{
 A scene descriptor list with S3 class \code{"scimesh_scene"},
-  with components \code{meshes} (list of scene nodes), \code{camera},
-  and \code{options}.
+  with components \code{meshes} (list of scene nodes), \code{lines} (list
+  of line layers, possibly empty), \code{texts} (list of text layers,
+  possibly empty), \code{camera}, and \code{options}.
 }
 \description{
 Bundles a list of meshes together with their placement transforms, a
@@ -53,4 +77,17 @@ sc <- scene(list(cube1, list(mesh = cube2, transform = tr, name = "blue")),
             camera = camera_auto(list(cube1, cube2), direction = c(1, 1, 1)))
 img <- render_scene(sc)
 
+# add a line layer drawn on top of the meshes:
+sc2 <- scene(list(cube1),
+             lines = line_layer(matrix(c(0, 0, 1), ncol = 3),
+                                matrix(c(1, 1, 1), ncol = 3), width = 3))
+
+# add a label anchored above the cube:
+sc3 <- scene(list(cube1),
+             texts = text_layer(matrix(c(0, 1, 0), ncol = 3), "cube",
+                                size = 18, adj = c(0.5, 0)))
+
+}
+\seealso{
+\code{\link{line_layer}}, \code{\link{text_layer}}
 }

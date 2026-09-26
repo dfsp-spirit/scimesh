@@ -3,6 +3,7 @@
 #include <scimesh/normals.h>
 #include <scimesh/clipping.h>
 #include <scimesh/rasterizer.h>
+#include <scimesh/text.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
@@ -23,8 +24,90 @@ struct DeferredTri {
     Vec3   normal0, normal1, normal2;
     Vec2   uv0, uv1, uv2;
     bool   smooth;
-    float  view_z;  // centroid depth in view space, for back-to-front sort
+    /// Centroid depth in view space: the camera looks down -Z, so a *smaller*
+    /// (more negative) value is farther away.
+    float  view_z;
 };
+
+/// A translucent line segment deferred to the blended pass (see DeferredTri).
+struct DeferredLine {
+    Vec3  screen_v0, screen_v1;
+    Color color0, color1;
+    float width;
+    bool  lit;
+    /// Midpoint depth in view space (see DeferredTri::view_z).
+    float view_z;
+};
+
+/// @brief Signed distance of a view-space point to the near clipping plane.
+///
+/// The camera looks down -Z, so points with `z <= -near_plane` are visible and
+/// the signed distance is positive inside the frustum.
+inline float signed_distance_near_plane(const Vec3 &p_view, float near_plane) {
+    return -near_plane - p_view.z;
+}
+
+/// @brief Signed distance of a view-space point to a (view-space) clip plane.
+///
+/// Matches the convention of the triangle clipper: the plane keeps the
+/// half-space `dot(normal, p) + offset >= 0`.
+inline float signed_distance_clip_plane(const Vec3 &p_view, const ClipPlane &plane) {
+    return glm::dot(plane.normal, p_view) + plane.offset;
+}
+
+/// @brief Clip a segment against the near plane and the user clip planes.
+///
+/// Works on the parameter interval of the segment: returns the sub-interval
+/// [t0, t1] (in [0, 1]) for which every point is inside all planes.  Returns
+/// false when nothing of the segment is visible, in which case the segment has
+/// to be skipped completely.
+///
+/// @param v0, v1      View-space endpoints of the segment.
+/// @param near_plane  Near plane distance of the camera.
+/// @param clip_planes User clip planes, already converted to view space.
+/// @param[out] t0, t1 The visible parameter interval.
+/// @return True if any part of the segment is visible.
+bool clip_segment_view(const Vec3 &v0, const Vec3 &v1, float near_plane,
+                       const std::vector<ClipPlane> &clip_planes,
+                       float &t0, float &t1) {
+    t0 = 0.0f;
+    t1 = 1.0f;
+
+    // Clip against a single plane given the signed distances of the endpoints.
+    auto clip_against = [&](float d0, float d1) -> bool {
+        const bool inside0 = d0 >= 0.0f;
+        const bool inside1 = d1 >= 0.0f;
+        if (!inside0 && !inside1) {
+            return false;
+        }
+        if (inside0 && inside1) {
+            return true;
+        }
+        const float denom = d0 - d1;
+        if (std::abs(denom) < 1e-12f) {
+            return true;
+        }
+        const float t = d0 / denom;
+        if (inside0) {
+            t1 = std::min(t1, t);
+        } else {
+            t0 = std::max(t0, t);
+        }
+        return t0 <= t1;
+    };
+
+    if (!clip_against(signed_distance_near_plane(v0, near_plane),
+                      signed_distance_near_plane(v1, near_plane))) {
+        return false;
+    }
+    for (const ClipPlane &plane : clip_planes) {
+        if (!clip_against(signed_distance_clip_plane(v0, plane),
+                          signed_distance_clip_plane(v1, plane))) {
+            return false;
+        }
+    }
+    return true;
+}
 
 } // anonymous namespace
 
@@ -36,7 +119,7 @@ Image Renderer::render_mesh(const Mesh &mesh, const Camera &camera, const Render
     Image internal(options.width * aa, options.height * aa);
     std::vector<SceneNodeRef> nodes;
     nodes.push_back({&mesh, Mat4(1.0f), ""});
-    render_pipeline(nodes, camera, options, internal);
+    render_pipeline(nodes, {}, {}, camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -47,7 +130,7 @@ Image Renderer::render_scene(const Scene &scene, const Camera &camera, const Ren
     int aa = std::max(1, options.aa_samples);
     Image internal(options.width * aa, options.height * aa);
     std::vector<SceneNodeRef> nodes = scene.nodes();
-    render_pipeline(nodes, camera, options, internal);
+    render_pipeline(nodes, scene.line_nodes(), scene.text_nodes(), camera, options, internal);
     return internal.downsample_box(aa);
 }
 
@@ -105,6 +188,10 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.fog_space = options.fog_space;
+    rasterizer.z_near = options.near_plane;
+    rasterizer.z_far = options.far_plane;
+    rasterizer.orthographic = (options.projection == ProjectionType::ORTHOGRAPHIC);
     rasterizer.ssao_enabled = options.ssao_enabled;
     rasterizer.ssao_radius = options.ssao_radius;
     rasterizer.ssao_intensity = options.ssao_intensity;
@@ -146,7 +233,37 @@ Image Renderer::render_points_raw(const std::vector<Vec3> &positions,
     return output.downsample_box(aa);
 }
 
+Image Renderer::render_lines_raw(const std::vector<Vec3> &from,
+                                 const std::vector<Vec3> &to,
+                                 const std::vector<Color> &colors,
+                                 float width,
+                                 const Camera &camera,
+                                 const RenderOptions &options) {
+    if (options.width <= 0 || options.height <= 0) {
+        throw std::invalid_argument("RenderOptions width and height must be > 0");
+    }
+
+    // A raw line render is simply a scene with a single line layer and no
+    // meshes, so there is only one code path for line rendering.
+    LineLayer layer;
+    layer.from = from;
+    layer.to = to;
+    layer.colors = colors;
+    layer.width = width;
+
+    Scene scene;
+    scene.add_lines(layer);
+
+    int aa = std::max(1, options.aa_samples);
+    Image internal(options.width * aa, options.height * aa);
+    std::vector<SceneNodeRef> no_meshes;
+    render_pipeline(no_meshes, scene.line_nodes(), {}, camera, options, internal);
+    return internal.downsample_box(aa);
+}
+
 void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
+                               const std::vector<LineNodeRef> &line_nodes,
+                               const std::vector<TextNodeRef> &text_nodes,
                                const Camera &camera,
                                const RenderOptions &options,
                                Image &output) {
@@ -174,6 +291,10 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
     rasterizer.fog_start = options.fog_start;
     rasterizer.fog_end = options.fog_end;
     rasterizer.fog_color = options.fog_color;
+    rasterizer.fog_space = options.fog_space;
+    rasterizer.z_near = options.near_plane;
+    rasterizer.z_far = options.far_plane;
+    rasterizer.orthographic = (options.projection == ProjectionType::ORTHOGRAPHIC);
     rasterizer.ssao_enabled = options.ssao_enabled;
     rasterizer.ssao_radius = options.ssao_radius;
     rasterizer.ssao_intensity = options.ssao_intensity;
@@ -193,23 +314,28 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
     Mat4 projection = proj_cam.get_projection_matrix(aspect, options.near_plane, options.far_plane);
     Mat4 view_projection = projection * view;
 
-    std::vector<ClipPlane> view_clip_planes = options.clip_planes;
-    for (auto &cp : view_clip_planes) {
-        cp.normal = glm::normalize(transform_direction(view, cp.normal));
+    // User clip planes default to world space; clipping itself happens in
+    // view space, so convert them here (see ClipPlane::space).
+    std::vector<ClipPlane> view_clip_planes;
+    view_clip_planes.reserve(options.clip_planes.size());
+    for (const auto &cp : options.clip_planes) {
+        view_clip_planes.push_back(
+            clip_plane_to_view_space(cp, camera.eye, view));
     }
 
     Vec3 light_direction = Vec3(0.0f, 0.0f, 1.0f);
 
-    bool scene_has_transparency = false;
-    for (const auto &nd : nodes) {
-        if (nd.mesh->has_transparency) { scene_has_transparency = true; break; }
-    }
-
     std::vector<DeferredTri> deferred;
+    std::vector<DeferredLine> deferred_lines;
 
     for (const auto &node : nodes) {
         const Mesh &mesh = *node.mesh;
         if (mesh.empty()) continue;
+
+        // Translucent meshes are deferred to the blended pass.  This is derived
+        // from the mesh's colors (and default_color), so callers no longer have
+        // to keep Mesh::has_transparency in sync by hand.
+        const bool mesh_transparent = mesh.is_transparent();
 
         // Placement transform for this mesh (model matrix in world space).
         const Mat4 &model = node.transform;
@@ -264,7 +390,7 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
             Vec2 uv1 = mesh.has_uvs() ? mesh.uvs[tri.v1] : Vec2(0, 0);
             Vec2 uv2 = mesh.has_uvs() ? mesh.uvs[tri.v2] : Vec2(0, 0);
 
-            bool tri_transparent = scene_has_transparency &&
+            bool tri_transparent = mesh_transparent &&
                 (c0.a < 1.0f - 1e-6f || c1.a < 1.0f - 1e-6f || c2.a < 1.0f - 1e-6f);
 
             ClipVertex cv0, cv1, cv2;
@@ -404,30 +530,131 @@ void Renderer::render_pipeline(const std::vector<SceneNodeRef> &nodes,
         }
     }
 
+    // ---- Line layers -------------------------------------------------------
+    // Line layers are drawn after the meshes, against the same depth buffer:
+    // opaque lines are occluded by meshes in front of them and occlude meshes
+    // behind them, translucent lines are deferred to the blended pass below.
+    // The output image is supersampled by `aa_samples`, so the screen-space
+    // line width has to be scaled by the same factor (like the point radius).
+    const float line_width_scale =
+        static_cast<float>(output.width) /
+        static_cast<float>(std::max(1, options.width));
+    for (const auto &line_node : line_nodes) {
+        const LineLayer &layer = *line_node.layer;
+        if (layer.empty()) {
+            continue;
+        }
+
+        const Mat4 view_model = view * line_node.transform;
+        const float width = std::max(0.5f, layer.width) * line_width_scale;
+        const size_t num_segments = layer.size();
+
+        for (size_t i = 0; i < num_segments; ++i) {
+            const Vec3 v0 = transform_point(view_model, layer.from[i]);
+            const Vec3 v1 = transform_point(view_model, layer.to[i]);
+
+            // Clip against the near plane and the user clip planes.  A segment
+            // with an endpoint behind the camera would otherwise project to
+            // garbage (w <= 0).
+            float t0 = 0.0f, t1 = 1.0f;
+            if (!clip_segment_view(v0, v1, options.near_plane, view_clip_planes,
+                                   t0, t1)) {
+                continue;
+            }
+
+            const Vec3 dir = v1 - v0;
+            const Vec3 p0 = v0 + t0 * dir;
+            const Vec3 p1 = v0 + t1 * dir;
+
+            float sx0, sy0, sz0, sx1, sy1, sz1;
+            ndc_to_screen(perspective_divide(transform_point_homogeneous(projection, p0)),
+                          output.width, output.height, sx0, sy0, sz0);
+            ndc_to_screen(perspective_divide(transform_point_homogeneous(projection, p1)),
+                          output.width, output.height, sx1, sy1, sz1);
+
+            // One color per segment: clipping does not change it.
+            const Color color = layer.color_or(i, options.default_color);
+            const Vec3 screen_v0(sx0, sy0, sz0);
+            const Vec3 screen_v1(sx1, sy1, sz1);
+            const Vec3 line_normal(0.0f, 0.0f, 1.0f);
+
+            if (color.a < 1.0f - 1e-6f) {
+                deferred_lines.push_back({screen_v0, screen_v1, color, color, width,
+                                          layer.lit, (p0.z + p1.z) * 0.5f});
+            } else {
+                rasterizer.rasterize_line(screen_v0, color, screen_v1, color,
+                                          width, layer.lit, line_normal,
+                                          light_direction, output);
+            }
+        }
+    }
+
     if (rasterizer.ssao_enabled) {
         rasterizer.apply_ssao(output, options.near_plane, options.far_plane);
     }
 
-    if (!deferred.empty()) {
+    if (!deferred.empty() || !deferred_lines.empty()) {
+        // Painter's algorithm: farthest primitive first, nearest last, so that
+        // nearer translucent surfaces are blended *over* the ones behind them.
+        // Ascending view-space z is farthest-to-nearest (the camera looks down
+        // -Z); sorting the other way round blends front-to-back and makes the
+        // nearest surface disappear behind the ones behind it.  Triangles and
+        // lines are sorted together, so their mutual order is correct too.
         std::sort(deferred.begin(), deferred.end(),
                   [](const DeferredTri &a, const DeferredTri &b) {
-                      return a.view_z > b.view_z;
+                      return a.view_z < b.view_z;
+                  });
+        std::sort(deferred_lines.begin(), deferred_lines.end(),
+                  [](const DeferredLine &a, const DeferredLine &b) {
+                      return a.view_z < b.view_z;
                   });
 
         rasterizer.set_blend_mode(true);
 
-        for (const auto &dt : deferred) {
-            rasterizer.rasterize_triangle(
-                dt.screen_v0, dt.color0, dt.normal0, dt.uv0,
-                dt.screen_v1, dt.color1, dt.normal1, dt.uv1,
-                dt.screen_v2, dt.color2, dt.normal2, dt.uv2,
-                options.backface_culling, dt.smooth,
-                light_direction,
-                options.wireframe, options.wireframe_color,
-                output);
+        size_t tri_idx = 0;
+        size_t line_idx = 0;
+        while (tri_idx < deferred.size() || line_idx < deferred_lines.size()) {
+            const bool take_line =
+                (tri_idx >= deferred.size()) ||
+                (line_idx < deferred_lines.size() &&
+                 deferred_lines[line_idx].view_z < deferred[tri_idx].view_z);
+            if (take_line) {
+                const DeferredLine &dl = deferred_lines[line_idx++];
+                rasterizer.rasterize_line(
+                    dl.screen_v0, dl.color0, dl.screen_v1, dl.color1,
+                    dl.width, dl.lit, Vec3(0.0f, 0.0f, 1.0f), light_direction,
+                    output);
+            } else {
+                const DeferredTri &dt = deferred[tri_idx++];
+                rasterizer.rasterize_triangle(
+                    dt.screen_v0, dt.color0, dt.normal0, dt.uv0,
+                    dt.screen_v1, dt.color1, dt.normal1, dt.uv1,
+                    dt.screen_v2, dt.color2, dt.normal2, dt.uv2,
+                    options.backface_culling, dt.smooth,
+                    light_direction,
+                    options.wireframe, options.wireframe_color,
+                    output);
+            }
         }
 
         rasterizer.set_blend_mode(false);
+    }
+
+    // ---- Text layers -------------------------------------------------------
+    // Text layers are drawn last, so labels end up on top of the geometry and
+    // of the lines.  They are drawn before the image is downsampled, so glyphs
+    // get the same anti-aliasing as everything else; the depth buffer is handed
+    // to the text renderer so that labels whose anchor is hidden behind a
+    // surface can be skipped (see TextLayer::depth_test).  Screen-space offsets
+    // (font size, pixel offsets, halo width) are scaled by the same factor as
+    // the supersampled image.
+    if (!text_nodes.empty()) {
+        const float pixel_scale =
+            static_cast<float>(output.width) /
+            static_cast<float>(std::max(1, options.width));
+        detail::render_text_layers(text_nodes, output, view_projection,
+                                   pixel_scale, rasterizer.z_buffer,
+                                   options.default_color);
     }
 }
 
