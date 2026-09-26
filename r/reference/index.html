@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,13 @@
 
         <dt>
 
+          <code><a href="bezier_path.html">bezier_path()</a></code>
+
+        </dt>
+        <dd>Sample a Bezier curve from a control polygon</dd>
+
+        <dt>
+
           <code><a href="camera.html">camera()</a></code>
 
         </dt>
@@ -64,10 +71,24 @@
 
         <dt>
 
+          <code><a href="camera_fit_scene.html">camera_fit_scene()</a></code>
+
+        </dt>
+        <dd>Fit a camera to a whole scene</dd>
+
+        <dt>
+
           <code><a href="camera_orbit.html">camera_orbit()</a></code>
 
         </dt>
         <dd>Orbit a camera around an axis</dd>
+
+        <dt>
+
+          <code><a href="clip_plane.html">clip_plane()</a></code>
+
+        </dt>
+        <dd>Create a clip plane specification</dd>
 
         <dt>
 
@@ -99,10 +120,31 @@
 
         <dt>
 
+          <code><a href="default_font.html">default_font()</a></code>
+
+        </dt>
+        <dd>Path of the font used for text labels</dd>
+
+        <dt>
+
           <code><a href="diverging_colormap.html">diverging_colormap()</a></code>
 
         </dt>
         <dd>Custom diverging colormap for neuroimaging</dd>
+
+        <dt>
+
+          <code><a href="flip_uvs.html">flip_uvs()</a></code>
+
+        </dt>
+        <dd>Flip the texture coordinates of a mesh vertically</dd>
+
+        <dt>
+
+          <code><a href="font_info.html">font_info()</a></code>
+
+        </dt>
+        <dd>Information about the font used for text labels</dd>
 
         <dt>
 
@@ -148,6 +190,20 @@
 
         <dt>
 
+          <code><a href="generate_multi_cylinders.html">generate_multi_cylinders()</a></code>
+
+        </dt>
+        <dd>Generate multiple cylinders as a single mesh</dd>
+
+        <dt>
+
+          <code><a href="generate_multi_spheres.html">generate_multi_spheres()</a></code>
+
+        </dt>
+        <dd>Generate multiple spheres as a single mesh</dd>
+
+        <dt>
+
           <code><a href="generate_plane.html">generate_plane()</a></code>
 
         </dt>
@@ -180,6 +236,20 @@
 
         </dt>
         <dd>Generate a torus mesh</dd>
+
+        <dt>
+
+          <code><a href="generate_tube.html">generate_tube()</a></code>
+
+        </dt>
+        <dd>Generate a tube (generalized cylinder) along a path</dd>
+
+        <dt>
+
+          <code><a href="generate_tubes.html">generate_tubes()</a></code>
+
+        </dt>
+        <dd>Generate multiple tubes as a single mesh</dd>
 
         <dt>
 
@@ -239,6 +309,13 @@
 
         <dt>
 
+          <code><a href="line_layer.html">line_layer()</a></code>
+
+        </dt>
+        <dd>Create a line layer (screen-space lines, no geometry)</dd>
+
+        <dt>
+
           <code><a href="mesh_bbox.html">mesh_bbox()</a></code>
 
         </dt>
@@ -257,6 +334,20 @@
 
         </dt>
         <dd>Convert a scimesh mesh to rgl tmesh3d format</dd>
+
+        <dt>
+
+          <code><a href="path_curvature.html">path_curvature()</a></code>
+
+        </dt>
+        <dd>Curvature along a path</dd>
+
+        <dt>
+
+          <code><a href="path_length.html">path_length()</a></code>
+
+        </dt>
+        <dd>Length of a path</dd>
 
         <dt>
 
@@ -316,6 +407,13 @@
 
         <dt>
 
+          <code><a href="render_segments.html">render_segments()</a></code>
+
+        </dt>
+        <dd>Render line segments directly to an image</dd>
+
+        <dt>
+
           <code><a href="render_spheres.html">render_spheres()</a></code>
 
         </dt>
@@ -323,10 +421,24 @@
 
         <dt>
 
+          <code><a href="render_text.html">render_text()</a></code>
+
+        </dt>
+        <dd>Render text labels to an image</dd>
+
+        <dt>
+
           <code><a href="render_triangles.html">render_triangles()</a></code>
 
         </dt>
         <dd>Render raw triangles without index buffer</dd>
+
+        <dt>
+
+          <code><a href="resample_path.html">resample_path()</a></code>
+
+        </dt>
+        <dd>Resample a path at a fixed arc length step</dd>
 
         <dt>
 
@@ -351,6 +463,27 @@
 
         <dt>
 
+          <code><a href="scene_set_line_affects_bounds.html">scene_set_line_affects_bounds()</a></code>
+
+        </dt>
+        <dd>Change whether line layers of a scene contribute to its bounds</dd>
+
+        <dt>
+
+          <code><a href="set_mesh_alpha.html">set_mesh_alpha()</a></code>
+
+        </dt>
+        <dd>Set the transparency of a whole mesh</dd>
+
+        <dt>
+
+          <code><a href="spline_path.html">spline_path()</a></code>
+
+        </dt>
+        <dd>Smooth curve through ordered 3D points</dd>
+
+        <dt>
+
           <code><a href="stack_horizontal.html">stack_horizontal()</a></code>
 
         </dt>
@@ -362,6 +495,20 @@
 
         </dt>
         <dd>Stack images vertically</dd>
+
+        <dt>
+
+          <code><a href="text_extent.html">text_extent()</a></code>
+
+        </dt>
+        <dd>Measure text</dd>
+
+        <dt>
+
+          <code><a href="text_layer.html">text_layer()</a></code>
+
+        </dt>
+        <dd>Create a text label layer (2D annotations for a scene)</dd>
 
         <dt>
 
@@ -383,6 +530,13 @@
 
         </dt>
         <dd>Viridis colormap</dd>
+
+        <dt>
+
+          <code><a href="world_to_screen.html">world_to_screen()</a></code>
+
+        </dt>
+        <dd>Project world coordinates to image pixels</dd>
 
         <dt>
 

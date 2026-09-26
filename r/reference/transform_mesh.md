@@ -1,8 +1,12 @@
 # Apply a 4x4 transformation matrix to a mesh
 
 Transforms all vertex positions in a mesh by a 4x4 homogeneous matrix
-(applied as `M * (x, y, z, 1)^T`). Vertex colors and normals are
-untouched.
+(applied as `M * (x, y, z, 1)^T`). Vertex colors are kept as they are;
+vertex normals (if the mesh has any) are transformed by the inverse
+transpose of `M`, so that shading stays correct for shearing and
+non-uniform scaling. Use
+[`compute_vertex_normals()`](https://dfsp-spirit.github.io/scimesh/r/reference/compute_vertex_normals.md)
+if the mesh has no normals yet.
 
 ## Usage
 

@@ -11,7 +11,7 @@ to render_scene() or write_gltf()."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,15 @@ to <code><a href="render_scene.html">render_scene()</a></code> or <code><a href=
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scene</span><span class="op">(</span><span class="va">meshes</span>, camera <span class="op">=</span> <span class="cn">NULL</span>, options <span class="op">=</span> <span class="cn">NULL</span>, transforms <span class="op">=</span> <span class="cn">NULL</span>, names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scene</span><span class="op">(</span></span>
+<span>  <span class="va">meshes</span>,</span>
+<span>  camera <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  options <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transforms <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  names <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lines <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  texts <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -80,12 +88,32 @@ overriding any embedded <code>transform</code> in the nodes.  May contain
 <dd><p>Optional character vector, one per mesh, overriding any
 embedded <code>name</code>.</p></dd>
 
+
+<dt id="arg-lines">lines<a class="anchor" aria-label="anchor" href="#arg-lines"></a></dt>
+<dd><p><code>NULL</code>, a line layer (see <code><a href="line_layer.html">line_layer</a></code>), or a
+list of them.  Line layers are drawn after the meshes with a width
+measured in pixels and without creating any geometry, which makes them the
+cheap way to draw many thin lines (wireframes, graph or connectome edges).
+They share the depth buffer with the meshes and contribute to the scene
+bounding box (and thus to the camera framing), unless the layer sets
+<code>affects_bounds = FALSE</code>, see <code><a href="line_layer.html">line_layer</a></code>.</p></dd>
+
+
+<dt id="arg-texts">texts<a class="anchor" aria-label="anchor" href="#arg-texts"></a></dt>
+<dd><p><code>NULL</code>, a text layer (see <code><a href="text_layer.html">text_layer</a></code>), or a
+list of them.  Text layers are drawn after the meshes and the lines as
+billboards and create no geometry either, so they are the way to annotate a
+figure (region names, atom labels, panel tags).  Unlike line layers they are
+ignored by the scene bounding box, since their extent depends on the font
+and the output size.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A scene descriptor list with S3 class <code>"scimesh_scene"</code>,
-  with components <code>meshes</code> (list of scene nodes), <code>camera</code>,
-  and <code>options</code>.</p>
+  with components <code>meshes</code> (list of scene nodes), <code>lines</code> (list
+  of line layers, possibly empty), <code>texts</code> (list of text layers,
+  possibly empty), <code>camera</code>, and <code>options</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -95,6 +123,10 @@ name = ...)</code>.  The optional <code>transform</code> is a 4x4 numeric matrix
 <code><a href="transform_mesh.html">transform_mesh()</a></code>) that places the mesh in world space at
 render/export time without modifying the mesh itself.  The optional
 <code>name</code> is used by exporters such as glTF for node names.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="line_layer.html">line_layer</a></code>, <code><a href="text_layer.html">text_layer</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -106,6 +138,16 @@ render/export time without modifying the mesh itself.  The optional
 <span class="r-in"><span><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu">scene</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cube1</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mesh <span class="op">=</span> <span class="va">cube2</span>, transform <span class="op">=</span> <span class="va">tr</span>, name <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>            camera <span class="op">=</span> <span class="fu"><a href="camera_auto.html">camera_auto</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cube1</span>, <span class="va">cube2</span><span class="op">)</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="render_scene.html">render_scene</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># add a line layer drawn on top of the meshes:</span></span></span>
+<span class="r-in"><span><span class="va">sc2</span> <span class="op">&lt;-</span> <span class="fu">scene</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cube1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>             lines <span class="op">=</span> <span class="fu"><a href="line_layer.html">line_layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># add a label anchored above the cube:</span></span></span>
+<span class="r-in"><span><span class="va">sc3</span> <span class="op">&lt;-</span> <span class="fu">scene</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cube1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>             texts <span class="op">=</span> <span class="fu"><a href="text_layer.html">text_layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, <span class="st">"cube"</span>,</span></span>
+<span class="r-in"><span>                                size <span class="op">=</span> <span class="fl">18</span>, adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

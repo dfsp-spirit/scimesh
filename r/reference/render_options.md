@@ -25,12 +25,15 @@ render_options(
   fog_start = 0,
   fog_end = 1,
   fog_color = c(0, 0, 0, 0),
+  fog_space = c("world", "ndc"),
   threads = 0L,
   clip_planes = NULL,
   ssao_enabled = FALSE,
   ssao_radius = 16,
   ssao_intensity = 0.8,
-  aa_samples = 1L
+  aa_samples = NULL,
+  near_plane = 0.1,
+  far_plane = 10000
 )
 ```
 
@@ -116,15 +119,37 @@ render_options(
 
 - fog_start:
 
-  Z-depth where fog begins (0 = near plane, 1 = far plane). Default 0.
+  Distance where fog begins, i.e. where objects start fading toward
+  `fog_color`. Default 0.
 
 - fog_end:
 
-  Z-depth where fog is fully opaque. Default 1.
+  Distance where fog is fully opaque. Must be larger than `fog_start`.
+  Default 1.
 
 - fog_color:
 
   RGBA fog colour (0-1 scale). Defaults to `background_color`.
+
+- fog_space:
+
+  Character, either `"world"` (default) or `"ndc"`: the space (and
+  therefore the unit) of `fog_start` and `fog_end`.
+
+  `"world"`
+
+  :   Distances in world units from the camera, measured along the
+      viewing direction. `fog_start = 20` means "fog starts 20 world
+      units in front of the camera". This is independent of
+      `near_plane`/`far_plane` and of the projection type.
+
+  `"ndc"`
+
+  :   Normalized device depth, i.e. the raw depth-buffer values in
+      `[-1, 1]`, where `-1` is the near plane, `0` the middle of the
+      depth range and `+1` the far plane. This is the legacy behaviour;
+      it depends on the near/far plane settings and is strongly
+      non-linear for perspective cameras.
 
 - threads:
 
@@ -134,10 +159,19 @@ render_options(
 
 - clip_planes:
 
-  A list of clip plane descriptors, each a list with `normal` (length-3
-  vector) and `offset` (numeric). Points satisfying
-  `dot(normal, position) + offset >= 0` are kept. Default `NULL` (no
-  clipping).
+  A list of clip planes (see
+  [`clip_plane`](https://dfsp-spirit.github.io/scimesh/r/reference/clip_plane.md)),
+  or `NULL` (default) for no clipping. Each plane removes the geometry
+  on its negative side, i.e. a point `p` is kept when
+  `dot(normal, p) + offset >= 0`; several planes are combined with a
+  logical AND. By default `p` is the world-space position, so the cut is
+  fixed in the scene and does not move when the camera moves; use
+  `clip_plane(..., space = "eye")` for a camera-relative cut. Note that
+  clip planes only apply to mesh and triangle rendering;
+  [`render_points()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_points.md)
+  and
+  [`render_spheres()`](https://dfsp-spirit.github.io/scimesh/r/reference/render_spheres.md)
+  ignore them.
 
 - ssao_enabled:
 
@@ -155,8 +189,24 @@ render_options(
 
   Anti-aliasing supersampling factor. Renders internally at
   `width * aa_samples` x `height * aa_samples`, then downsamples to the
-  requested size via box averaging. Default `1` (no AA), `2` for 2x2
-  SSAA, `4` for 4x4.
+  requested size via box averaging. Use `1` (the default) for no AA, `2`
+  for 2x2 SSAA, `4` for 4x4. If `NULL`, the global option
+  `scimesh.aa_samples` is used (which defaults to `1`). Set that option
+  once per session to enable AA for all render calls, e.g.
+  `options(scimesh.aa_samples = 2)`. Note that AA increases render time
+  and memory roughly with `aa_samples^2`, and that thin lines and points
+  get smoother edges from it.
+
+- near_plane:
+
+  Distance of the near clipping plane (default 0.1). Geometry closer to
+  the camera is clipped away. Also defines the depth range together with
+  `far_plane`, which matters when `fog_space = "ndc"`.
+
+- far_plane:
+
+  Distance of the far clipping plane (default 10000). Must be larger
+  than `near_plane`.
 
 ## Value
 
@@ -181,4 +231,32 @@ opts <- render_options(width = 1200, height = 900,
 opts <- render_options(wireframe = TRUE,
     wireframe_color = c(0, 0, 0, 1),
     background_color = c(0, 0, 0, 0))
+
+# World-space clip plane: keep the half of the scene with x <= 0.
+# The cut stays at x = 0, whatever the camera does.
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(-1, 0, 0), offset = 0)))
+
+# Eye-space clip plane: additionally remove everything closer than 2 units
+# to the camera (camera-attached cutaway).
+opts <- render_options(clip_planes = list(
+    clip_plane(normal = c(-1, 0, 0), offset = 0),
+    clip_plane(normal = c(0, 0, -1), offset = -2, space = "eye")))
+
+# Fog in world units (default): fade from 20 to 60 units away from the
+# camera
+opts <- render_options(fog_enabled = TRUE, fog_start = 20, fog_end = 60,
+    fog_color = c(0.9, 0.95, 1, 1))
+
+# Legacy normalized-device-depth fog, for backwards compatibility
+opts <- render_options(fog_enabled = TRUE, fog_space = "ndc",
+    fog_start = 0.5, fog_end = 1)
+
+# Enable 2x2 anti-aliasing for this session: affects all subsequent
+# render calls that do not pass \code{aa_samples} explicitly.
+old <- options(scimesh.aa_samples = 2L)
+opts <- render_options()
+opts$aa_samples
+#> [1] 2
+options(old)
 ```

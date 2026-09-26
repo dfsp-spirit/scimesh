@@ -13,7 +13,7 @@ transparently converted."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,10 @@ nodes.  Each mesh descriptor is a list with components
 <code>vertices</code> (Nx3 matrix), <code>triangles</code> (Mx3 integer matrix),
 and optionally <code>colors</code>, <code>face_colors</code>, <code>normals</code>, and
 <code>default_color</code>.  Elements may also be rgl-style lists (with
-<code>vb</code> and <code>it</code>), which are converted automatically.</p></dd>
+<code>vb</code> and <code>it</code>), which are converted automatically.
+A <code>scimesh_scene</code> may hold line layers and text layers, which are
+drawn together with the meshes (see <code><a href="line_layer.html">line_layer</a></code> and
+<code><a href="text_layer.html">text_layer</a></code>).</p></dd>
 
 
 <dt id="arg-camera">camera<a class="anchor" aria-label="anchor" href="#arg-camera"></a></dt>

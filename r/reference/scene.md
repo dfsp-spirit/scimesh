@@ -10,7 +10,15 @@ or
 ## Usage
 
 ``` r
-scene(meshes, camera = NULL, options = NULL, transforms = NULL, names = NULL)
+scene(
+  meshes,
+  camera = NULL,
+  options = NULL,
+  transforms = NULL,
+  names = NULL,
+  lines = NULL,
+  texts = NULL
+)
 ```
 
 ## Arguments
@@ -50,10 +58,34 @@ scene(meshes, camera = NULL, options = NULL, transforms = NULL, names = NULL)
   Optional character vector, one per mesh, overriding any embedded
   `name`.
 
+- lines:
+
+  `NULL`, a line layer (see
+  [`line_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/line_layer.md)),
+  or a list of them. Line layers are drawn after the meshes with a width
+  measured in pixels and without creating any geometry, which makes them
+  the cheap way to draw many thin lines (wireframes, graph or connectome
+  edges). They share the depth buffer with the meshes and contribute to
+  the scene bounding box (and thus to the camera framing), unless the
+  layer sets `affects_bounds = FALSE`, see
+  [`line_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/line_layer.md).
+
+- texts:
+
+  `NULL`, a text layer (see
+  [`text_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/text_layer.md)),
+  or a list of them. Text layers are drawn after the meshes and the
+  lines as billboards and create no geometry either, so they are the way
+  to annotate a figure (region names, atom labels, panel tags). Unlike
+  line layers they are ignored by the scene bounding box, since their
+  extent depends on the font and the output size.
+
 ## Value
 
 A scene descriptor list with S3 class `"scimesh_scene"`, with components
-`meshes` (list of scene nodes), `camera`, and `options`.
+`meshes` (list of scene nodes), `lines` (list of line layers, possibly
+empty), `texts` (list of text layers, possibly empty), `camera`, and
+`options`.
 
 ## Details
 
@@ -66,6 +98,11 @@ that places the mesh in world space at render/export time without
 modifying the mesh itself. The optional `name` is used by exporters such
 as glTF for node names.
 
+## See also
+
+[`line_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/line_layer.md),
+[`text_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/text_layer.md)
+
 ## Examples
 
 ``` r
@@ -76,4 +113,14 @@ tr <- diag(1, 4); tr[1, 4] <- 2
 sc <- scene(list(cube1, list(mesh = cube2, transform = tr, name = "blue")),
             camera = camera_auto(list(cube1, cube2), direction = c(1, 1, 1)))
 img <- render_scene(sc)
+
+# add a line layer drawn on top of the meshes:
+sc2 <- scene(list(cube1),
+             lines = line_layer(matrix(c(0, 0, 1), ncol = 3),
+                                matrix(c(1, 1, 1), ncol = 3), width = 3))
+
+# add a label anchored above the cube:
+sc3 <- scene(list(cube1),
+             texts = text_layer(matrix(c(0, 1, 0), ncol = 3), "cube",
+                                size = 18, adj = c(0.5, 0)))
 ```

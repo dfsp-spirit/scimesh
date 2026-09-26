@@ -1,8 +1,8 @@
 # Auto-frame a camera to fit a mesh or vertex set
 
 Computes a camera position that frames the entire mesh in view. The
-camera looks along the given direction, positioned at a distance that
-ensures the mesh fits within the field of view.
+camera is placed on the side given by `direction` and looks back at the
+mesh, at a distance that ensures the mesh fits within the field of view.
 
 ## Usage
 
@@ -27,8 +27,11 @@ camera_auto(
 
 - direction:
 
-  The view direction as a length-3 vector. For example, `c(0, 0, -1)`
-  looks along the negative Z axis. Ignored when `rgl_compat = TRUE`.
+  Direction from the mesh towards the camera, as a length-3 vector: it
+  selects the side you view the mesh from (the camera is placed at
+  `center + direction * distance`). For example, `c(0, 0, 1)` gives a
+  front view of a mesh that faces +Z, and `c(1, 0, 0)` looks at it from
+  its +X side. Ignored when `rgl_compat = TRUE`.
 
 - up:
 
@@ -65,6 +68,14 @@ behaviour: a 30° FOV, 15° elevation, and the distance is computed from
 the *bounding sphere* of the mesh (the half-diagonal of the axis-aligned
 bounding box), reproducing the formula
 `distance = sphere_radius / sin(FOV/2)` used by rgl.
+
+## Note
+
+This function frames a mesh (or a set of vertices). It does not know
+about scene contents such as line layers or text labels; use
+[`camera_fit_scene`](https://dfsp-spirit.github.io/scimesh/r/reference/camera_fit_scene.md)
+to fit a camera to a whole scene, including the line layers that
+contribute to the scene bounds.
 
 ## Examples
 

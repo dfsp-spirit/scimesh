@@ -37,8 +37,10 @@ render_mesh(
 
 - colors:
 
-  Optional Nx4 numeric matrix of RGBA vertex colors (0-1). Use
-  `face_colors` (Mx4) for per-triangle colours instead.
+  Optional Nx4 numeric matrix of RGBA vertex colors (0-1). The fourth
+  column is the alpha value; alpha \< 1 renders the mesh translucently
+  (see the Transparency section below). Use `face_colors` (Mx4) for
+  per-triangle colours instead.
 
 - face_colors:
 
@@ -52,13 +54,20 @@ render_mesh(
 
 - uv:
 
-  Optional Nx2 numeric matrix of texture coordinates (0-1).
+  Optional Nx2 numeric matrix of texture coordinates (0-1). scimesh uses
+  image-space UVs: `v = 0` is the *top* edge of the texture image, so
+  `c(0, 0)` addresses its top-left pixel. UVs from OBJ/PLY files, rgl or
+  Blender use the opposite convention and must be converted with
+  [`flip_uvs()`](https://dfsp-spirit.github.io/scimesh/r/reference/flip_uvs.md)
+  first.
 
 - texture:
 
   Optional texture image as a 3D array (H x W x 3 or 4) with values in
   `[0, 1]`, e.g. from
-  [`png::readPNG()`](https://rdrr.io/pkg/png/man/readPNG.html).
+  [`png::readPNG()`](https://rdrr.io/pkg/png/man/readPNG.html). Row 1 of
+  the array is the top row of the image, matching the UV convention
+  above.
 
 - camera:
 
@@ -76,6 +85,18 @@ render_mesh(
 
 A list with components `width`, `height`, and `pixels` (raw vector of
 RGBA values).
+
+## Transparency
+
+The fourth column of `colors` (and of `face_colors`) is the alpha value:
+values `< 1` make the mesh translucent, and the renderer blends it with
+whatever is behind it automatically - there is no flag to set.
+Per-vertex alpha is interpolated across each triangle, so a smooth fade
+is possible, and `alpha = 0` makes geometry invisible (holes).
+Translucent triangles are drawn back-to-front after the opaque geometry,
+so they are correctly hidden by opaque meshes in front of them. Use
+[`set_mesh_alpha()`](https://dfsp-spirit.github.io/scimesh/r/reference/set_mesh_alpha.md)
+to set one alpha value for a whole mesh.
 
 ## Examples
 

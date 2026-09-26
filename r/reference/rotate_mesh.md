@@ -1,6 +1,6 @@
 # Rotate a mesh around an axis
 
-Rotate a mesh around an axis
+Vertex normals (if the mesh has any) are rotated with the mesh.
 
 ## Usage
 

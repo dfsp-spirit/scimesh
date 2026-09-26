@@ -1,8 +1,12 @@
 # Read a Wavefront OBJ file
 
-Reads a Wavefront OBJ file (with optional UV coordinates and normals)
-and returns a scimesh mesh descriptor list with `vertices`, `triangles`,
-and optionally `uv` and `normals`.
+Reads the geometry (vertices and triangles) of a Wavefront OBJ file and
+returns a scimesh mesh descriptor list with `vertices` and `triangles`.
+Normals and texture coordinates in the file are ignored: call
+[`compute_vertex_normals()`](https://dfsp-spirit.github.io/scimesh/r/reference/compute_vertex_normals.md)
+if you need normals, and assign `uv` yourself (see
+[`render_mesh`](https://dfsp-spirit.github.io/scimesh/r/reference/render_mesh.md))
+if you want to render the mesh with a texture.
 
 ## Usage
 
@@ -18,7 +22,7 @@ read_obj(path)
 
 ## Value
 
-A mesh descriptor list.
+A mesh descriptor list with `vertices` and `triangles`.
 
 ## Examples
 

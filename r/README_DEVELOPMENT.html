@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,11 +56,40 @@
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="ex">./build/scimesh_tests</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="c-code-coverage">C++ code coverage<a class="anchor" aria-label="anchor" href="#c-code-coverage"></a></h3>
+<p>Coverage of the C++ core is measured with clang’s source-based coverage and reported with <code>llvm-cov</code>. The helper script builds the test suite with instrumentation, runs it and writes a report:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">dev_tools/coverage_cpp.sh</span>                 <span class="co"># build, run all tests, report</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">dev_tools/coverage_cpp.sh</span> <span class="st">"[fog]"</span>         <span class="co"># only matching Catch2 tests</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="va">CXX</span><span class="op">=</span>clang++-18 <span class="ex">dev_tools/coverage_cpp.sh</span>  <span class="co"># use a specific clang</span></span></code></pre></div>
+<p><strong>Requirements (Linux):</strong> <code>clang</code>, plus <code>llvm-profdata</code> and <code>llvm-cov</code> of the same major version, and <code>cmake</code>. On Debian/Ubuntu: <code>sudo apt install clang llvm</code>.</p>
+<p>The report is written to <code>coverage/</code> (gitignored): <code>coverage/html/index.html</code> for browsing, <code>coverage/lcov.info</code> if you want coverage gutters in your editor (e.g. the VS Code “Coverage Gutters” extension).</p>
+<p>Notes:</p>
+<ul><li>Test code, the Catch2 amalgamation and all vendored third-party code (<code>src/third_party/</code>, whose header-only libraries are inlined into the core) are excluded from the report.</li>
+<li>Library files that no test references are not linked into the test binary at all, so they do not show up in the report - not even as 0 % (e.g. <code>obj_io.cpp</code> and <code>transforms.cpp</code>, which are exercised from R instead). A file shown at 0 % is linked but never executed (e.g. <code>ply_io.cpp</code>).</li>
+<li>Coverage is a local development tool: nothing is uploaded, there is no badge and there are no coverage thresholds (vendored third-party headers would break any gate). The <code>Coverage (C++)</code> CI workflow stores the HTML report as an artifact but never fails on low coverage.</li>
+<li>Coverage of the R layer is not measured here - use <code>covr::package_coverage()</code> in R for that. The C++ code inside the R package is a separate build (see <code>src/Makevars</code>) and is not covered by this script.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="checking-compatibility-with-the-macos-toolchain">Checking compatibility with the macOS toolchain<a class="anchor" aria-label="anchor" href="#checking-compatibility-with-the-macos-toolchain"></a></h3>
+<p>A missing standard header is invisible to almost every build we have: libstdc++ (GCC, i.e. R on Linux and Windows) and libc++ 15+ (Xcode 15+, i.e. the <code>macos-latest</code> CI runner) both pull headers such as <code>&lt;array&gt;</code> in transitively via <code>&lt;functional&gt;</code>. The CRAN macOS builders use the clang 14 / libc++ 14 toolchain, which does not - so such code fails there with a confusing <code>implicit instantiation of undefined template 'std::array&lt;...&gt;'</code> (this is what broke the CRAN installation of 0.3.4). Compile every translation unit with libc++ 14 to check:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">dev_tools/check_libcxx_strictness.sh</span>                    <span class="co"># needs libc++ &lt;= 14</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="va">CXX</span><span class="op">=</span>clang++-14 <span class="ex">dev_tools/check_libcxx_strictness.sh</span>     <span class="co"># use a specific clang</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="va">LIBCXX_INC</span><span class="op">=</span>/usr/lib/llvm-14/include/c++/v1 <span class="ex">dev_tools/check_libcxx_strictness.sh</span></span></code></pre></div>
+<p><strong>Requirements (Linux):</strong> <code>clang</code> plus the libc++ headers of version &lt;= 14. On Debian/Ubuntu: <code>sudo apt install clang-14 libc++-14-dev</code>. The check is <code>-fsyntax-only</code>, so nothing is linked and R is only needed for the two Rcpp binding translation units (they are skipped when R or Rcpp is missing). The script refuses to run with libc++ &gt;= 15, because that standard library cannot reproduce the strict behaviour. The <code>C++ stdlib strictness</code> CI workflow runs this on every push/PR, on the pinned <code>ubuntu-24.04</code> image (newer Ubuntu releases no longer ship libc++ 14).</p>
+</div>
+<div class="section level3">
+<h3 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h3>
+<p>The example programs are part of what we ship, so they are built and run:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">./examples/cpp/run_all_cpp.sh</span>      <span class="co"># builds and runs every C++ example</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">./examples/R/run_all_R.sh</span>          <span class="co"># runs every R example (needs scimesh installed)</span></span></code></pre></div>
+<p>Both can take a name to run a single example. The <code>Examples</code> CI workflow does this on every push/PR, because the C++ examples are not compiled by any test target - breakage in them would otherwise go unnoticed.</p>
+</div>
+<div class="section level3">
 <h3 id="running-the-r-unit-tests">Running the R unit tests<a class="anchor" aria-label="anchor" href="#running-the-r-unit-tests"></a></h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Or via R CMD check:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>R CMD build . <span class="sc">&amp;&amp;</span> R CMD check scimesh_<span class="sc">*</span>.tar.gz</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>R CMD build . <span class="sc">&amp;&amp;</span> R CMD check scimesh_<span class="sc">*</span>.tar.gz</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="generating-c-api-documentation">Generating C++ API documentation<a class="anchor" aria-label="anchor" href="#generating-c-api-documentation"></a></h3>

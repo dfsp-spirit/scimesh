@@ -21,7 +21,11 @@ render_scene(meshes, camera = NULL, options = NULL)
   `triangles` (Mx3 integer matrix), and optionally `colors`,
   `face_colors`, `normals`, and `default_color`. Elements may also be
   rgl-style lists (with `vb` and `it`), which are converted
-  automatically.
+  automatically. A `scimesh_scene` may hold line layers and text layers,
+  which are drawn together with the meshes (see
+  [`line_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/line_layer.md)
+  and
+  [`text_layer`](https://dfsp-spirit.github.io/scimesh/r/reference/text_layer.md)).
 
 - camera:
 

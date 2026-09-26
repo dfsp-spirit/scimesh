@@ -2,7 +2,7 @@
 
 Reads a PLY file (ASCII or binary) with optional per-vertex colors and
 returns a scimesh mesh descriptor list with `vertices`, `triangles`, and
-optionally `colors`.
+optionally `colors`. Texture coordinates in the file are ignored.
 
 ## Usage
 

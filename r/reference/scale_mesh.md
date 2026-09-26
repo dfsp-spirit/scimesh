@@ -1,6 +1,9 @@
 # Scale a mesh uniformly or per-axis
 
-Scale a mesh uniformly or per-axis
+Per-vertex normals (if the mesh has any) are scaled as well, using the
+inverse transpose of the scaling matrix: a non-uniform scale would
+otherwise leave normals pointing in a direction that no longer matches
+the surface, which shows up as wrong shading.
 
 ## Usage
 

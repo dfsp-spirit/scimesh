@@ -1,6 +1,7 @@
 # Translate a mesh
 
-Translate a mesh
+Vertex colors and normals are untouched: a translation does not change
+the orientation of a surface.
 
 ## Usage
 

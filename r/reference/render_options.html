@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,12 +59,15 @@
 <span>  fog_start <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  fog_end <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  fog_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  fog_space <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"world"</span>, <span class="st">"ndc"</span><span class="op">)</span>,</span>
 <span>  threads <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  clip_planes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ssao_enabled <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ssao_radius <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  ssao_intensity <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  aa_samples <span class="op">=</span> <span class="fl">1L</span></span>
+<span>  aa_samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  near_plane <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  far_plane <span class="op">=</span> <span class="fl">10000</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -155,17 +158,39 @@ darker darks and lighter highlights (S-curve).  Formula:
 
 
 <dt id="arg-fog-start">fog_start<a class="anchor" aria-label="anchor" href="#arg-fog-start"></a></dt>
-<dd><p>Z-depth where fog begins (0 = near plane, 1 = far
-plane).  Default 0.</p></dd>
+<dd><p>Distance where fog begins, i.e. where objects start
+fading toward <code>fog_color</code>.  Default 0.</p></dd>
 
 
 <dt id="arg-fog-end">fog_end<a class="anchor" aria-label="anchor" href="#arg-fog-end"></a></dt>
-<dd><p>Z-depth where fog is fully opaque.  Default 1.</p></dd>
+<dd><p>Distance where fog is fully opaque.  Must be larger
+than <code>fog_start</code>.  Default 1.</p></dd>
 
 
 <dt id="arg-fog-color">fog_color<a class="anchor" aria-label="anchor" href="#arg-fog-color"></a></dt>
 <dd><p>RGBA fog colour (0-1 scale).  Defaults to
 <code>background_color</code>.</p></dd>
+
+
+<dt id="arg-fog-space">fog_space<a class="anchor" aria-label="anchor" href="#arg-fog-space"></a></dt>
+<dd><p>Character, either <code>"world"</code> (default) or
+<code>"ndc"</code>: the space (and therefore the unit) of
+<code>fog_start</code> and <code>fog_end</code>.</p><dl><dt><code>"world"</code></dt>
+<dd><p>Distances in world units from the camera,
+    measured along the viewing direction.  <code>fog_start = 20</code> means
+    "fog starts 20 world units in front of the camera".  This is
+    independent of <code>near_plane</code>/<code>far_plane</code> and of the
+    projection type.</p></dd>
+
+  <dt><code>"ndc"</code></dt>
+<dd><p>Normalized device depth, i.e. the raw depth-buffer
+    values in <code>[-1, 1]</code>, where <code>-1</code> is the near plane,
+    <code>0</code> the middle of the depth range and <code>+1</code> the far plane.
+    This is the legacy behaviour; it depends on the near/far plane
+    settings and is strongly non-linear for perspective cameras.</p></dd>
+
+
+</dl></dd>
 
 
 <dt id="arg-threads">threads<a class="anchor" aria-label="anchor" href="#arg-threads"></a></dt>
@@ -175,10 +200,15 @@ Requires OpenMP at compile time.</p></dd>
 
 
 <dt id="arg-clip-planes">clip_planes<a class="anchor" aria-label="anchor" href="#arg-clip-planes"></a></dt>
-<dd><p>A list of clip plane descriptors, each a list
-with <code>normal</code> (length-3 vector) and <code>offset</code> (numeric).
-Points satisfying <code>dot(normal, position) + offset &gt;= 0</code> are
-kept.  Default <code>NULL</code> (no clipping).</p></dd>
+<dd><p>A list of clip planes (see <code><a href="clip_plane.html">clip_plane</a></code>),
+or <code>NULL</code> (default) for no clipping.  Each plane removes the
+geometry on its negative side, i.e. a point <code>p</code> is kept when
+<code>dot(normal, p) + offset &gt;= 0</code>; several planes are combined with a
+logical AND.  By default <code>p</code> is the world-space position, so the cut
+is fixed in the scene and does not move when the camera moves; use
+<code>clip_plane(..., space = "eye")</code> for a camera-relative cut.
+Note that clip planes only apply to mesh and triangle rendering;
+<code><a href="render_points.html">render_points()</a></code> and <code><a href="render_spheres.html">render_spheres()</a></code> ignore them.</p></dd>
 
 
 <dt id="arg-ssao-enabled">ssao_enabled<a class="anchor" aria-label="anchor" href="#arg-ssao-enabled"></a></dt>
@@ -198,8 +228,26 @@ Default <code>FALSE</code>.</p></dd>
 <dd><p>Anti-aliasing supersampling factor.  Renders
 internally at <code>width * aa_samples</code> x
 <code>height * aa_samples</code>, then downsamples to the requested
-size via box averaging.  Default <code>1</code> (no AA), <code>2</code> for
-2x2 SSAA, <code>4</code> for 4x4.</p></dd>
+size via box averaging.  Use <code>1</code> (the default) for no AA,
+<code>2</code> for 2x2 SSAA, <code>4</code> for 4x4.  If <code>NULL</code>, the
+global option <code>scimesh.aa_samples</code> is used (which defaults
+to <code>1</code>).  Set that option once per session to enable AA for
+all render calls, e.g. <code>options(scimesh.aa_samples = 2)</code>.
+Note that AA increases render time and memory roughly with
+<code>aa_samples^2</code>, and that thin lines and points get smoother
+edges from it.</p></dd>
+
+
+<dt id="arg-near-plane">near_plane<a class="anchor" aria-label="anchor" href="#arg-near-plane"></a></dt>
+<dd><p>Distance of the near clipping plane (default 0.1).
+Geometry closer to the camera is clipped away.  Also defines the
+depth range together with <code>far_plane</code>, which matters when
+<code>fog_space = "ndc"</code>.</p></dd>
+
+
+<dt id="arg-far-plane">far_plane<a class="anchor" aria-label="anchor" href="#arg-far-plane"></a></dt>
+<dd><p>Distance of the far clipping plane (default 10000).
+Must be larger than <code>near_plane</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -223,6 +271,34 @@ size via box averaging.  Default <code>1</code> (no AA), <code>2</code> for
 <span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span>wireframe <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    wireframe_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    background_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># World-space clip plane: keep the half of the scene with x &lt;= 0.</span></span></span>
+<span class="r-in"><span><span class="co"># The cut stays at x = 0, whatever the camera does.</span></span></span>
+<span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span>clip_planes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="clip_plane.html">clip_plane</a></span><span class="op">(</span>normal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, offset <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Eye-space clip plane: additionally remove everything closer than 2 units</span></span></span>
+<span class="r-in"><span><span class="co"># to the camera (camera-attached cutaway).</span></span></span>
+<span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span>clip_planes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="clip_plane.html">clip_plane</a></span><span class="op">(</span>normal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, offset <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="clip_plane.html">clip_plane</a></span><span class="op">(</span>normal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, offset <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, space <span class="op">=</span> <span class="st">"eye"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Fog in world units (default): fade from 20 to 60 units away from the</span></span></span>
+<span class="r-in"><span><span class="co"># camera</span></span></span>
+<span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span>fog_enabled <span class="op">=</span> <span class="cn">TRUE</span>, fog_start <span class="op">=</span> <span class="fl">20</span>, fog_end <span class="op">=</span> <span class="fl">60</span>,</span></span>
+<span class="r-in"><span>    fog_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Legacy normalized-device-depth fog, for backwards compatibility</span></span></span>
+<span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span>fog_enabled <span class="op">=</span> <span class="cn">TRUE</span>, fog_space <span class="op">=</span> <span class="st">"ndc"</span>,</span></span>
+<span class="r-in"><span>    fog_start <span class="op">=</span> <span class="fl">0.5</span>, fog_end <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Enable 2x2 anti-aliasing for this session: affects all subsequent</span></span></span>
+<span class="r-in"><span><span class="co"># render calls that do not pass \code{aa_samples} explicitly.</span></span></span>
+<span class="r-in"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scimesh.aa_samples <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu">render_options</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">opts</span><span class="op">$</span><span class="va">aa_samples</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

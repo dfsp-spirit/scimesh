@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Headless Publication-Quality 3D Mesh Rendering Engine">
-<meta name="description" content="A fast, GPU-free 3D software renderer written in modern C++17 with native R bindings. Renders triangle meshes to publication-quality images entirely on the CPU, requiring no display server or graphics hardware. Features multi-light Blinn-Phong shading, screen-space ambient occlusion, anti-aliasing, depth fog, transparency, wireframe rendering, texture mapping, and procedural geometry generation. Supports standard mesh file formats with PNG and PPM output. Works on high-performance computing clusters, headless servers, containers, and continuous integration pipelines, making it suitable for scientific visualization across neuro-imaging, molecular structures, and general 3D graphics.">
-<meta property="og:description" content="A fast, GPU-free 3D software renderer written in modern C++17 with native R bindings. Renders triangle meshes to publication-quality images entirely on the CPU, requiring no display server or graphics hardware. Features multi-light Blinn-Phong shading, screen-space ambient occlusion, anti-aliasing, depth fog, transparency, wireframe rendering, texture mapping, and procedural geometry generation. Supports standard mesh file formats with PNG and PPM output. Works on high-performance computing clusters, headless servers, containers, and continuous integration pipelines, making it suitable for scientific visualization across neuro-imaging, molecular structures, and general 3D graphics.">
+<meta name="description" content="A fast, GPU-free 3D software renderer written in modern C++17 with native R bindings. Renders triangle meshes to publication-quality images entirely on the CPU, requiring no display server or graphics hardware. Features multi-light Blinn-Phong shading, screen-space ambient occlusion, anti-aliasing, depth fog, transparency, wireframe rendering, texture mapping, screen-space lines and text labels, and procedural geometry generation. Supports standard mesh file formats with PNG and PPM output. Works on high-performance computing clusters, headless servers, containers, and continuous integration pipelines, making it suitable for scientific visualization across neuro-imaging, molecular structures, and general 3D graphics.">
+<meta property="og:description" content="A fast, GPU-free 3D software renderer written in modern C++17 with native R bindings. Renders triangle meshes to publication-quality images entirely on the CPU, requiring no display server or graphics hardware. Features multi-light Blinn-Phong shading, screen-space ambient occlusion, anti-aliasing, depth fog, transparency, wireframe rendering, texture mapping, screen-space lines and text labels, and procedural geometry generation. Supports standard mesh file formats with PNG and PPM output. Works on high-performance computing clusters, headless servers, containers, and continuous integration pipelines, making it suitable for scientific visualization across neuro-imaging, molecular structures, and general 3D graphics.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">scimesh</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,6 +92,10 @@
 <li>Depth cueing (fog)</li>
 <li>Clip planes</li>
 <li>Procedural geometry: spheres, cylinders, cuboids, pyramids, tetrahedra, tori, planes</li>
+<li>Batched primitives: thousands of spheres/cylinders as a single mesh</li>
+<li>Polyline tubes with rotation-minimizing frames (curved edges, streamlines)</li>
+<li>Scene line layers: pixel-wide lines without geometry (wireframes, graph edges)</li>
+<li>Text labels: anti-aliased TrueType glyphs anchored in world space (labels that follow the camera and can be hidden by the geometry) or in screen space (titles, panel tags, captions), with optional halos, in a bundled font</li>
 <li>Mesh I/O: STL (binary/ASCII), Wavefront OBJ, Stanford PLY</li>
 <li>Image I/O: PNG, PPM, BMP</li>
 <li>Automatic camera framing (<code>camera_fit_mesh</code>, <code>camera_fit_scene</code>)</li>
@@ -112,6 +116,40 @@
 </ul>
 <p>If you need colorbars in C++, have a look at <a href="https://github.com/dfsp-spirit/scibar" class="external-link">scibar</a>.</p>
 </div>
+<div class="section level3">
+<h3 id="global-render-defaults-r">Global render defaults (R)<a class="anchor" aria-label="anchor" href="#global-render-defaults-r"></a>
+</h3>
+<p>Anti-aliasing can be switched on for a whole session instead of per render call. <code><a href="reference/render_options.html">render_options()</a></code> resolves <code>aa_samples</code> from the global option <code>scimesh.aa_samples</code> (default <code>1</code>, i.e. no AA) unless you pass it explicitly:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scimesh.aa_samples <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>      <span class="co"># 2x2 supersampling, 4 for 4x4</span></span>
+<span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="fu"><a href="reference/scene.html">scene</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span><span class="op">)</span>     <span class="co"># anti-aliased, no extra arguments needed</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scimesh.aa_samples <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>   <span class="co"># back to no AA</span></span></code></pre></div>
+<p>This is most noticeable on screen-space lines and points (e.g. connectome edges, see <code><a href="reference/line_layer.html">line_layer()</a></code> and <code><a href="reference/render_segments.html">render_segments()</a></code>), which get smooth edges instead of a hard staircase pattern. The cost grows with <code>aa_samples^2</code>, both in render time and in memory (the internal framebuffer is <code>width * aa_samples</code> by <code>height * aa_samples</code>).</p>
+</div>
+<div class="section level3">
+<h3 id="text-labels-r">Text labels (R)<a class="anchor" aria-label="anchor" href="#text-labels-r"></a>
+</h3>
+<p><code><a href="reference/text_layer.html">text_layer()</a></code> annotates a figure. Labels are billboards: they always face the camera and keep their size in pixels, and the font ships with the package, so no system font is needed. Positions are either world space (the label sticks to the 3D location it annotates, and is hidden when geometry is in front of it) or screen space (<code>space = "screen"</code>, pixels from the top left corner):</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">surf</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_sphere.html">generate_sphere</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">cam</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/camera_auto.html">camera_auto</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">surf</span><span class="op">)</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scene.html">scene</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">surf</span><span class="op">)</span>, camera <span class="op">=</span> <span class="va">cam</span>,</span>
+<span>            options <span class="op">=</span> <span class="fu"><a href="reference/render_options.html">render_options</a></span><span class="op">(</span>background_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>            texts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>                <span class="co"># a label that belongs to the scene, anchored above the sphere</span></span>
+<span>                <span class="fu"><a href="reference/text_layer.html">text_layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.3</span>, <span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, <span class="st">"superior"</span>,</span>
+<span>                           size <span class="op">=</span> <span class="fl">20</span>, adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                <span class="co"># a direction annotation that must stay readable: no depth test</span></span>
+<span>                <span class="fu"><a href="reference/text_layer.html">text_layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.4</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, <span class="st">"anterior"</span>,</span>
+<span>                           size <span class="op">=</span> <span class="fl">18</span>, adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>                           colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">1</span><span class="op">)</span>, depth_test <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>                <span class="co"># a panel tag, positioned in output pixels</span></span>
+<span>                <span class="fu"><a href="reference/text_layer.html">text_layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">10</span><span class="op">)</span>, <span class="st">"A"</span>, space <span class="op">=</span> <span class="st">"screen"</span>, adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>                           size <span class="op">=</span> <span class="fl">28</span>, halo_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span></code></pre></div>
+<p>Labels can also be measured (<code><a href="reference/text_extent.html">text_extent()</a></code>), projected from 3D to image pixels (<code><a href="reference/world_to_screen.html">world_to_screen()</a></code>), rotated (<code>rotation = 90</code> reads bottom to top, for a vertical axis label), and used without any mesh (<code><a href="reference/render_text.html">render_text()</a></code>). Use <code>font_file = "path/to/font.ttf"</code> or the <code>SCIMESH_FONT</code> environment variable to replace the bundled Inter font.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="what-scimesh-is-not">What scimesh is not<a class="anchor" aria-label="anchor" href="#what-scimesh-is-not"></a>
@@ -129,7 +167,7 @@
 <div class="section level3">
 <h3 id="r-package">R package<a class="anchor" aria-label="anchor" href="#r-package"></a>
 </h3>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install from GitHub</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dfsp-spirit/scimesh"</span><span class="op">)</span></span>
 <span></span>
@@ -142,16 +180,16 @@
 <div class="section level4">
 <h4 id="via-cmake-fetchcontent-recommended">Via CMake FetchContent (recommended)<a class="anchor" aria-label="anchor" href="#via-cmake-fetchcontent-recommended"></a>
 </h4>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cmake"><code class="sourceCode cmake"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="kw">include</span>(<span class="im">FetchContent</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">FetchContent_Declare</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    scimesh</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="ot">GIT_REPOSITORY</span> https://github.com/dfsp-spirit/scimesh.git</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="ot">GIT_TAG</span>        main          <span class="co"># or a release tag, e.g. v0.2.8</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">FetchContent_MakeAvailable</span>(scimesh)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="kw">add_executable</span>(<span class="bn">my_app</span> main.cpp)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="kw">target_link_libraries</span>(<span class="bn">my_app</span> <span class="ot">PRIVATE</span> scimesh)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cmake"><code class="sourceCode cmake"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="kw">include</span>(<span class="im">FetchContent</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">FetchContent_Declare</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    scimesh</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="ot">GIT_REPOSITORY</span> https://github.com/dfsp-spirit/scimesh.git</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="ot">GIT_TAG</span>        main          <span class="co"># or a release tag, e.g. v0.2.8</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">FetchContent_MakeAvailable</span>(scimesh)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="kw">add_executable</span>(<span class="bn">my_app</span> main.cpp)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="kw">target_link_libraries</span>(<span class="bn">my_app</span> <span class="ot">PRIVATE</span> scimesh)</span></code></pre></div>
 <p>That’s it — no manual source listing, include paths, or preprocessor defines needed.</p>
 </div>
 <div class="section level4">
@@ -167,7 +205,7 @@
 <div class="section level3">
 <h3 id="r">R<a class="anchor" aria-label="anchor" href="#r"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dfsp-spirit/scimesh" class="external-link">scimesh</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_sphere.html">generate_sphere</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1.2</span>,</span>
