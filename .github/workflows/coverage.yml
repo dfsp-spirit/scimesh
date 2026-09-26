@@ -35,7 +35,7 @@ jobs:
         run: ./dev_tools/coverage_cpp.sh
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cpp-coverage-html
           path: coverage/html
