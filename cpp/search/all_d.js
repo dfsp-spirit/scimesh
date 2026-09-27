@@ -19,5 +19,5 @@ var searchData=
   ['normals_16',['normals',['../structscimesh_1_1gltf__io_1_1detail_1_1PackedMesh.html#a4b96210e5e5668e185fb8ba259d5d951',1,'scimesh::gltf_io::detail::PackedMesh::normals'],['../structscimesh_1_1Mesh.html#aa2092283d1400704fb9371409b864b06',1,'scimesh::Mesh::normals']]],
   ['normals_2ecpp_17',['normals.cpp',['../normals_8cpp.html',1,'']]],
   ['normals_2eh_18',['normals.h',['../normals_8h.html',1,'']]],
-  ['not_19',['What scimesh is not',['../index.html#autotoc_md29',1,'']]]
+  ['not_19',['What scimesh is not',['../index.html#autotoc_md27',1,'']]]
 ];

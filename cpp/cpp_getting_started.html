@@ -94,18 +94,18 @@ $(document).ready(function(){initNavTree('cpp_getting_started.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>A gentle introduction to using the scimesh C++ software renderer. No OpenGL, GPU, or display server required — just a C++17 compiler.</p>
-<h2><a class="anchor" id="autotoc_md52"></a>
+<h2><a class="anchor" id="autotoc_md50"></a>
 What is scimesh C++?</h2>
 <p>scimesh is a <b>headless software renderer</b> that takes 3D triangle meshes and produces RGBA images entirely on the CPU. It is designed for scientific visualization where GPU access is unavailable or impractical: HPC clusters, CI pipelines, headless servers, and containers.</p>
 <p>The renderer supports multi-light Blinn-Phong shading, anti-aliasing, semi-transparent overlays, wireframe mode, SSAO, fog, clip planes, and procedural geometry.</p>
 <p>scimesh is <b>not</b> a game engine, raytracer, or interactive viewer. It produces static images.</p>
-<h2><a class="anchor" id="autotoc_md53"></a>
+<h2><a class="anchor" id="autotoc_md51"></a>
 Prerequisites</h2>
 <ul>
 <li>A C++17 compiler (GCC 7+, Clang 5+, MSVC 2017+)</li>
 <li>CMake 3.10 or newer</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md54"></a>
+<h2><a class="anchor" id="autotoc_md52"></a>
 Project Layout</h2>
 <p>The C++ renderer core lives in <code>src/core/</code>:</p>
 <table class="markdownTable">
@@ -139,7 +139,7 @@ Project Layout</h2>
 <td class="markdownTableBodyNone"><code>third_party/glm/</code>   </td><td class="markdownTableBodyNone">Vendored GLM math library (headers only)   </td></tr>
 </table>
 <p>To use scimesh in your own project, compile the <code>.cpp</code> files from <code>src/core/</code> alongside your code. Headers are under <code>src/core/scimesh/</code> and included as <code>#include &lt;scimesh/header.h&gt;</code>.</p>
-<h2><a class="anchor" id="autotoc_md55"></a>
+<h2><a class="anchor" id="autotoc_md53"></a>
 Minimal Example</h2>
 <p>The simplest program builds a colored cube and renders it:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="renderer_8h.html">scimesh/renderer.h</a>&gt;</span></div>
@@ -200,7 +200,7 @@ Minimal Example</h2>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html">scimesh::RenderOptions</a></div><div class="ttdoc">All settings that control rendering output.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00074">render_options.h:74</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a533958c458a0c8f7796d66716ace8976"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a533958c458a0c8f7796d66716ace8976">scimesh::RenderOptions::width</a></div><div class="ttdeci">int width</div><div class="ttdoc">Image width in pixels (default: 800).</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00079">render_options.h:79</a></div></div>
 <div class="ttc" id="atext_8cpp_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdoc">Left edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00223">text.cpp:223</a></div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md56"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md54"></a>
 Loading a PLY Mesh</h3>
 <p>Instead of generating geometry, you can load a mesh from a PLY file:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="renderer_8h.html">scimesh/renderer.h</a>&gt;</span></div>
@@ -232,9 +232,9 @@ Loading a PLY Mesh</h3>
 <div class="line">}</div>
 <div class="ttc" id="aply__io_8h_html"><div class="ttname"><a href="ply__io_8h.html">ply_io.h</a></div><div class="ttdoc">Read Stanford PLY files (.ply).</div></div>
 </div><!-- fragment --><p>Compile with <code><a class="el" href="ply__io_8cpp.html">ply_io.cpp</a></code> added to the source list (see Building below).</p>
-<h3><a class="anchor" id="autotoc_md57"></a>
+<h3><a class="anchor" id="autotoc_md55"></a>
 Building</h3>
-<h4><a class="anchor" id="autotoc_md58"></a>
+<h4><a class="anchor" id="autotoc_md56"></a>
 CMake with FetchContent (Recommended)</h4>
 <p>The easiest way to use scimesh in your own CMake project is via <code>FetchContent</code>. Add the following to your <code>CMakeLists.txt</code>:</p>
 <div class="fragment"><div class="line">include(FetchContent)</div>
@@ -249,7 +249,7 @@ CMake with FetchContent (Recommended)</h4>
 <div class="line">target_link_libraries(my_app PRIVATE scimesh)</div>
 </div><!-- fragment --><p>That's it — CMake will clone scimesh, build it as a static library, and make all headers and compiled code available to your target. No manual source listing, include paths, or preprocessor defines needed.</p>
 <p>For the in-repo examples, see any <a href="../examples/cpp/all_primitives/CMakeLists.txt"><code>examples/cpp/*/CMakeLists.txt</code></a> which use <code><a class="el" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc" title="Left edge of the bitmap, in image pixels.">add_subdirectory()</a></code> for the same effect.</p>
-<h4><a class="anchor" id="autotoc_md59"></a>
+<h4><a class="anchor" id="autotoc_md57"></a>
 Manually (without CMake)</h4>
 <p>Copy scimesh <code>src/</code> so it sits next to your project. Assuming your code is in <code>my_project/</code>, the layout should look like this:</p>
 <div class="fragment"><div class="line">parent_directory/</div>
@@ -265,9 +265,9 @@ Manually (without CMake)</h4>
 <p><code>write_tga()</code>, <code>write_bmp()</code> and <code>write_ppm()</code> need no extra defines — they use scimesh's own writers. </p>
 </blockquote>
 <p>A runnable script that manually compiles one of our demos using <code>g++</code>: <a href="../examples/cpp/all_primitives/build_manually.sh"><code>examples/cpp/all_primitives/build_manually.sh</code></a>.</p>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md58"></a>
 Core Concepts</h2>
-<h3><a class="anchor" id="autotoc_md61"></a>
+<h3><a class="anchor" id="autotoc_md59"></a>
 Mesh</h3>
 <p>A <code>Mesh</code> holds the geometry and appearance data:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> {</div>
@@ -286,7 +286,7 @@ Mesh</h3>
 <div class="ttc" id="astructscimesh_1_1Triangle_html"><div class="ttname"><a href="structscimesh_1_1Triangle.html">scimesh::Triangle</a></div><div class="ttdoc">A triangle defined by three vertex indices.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00127">types.h:127</a></div></div>
 </div><!-- fragment --><p>Colors are RGBA floats in [0, 1]:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span><a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a> { <span class="keywordtype">float</span> r, g, b, a; };</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md62"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md60"></a>
 Scene</h3>
 <p>A <code>Scene</code> is a collection of meshes rendered together:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Scene.html">Scene</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scene</a>;</div>
@@ -295,7 +295,7 @@ Scene</h3>
 <div class="ttc" id="astructscimesh_1_1Scene_html"><div class="ttname"><a href="structscimesh_1_1Scene.html">scimesh::Scene</a></div><div class="ttdoc">A collection of Mesh objects to be rendered together.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00069">scene.h:69</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Scene_html_a10d1c0a9734d6d082bcf03cab6f18fe7"><div class="ttname"><a href="structscimesh_1_1Scene.html#a10d1c0a9734d6d082bcf03cab6f18fe7">scimesh::Scene::meshes</a></div><div class="ttdeci">std::vector&lt; Mesh &gt; meshes</div><div class="ttdoc">The meshes in this scene, drawn in order.</div><div class="ttdef"><b>Definition</b> <a href="scene_8h_source.html#l00071">scene.h:71</a></div></div>
 </div><!-- fragment --><p>When meshes have semi-transparent colors (<code>has_transparency = true</code> or alpha &lt; 1), the renderer sorts them back-to-front and blends appropriately.</p>
-<h3><a class="anchor" id="autotoc_md63"></a>
+<h3><a class="anchor" id="autotoc_md61"></a>
 Camera</h3>
 <p>A <code>Camera</code> defines the viewpoint:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>;</div>
@@ -311,7 +311,7 @@ Camera</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fit an entire scene</span></div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a> = camera_fit_scene(<a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scene</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">view_dir</a>, up, 45.0f, 1.1f);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md64"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md62"></a>
 RenderOptions</h3>
 <p>Controls image size, shading, lighting, and post-processing:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1RenderOptions.html">RenderOptions</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>;</div>
@@ -338,7 +338,7 @@ RenderOptions</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Projection</span></div>
 <div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.projection = ProjectionType::ORTHOGRAPHIC;</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md65"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md63"></a>
 Renderer</h3>
 <p>The <code>Renderer</code> is the main entry point:</p>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classscimesh_1_1Renderer.html">Renderer</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">renderer</a>;</div>
@@ -354,7 +354,7 @@ Renderer</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Points</span></div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Image.html">Image</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a> = <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">renderer</a>.render_points_raw(positions, colors, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">radius</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md66"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md64"></a>
 Image</h3>
 <p><code>Image</code> stores RGBA pixels and can write to several formats:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Image.html">Image</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a>(<a class="code hl_variable" href="renderer_8cpp.html#ae426f00e82704fa09578f5446e22d915">width</a>, height);</div>
@@ -378,10 +378,10 @@ Image</h3>
 <div class="ttc" id="arenderer_8cpp_html_ae426f00e82704fa09578f5446e22d915"><div class="ttname"><a href="renderer_8cpp.html#ae426f00e82704fa09578f5446e22d915">width</a></div><div class="ttdeci">float width</div><div class="ttdef"><b>Definition</b> <a href="renderer_8cpp_source.html#l00036">renderer.cpp:36</a></div></div>
 <div class="ttc" id="astructscimesh_1_1Image_html_acec4b4478ac85999115cce27452755d5"><div class="ttname"><a href="structscimesh_1_1Image.html#acec4b4478ac85999115cce27452755d5">scimesh::Image::downsample_box</a></div><div class="ttdeci">Image downsample_box(int factor) const</div><div class="ttdoc">Downsample the image by a factor using box filtering.</div><div class="ttdef"><b>Definition</b> <a href="image_8cpp_source.html#l00077">image.cpp:77</a></div></div>
 <div class="ttc" id="atext_8cpp_html_a0a2f84ed7838f07779ae24c5a9086d33"><div class="ttname"><a href="text_8cpp.html#a0a2f84ed7838f07779ae24c5a9086d33">y</a></div><div class="ttdeci">int y</div><div class="ttdoc">Top edge of the bitmap, in image pixels.</div><div class="ttdef"><b>Definition</b> <a href="text_8cpp_source.html#l00224">text.cpp:224</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md67"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md65"></a>
 Mesh I/O</h2>
 <p>scimesh can read and write several mesh formats:</p>
-<h3><a class="anchor" id="autotoc_md68"></a>
+<h3><a class="anchor" id="autotoc_md66"></a>
 STL</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="stl__io_8h.html">scimesh/stl_io.h</a>&gt;</span></div>
 <div class="line"> </div>
@@ -389,20 +389,20 @@ STL</h3>
 <div class="line">stl_io::write(mesh, <span class="stringliteral">&quot;output.stl&quot;</span>);         <span class="comment">// binary</span></div>
 <div class="line">stl_io::write(mesh, <span class="stringliteral">&quot;output.stl&quot;</span>, <span class="keyword">true</span>);   <span class="comment">// ASCII</span></div>
 <div class="ttc" id="astl__io_8h_html"><div class="ttname"><a href="stl__io_8h.html">stl_io.h</a></div><div class="ttdoc">Read and write STL files (.stl).</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md69"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md67"></a>
 Wavefront OBJ</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="obj__io_8h.html">scimesh/obj_io.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> mesh = obj_io::read(<span class="stringliteral">&quot;model.obj&quot;</span>);</div>
 <div class="ttc" id="aobj__io_8h_html"><div class="ttname"><a href="obj__io_8h.html">obj_io.h</a></div><div class="ttdoc">Read Wavefront OBJ files (.obj).</div></div>
 </div><!-- fragment --><p>The OBJ reader supports vertices, faces, UV coordinates, and normals. For textured meshes, the texture image must be loaded separately.</p>
-<h3><a class="anchor" id="autotoc_md70"></a>
+<h3><a class="anchor" id="autotoc_md68"></a>
 Stanford PLY</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="ply__io_8h.html">scimesh/ply_io.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> mesh = ply_io::read(<span class="stringliteral">&quot;model.ply&quot;</span>);</div>
 </div><!-- fragment --><p>The PLY reader supports ASCII and binary formats, with optional per-vertex colors.</p>
-<h2><a class="anchor" id="autotoc_md71"></a>
+<h2><a class="anchor" id="autotoc_md69"></a>
 Procedural Geometry</h2>
 <p>Generate primitives without external files:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="primitives_8h.html">scimesh/primitives.h</a>&gt;</span></div>
@@ -450,7 +450,7 @@ Procedural Geometry</h2>
 <div class="line">    2.0f, 2.0f,         <span class="comment">// half-sizes</span></div>
 <div class="line">    <a class="code hl_struct" href="structscimesh_1_1Color.html">Color</a>(0.8f, 0.8f, 0.8f, 1)</div>
 <div class="line">);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md72"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md70"></a>
 Merged Primitives</h3>
 <p>For rendering many instances at once (e.g., molecular atoms), use the merged variants that combine multiple primitives into a single mesh:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="primitives_8h.html">scimesh/primitives.h</a>&gt;</span></div>
@@ -467,7 +467,7 @@ Merged Primitives</h3>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">bonds</a> = <a class="code hl_function" href="namespacescimesh.html#ac7efbd159ae6f75aee34a95204a385ee">generate_multi_cylinders</a>(<a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">starts</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">ends</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">radii</a>, colors, 12);</div>
 <div class="ttc" id="anamespacescimesh_html_a8e2e4c21efc16ecddd37b02f44757297"><div class="ttname"><a href="namespacescimesh.html#a8e2e4c21efc16ecddd37b02f44757297">scimesh::generate_multi_spheres</a></div><div class="ttdeci">Mesh generate_multi_spheres(const std::vector&lt; Vec3 &gt; &amp;centers, const std::vector&lt; float &gt; &amp;radii, const std::vector&lt; Color &gt; &amp;colors, int segments)</div><div class="ttdoc">Generate multiple spheres in a single mesh (efficient batching).</div><div class="ttdef"><b>Definition</b> <a href="primitives_8cpp_source.html#l00374">primitives.cpp:374</a></div></div>
 <div class="ttc" id="anamespacescimesh_html_ac7efbd159ae6f75aee34a95204a385ee"><div class="ttname"><a href="namespacescimesh.html#ac7efbd159ae6f75aee34a95204a385ee">scimesh::generate_multi_cylinders</a></div><div class="ttdeci">Mesh generate_multi_cylinders(const std::vector&lt; Vec3 &gt; &amp;starts, const std::vector&lt; Vec3 &gt; &amp;ends, const std::vector&lt; float &gt; &amp;radii, const std::vector&lt; Color &gt; &amp;colors, int segments, bool caps)</div><div class="ttdoc">Generate multiple cylinders in a single mesh (efficient batching).</div><div class="ttdef"><b>Definition</b> <a href="primitives_8cpp_source.html#l00402">primitives.cpp:402</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md73"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md71"></a>
 Mesh Transforms</h2>
 <p>Transform vertices without modifying colors or normals:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="transforms_8h.html">scimesh/transforms.h</a>&gt;</span></div>
@@ -480,7 +480,7 @@ Mesh Transforms</h2>
 <div class="line">glm::mat4 <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">M</a> = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));</div>
 <div class="line">transform_mesh(mesh, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">M</a>);</div>
 <div class="ttc" id="atransforms_8h_html"><div class="ttname"><a href="transforms_8h.html">transforms.h</a></div><div class="ttdoc">Mesh transformation functions: translate, scale, rotate, and general matrix transforms.</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md74"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md72"></a>
 Lighting</h2>
 <p>Scimesh works in display-referred (sRGB) colour space for simplicity. Lights are defined as structs with position, color, and intensity:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Light.html">Light</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">key_light</a>;</div>
@@ -503,20 +503,20 @@ Lighting</h2>
 <div class="ttc" id="astructscimesh_1_1Light_html_a86bd05f5af7643a671008f8910a5b791"><div class="ttname"><a href="structscimesh_1_1Light.html#a86bd05f5af7643a671008f8910a5b791">scimesh::Light::position</a></div><div class="ttdeci">Vec3 position</div><div class="ttdoc">Position of the light.</div><div class="ttdef"><b>Definition</b> <a href="types_8h_source.html#l00184">types.h:184</a></div></div>
 <div class="ttc" id="astructscimesh_1_1RenderOptions_html_a02344509b41c4ade2809002b4a9129c9"><div class="ttname"><a href="structscimesh_1_1RenderOptions.html#a02344509b41c4ade2809002b4a9129c9">scimesh::RenderOptions::lights</a></div><div class="ttdeci">std::vector&lt; Light &gt; lights</div><div class="ttdoc">List of light sources.</div><div class="ttdef"><b>Definition</b> <a href="render__options_8h_source.html#l00194">render_options.h:194</a></div></div>
 </div><!-- fragment --><p>When no lights are specified, a single headlight at <code>(0, 0, 1)</code> is used.</p>
-<h3><a class="anchor" id="autotoc_md75"></a>
+<h3><a class="anchor" id="autotoc_md73"></a>
 Contrast</h3>
 <p><code>opts.contrast</code> (default 1.0, no change) applies an S-curve contrast stretch after shading via <code>(value - 0.5) * contrast + 0.5</code>. Values &gt; 1.0 push darks toward black and lights toward white. Typical values: 1.1&ndash;1.3 for subtle contrast, up to 1.5 for dramatic.</p>
-<h3><a class="anchor" id="autotoc_md76"></a>
+<h3><a class="anchor" id="autotoc_md74"></a>
 Ambient</h3>
 <p><code>opts.ambient</code> (default 0.3) controls how much light reaches surfaces facing away from the light source. Lower values produce deeper shadows. Typical values are 0.1&ndash;0.3.</p>
-<h3><a class="anchor" id="autotoc_md77"></a>
+<h3><a class="anchor" id="autotoc_md75"></a>
 Post-Processing</h3>
 <p><code>Image::apply_contrast()</code> applies the same S-curve to an already rendered image:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Image.html">Image</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a> = <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">renderer</a>.render_mesh(mesh, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>);</div>
 <div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a>.<a class="code hl_function" href="structscimesh_1_1Image.html#a0b461734dee4b19f3e4052fb906fa355">apply_contrast</a>(1.1f);  <span class="comment">// S-curve contrast stretch</span></div>
 <div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a>.write_png(<span class="stringliteral">&quot;output.png&quot;</span>);</div>
 <div class="ttc" id="astructscimesh_1_1Image_html_a0b461734dee4b19f3e4052fb906fa355"><div class="ttname"><a href="structscimesh_1_1Image.html#a0b461734dee4b19f3e4052fb906fa355">scimesh::Image::apply_contrast</a></div><div class="ttdeci">void apply_contrast(float contrast)</div><div class="ttdoc">Apply a contrast adjustment to the image.</div><div class="ttdef"><b>Definition</b> <a href="image_8cpp_source.html#l00379">image.cpp:379</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md78"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md76"></a>
 Semi-Transparent Meshes</h2>
 <p>For transparency, set per-vertex colors with alpha &lt; 1 and mark the mesh:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Mesh.html">Mesh</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">glass_mesh</a> = <span class="comment">/* ... */</span>;</div>
@@ -530,9 +530,9 @@ Semi-Transparent Meshes</h2>
 <div class="line"><span class="comment">// The renderer sorts transparent meshes back-to-front</span></div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Image.html">Image</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">img</a> = <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">renderer</a>.render_scene(<a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scene</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>);</div>
 <div class="ttc" id="astructscimesh_1_1Mesh_html_a720f2b716dcd289713dcb2d724009437"><div class="ttname"><a href="structscimesh_1_1Mesh.html#a720f2b716dcd289713dcb2d724009437">scimesh::Mesh::has_transparency</a></div><div class="ttdeci">bool has_transparency</div><div class="ttdoc">Whether the mesh contains any transparent fragments.</div><div class="ttdef"><b>Definition</b> <a href="mesh_8h_source.html#l00187">mesh.h:187</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md79"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md77"></a>
 Camera Helpers</h2>
-<h3><a class="anchor" id="autotoc_md80"></a>
+<h3><a class="anchor" id="autotoc_md78"></a>
 Auto-framing</h3>
 <div class="fragment"><div class="line"><span class="comment">// Look from a direction, auto-distance to fit</span></div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a> = camera_fit_mesh(mesh,</div>
@@ -544,11 +544,11 @@ Auto-framing</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fit an entire scene</span></div>
 <div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a> = camera_fit_scene(<a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">scene</a>, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">view_dir</a>, up, 45.0f, 1.1f);</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md81"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md79"></a>
 Orthographic projection</h3>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>.projection = ProjectionType::ORTHOGRAPHIC;</div>
 <div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a>.fov_degrees = 40.0f;  <span class="comment">// orthographic extent</span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md82"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md80"></a>
 Orbit paths</h3>
 <p><code>camera_orbit()</code> rotates a camera's eye and up around its center:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structscimesh_1_1Camera.html">Camera</a> <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">cam</a> = camera_fit_mesh(mesh, <a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">view_dir</a>, up, 45.0f);</div>
@@ -558,12 +558,12 @@ Orbit paths</h3>
 <div class="line">    <span class="comment">// write frame...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This is useful for turntable video sequences. See <code>examples/cpp/brain_video/</code> for a complete example.</p>
-<h2><a class="anchor" id="autotoc_md83"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 Anti-Aliasing</h2>
 <p>Set <code>aa_samples</code> to 2 or 4 for supersampled anti-aliasing:</p>
 <div class="fragment"><div class="line"><a class="code hl_variable" href="text_8cpp.html#a6150e0515f7202e2fb518f7206ed97dc">opts</a>.aa_samples = 2;  <span class="comment">// 2x2 SSAA — renders at 2x resolution, downsamples</span></div>
 </div><!-- fragment --><p>Higher values produce smoother edges but use more memory and time.</p>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md82"></a>
 Examples</h2>
 <p>The <code>examples/cpp/</code> directory contains complete, runnable programs:</p>
 <table class="markdownTable">
@@ -592,7 +592,7 @@ Examples</h2>
 <div class="line">./spot_cow</div>
 </div><!-- fragment --><p>Run all examples at once:</p>
 <div class="fragment"><div class="line">./examples/cpp/run_all_cpp.sh</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md85"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md83"></a>
 Common Pitfalls</h2>
 <p><b>Black images / nothing visible:</b></p><ul>
 <li>Check that near/far planes contain your geometry. The defaults work for unit-scale meshes; for very large or distant scenes, adjust <code>opts.near_plane</code> and <code>opts.far_plane</code>.</li>
