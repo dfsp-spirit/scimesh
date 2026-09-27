@@ -53,7 +53,7 @@
       <h1>Getting Started with scimesh</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/dfsp-spirit/scimesh/blob/v0.4.0/vignettes/scimesh.Rmd" class="external-link"><code>vignettes/scimesh.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dfsp-spirit/scimesh/blob/main/vignettes/scimesh.Rmd" class="external-link"><code>vignettes/scimesh.Rmd</code></a></small>
       <div class="d-none name"><code>scimesh.Rmd</code></div>
     </div>
 
@@ -513,11 +513,30 @@ resolution, downsamples by box averaging):</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>aa_samples <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></code></pre></div>
 <p>Values of 1 (off), 2, or 4 are supported. Higher values give smoother
 edges but use proportionally more memory and time.</p>
+<div class="section level4">
+<h4 id="global-render-defaults">Global render defaults<a class="anchor" aria-label="anchor" href="#global-render-defaults"></a>
+</h4>
+<p>AA can also be switched on for a whole session instead of for every
+render call. <code><a href="../reference/render_options.html">render_options()</a></code> resolves
+<code>aa_samples</code> from the global option
+<code>scimesh.aa_samples</code> (default <code>1</code>, i.e. no AA)
+whenever you do not pass it explicitly:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scimesh.aa_samples <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>      <span class="co"># 2x2 supersampling, 4 for 4x4</span></span>
+<span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="fu"><a href="../reference/scene.html">scene</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span><span class="op">)</span>     <span class="co"># anti-aliased, no extra arguments needed</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>scimesh.aa_samples <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>   <span class="co"># back to no AA</span></span></code></pre></div>
+<p>This is most noticeable on screen-space lines and points
+(e.g. connectome edges, see <code><a href="../reference/line_layer.html">line_layer()</a></code> and
+<code><a href="../reference/render_segments.html">render_segments()</a></code>), which get smooth edges instead of a
+hard staircase pattern. The cost grows with <code>aa_samples^2</code>,
+both in render time and in memory: the internal framebuffer is
+<code>width * aa_samples</code> by <code>height * aa_samples</code>.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="wireframe-mode">Wireframe Mode<a class="anchor" aria-label="anchor" href="#wireframe-mode"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>wireframe <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    wireframe_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>  <span class="co"># black edges</span></span></code></pre></div>
 <p>Edges are computed via barycentric distance testing inside the
@@ -530,7 +549,7 @@ adapts to triangle size so small triangles don’t disappear.</p>
 <p>SSAO adds contact shadows in crevices and concavities, dramatically
 improving depth perception and realism. It’s a screen-space
 post-processing effect — no extra geometry needed:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span></span>
 <span>    ssao_enabled <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    ssao_radius <span class="op">=</span> <span class="fl">12</span>,       <span class="co"># sample radius in pixels</span></span>
@@ -550,7 +569,7 @@ color, useful for emphasising foreground objects or creating stylised
 renders. By default the fog distances are given in <strong>world
 units</strong> (distance from the camera), so a scene looks the same no
 matter where the camera is placed:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span></span>
 <span>    fog_enabled <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    fog_start <span class="op">=</span> <span class="fl">20</span>,                   <span class="co"># start fading 20 world units away</span></span>
@@ -564,7 +583,7 @@ independent of the near/far clipping planes (<code>near_plane</code>,
 fog in <strong>normalized device depth</strong> (the raw depth buffer,
 <code>-1</code> = near plane, <code>+1</code> = far plane) is still
 available, but has to be requested explicitly:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span></span>
 <span>    fog_enabled <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    fog_space <span class="op">=</span> <span class="st">"ndc"</span>,</span>
@@ -585,7 +604,7 @@ points toward the part that stays visible.</p>
 the cut is a fixed feature of the scene and does not move when the
 camera is moved — which is what makes it usable for orbit videos and
 multi-view figures:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>clip_planes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/clip_plane.html">clip_plane</a></span><span class="op">(</span>normal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, offset <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="co"># keep world x &lt;= 0</span></span></code></pre></div>
 <p>The same scene rendered from any camera position always shows the
@@ -595,7 +614,7 @@ same cut.</p>
 (the classic OpenGL <code>glClipPlane</code> behaviour). This is handy
 for camera-attached cutaways, e.g. removing everything closer than 2
 units to the viewer so that the camera always sees inside the mesh:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>clip_planes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/clip_plane.html">clip_plane</a></span><span class="op">(</span>normal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, offset <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, space <span class="op">=</span> <span class="st">"eye"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Both modes can be mixed in the same <code>clip_planes</code>
@@ -624,7 +643,7 @@ medial wall.</li>
 uniform alpha (<code>set_mesh_alpha(mesh, 0.1)</code> for the 10 % brain
 shell used as a spatial reference).</p>
 <p><strong>R example:</strong></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dfsp-spirit/scimesh" class="external-link">scimesh</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">white</span> <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.surface.html" class="external-link">read.fs.surface</a></span><span class="op">(</span><span class="st">"sub-01/surf/lh.white"</span><span class="op">)</span></span>
@@ -654,7 +673,7 @@ shell used as a spatial reference).</p>
 <p><strong>Recipe: a half-transparent medial wall</strong> (in this case
 with the cortex colored by sulcal depth, so the inside of the hemisphere
 stays visible):</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.surface.html" class="external-link">read.fs.surface</a></span><span class="op">(</span><span class="st">"sub-01/surf/lh.white"</span><span class="op">)</span></span>
 <span><span class="va">sulc</span>    <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.morph.html" class="external-link">read.fs.morph</a></span><span class="op">(</span><span class="st">"sub-01/surf/lh.sulc"</span><span class="op">)</span></span>
 <span><span class="va">cortex</span>  <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.label.html" class="external-link">read.fs.label</a></span><span class="op">(</span><span class="st">"sub-01/label/lh.cortex.label"</span><span class="op">)</span></span>
@@ -673,7 +692,7 @@ stays visible):</p>
 <span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">brain</span><span class="op">)</span>, <span class="fu"><a href="../reference/camera_auto.html">camera_auto</a></span><span class="op">(</span><span class="va">brain</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>background_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Per-vertex alpha can vary freely, which makes gradients possible:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quads</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_plane.html">generate_plane</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span>, <span class="fl">0.2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">quads</span><span class="op">$</span><span class="va">colors</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">quads</span><span class="op">$</span><span class="va">colors</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><strong>File formats:</strong> PLY vertex colors are read with their
@@ -709,7 +728,7 @@ system font is required.</p>
 <p>Positions are either <strong>world space</strong> (the default) or
 <strong>screen space</strong> (<code>space = "screen"</code>, measured
 in output pixels from the top-left corner):</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">surf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_sphere.html">generate_sphere</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">cam</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/camera_auto.html">camera_auto</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">surf</span><span class="op">)</span>, direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">500</span>, height <span class="op">=</span> <span class="fl">400</span>,</span>
@@ -736,7 +755,7 @@ in output pixels from the top-left corner):</p>
 carry world coordinates of the region they name, and are hidden when the
 surface is in front of them (unless
 <code>depth_test = FALSE</code>).</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.surface.html" class="external-link">read.fs.surface</a></span><span class="op">(</span><span class="st">"sub-01/surf/lh.white"</span><span class="op">)</span></span>
 <span><span class="va">sulc</span>    <span class="op">&lt;-</span> <span class="fu">freesurferformats</span><span class="fu">::</span><span class="fu"><a href="https://dfsp-spirit.github.io/freesurferformats/reference/read.fs.morph.html" class="external-link">read.fs.morph</a></span><span class="op">(</span><span class="st">"sub-01/surf/lh.sulc"</span><span class="op">)</span></span>
 <span><span class="va">colors</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/apply_colormap.html">apply_colormap</a></span><span class="op">(</span><span class="va">sulc</span>, colormap <span class="op">=</span> <span class="fu"><a href="../reference/viridis_colormap.html">viridis_colormap</a></span><span class="op">(</span><span class="fl">256L</span><span class="op">)</span>,</span>
@@ -813,7 +832,7 @@ setting the <code>SCIMESH_FONT</code> environment variable.</li>
 (<code>background_color = c(0, 0, 0, 0)</code>), which is ideal for
 compositing.</p>
 <p>For a solid background (e.g., white for papers), set:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_options.html">render_options</a></span><span class="op">(</span>background_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>  <span class="co"># solid white</span></span></code></pre></div>
 <p>The background color is written to the output image’s alpha channel,
 so transparent backgrounds survive PNG export and can be further
@@ -828,7 +847,7 @@ composited in tools like ImageMagick or layout packages.</p>
 </h3>
 <p>scimesh provides C++ and R functions for generating primitive
 geometry:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cube</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_cuboid.html">generate_cuboid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sphere</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_sphere.html">generate_sphere</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, radius <span class="op">=</span> <span class="fl">1.2</span>,</span>
 <span>                           segments <span class="op">=</span> <span class="fl">32</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -855,7 +874,7 @@ mode.</p>
 return a mesh descriptor list with <code>vertices</code>,
 <code>triangles</code>, and optionally <code>normals</code>,
 <code>uv</code>, or <code>colors</code>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read a Wavefront OBJ file (with optional UVs and normals)</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_obj.html">read_obj</a></span><span class="op">(</span><span class="st">"model.obj"</span><span class="op">)</span></span>
 <span></span>
@@ -880,7 +899,7 @@ vertex normals when available.</p>
 </h3>
 <p>Translate, scale, rotate, or apply arbitrary 4x4 matrices to
 meshes:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_cuboid.html">generate_cuboid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/translate_mesh.html">translate_mesh</a></span><span class="op">(</span><span class="va">mesh</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scale_mesh.html">scale_mesh</a></span><span class="op">(</span><span class="va">mesh</span>, <span class="fl">2.0</span><span class="op">)</span></span>
@@ -893,7 +912,7 @@ meshes:</p>
 <p>Per-face coloring lets you assign a single color to every vertex of a
 triangle. This is useful for parcellation overlays or material
 assignment:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_cuboid.html">generate_cuboid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 12 triangles, each gets a color</span></span>
@@ -906,7 +925,7 @@ vertex <code>colors</code>.</p>
 <h3 id="texture-mapping">Texture Mapping<a class="anchor" aria-label="anchor" href="#texture-mapping"></a>
 </h3>
 <p>Load a texture image, give the mesh UV coordinates and render it:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Requires the 'png' package</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.rforge.net/png/" class="external-link">png</a></span><span class="op">)</span></span>
 <span><span class="va">tex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/png/man/readPNG.html" class="external-link">readPNG</a></span><span class="op">(</span><span class="st">"texture.png"</span><span class="op">)</span>   <span class="co"># H x W x C array, row 1 = top of the image</span></span>
@@ -927,7 +946,7 @@ have to supply <code>uv</code> yourself. Note also that OBJ files, rgl,
 OpenGL and tools like Blender store UVs with the <em>opposite</em>
 origin (<code>v = 0</code> at the bottom of the image); convert such
 coordinates once with <code><a href="../reference/flip_uvs.html">flip_uvs()</a></code>:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># UVs taken from an OBJ file / another 3D tool: v = 0 is the bottom</span></span>
 <span><span class="va">uv_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flip_uvs.html">flip_uvs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>vertices <span class="op">=</span> <span class="va">mesh</span><span class="op">$</span><span class="va">vertices</span>, triangles <span class="op">=</span> <span class="va">mesh</span><span class="op">$</span><span class="va">triangles</span>,</span>
@@ -944,7 +963,7 @@ including the UV conversion.</p>
 <h4 id="bounding-box">Bounding Box<a class="anchor" aria-label="anchor" href="#bounding-box"></a>
 </h4>
 <p>Compute or visualise the axis-aligned bounding box:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_torus.html">generate_torus</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1.5</span>, <span class="fl">0.4</span>, <span class="fl">32</span>, <span class="fl">16</span><span class="op">)</span></span>
 <span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mesh_bbox.html">mesh_bbox</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="va">bbox</span><span class="op">$</span><span class="va">min</span>  <span class="co"># c(xmin, ymin, zmin)</span></span>
@@ -957,7 +976,7 @@ including the UV conversion.</p>
 <h4 id="axis-arrows">Axis Arrows<a class="anchor" aria-label="anchor" href="#axis-arrows"></a>
 </h4>
 <p>Generate coloured XYZ axis arrows (red X, green Y, blue Z):</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">axes_mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_axes.html">generate_axes</a></span><span class="op">(</span>center <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Render together with your mesh:</span></span>
 <span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">mesh</span>, <span class="va">axes_mesh</span><span class="op">)</span>, <span class="va">cam</span><span class="op">)</span></span></code></pre></div>
@@ -974,7 +993,7 @@ scimesh provides lower-level functions for special use cases.</p>
 </h3>
 <p>Render geometry where positions and colors are flat arrays with 3
 vertices per triangle — useful for dynamically generated geometry:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>, <span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>, <span class="fl">0.5</span>,<span class="fl">1</span>,<span class="fl">0</span>,</span>
 <span>                      <span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>, <span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">1</span>, <span class="fl">0.5</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>, <span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">1</span>, <span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">1</span>,</span>
@@ -986,7 +1005,7 @@ vertices per triangle — useful for dynamically generated geometry:</p>
 <h3 id="points">Points<a class="anchor" aria-label="anchor" href="#points"></a>
 </h3>
 <p>Render point cloud data with depth-tested circular markers:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">300</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_points.html">render_points</a></span><span class="op">(</span><span class="va">pts</span>, <span class="va">cols</span>, radius <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
@@ -995,7 +1014,7 @@ vertices per triangle — useful for dynamically generated geometry:</p>
 <h3 id="lines-as-cylinders">Lines (as Cylinders)<a class="anchor" aria-label="anchor" href="#lines-as-cylinders"></a>
 </h3>
 <p>Render line segments as thin cylinders:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">from</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>, <span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">to</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>, <span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>, <span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -1010,7 +1029,7 @@ vertices per triangle — useful for dynamically generated geometry:</p>
 </h3>
 <p>scimesh can produce horizontal or vertical colour bars in pure R (no
 X11), ready to be composed alongside rendered images:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/colorbar_horizontal.html">colorbar_horizontal</a></span><span class="op">(</span><span class="va">viridis_colormap</span>,</span>
 <span>    n_colors <span class="op">=</span> <span class="fl">256</span>, width <span class="op">=</span> <span class="fl">600</span>, height <span class="op">=</span> <span class="fl">80</span>,</span>
 <span>    ticks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -1024,7 +1043,7 @@ as: - <strong>A function</strong> returning hex colors (e.g.,
 <code><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">viridisLite::viridis</a></code>) - <strong>A vector of color
 strings</strong> (e.g., <code>c("red", "white", "blue")</code>)</p>
 <p>Built-in colormaps (no extra packages required):</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Viridis (perceptually uniform, colourblind-friendly)</span></span>
 <span><span class="fu"><a href="../reference/viridis_colormap.html">viridis_colormap</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span></span>
 <span></span>
@@ -1039,7 +1058,7 @@ strings</strong> (e.g., <code>c("red", "white", "blue")</code>)</p>
 <span><span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/colorbar_horizontal.html">colorbar_horizontal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"darkblue"</span>, <span class="st">"cyan"</span>, <span class="st">"yellow"</span>, <span class="st">"red"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>If you have <code>viridisLite</code> installed, you can use its full
 colormap family (magma, inferno, plasma, cividis) directly:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridisLite/" class="external-link">viridisLite</a></span><span class="op">)</span></span>
 <span><span class="va">cbar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/colorbar_horizontal.html">colorbar_horizontal</a></span><span class="op">(</span><span class="va">viridis</span><span class="op">)</span>  <span class="co"># viridisLite function</span></span></code></pre></div>
 <p>See <code>examples/R/colormaps/run.R</code> for a complete
@@ -1050,7 +1069,7 @@ demonstration.</p>
 </h3>
 <p><code><a href="../reference/compose_layout.html">compose_layout()</a></code> arranges rendered images in a grid with
 optional per-row/per-column cropping to eliminate wasted whitespace:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">img1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_mesh.html">render_mesh</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">img2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_mesh.html">render_mesh</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compose_layout.html">compose_layout</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">img1</span>, <span class="va">img2</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1L</span>, crop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -1062,7 +1081,7 @@ optional per-row/per-column cropping to eliminate wasted whitespace:</p>
 <h3 id="image-stacking">Image Stacking<a class="anchor" aria-label="anchor" href="#image-stacking"></a>
 </h3>
 <p>Quick helpers for combining images:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Horizontal stack (side by side)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stack_horizontal.html">stack_horizontal</a></span><span class="op">(</span><span class="va">img1</span>, <span class="va">img2</span>, <span class="va">img3</span><span class="op">)</span></span>
 <span></span>
@@ -1091,13 +1110,13 @@ conversion needed.</p>
 <code>vb</code> and <code>it</code> components) directly to
 <code><a href="../reference/render_mesh.html">render_mesh()</a></code> or include it in a scene list for
 <code><a href="../reference/render_scene.html">render_scene()</a></code> — the conversion happens automatically:</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rgl"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">rgl_mesh</span> <span class="op">&lt;-</span> <span class="fu">rgl</span><span class="fu">::</span><span class="fu">tetrahedron3d</span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_mesh.html">render_mesh</a></span><span class="op">(</span><span class="va">rgl_mesh</span><span class="op">)</span>          <span class="co"># transparent conversion</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>This also works when mixing scimesh and rgl meshes in a scene:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cube</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_cuboid.html">generate_cuboid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_scene.html">render_scene</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cube</span>, <span class="va">rgl_mesh</span><span class="op">)</span>, <span class="va">cam</span><span class="op">)</span>   <span class="co"># mixed formats</span></span></code></pre></div>
 </div>
@@ -1108,7 +1127,7 @@ conversion needed.</p>
 This also works <strong>without the rgl package</strong> installed — any
 list with <code>vb</code> and <code>it</code> components is
 accepted:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tmesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    vb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    it <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2L</span>, <span class="fl">3L</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3L</span>, <span class="fl">4L</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1121,7 +1140,7 @@ accepted:</p>
 <p>Convert a scimesh mesh back to rgl’s <code>tmesh3d</code> format with
 <code><a href="../reference/mesh_to_rgl.html">mesh_to_rgl()</a></code>. Vertex colors are forwarded automatically if
 present in the mesh:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_cuboid.html">generate_cuboid</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">rgl_mesh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mesh_to_rgl.html">mesh_to_rgl</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rgl"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1140,7 +1159,7 @@ and <code>mat</code> (material/colors).</p>
 visually match what you’d see in an rgl window. Pass
 <code>rgl_compat = TRUE</code> to <code><a href="../reference/camera_auto.html">camera_auto()</a></code> to get
 rgl’s default 30° FOV, 15° elevation, and bounding-sphere distance:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rgl"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">rgl_mesh</span> <span class="op">&lt;-</span> <span class="fu">rgl</span><span class="fu">::</span><span class="fu">cube3d</span><span class="op">(</span><span class="op">)</span>             <span class="co"># rgl primitive</span></span>
 <span>    <span class="va">cam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/camera_auto.html">camera_auto</a></span><span class="op">(</span><span class="va">rgl_mesh</span>, rgl_compat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -1164,7 +1183,7 @@ morphometrics), and <a href="https://cran.r-project.org/package=fsbrain" class="
 transparently accepts rgl meshes, you can process a mesh with any of
 these packages and render it with scimesh <strong>without any conversion
 step</strong>:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"Rvcg"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">Rvcg</span><span class="fu">::</span><span class="fu">vcgSphere</span><span class="op">(</span><span class="op">)</span>          <span class="co"># returns rgl-format mesh</span></span>
 <span>    <span class="va">img</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_mesh.html">render_mesh</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span>          <span class="co"># scimesh renders it directly</span></span>
@@ -1218,8 +1237,8 @@ step</strong>:</p>
 </tbody>
 </table>
 <p>Run all examples at once:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="bu">cd</span> examples/R</span>
-<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a><span class="fu">bash</span> run_all_R.sh</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="bu">cd</span> examples/R</span>
+<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a><span class="fu">bash</span> run_all_R.sh</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
